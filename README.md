@@ -1,13 +1,49 @@
-# Forward-app
+# Forward-app Backend Notes
 
-Hey everyone I made a repo inside the 'forward-curriculum' group just as a start to what itll become
-ive copied the last bits of the meeting notes down here so that its within the repo and not just
-the google doc.
+Django backend for the Forward application.
 
+## Project Structure
+```
+Forward-app/
+├── api/               # API endpoints and serializers
+│   ├── urls.py       
+│   ├── views.py      
+│   └── serializers.py
+│
+├── core/              # Business logic and models
+│   ├── models.py    
+│   └── services.py
+│
+├── forward/           # Project root
+│   ├── settings.py    
+│   └── urls.py
+```
 
-Backend Team (Lalo/Andrew/Aidan)
-Determine what is needed for users, database, course integration, etc.
-Determine curriculum structure and its shape in DB
-Frontend
-Login screen and information
-Build out routes and endpoints (e.g., Teacher dashboard, homepage, lesson)
+## Setup
+
+1. Create and activate a virtual environment:
+```bash
+python -m venv .venv
+
+# Windows
+venv\Scripts\activate
+
+# Mac/Linux
+source venv/bin/activate
+```
+
+2. Install requirements
+```bash
+pip install django djangorestframework
+```
+
+3. Run migrations
+```bash
+python manage.py migrate
+```
+
+4. Run the development server
+```bash
+python manage.py runserver
+```
+The server will be running at http://localhost:8000
