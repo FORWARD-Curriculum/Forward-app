@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function Header() {
     return <>
         <div className="flex bg-cyan-500 text-white box-border items-center px-12 h-18 w-full">

@@ -1,4 +1,5 @@
 import './App.css'
+import React from 'react';
 import Dashboard from './pages/Dashboard';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -10,7 +11,7 @@ function App() {
       Page = <h1>Home</h1>
       break;
     case "/dashboard":
-      Page = <Dashboard className='mx-100 mt-18'/>
+      Page = <Dashboard className='mx-4 lg:mx-[15vw] mt-18'/>
       break;
     default:
       Page = <h1>404: Page not found</h1>
