@@ -2,6 +2,9 @@
 
 Django backend for the Forward application.
 
+## Endpoints
+- POST `/api/users`: New user registration
+
 ## Project Structure
 ```
 Forward-app/
