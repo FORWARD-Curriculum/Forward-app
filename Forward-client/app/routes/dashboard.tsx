@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect } from 'react'
+import {type ReactNode, useState, useEffect } from 'react'
 import React from 'react';
 import { ChevronDown, ChevronUp, Expand, FileVolume } from 'lucide-react';
 import Pie from '../components/progress';
@@ -59,7 +59,7 @@ function Accordion(props: { children?: ReactNode }) {
 export default function Dashboard({ className = "" }: { className?: string }) {
   const [sortType, setSortType] = useState<"recent" | "date" | "progress">("progress");
 
-  /*
+  /* TODO: grab from api instead of hardcoding*/
   const lessons: Lesson[] = [
     {
       name: "Going to College",
@@ -83,10 +83,10 @@ export default function Dashboard({ className = "" }: { className?: string }) {
       last_date: new Date("Feb 2, 2025"),
     }
   ]
-    */
+    
 
-  const [lessons, setLessons] = useState<Lesson[] | null>(null);
-
+  //const [lessons, setLessons] = useState<Lesson[] | null>(null);
+  /*
   useEffect(() => {
     fetch('http://localhost:3000/lessons')
       .then((res) => {
@@ -96,16 +96,17 @@ export default function Dashboard({ className = "" }: { className?: string }) {
         setLessons(data);
       });
   }, []);
-
+*/
   const user: User = {
     name: "Sam Meyers",
     username: "ChillSam08",
     id: "0"
   }
+    
 
 
   return (
-    <><div className={className ? className : ""}>
+    <><div className='mx-4 lg:mx-[15vw] my-12'>
       <div className='flex gap-3 w-full text-sm mb-4'>
         <p>Filter By:</p>
         <button className='bg-white text-center px-8 rounded-md drop-shadow-xs' onClick={() => { setSortType("recent") }}>Recent</button>
