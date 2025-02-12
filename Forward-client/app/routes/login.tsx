@@ -1,10 +1,17 @@
+import { useLocation, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
+import { useAuth } from "@/lib/useAuth";
 
 export default function Login() {
     const [error, setError] = useState(null);
+    const login = useAuth().login;
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
+
     const handleSubmit = async (e: any) => {
 
         e.preventDefault(); // Prevent the default form submission behavior
@@ -17,7 +24,7 @@ export default function Login() {
 
         try {
             /* TODO: change api domain*/
-            const response = await fetch('/api/login', {
+            const response = await fetch('/api/sessions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -25,12 +32,26 @@ export default function Login() {
                 body: JSON.stringify(data),
             });
 
+
             if (!response.ok) {
                 throw new Error('Failed to login');
             }
 
+
+            (response: {
+                message: string;
+                user: {
+                    id: string;
+                    username: string;
+                    firstName: string;
+                    lastName: string;
+                };
+            }) => {
+                login(response.user);
+            }
+
             // Redirect to the dashboard on success
-            window.location.href = '/dashboard';
+            navigate(from, { replace: true });
         } catch (err: any) {
             setError(err.message);
         }
@@ -38,34 +59,34 @@ export default function Login() {
 
     return (
         <div className="flex justify-center items-center w-screen grow">
-        <div className="bg-white rounded-3xl w-fit p-6 flex flex-col items-center">
-            <h1 className="text-xl font-medium">Login to an existing account</h1>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6 my-6">
-                <div>
-                <label htmlFor="username">Username</label>
-                <Input
-                    type="text"
-                    name="username"
-                    id="username"
-                    placeholder="Username"
-                    className="input min-w-[25vw]"
-                    required
-                /></div>
-                <div><label htmlFor="password">Password</label>
-                <PasswordInput
-                    name="password"
-                    id="password"
-                    placeholder="Password"
-                    className="input"
-                    disabled={false}
-                /></div>
-                <Button type="submit" className="button w-full bg-cyan-500 text-white" variant={"outline"}>
-                    Login
-                </Button>
-                {error && <p className="text-red-500 w-full text-center">{error}</p>}
-            </form>
-            <p className="text-center text-gray-400">Don't have an account? <br/><a href="/register">Sign Up</a> instead</p>
-        </div>
+            <div className="bg-white rounded-3xl w-fit p-6 flex flex-col items-center">
+                <h1 className="text-xl font-medium">Login to an existing account</h1>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-6 my-6">
+                    <div>
+                        <label htmlFor="username">Username</label>
+                        <Input
+                            type="text"
+                            name="username"
+                            id="username"
+                            placeholder="Username"
+                            className="input min-w-[25vw]"
+                            required
+                        /></div>
+                    <div><label htmlFor="password">Password</label>
+                        <PasswordInput
+                            name="password"
+                            id="password"
+                            placeholder="Password"
+                            className="input"
+                            disabled={false}
+                        /></div>
+                    <Button type="submit" className="button w-full bg-cyan-500 text-white" variant={"outline"}>
+                        Login
+                    </Button>
+                    {error && <p className="text-red-500 w-full text-center">{error}</p>}
+                </form>
+                <p className="text-center text-gray-400">Don't have an account? <br /><a href="/register">Sign Up</a> instead</p>
+            </div>
         </div>
     );
 };
