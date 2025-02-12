@@ -1,6 +1,6 @@
 export default function Footer() {
     return <>
-        <div className="flex flex-col bg-gray-200 text-gray-400 box-border items-center px-12 py-4 h-25 left-0 bottom-0 right-0 w-full space-y-0.5 absolute">
+        <div className="flex flex-col bg-gray-200 **:!text-gray-400 **:!no-underline  box-border items-center px-12 py-4 h-25 left-0 bottom-0 right-0 w-full space-y-0.5">
             <a href="/" className="text-xl font-medium text-left w-full">FORWARD</a>
             <ul className=" list-none flex gap-1 items-center">
                 <li>
