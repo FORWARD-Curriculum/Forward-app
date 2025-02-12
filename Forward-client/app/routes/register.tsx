@@ -2,25 +2,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
+import { useAuth } from "@/lib/useAuth";
 
 export default function Login() {
     const [error, setError] = useState(null);
     const [instructor, setInstructor] = useState(false);
 
     const handleSubmit = async (e: any) => {
-
+        const login = useAuth().login;
         e.preventDefault();
 
 
 
         const formData = new FormData(e.target);
         const data = {
-            first_name: formData.get('first_name'),
-            last_name: formData.get('last_name'),
             username: formData.get('username'),
             password: formData.get('password'),
-            iid: formData.get('institution'),
+            password_confirm: formData.get('password2'),
             email: formData.get('email'),
+            first_name: formData.get('first_name'),
+            last_name: formData.get('last_name'),
+            iid: formData.get('institution'),
         };
 
         const password = formData.get("password") as string;
@@ -35,7 +37,7 @@ export default function Login() {
 
         try {
             /* TODO: change api domain*/
-            const response = await fetch('/api/register', {
+            const response = await fetch('/api/users', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -45,6 +47,18 @@ export default function Login() {
 
             if (!response.ok) {
                 throw new Error('Failed to login');
+            }
+
+            (response: {
+                message: string;
+                user: {
+                    id: string;
+                    username: string;
+                    firstName: string;
+                    lastName: string;
+                };
+            }) => {
+                login(response.user);
             }
 
             // Redirect to the dashboard on success
