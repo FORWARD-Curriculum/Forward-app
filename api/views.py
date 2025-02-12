@@ -3,7 +3,8 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserRegistrationSerializer
+from .serializers import UserLoginSerializer, UserRegistrationSerializer
+from core.services import UserService
 
 class UserRegistrationView(generics.CreateAPIView):
     """
@@ -57,7 +58,7 @@ class UserRegistrationView(generics.CreateAPIView):
         Raises:
             ValidationError: If the registration data is invalid
         """
-        serializer = self.get_serializer(data=request.data)
+        serializer: UserRegistrationSerializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True) # Validates the data, raises exception if invalid
         user = serializer.save() # Creates the user
 
@@ -66,8 +67,23 @@ class UserRegistrationView(generics.CreateAPIView):
             "user": {
                 "id": user.id,
                 "username": user.username,
-                "email": user.email,
                 "first_name": user.first_name,
                 "last_name": user.last_name
             }
         }, status=status.HTTP_201_CREATED)
+    
+class UserLoginView(generics.GenericAPIView):
+    serializer_class = UserLoginSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer: UserLoginSerializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.validated_data['user']
+        user_data = UserService.login_user(request, user)
+
+        return Response({
+            'message': 'Login successful',
+            'user': user_data
+        }, status=status.HTTP_200_OK)

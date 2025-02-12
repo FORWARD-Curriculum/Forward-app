@@ -12,7 +12,6 @@ class UserRegistrationViewTests(TestCase):
             'username': 'testuser',
             'password': 'StrongPass123!',
             'password_confirm': 'StrongPass123!',
-            'email': 'test@example.com',
             'first_name': 'Test',
             'last_name': 'User',
             'date_of_birth': '1990-01-01'
@@ -76,3 +75,45 @@ class UserRegistrationViewTests(TestCase):
         
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(User.objects.count(), 1)
+
+class UserLoginTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.login_url = reverse('user-login')
+        
+        # Create a test user
+        self.user_data = {
+            'username': 'testuser',
+            'password': 'StrongPass123!',
+            'first_name': 'Test',
+            'last_name': 'User'
+        }
+        self.user = User.objects.create_user(**self.user_data)
+
+    def test_login_success(self):
+        """Test successful login"""
+        response = self.client.post(self.login_url, {
+            'username': self.user_data['username'],
+            'password': self.user_data['password']
+        })
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['user']['username'], self.user_data['username'])
+        self.assertEqual(response.data['message'], 'Login successful')
+
+    def test_login_invalid_credentials(self):
+        """Test login with invalid credentials"""
+        response = self.client.post(self.login_url, {
+            'username': self.user_data['username'],
+            'password': 'wrongpassword'
+        })
+        
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_login_missing_fields(self):
+        """Test login with missing fields"""
+        response = self.client.post(self.login_url, {
+            'username': self.user_data['username']
+        })
+        
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

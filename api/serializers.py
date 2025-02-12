@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from core.models import User
 
@@ -30,7 +31,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'username',
             'password',
             'password_confirm',
-            'email',
             'first_name',
             'last_name',
             'date_of_birth'
@@ -61,7 +61,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             })
         return attrs
     
-    def create(self, validated_data):
+    def create(self, validated_data: dict):
         """
         Create a new user instance.
         
@@ -81,3 +81,35 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         # Delegate user creation to the service layer
         from core.services import UserService
         return UserService.create_user(validated_data)
+    
+class UserLoginSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(
+        required=True,
+        write_only=True,
+        style={'input_type': 'password'}
+    )
+
+    def validate(self, attrs: dict):
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        if username and password:
+            user = authenticate(
+                request=self.context.get('request'),
+                username=username,
+                password=password
+            )
+            if not user:
+                raise serializers.ValidationError(
+                    'Unable to log in with provided credentials.',
+                    code='authorization'
+                )
+        else:
+            raise serializers.ValidationError(
+                'Must include "username" and "password".',
+                code='authorization'
+            )
+        
+        attrs['user'] = user
+        return attrs

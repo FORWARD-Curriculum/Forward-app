@@ -1,5 +1,6 @@
 # Business logic
 from django.db import transaction
+from django.contrib.auth import login
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import User
@@ -7,7 +8,7 @@ from .models import User
 class UserService:
     @staticmethod
     @transaction.atomic
-    def create_user(data):
+    def create_user(data: dict):
         """
         Create a new user with validated data
         
@@ -28,10 +29,9 @@ class UserService:
             # Create user instance but don't save yet
             user = User(
                 username=data['username'],
-                email=data.get('email'),
                 first_name=data['first_name'],
                 last_name=data['last_name'],
-                date_of_birth=data.get('date_of_birth')
+                date_of_birth=data.get('date_of_birth') # (optional) TODO may be removed
             )
             
             # Set password (this handles the hashing)
@@ -45,3 +45,28 @@ class UserService:
             raise ValidationError({'password': e.messages})
         except KeyError as e:
             raise ValidationError(f'Missing required field: {str(e)}')
+        
+    @staticmethod
+    def login_user(request, user: User):
+        """
+        Log in a user and create a session
+        
+        Args:
+            request: The HTTP request object
+            user: The authenticated user instance
+            
+        Returns:
+            dict: User data including authentication token if used
+        """
+        try:
+            # Log the user in (validates with HTTP session storage)
+            login(request, user)
+
+            return {
+                'id': user.id,
+                'username': user.username,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+            }
+        except Exception as e:
+            raise ValidationError('login failed. Please try again.')
