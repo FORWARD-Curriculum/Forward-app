@@ -1,5 +1,4 @@
 import { useAuth } from '@/lib/useAuth';
-import { Button } from './ui/button';
 import * as DropdownMenu from '@/components/ui/dropdown-menu';
 
 export default function Header() {

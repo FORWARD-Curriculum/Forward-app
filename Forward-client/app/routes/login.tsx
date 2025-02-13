@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useAuth } from "@/lib/useAuth";
+import type { User } from "@/lib/useUser";
 
 export default function Login() {
     const [error, setError] = useState(null);
@@ -15,16 +16,16 @@ export default function Login() {
     const handleSubmit = async (e: any) => {
 
         e.preventDefault(); // Prevent the default form submission behavior
-
+        console.log("submitting form");
         const formData = new FormData(e.target);
         const data = {
-            username: formData.get('username'),
-            password: formData.get('password'),
+            "username": formData.get('username'),
+            "password": formData.get('password'),
         };
 
         try {
             /* TODO: change api domain*/
-            const response = await fetch('/api/sessions', {
+            const response = await fetch('/api/sessions/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -37,18 +38,15 @@ export default function Login() {
                 throw new Error('Failed to login');
             }
 
-
-            (response: {
-                message: string;
-                user: {
-                    id: string;
-                    username: string;
-                    firstName: string;
-                    lastName: string;
-                };
-            }) => {
-                login(response.user);
+            const result = await response.json();
+            const user: User = {
+                id: result.user.id,
+                username: result.user.username,
+                firstName: result.user.first_name,
+                lastName: result.user.last_name,
             }
+
+            login(user);
 
             // Redirect to the dashboard on success
             navigate(from, { replace: true });

@@ -3,16 +3,16 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useAuth } from "@/lib/useAuth";
+import type { User } from "@/lib/useUser";
 
 export default function Login() {
     const [error, setError] = useState(null);
     const [instructor, setInstructor] = useState(false);
+    const login = useAuth().login;
 
     const handleSubmit = async (e: any) => {
-        const login = useAuth().login;
+
         e.preventDefault();
-
-
 
         const formData = new FormData(e.target);
         const data = {
@@ -22,7 +22,6 @@ export default function Login() {
             email: formData.get('email'),
             first_name: formData.get('first_name'),
             last_name: formData.get('last_name'),
-            iid: formData.get('institution'),
         };
 
         const password = formData.get("password") as string;
@@ -37,7 +36,7 @@ export default function Login() {
 
         try {
             /* TODO: change api domain*/
-            const response = await fetch('/api/users', {
+            const response = await fetch('/api/users/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -49,17 +48,15 @@ export default function Login() {
                 throw new Error('Failed to login');
             }
 
-            (response: {
-                message: string;
-                user: {
-                    id: string;
-                    username: string;
-                    firstName: string;
-                    lastName: string;
-                };
-            }) => {
-                login(response.user);
+            const result = await response.json();
+            const user: User = {
+                id: result.user.id,
+                username: result.user.username,
+                firstName: result.user.first_name,
+                lastName: result.user.last_name,
             }
+            
+            login(user);
 
             // Redirect to the dashboard on success
             window.location.href = '/dashboard';

@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
@@ -61,15 +62,11 @@ class UserRegistrationView(generics.CreateAPIView):
         serializer: UserRegistrationSerializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True) # Validates the data, raises exception if invalid
         user = serializer.save() # Creates the user
+        user_data = UserService.login_user(request, user) # Logs the user in and returns user data  
 
         return Response({
             "message": "User registered successfully",
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "first_name": user.first_name,
-                "last_name": user.last_name
-            }
+            'user': user_data
         }, status=status.HTTP_201_CREATED)
     
 class UserLoginView(generics.GenericAPIView):
@@ -86,4 +83,12 @@ class UserLoginView(generics.GenericAPIView):
         return Response({
             'message': 'Login successful',
             'user': user_data
+        }, status=status.HTTP_200_OK)
+        
+class UserLogoutView(APIView):
+    def post(self, request, *args, **kwargs):
+        print(request)
+        UserService.logout_user(request)
+        return Response({
+            'message': 'Logout successful',
         }, status=status.HTTP_200_OK)
