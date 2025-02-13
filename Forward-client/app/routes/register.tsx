@@ -2,25 +2,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
+import { useAuth } from "@/lib/useAuth";
+import type { User } from "@/lib/useUser";
 
 export default function Login() {
     const [error, setError] = useState(null);
     const [instructor, setInstructor] = useState(false);
+    const login = useAuth().login;
 
     const handleSubmit = async (e: any) => {
 
         e.preventDefault();
 
-
-
         const formData = new FormData(e.target);
         const data = {
-            first_name: formData.get('first_name'),
-            last_name: formData.get('last_name'),
             username: formData.get('username'),
             password: formData.get('password'),
-            iid: formData.get('institution'),
+            password_confirm: formData.get('password2'),
             email: formData.get('email'),
+            first_name: formData.get('first_name'),
+            last_name: formData.get('last_name'),
         };
 
         const password = formData.get("password") as string;
@@ -35,7 +36,7 @@ export default function Login() {
 
         try {
             /* TODO: change api domain*/
-            const response = await fetch('/api/register', {
+            const response = await fetch('/api/users/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -46,6 +47,16 @@ export default function Login() {
             if (!response.ok) {
                 throw new Error('Failed to login');
             }
+
+            const result = await response.json();
+            const user: User = {
+                id: result.user.id,
+                username: result.user.username,
+                firstName: result.user.first_name,
+                lastName: result.user.last_name,
+            }
+            
+            login(user);
 
             // Redirect to the dashboard on success
             window.location.href = '/dashboard';

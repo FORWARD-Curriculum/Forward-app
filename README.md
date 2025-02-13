@@ -48,6 +48,18 @@ Django backend for the Forward application.
 }
 ```
 
+### POST `/api/logout`: User logout
+#### Request format
+```json
+{}
+```
+#### Response format
+```json
+{
+    "message":"Logout successful"
+}
+```
+
 ## Project Structure
 ```
 Forward-app/
