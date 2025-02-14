@@ -1,6 +1,6 @@
 # Business logic
 from django.db import transaction
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import User
@@ -70,3 +70,20 @@ class UserService:
             }
         except Exception as e:
             raise ValidationError('login failed. Please try again.')
+        
+    @staticmethod
+    def logout_user(request):
+        """
+        Log out a user and destroy the session
+        
+        Args:
+            request: The HTTP request object
+            
+        Returns:
+            dict: User data including authentication token if used
+        """
+        try:
+            # Log the user out (validates with HTTP session storage)
+            logout(request)
+        except Exception as e:
+            raise ValidationError('logout failed. Please try again.')
