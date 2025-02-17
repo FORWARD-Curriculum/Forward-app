@@ -1,0 +1,38 @@
+# Node
+node_modules
+npm-debug.log
+dist
+build
+.next
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
+pip-log.txt
+*.egg-info/
+*.egg
+
+# Development/IDE
+.git
+.gitignore
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+.dockerignore
+Dockerfile*
+docker-compose*
+
+# Project specific (add any large files/directories you don't need)
+tests/
+docs/
+*.log
+media/

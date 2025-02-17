@@ -2,6 +2,7 @@ import {type ReactNode, useState, useEffect } from 'react'
 import React from 'react';
 import { ChevronDown, ChevronUp, Expand, FileVolume } from 'lucide-react';
 import Pie from '../components/progress';
+import { useAuth } from '@/lib/useAuth';
 
 interface Lesson {
   name: string;
@@ -11,11 +12,7 @@ interface Lesson {
   last_date: Date;
 }
 
-interface User {
-  name: string;
-  username: string;
-  id: string
-}
+export async function clientLoader(){}
 
 function LessonCard(props: { lesson?: Lesson, children?: ReactNode }) {
   return <div className='bg-gray-100 rounded-2xl pt-3'>
@@ -58,6 +55,7 @@ function Accordion(props: { children?: ReactNode }) {
 
 export default function Dashboard({ className = "" }: { className?: string }) {
   const [sortType, setSortType] = useState<"recent" | "date" | "progress">("progress");
+  const {user} = useAuth();
 
   /* TODO: grab from api instead of hardcoding*/
   const lessons: Lesson[] = [
@@ -97,11 +95,7 @@ export default function Dashboard({ className = "" }: { className?: string }) {
       });
   }, []);
 */
-  const user: User = {
-    name: "Sam Meyers",
-    username: "ChillSam08",
-    id: "0"
-  }
+
     
 
 
@@ -142,8 +136,8 @@ export default function Dashboard({ className = "" }: { className?: string }) {
           <div className='bg-white rounded-3xl p-4 flex items-center gap-3 h-fit w-full'>
             <img src='/pfp.png' className='max-w-16' />
             <div className='text-left'>
-              <h3 className='text-lg'>{user.name}</h3>
-              <p className='text-sm text-gray-400'>{user.username}</p>
+              <h3 className='text-lg'>{user?.firstName} {user?.lastName}</h3>
+              <p className='text-sm text-gray-400'>{user?.username}</p>
             </div>
             <button className='ml-auto'>Edit</button>
           </div>

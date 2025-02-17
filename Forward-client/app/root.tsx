@@ -25,6 +25,7 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
+
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
@@ -41,8 +42,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+
+
 export default function App() {
-  return <Outlet />;
+
+  return (
+
+    <Outlet />
+
+  )
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
