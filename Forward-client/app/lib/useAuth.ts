@@ -6,7 +6,7 @@ import { useLocalStorage } from "@/lib/useLocalStorage";
 const getCookie = (name: string) => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(';').shift();
+  if (parts.length === 2) return parts.pop()?.split(";").shift();
 };
 
 export const useAuth = () => {
@@ -36,19 +36,27 @@ export const useAuth = () => {
     addUser(user);
   };
 
-  const logout = () => {
-    fetch("/api/logout/", {
-      method: "POST",
-      headers: {
-        "X-CSRFToken": getCookie("csrftoken") || "",
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({})
-    }).then((response) => {
-      if (response.ok) {
-        removeUser();
+  const logout = async () => {
+    try {
+      // TODO: Write an API calling function that automatically adds token for auth
+      const response = await fetch("/api/logout/", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken") || "",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to Log Out, please try again.");
       }
-    });
+
+      removeUser();
+    } catch (error) {
+      console.error("Logout failed:", error);
+      throw error; // This propagates the error to the caller
+    }
   };
 
   return { user, loading, login, logout, setUser };
