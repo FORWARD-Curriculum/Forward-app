@@ -18,7 +18,6 @@ export default function Login() {
       username: formData.get("username"),
       password: formData.get("password"),
       password_confirm: formData.get("password2"),
-      email: formData.get("email"),
       first_name: formData.get("first_name"),
       last_name: formData.get("last_name"),
     };
@@ -44,17 +43,25 @@ export default function Login() {
         },
         body: JSON.stringify(data),
       });
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error("Failed to login");
+        // Handle field-specific errors
+        if (result.detail && typeof result.detail === "object") {
+          const errorMessages = Object.values(result.detail)
+            .map(messages => (messages as string[]).join("\n"))
+            .join("\n");
+          throw new Error(errorMessages);
+        }
+        // Handle simple string errors
+        throw new Error(result.detail);
       }
 
-      const result = await response.json();
       const user: User = {
-        id: result.user.id,
-        username: result.user.username,
-        firstName: result.user.first_name,
-        lastName: result.user.last_name,
+        id: result.data.user.id,
+        username: result.data.user.username,
+        firstName: result.data.user.first_name,
+        lastName: result.data.user.last_name,
       };
 
       login(user);
