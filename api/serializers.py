@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from core.models import User
@@ -33,7 +34,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'password_confirm',
             'first_name',
             'last_name',
-            'date_of_birth'
         ]
         # Override default optional fields to make them required
         extra_kwargs = {
@@ -94,22 +94,20 @@ class UserLoginSerializer(serializers.Serializer):
         username = attrs.get('username')
         password = attrs.get('password')
 
-        if username and password:
-            user = authenticate(
-                request=self.context.get('request'),
-                username=username,
-                password=password
-            )
-            if not user:
-                raise serializers.ValidationError(
-                    'Unable to log in with provided credentials.',
-                    code='authorization'
-                )
-        else:
+        if not username or not password:
             raise serializers.ValidationError(
-                'Must include "username" and "password".',
-                code='authorization'
+                'Both username and password are required.',
+                code='validation'
             )
+
+        user = authenticate(
+            request=self.context.get('request'),
+            username=username,
+            password=password
+        )
         
+        if not user:
+            raise AuthenticationFailed('Invalid credentials')
+
         attrs['user'] = user
         return attrs

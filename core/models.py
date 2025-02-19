@@ -34,14 +34,6 @@ class User(AbstractUser):
         validators=[MinLengthValidator(2)]
     )
 
-    # Optional date of birth field
-    # Both null and blank are True to make it optional
-    date_of_birth = models.DateField(
-        'date of birth',
-        null=True,
-        blank=True
-    )
-
     # Automatically set when the user is created and updated
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -52,21 +44,6 @@ class User(AbstractUser):
         """
         full_name = f'{self.first_name} {self.last_name}'
         return full_name.strip()
-    
-    def get_age(self):
-        """
-        Calculate age from date of birth
-        """
-        if not self.date_of_birth:
-            return None
-        
-        from datetime import date
-        today = date.today()
-
-        # accounts for birth dates that haven't occurred yet this year
-        return today.year - self.date_of_birth.year - (
-            (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
-        )
     
     def __str__(self):
         """

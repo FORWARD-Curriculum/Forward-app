@@ -57,6 +57,9 @@ class UserService:
             
         Returns:
             dict: User data including authentication token if used
+
+        Raises:
+            ValidationError: If login fails
         """
         try:
             # Log the user in (validates with HTTP session storage)
