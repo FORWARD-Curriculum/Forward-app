@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserLoginSerializer, UserRegistrationSerializer
@@ -18,17 +18,6 @@ class UserRegistrationView(generics.CreateAPIView):
     - Returns the created user's details
     
     Endpoint: POST /api/register/
-    
-    Request body:
-    {
-        "username": "string",
-        "password": "string",
-        "password_confirm": "string",
-        "email": "string",
-        "first_name": "string",
-        "last_name": "string",
-        "date_of_birth": "YYYY-MM-DD"
-    }
     
     Returns:
         201 Created - On successful registration
@@ -69,12 +58,28 @@ class UserRegistrationView(generics.CreateAPIView):
             'user': user_data
         }, status=status.HTTP_201_CREATED)
     
-class UserLoginView(generics.GenericAPIView):
-    serializer_class = UserLoginSerializer
-    permission_classes = [AllowAny]
+class SessionView(APIView):
+    """
+    API endpoint for managing user sessions.
+    
+    GET: Retrieve current user's session information
+    POST: Create a new session (login)
+    """
+    
+    def get_permissions(self):
+        """
+        Only POST requests do not require authentication.
+        """
+        if self.request.method == 'POST':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def post(self, request, *args, **kwargs):
-        serializer: UserLoginSerializer = self.get_serializer(data=request.data)
+        """
+        Handle user login and create a new session.
+        Accessible to unauthenticated users.
+        """
+        serializer = UserLoginSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
 
         user = serializer.validated_data['user']
@@ -84,11 +89,29 @@ class UserLoginView(generics.GenericAPIView):
             'message': 'Login successful',
             'user': user_data
         }, status=status.HTTP_200_OK)
-        
-class UserLogoutView(APIView):
-    def post(self, request, *args, **kwargs):
-        print(request)
+
+    def delete(self, request, *args, **kwargs):
+        """End the current session (logout)"""
         UserService.logout_user(request)
         return Response({
             'message': 'Logout successful',
         }, status=status.HTTP_200_OK)
+        
+class CurrentUserView(APIView):
+    """Endpoint for retrieving current user information"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        """
+        Return the current user's information.
+        Only accessible to authenticated users.
+        """
+        user = request.user
+        return Response({
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+            }
+        })
