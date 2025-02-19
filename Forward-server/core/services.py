@@ -31,7 +31,6 @@ class UserService:
                 username=data['username'],
                 first_name=data['first_name'],
                 last_name=data['last_name'],
-                #date_of_birth=data.get('date_of_birth') # (optional) TODO may be removed
             )
             
             # Set password (this handles the hashing)
@@ -66,10 +65,12 @@ class UserService:
             login(request, user)
 
             return {
-                'id': user.id,
-                'username': user.username,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                }
             }
         except Exception as e:
             raise ValidationError('login failed. Please try again.')

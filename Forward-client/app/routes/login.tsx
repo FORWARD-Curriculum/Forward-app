@@ -32,19 +32,18 @@ export default function Login() {
         },
         body: JSON.stringify(data),
       });
+      const result = await response.json();
 
       if (!response.ok) {
-        const detail = await response.json();
-        toast.error(detail.detail?detail.detail:"Hmm... something went wrong")
-        throw new Error(detail.detail);
+        toast.error("Hmm... something went wrong")
+        throw new Error(result.detail||"Login error.");
       } 
 
-      const result = await response.json();
       const user: User = {
-        id: result.user.id,
-        username: result.user.username,
-        firstName: result.user.first_name,
-        lastName: result.user.last_name,
+        id: result.data.user.id,
+        username: result.data.user.username,
+        firstName: result.data.user.first_name,
+        lastName: result.data.user.last_name,
       };
 
       login(user);

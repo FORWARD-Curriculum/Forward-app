@@ -1,108 +1,242 @@
-# Forward-app Backend Notes
+# API Documentation
 [Back to Main Docs](../README.md)
 
-Django backend for the Forward application.
+#### All responses follow a consistent format
+```json
+{
+  "detail": "Some message",
+  "data": {
+    "exampleObject": {
+      "exampleField1": "content",
+      "exampleField2": "more content"
+    }
+  }
+}
+```
+
+#### For **Unauthorized** requests (no valid session/credentials):
+
+* Status Code: 401 UNAUTHORIZED
+* Default Response Body:
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
+
+#### For **Unauthorized** reqeusts (authenticated but forbidden):
+
+* Status Code: 403 FORBIDDEN
+* Default Response Body:
+```json
+{
+  "detail": "You do not have permission to perform this action."
+}
+```
 
 ## Endpoints
-### POST `/api/users`: New user registration
-#### Request format
-```json
-{
-    "username": "your_username",
-    "password": "your_password",
-    "password_confirm": "your_confirmed_password",
-    "first_name": "Your",
-    "last_name": "Name"
-}
-```
-#### Response format
-```json
-{
-    "message": "User registered successfully",
-    "user": {
-        "id": 1,
-        "username": "your_username",
-        "first_name": "Your",
-        "last_name": "Name"
+
+### Get the Current User
+
+Returns the information about the current user that is logged in.
+
+* Require Authentication: **true**
+* Request
+  * Method: GET
+  * URL: /api/users/me/
+  * Body: *none*
+
+* Response
+  * Status Code: 200 OK
+  * Headers:
+    * Content-Type: application/json
+  * Body:
+    ```json
+    {
+      "data": {
+        "user": {
+          "id": 1,
+          "username": "JohnSmith",
+          "firstName": "John",
+          "lastName": "Smith"
+        }
+      }
     }
-}
-```
+    ```
 
-### POST `/api/sessions`: User login
-#### Request format
-```json
-{
-    "username": "your_username",
-    "password": "your_password"
-}
-```
-#### Response format
-```json
-{
-    "message": "Login successful",
-    "user": {
-        "id": 1,
-        "username": "your_username",
-        "first_name": "Your",
-        "last_name": "Name"
+### Log In a User
+
+Logs in a current user with valid credentials and returns the current user's
+information.
+
+* Require Authentication: **false**
+* Request
+  * Method: POST
+  * URL: /api/sessions/
+  * Headers:
+    * Content-Type: application/json
+  * Body:
+
+    ```json
+    {
+      "username": "JohnSmith",
+      "password": "secret password"
     }
-}
-```
+    ```
 
-### POST `/api/logout`: User logout
-#### Request format
-```json
-{}
-```
-#### Response format
-```json
-{
-    "message":"Logout successful"
-}
-```
+* Response
+  * Status Code: 200 OK
+  * Headers:
+    * Content-Type: application/json
+  * Body:
+    ```json
+    {
+      "detail": "Login successful",
+      "data": {
+        "user": {
+          "id": 1,
+          "username": "JohnSmith",
+          "firstName": "John",
+          "lastName": "Smith"
+        }
+      }
+    }
+    ```
 
-## Project Structure
-```
-Forward-app/
-├── api/               # API endpoints and serializers
-│   ├── urls.py       
-│   ├── views.py      
-│   └── serializers.py
-│
-├── core/              # Business logic and models
-│   ├── models.py    
-│   └── services.py
-│
-├── forward/           # Project root
-│   ├── settings.py    
-│   └── urls.py
-```
+* Error Response: Invalid credentials
+  * Status Code: 401 UNAUTHORIZED
+  * Headers:
+    * Content-Type: application/json
+  * Body:
+    ```json
+    {
+      "detail": "Invalid credentials"
+    }
+    ```
 
-## Setup
+* Error response: Body validation errors
+  * Status Code: 400 BAD_REQUEST
+  * Headers:
+    * Content-Type: application/json
+  * Body:
 
-1. Create and activate a virtual environment:
-```bash
-python -m venv .venv
+    ```json
+    {
+      "detail": "Both username and password are required."
+    }
+    ```
 
-# Windows
-venv\Scripts\activate
+### Log out a user
 
-# Mac/Linux
-source venv/bin/activate
-```
+Logs out the current user by terminating the session.
 
-2. Install requirements
-```bash
-pip install django djangorestframework
-```
+* Require Authentication: **true**
+* Request
+  * Method: DELETE
+  * URL: /api/sessions/
+  * Headers:
+    * Content-Type: application/json
+  * Body: *none*
 
-3. Run migrations
-```bash
-python manage.py migrate
-```
+* Response
+  * Status Code: 200 OK
+  * Headers:
+    * Content-Type: application/json
+  * Body:
+  ```json
+  {
+    "detail": "Logout successful"
+  }
+  ```
 
-4. Run the development server
-```bash
-python manage.py runserver
-```
-The server will be running at http://localhost:8000
+### Sign Up a User
+
+Creates a new user, logs them in as the current user, and returns the current
+user's information.
+
+* Require Authentication: **false**
+* Request
+  * Method: POST
+  * URL: /api/users/
+  * Headers:
+    * Content-Type: application/json
+  * Body:
+    ```json
+    {
+      "username": "JohnSmith",
+      "password": "secret password",
+      "password_confirm": "secret password",
+      "firstName": "John",
+      "lastName": "Smith"
+    }
+    ```
+
+* Response
+  * Status Code: 201 CREATED
+  * Headers:
+    * Content-Type: application/json
+  * Body:
+    ```json
+    {
+      "detail": "Registration successful",
+      "data": {
+        "user": {
+          "id": 1,
+          "username": "JohnSmith",
+          "firstName": "John",
+          "lastName": "Smith"
+        }
+      }
+    }
+    ```
+
+* Error response: Body validation errors
+  * Status Code: 400
+  * Headers:
+    * Content-Type: application/json
+  * Body:
+    1. Missing required fields:
+    ```json
+    {
+      "detail": {
+        "username": "This field is required.",
+        "password": "This field is required.",
+        "password_confirm": "This field is required.",
+        "first_name": "This field is required.",
+        "last_name": "This field is required."
+      },
+    }
+    ```
+    2. Password validation errors:
+    ```json
+    {
+      "detail": {
+        "password": [
+          "This password is too short. It must contain at least 8 characters.",
+          "This password is too common.",
+          "This password is entirely numeric."
+        ] 
+      }
+    }
+    ```
+    3. Passwords don't match:
+    ```json
+    {
+      "detail": "Password fields didn't match."
+    }
+    ```
+    4. Username already exists:
+    ```json
+    {
+      "detail": "username: A user with that username already exists."
+    }
+    ```
+    5. Invalid field length:
+    ```json
+    {
+      "detail": {
+        "first_name": "Ensure this field has at least 2 characters.",
+        "last_name": "Ensure this field has at least 2 characters.",
+      }
+    }
+    ```

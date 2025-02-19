@@ -44,23 +44,25 @@ export default function Login() {
         },
         body: JSON.stringify(data),
       });
+      const result = await response.json();
 
       if (!response.ok) {
-        const json = await response.json();
-        const err = json.detail||
-        json.username||
-        json.password||
-        "Hmm... something went wrong"
-        toast.error(err);
-        throw new Error(err);
-      } 
+        // Handle field-specific errors
+        if (result.detail && typeof result.detail === "object") {
+          const errorMessages = Object.values(result.detail)
+            .map(messages => (messages as string[]).join("\n"))
+            .join("\n");
+          throw new Error(errorMessages);
+        }
+        // Handle simple string errors
+        throw new Error(result.detail);
+      }
 
-      const result = await response.json();
       const user: User = {
-        id: result.user.id,
-        username: result.user.username,
-        firstName: result.user.first_name,
-        lastName: result.user.last_name,
+        id: result.data.user.id,
+        username: result.data.user.username,
+        firstName: result.data.user.first_name,
+        lastName: result.data.user.last_name,
       };
 
       login(user);
@@ -176,12 +178,14 @@ export default function Login() {
               Create Account
             </Button>
           </div>
-          
+          {error && <p className="text-red-500 w-full text-center">{error}</p>}
         </form>
-        {error && <p className="text-red-500 w-full text-center text-wrap max-w-100">{error}</p>}
         <p className="text-center text-gray-400">
           Already have an account? <br />
-          <a href="/login" className="text-blue-500 underline">Log In</a> instead
+          <a href="/login" className="text-blue-500 underline">
+            Log In
+          </a>{" "}
+          instead
         </p>
       </div>
     </div>

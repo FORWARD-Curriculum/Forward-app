@@ -54,16 +54,16 @@ export const useAuth = () => {
           "X-CSRFToken": getCookie("csrftoken") || "",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({}),
       });
+      const result = await response.json();
       
       if (!response.ok) {
-        throw new Error("Failed to Log Out, please try again.");
+        throw new Error(result.detail);
       }
 
       removeUser();
-    } catch (error) {
-      //console.error("Logout failed:", error);
+    } catch (error: any) {
+      console.error(error.message || "Logout failed. Please try again.");
       throw error; // This propagates the error to the caller
     }
   };
