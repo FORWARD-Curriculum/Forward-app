@@ -31,7 +31,7 @@ class UserService:
                 username=data['username'],
                 first_name=data['first_name'],
                 last_name=data['last_name'],
-                date_of_birth=data.get('date_of_birth') # (optional) TODO may be removed
+                #date_of_birth=data.get('date_of_birth') # (optional) TODO may be removed
             )
             
             # Set password (this handles the hashing)

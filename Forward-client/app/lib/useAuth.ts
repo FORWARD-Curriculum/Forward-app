@@ -39,8 +39,8 @@ export const useAuth = () => {
   const logout = async () => {
     try {
       // TODO: Write an API calling function that automatically adds token for auth
-      const response = await fetch("/api/logout/", {
-        method: "POST",
+      const response = await fetch("/api/sessions/", {
+        method: "DELETE",
         headers: {
           "X-CSRFToken": getCookie("csrftoken") || "",
           "Content-Type": "application/json",

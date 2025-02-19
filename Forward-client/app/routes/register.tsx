@@ -4,6 +4,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useAuth } from "@/lib/useAuth";
 import type { User } from "@/lib/useUser";
+import { toast } from "sonner";
 
 export default function Login() {
   const [error, setError] = useState(null);
@@ -18,7 +19,6 @@ export default function Login() {
       username: formData.get("username"),
       password: formData.get("password"),
       password_confirm: formData.get("password2"),
-      email: formData.get("email"),
       first_name: formData.get("first_name"),
       last_name: formData.get("last_name"),
     };
@@ -46,8 +46,14 @@ export default function Login() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to login");
-      }
+        const json = await response.json();
+        const err = json.detail||
+        json.username||
+        json.password||
+        "Hmm... something went wrong"
+        toast.error(err);
+        throw new Error(err);
+      } 
 
       const result = await response.json();
       const user: User = {
@@ -170,8 +176,9 @@ export default function Login() {
               Create Account
             </Button>
           </div>
-          {error && <p className="text-red-500 w-full text-center">{error}</p>}
+          
         </form>
+        {error && <p className="text-red-500 w-full text-center text-wrap max-w-100">{error}</p>}
         <p className="text-center text-gray-400">
           Already have an account? <br />
           <a href="/login" className="text-blue-500 underline">Log In</a> instead

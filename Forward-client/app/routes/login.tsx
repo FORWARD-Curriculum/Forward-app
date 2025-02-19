@@ -34,9 +34,10 @@ export default function Login() {
       });
 
       if (!response.ok) {
-        toast.error("Hmm... something went wrong")
-        throw new Error("Failed to login");
-      }
+        const detail = await response.json();
+        toast.error(detail.detail?detail.detail:"Hmm... something went wrong")
+        throw new Error(detail.detail);
+      } 
 
       const result = await response.json();
       const user: User = {
