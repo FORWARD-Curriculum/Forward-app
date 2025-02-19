@@ -1,8 +1,7 @@
 # Forward App
 ### Useful Links
-- [API Docs](Forward-server/API-Docs.md)
 - [Client/Frontend Notes](Forward-client/README.md)
-- [Server/Backend Notes](Forward-server/README.md)
+- [API Documentation](Forward-server/README.md)
 
 ## Testing
 ### Docker

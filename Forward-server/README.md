@@ -1,4 +1,5 @@
 # API Documentation
+[Back to Main Docs](../README.md)
 
 #### All responses follow a consistent format
 ```json

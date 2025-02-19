@@ -36,8 +36,8 @@ export default function Login() {
 
       if (!response.ok) {
         toast.error("Hmm... something went wrong")
-        throw new Error(result.detail);
-      }
+        throw new Error(result.detail||"Login error.");
+      } 
 
       const user: User = {
         id: result.data.user.id,
