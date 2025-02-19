@@ -38,7 +38,11 @@ const Text = ({ percentage, size = 200 }: { percentage: number; size: number }) 
     </text>
   );
 };
-
+/**
+ * A circle who's border represents something's progress
+ * @param {number} percentage - 0-100
+ * @returns 
+ */
 const Pie = ({ percentage, color, size = 200 }: { percentage: number; color: string; size: number }) => {
   const pct = cleanPercentage(percentage);
   return (

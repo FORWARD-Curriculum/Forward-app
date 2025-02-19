@@ -2,6 +2,10 @@ import React, { useContext } from "react";
 import { AuthContext } from "@/components/authContext";
 import { useLocalStorage } from "@/lib/useLocalStorage";
 
+/**
+ * Represents a User, usually provided by the server
+ * @interface
+ */
 export interface User {
     firstName: string;
     lastName: string;

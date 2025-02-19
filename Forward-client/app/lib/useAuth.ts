@@ -32,10 +32,19 @@ export const useAuth = () => {
     setLoading(false); // Loading complete
   }, [user, addUser, getItem]);
 
+  /**
+   * Adds a user's information to LocalStorage and updates the AuthContext
+   * @param {User} user - The constructed User object from the backend
+   */
   const login = (user: User) => {
     addUser(user);
   };
 
+  /**
+   * Sends a request to the backend to delete the current user session
+   * @throws Logout Error
+   * @async
+   */
   const logout = async () => {
     try {
       // TODO: Write an API calling function that automatically adds token for auth
@@ -54,7 +63,7 @@ export const useAuth = () => {
 
       removeUser();
     } catch (error) {
-      console.error("Logout failed:", error);
+      //console.error("Logout failed:", error);
       throw error; // This propagates the error to the caller
     }
   };

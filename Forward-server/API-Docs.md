@@ -1,5 +1,5 @@
 # API Documentation
-
+[Back to Main Docs](../README.md)
 #### For **Unauthorized** requests (no valid session/credentials):
 
 * Status Code: 401 UNAUTHORIZED
