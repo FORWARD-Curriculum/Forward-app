@@ -110,6 +110,43 @@ class Lesson(models.Model):
     def get_ordered_sections(self):
         """Returns all sections for this lesson in their specified order."""
         return self.sections.all().order_by('order')
+
+class TextContent(models.Model):
+    """
+    Model for text-based content sections within a lesson.
+    Can contain formatted text, HTML, or markdown content.
+    """
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='text_contents',
+        help_text="The lesson this content belongs to"
+    )
+    
+    title = models.CharField(
+        max_length=200,
+        validators=[MinLengthValidator(3)],
+        help_text="The title of this content section"
+    )
+    
+    content = models.TextField(
+        help_text="The main content text, can include HTML/markdown formatting"
+    )
+    
+    order = models.PositiveIntegerField(
+        help_text="Order within the lesson"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "text content"
+        verbose_name_plural = "text contents"
+        
+    def __str__(self):
+        return f"Text Content: {self.title}"
     
 class BaseActivity(models.Model):
     """
@@ -228,3 +265,51 @@ class Question(models.Model):
     def __str__(self):
         return f"Question {self.order}: {self.question_text[:50]}..."
     
+class Poll(BaseActivity):
+    """
+    Model for Poll activities. Unlike quizzes, polls don't have correct answers and focus on collecting
+    and optionally displaying aggregate responses.
+    """
+    config = models.JSONField(
+        default=dict,
+        help_text="Configuration options for poll display and behavior"
+    )
+
+    class Meta:
+        verbose_name = "poll"
+        verbose_name_plural = "polls"
+
+class PollQuestion(models.Model):
+    """Models for individual poll questions within a poll"""
+    poll = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        related_name="polls",
+        help_text="The poll this poll question belongs to"
+    )
+
+    question_text = models.TextField(
+        help_text="The text of the poll question"
+    )
+    
+    options = models.JSONField(
+        help_text="Available options for the poll question"
+    )
+    
+    allow_multiple = models.BooleanField(
+        default=False,
+        help_text="Whether multiple options can be selected"
+    )
+    
+    order = models.PositiveIntegerField(
+        help_text="Order within the poll"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order']
+        
+    def __str__(self):
+        return f"Poll Question {self.order}: {self.question_text[:50]}..."

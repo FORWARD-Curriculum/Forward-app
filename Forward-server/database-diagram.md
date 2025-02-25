@@ -129,47 +129,47 @@ erDiagram
     - Can have multiple associated media assets
     - Supports different video types and sources through metadata
 
-4. Quiz
+4. MediaAsset
+    - Stores metadata for video and other media files
+    - Links directly to VideoContent
+    - Contains technical information about the media
+    - Supports different file types and formats
+    - Includes file size and content type information
+
+5. Quiz
     - Assessment component containing multiple questions
     - Includes instructions and configurable passing score
     - Contains feedback configuration for different score ranges
     - Can track student performance and completion
     - Ordered within the lesson flow
 
-5. Poll
-    - Interactive polling component with multiple questions
-    - Used for gathering student opinions or preferences
-    - Can include various configuration options for display and interaction
-    - Results can be shown to students or kept private
-    - No "correct" answers, unlike quizzes
-
-6. PollQuestion
-    - Individual questions within a poll
-    - Contains multiple choice options in JSON format
-    - Can allow single or multiple selections
-    - Ordered within its parent poll
-    - Stores response options and configuration
-
-7. WritingActivity
-    - Free-form writing exercises or assignments
-    - Contains instructions and multiple optional prompts
-    - Can include helper text or example responses
-    - Supports different types of writing activities through configuration
-    - May include word count limits or other constraints
-
-8. Question
+6. Question
     - Individual questions within a quiz
     - Supports multiple question types (multiple choice, true/false, etc.)
     - Can have correct answers for automatic grading
     - Includes required/optional status
     - Ordered within its parent quiz
 
-9. MediaAsset
-    - Stores metadata for video and other media files
-    - Links directly to VideoContent
-    - Contains technical information about the media
-    - Supports different file types and formats
-    - Includes file size and content type information
+7. Poll
+    - Interactive polling component with multiple questions
+    - Used for gathering student opinions or preferences
+    - Can include various configuration options for display and interaction
+    - Results can be shown to students or kept private
+    - No "correct" answers, unlike quizzes
+
+8. PollQuestion
+    - Individual questions within a poll
+    - Contains multiple choice options in JSON format
+    - Can allow single or multiple selections
+    - Ordered within its parent poll
+    - Stores response options and configuration
+
+9. WritingActivity
+    - Free-form writing exercises or assignments
+    - Contains instructions and multiple optional prompts
+    - Can include helper text or example responses
+    - Supports different types of writing activities through configuration
+    - May include word count limits or other constraints
 
 ## Common Fields
 
