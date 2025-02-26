@@ -51,12 +51,15 @@ Returns the information about the current user that is logged in.
 
     ```json
     {
-      "user": {
-        "id": 1,
-        "firstName": "John",
-        "lastName": "Smith",
-        "email": "john.smith@gmail.com",
-        "username": "JohnSmith"
+      "detail":"successful response for getting current user",
+      "data": {
+        "user": {
+          "id": 1,
+          "firstName": "John",
+          "lastName": "Smith",
+          "email": "john.smith@gmail.com",
+          "username": "JohnSmith"
+        }
       }
     }
     ```
@@ -101,6 +104,8 @@ information.
 
     ```json
     {
+      "detail":"",
+      "data": {},
       "user": {
         "id": 1,
         "firstName": "John",
@@ -158,7 +163,8 @@ user's information.
       "lastName": "Smith",
       "email": "john.smith@gmail.com",
       "username": "JohnSmith",
-      "password": "secret password"
+      "password": "secret password",
+      "passwordConfirm": "secret password"
     }
     ```
 
@@ -170,13 +176,17 @@ user's information.
 
     ```json
     {
-      "user": {
+      "detail": "successful user creation completed",
+      "data": {
+        "user": {
         "id": 1,
         "firstName": "John",
         "lastName": "Smith",
         "email": "john.smith@gmail.com",
         "username": "JohnSmith"
-      }
+        }
+      },
+
     }
     ```
 
@@ -245,12 +255,15 @@ Retrieves a quiz by its ID.
   * Body:
     ```json
     {
-      "id": "12345",
-      "title": "Random Quiz Title",
-      "lesson_id": "67890",
-      "instructions": "Complete all questions within 10 minutes.",
-      "passing_score": 80,
-      "feedback": "Great job! Keep practicing."
+      "detail":" successfully retrieved a quiz by its id",
+      "data": {
+        "id": "12345",
+        "title": "Random Quiz Title",
+        "lesson_id": "67890",
+        "instructions": "Complete all questions within 10 minutes.",
+        "passing_score": 80,
+        "feedback": "Great job! Keep practicing."
+      },
     }
     ```
 
@@ -287,10 +300,13 @@ submits results of quiz along with its data
 
       ```json
       {
-        "testId":1,
-        "userId":1,
-        "score":70,
-        "totalTimeTaken": "1h"
+        "detail":" successfully submitted a quiz and recieved its results",
+        "data": {
+          "testId":1,
+          "userId":1,
+          "score":70,
+          "totalTimeTaken": "1h"
+        },
       }
       ```
 
@@ -314,18 +330,21 @@ Returns all the readings
 
     ```json
     {
-      "Readings": [
-        {
-          "id": 1,
-          "lessonId": 9495793,
-          "title": "first reading",
-          "order": 1,
-          "content": "Lorem ipsum ...",
-          "readingPt2": "Lorem ipsum ...",
-          "CreatedAt": "2025-02-24 09:40:06.183551",
-          "UpdatedAt": "2025-02-24 09:40:06.183551"
-        }
-      ]
+      "detail":" successfully retrieved text content by its lesson id",
+      "data": {
+        "Readings": [
+          {
+            "id": 1,
+            "lessonId": 9495793,
+            "title": "first reading",
+            "order": 1,
+            "content": "Lorem ipsum ...",
+            "readingPt2": "Lorem ipsum ...",
+            "CreatedAt": "2025-02-24 09:40:06.183551",
+            "UpdatedAt": "2025-02-24 09:40:06.183551"
+          }
+        ]
+      },
     }
     ```
 * Error response: Couldn't find a reading with the specified id
@@ -357,12 +376,15 @@ Retrieves a lesson by its ID.
   * Body:
     ```json
     {
-      "id": "1",
-      "title": "college 101",
-      "description": "helps you with college basics",
-      "objectives": ["Understand college system", "learn what kind of colleges there are"],
-      "created_at": "2024-02-01T12:00:00Z",
-      "updated_at": "2024-02-15T08:30:00Z"
+      "detail":"successfully retrieved a lesson by its id",
+      "data": {
+        "id": "1",
+        "title": "college 101",
+        "description": "helps you with college basics",
+        "objectives": ["Understand college system", "learn what kind of colleges there are"],
+        "created_at": "2024-02-01T12:00:00Z",
+        "updated_at": "2024-02-15T08:30:00Z"
+      },
     }
     ```
 ## video content
@@ -383,14 +405,17 @@ Retrieves video content by its lesson Id.
   * Body:
     ```json
     {
-      "id": "20",
-      "lesson_id": "1",
-      "title": "Introduction Video",
-      "order": 2,
-      "description": "An introductory video on programming concepts.",
-      "video_metadata": {"duration": "5 minutes", "resolution": "1080p"},
-      "created_at": "2024-02-02T14:30:00Z",
-      "updated_at": "2024-02-15T09:15:00Z"
+      "detail":" successfully retrieved video content by its lesson id",
+        "data": {
+        "id": "20",
+        "lesson_id": "1",
+        "title": "Introduction Video",
+        "order": 2,
+        "description": "An introductory video on programming concepts.",
+        "video_metadata": {"duration": "5 minutes", "resolution": "1080p"},
+        "created_at": "2024-02-02T14:30:00Z",
+        "updated_at": "2024-02-15T09:15:00Z"
+      },
     }
     ```
 
@@ -409,14 +434,17 @@ Retrieves a media asset by its videocontent id.
   * Body:
     ```json
     {
-      "id": "30",
-      "video_content_id": "20",
-      "file_path": "https://example.com/video.mp4",
-      "asset_type": "video",
-      "metadata": {"codec": "H.264", "bitrate": "3Mbps"},
-      "content_type": "video/mp4",
-      "file_size": 52428800,
-      "created_at": "2024-02-02T15:00:00Z"
+      "detail":"",
+      "data": {
+        "id": "30",
+        "video_content_id": "20",
+        "file_path": "https://example.com/video.mp4",
+        "asset_type": "video",
+        "metadata": {"codec": "H.264", "bitrate": "3Mbps"},
+        "content_type": "video/mp4",
+        "file_size": 52428800,
+        "created_at": "2024-02-02T15:00:00Z"
+      },
     }
     ```
 ## poll
@@ -437,14 +465,17 @@ Retrieves a poll by its lesson id.
   * Body:
     ```json
     {
-      "id": "40",
-      "lesson_id": "1",
-      "title": "what is your plan for college",
-      "order": 3,
-      "instructions": "pick your preferred option",
-      "configuration": {"allow_multiple": false},
-      "created_at": "2024-02-02T16:00:00Z",
-      "updated_at": "2024-02-15T10:00:00Z"
+      "detail":"successfully retireved poll by its lesson id",
+      "data": {
+        "id": "40",
+        "lesson_id": "1",
+        "title": "what is your plan for college",
+        "order": 3,
+        "instructions": "pick your preferred option",
+        "configuration": {"allow_multiple": false},
+        "created_at": "2024-02-02T16:00:00Z",
+        "updated_at": "2024-02-15T10:00:00Z"
+      },
     }
     ```
 
@@ -464,6 +495,8 @@ get all poll questions based on the poll id
   * Body:
     ```json
     {
+      "detail":"successfully retrieved poll question by its poll id",
+      "data": {
         "id":1,
         "poll_id":93549349,
         "questionText": "what is your favorite thing about college?",
@@ -472,6 +505,7 @@ get all poll questions based on the poll id
         "order":1,
         "created_at": "2024-02-02T16:00:00Z",
         "updated_at": "2024-02-15T10:00:00Z"
+      },
     }
     ```
 
@@ -493,13 +527,16 @@ Retrieves a writing activity by its lesson id.
   * Body:
     ```json
     {
-      "id": "50",
-      "lesson_id": "1",
-      "title": "Write a Short Paragraph about what you learned",
-      "order": 4,
-      "instructions": "Write your favorite part of what you've read or watched.",
-      "prompts": ["take your time", "be honest when answering"],
-      "created_at": "2024-02-02T17:00:00Z",
-      "updated_at": "2024-02-15T11:00:00Z"
+      "detail":" successfully retrieved writing activity by lesson id",
+      "data": {
+        "id": "50",
+        "lesson_id": "1",
+        "title": "Write a Short Paragraph about what you learned",
+        "order": 4,
+        "instructions": "Write your favorite part of what you've read or watched.",
+        "prompts": ["take your time", "be honest when answering"],
+        "created_at": "2024-02-02T17:00:00Z",
+        "updated_at": "2024-02-15T11:00:00Z"
+      },
     }
     ```
