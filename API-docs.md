@@ -104,15 +104,16 @@ information.
 
     ```json
     {
-      "detail":"",
-      "data": {},
-      "user": {
-        "id": 1,
-        "firstName": "John",
-        "lastName": "Smith",
-        "email": "john.smith@gmail.com",
-        "username": "JohnSmith"
-      }
+      "detail":"successfully logged in the user",
+      "data": {
+        "user": {
+          "id": 1,
+          "firstName": "John",
+          "lastName": "Smith",
+          "email": "john.smith@gmail.com",
+          "username": "JohnSmith"
+        }
+      },
     }
     ```
 
@@ -179,14 +180,13 @@ user's information.
       "detail": "successful user creation completed",
       "data": {
         "user": {
-        "id": 1,
-        "firstName": "John",
-        "lastName": "Smith",
-        "email": "john.smith@gmail.com",
-        "username": "JohnSmith"
+          "id": 1,
+          "firstName": "John",
+          "lastName": "Smith",
+          "email": "john.smith@gmail.com",
+          "username": "JohnSmith"
         }
       },
-
     }
     ```
 
