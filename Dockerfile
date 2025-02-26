@@ -27,7 +27,7 @@ RUN python -m venv /app/.venv && \
     . /app/.venv/bin/activate &&
 
 # Copy Python application code
-COPY . .
+COPY ./Forward-server .
 
 # Copy built Node.js files from node-builder
 COPY --from=node-builder /app/Forward-client/dist ./Forward-client/dist

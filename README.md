@@ -1,84 +1,26 @@
-# Forward-app Backend Notes
+# Forward App
+### Useful Links
+- [Client/Frontend Notes](Forward-client/README.md)
+- [API Documentation](Forward-server/README.md)
 
-Django backend for the Forward application.
+## Testing
+### Docker
+If you have Docker installed on your system, a system agnostic testing environment is available by running:
+`docker build -t forward-app . && docker run -p 8000:8000 -p 5173:5173 forward-app`, or if on a UNIX based system: `./run.sh`
 
-## Endpoints
-### POST `/api/users`: New user registration
-#### Request format
-```json
-{
-    "username": "your_username",
-    "password": "your_password",
-    "password_confirm": "your_confirmed_password",
-    "first_name": "Your",
-    "last_name": "Name"
-}
-```
-#### Response format
-```json
-{
-    "message": "User registered successfully",
-    "user": {
-        "id": 1,
-        "username": "your_username",
-        "first_name": "Your",
-        "last_name": "Name"
-    }
-}
-```
+This docker container will automatically run a development build of the full-scale app with all files as they are at the time of running. Use `^C` (Ctrl-C) to exit the container.
 
-### POST `/api/sessions`: User login
-#### Request format
-```json
-{
-    "username": "your_username",
-    "password": "your_password"
-}
-```
-#### Response format
-```json
-{
-    "message": "Login successful",
-    "user": {
-        "id": 1,
-        "username": "your_username",
-        "first_name": "Your",
-        "last_name": "Name"
-    }
-}
-```
+> [!IMPORTANT]  
+> Any data action taken within the context of the container, such as user registration / lesson progress, is volatile and will not be saved.
 
-### POST `/api/logout`: User logout
-#### Request format
-```json
-{}
-```
-#### Response format
-```json
-{
-    "message":"Logout successful"
-}
-```
+---
 
-## Project Structure
-```
-Forward-app/
-├── api/               # API endpoints and serializers
-│   ├── urls.py       
-│   ├── views.py      
-│   └── serializers.py
-│
-├── core/              # Business logic and models
-│   ├── models.py    
-│   └── services.py
-│
-├── forward/           # Project root
-│   ├── settings.py    
-│   └── urls.py
-```
+### Frontend
+`cd Forward-client && npm run dev`
+This will start the Frontend dev server, making it available at http://localhost:5173/
 
-## Setup
-
+---
+### Backend
 1. Create and activate a virtual environment:
 ```bash
 python -m venv .venv
