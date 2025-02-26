@@ -1,4 +1,6 @@
 # Proposed Curriculum Content Database Structure
+[Back to API Documentation](./README.md)
+
 ```mermaid
 erDiagram
     Lesson ||--o{ TextContent : contains
