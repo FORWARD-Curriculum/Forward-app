@@ -4,6 +4,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useAuth } from "@/lib/useAuth";
 import type { User } from "@/lib/useUser";
+import { toast } from "sonner";
 
 export default function Login() {
   const [error, setError] = useState(null);
@@ -18,7 +19,6 @@ export default function Login() {
       username: formData.get("username"),
       password: formData.get("password"),
       password_confirm: formData.get("password2"),
-      email: formData.get("email"),
       first_name: formData.get("first_name"),
       last_name: formData.get("last_name"),
     };
@@ -44,17 +44,33 @@ export default function Login() {
         },
         body: JSON.stringify(data),
       });
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error("Failed to login");
+       
+        if (result.detail) {
+          if (typeof result.detail === "object") {
+             // Handle field-specific errors
+            const errorMessages = Object.values(result.detail)
+              .map((messages) => (messages as string[]).join("\n"))
+              .join("\n");
+            throw new Error(errorMessages);
+          } else {
+            // Handle simple string errors
+            throw new Error(result.detail);
+          }
+          
+        }
+        // Handle invalid server responses / Server non-responses
+        toast.error("Registration failed. Please try again.")
+        throw new Error("Registration failed. Please try again.")
       }
 
-      const result = await response.json();
       const user: User = {
-        id: result.user.id,
-        username: result.user.username,
-        firstName: result.user.first_name,
-        lastName: result.user.last_name,
+        id: result.data.user.id,
+        username: result.data.user.username,
+        firstName: result.data.user.first_name,
+        lastName: result.data.user.last_name,
       };
 
       login(user);
@@ -174,7 +190,10 @@ export default function Login() {
         </form>
         <p className="text-center text-gray-400">
           Already have an account? <br />
-          <a href="/login" className="text-blue-500 underline">Log In</a> instead
+          <a href="/login" className="text-blue-500 underline">
+            Log In
+          </a>{" "}
+          instead
         </p>
       </div>
     </div>

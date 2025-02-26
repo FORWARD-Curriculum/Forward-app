@@ -32,29 +32,38 @@ export const useAuth = () => {
     setLoading(false); // Loading complete
   }, [user, addUser, getItem]);
 
+  /**
+   * Adds a user's information to LocalStorage and updates the AuthContext
+   * @param {User} user - The constructed User object from the backend
+   */
   const login = (user: User) => {
     addUser(user);
   };
 
+  /**
+   * Sends a request to the backend to delete the current user session
+   * @throws Logout Error
+   * @async
+   */
   const logout = async () => {
     try {
       // TODO: Write an API calling function that automatically adds token for auth
-      const response = await fetch("/api/logout/", {
-        method: "POST",
+      const response = await fetch("/api/sessions/", {
+        method: "DELETE",
         headers: {
           "X-CSRFToken": getCookie("csrftoken") || "",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({}),
       });
+      const result = await response.json();
       
       if (!response.ok) {
-        throw new Error("Failed to Log Out, please try again.");
+        throw new Error(result.detail);
       }
 
       removeUser();
-    } catch (error) {
-      console.error("Logout failed:", error);
+    } catch (error: any) {
+      console.error(error.message || "Logout failed. Please try again.");
       throw error; // This propagates the error to the caller
     }
   };
