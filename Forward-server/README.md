@@ -1,6 +1,8 @@
 # API Documentation
 [Back to Main Docs](../README.md)
 
+[Database Docs](./database-diagram.md)
+
 #### All responses follow a consistent format
 ```json
 {
