@@ -10,6 +10,9 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 
+import { Provider } from "react-redux";
+import store from "@/store"
+
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -25,7 +28,6 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
@@ -42,15 +44,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-
-
 export default function App() {
-
+  store.subscribe(()=>{
+    localStorage.setItem("reduxState",JSON.stringify(store.getState()))
+  })
   return (
-
-    <Outlet />
-
-  )
+    <Provider store={store}>
+      <Outlet />
+    </Provider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import { useUser, type User } from "@/lib/useUser";
-import { useLocalStorage } from "@/lib/useLocalStorage";
+import { type User } from "@/lib/userSlice";
+import { useDispatch } from "react-redux";
 
 // Function to get the CSRF token from cookies
 const getCookie = (name: string) => {
@@ -11,33 +10,13 @@ const getCookie = (name: string) => {
 
 export const useAuth = () => {
   // we can re export the user methods or object from this hook
-  const { user, addUser, removeUser, setUser } = useUser();
-  const { getItem } = useLocalStorage();
-
-  const [loading, setLoading] = useState(true); // Loading state to prevent early navigation
-
-  useEffect(() => {
-    // Check for an existing user in localStorage only once when the app initializes
-    const existingUser = getItem("user");
-    if (existingUser && !user) {
-      let parsedUser;
-      try {
-        parsedUser = JSON.parse(existingUser);
-      } catch (error) {
-        parsedUser = null;
-      }
-
-      addUser(parsedUser);
-    }
-    setLoading(false); // Loading complete
-  }, [user, addUser, getItem]);
-
+  const dispatch = useDispatch();
   /**
    * Adds a user's information to LocalStorage and updates the AuthContext
    * @param {User} user - The constructed User object from the backend
    */
   const login = (user: User) => {
-    addUser(user);
+    dispatch({ type: "user/setUser", payload: user });
   };
 
   /**
@@ -56,17 +35,16 @@ export const useAuth = () => {
         },
       });
       const result = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(result.detail);
       }
-
-      removeUser();
+      dispatch({ type: "user/setUser", payload: null });
     } catch (error: any) {
       console.error(error.message || "Logout failed. Please try again.");
       throw error; // This propagates the error to the caller
     }
   };
 
-  return { user, loading, login, logout, setUser };
+  return { login, logout };
 };
