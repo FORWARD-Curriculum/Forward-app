@@ -20,7 +20,7 @@ export type RootState = StateFromReducersMapObject<typeof reducer>;
 const preloadedState: RootState | undefined =
   typeof window === "undefined"
     ? undefined
-    : JSON.parse(localStorage.getItem("reduxState") || "undefined");
+    : JSON.parse(localStorage.getItem("reduxState") || "null") || undefined;
 
 const store = configureStore({
   reducer,
