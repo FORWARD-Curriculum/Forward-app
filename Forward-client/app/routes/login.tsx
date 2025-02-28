@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -92,9 +92,9 @@ export default function Login() {
         </form>
         <p className="text-center text-gray-400">
           Don't have an account? <br />
-          <a href="/register" className="text-blue-500 underline">
+          <Link to="/register" className="text-blue-500 underline">
             Sign Up
-          </a>{" "}
+          </Link>{" "}
           instead
         </p>
       </div>

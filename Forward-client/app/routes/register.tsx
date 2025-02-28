@@ -3,8 +3,9 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useAuth } from "@/lib/useAuth";
-import type { User } from "@/lib/useUser";
+import type { User } from "@/lib/userSlice";
 import { toast } from "sonner";
+import { Link } from "react-router";
 
 export default function Login() {
   const [error, setError] = useState(null);
@@ -47,10 +48,9 @@ export default function Login() {
       const result = await response.json();
 
       if (!response.ok) {
-       
         if (result.detail) {
           if (typeof result.detail === "object") {
-             // Handle field-specific errors
+            // Handle field-specific errors
             const errorMessages = Object.values(result.detail)
               .map((messages) => (messages as string[]).join("\n"))
               .join("\n");
@@ -59,11 +59,10 @@ export default function Login() {
             // Handle simple string errors
             throw new Error(result.detail);
           }
-          
         }
         // Handle invalid server responses / Server non-responses
-        toast.error("Registration failed. Please try again.")
-        throw new Error("Registration failed. Please try again.")
+        toast.error("Registration failed. Please try again.");
+        throw new Error("Registration failed. Please try again.");
       }
 
       const user: User = {
@@ -190,9 +189,9 @@ export default function Login() {
         </form>
         <p className="text-center text-gray-400">
           Already have an account? <br />
-          <a href="/login" className="text-blue-500 underline">
+          <Link to="/login" className="text-blue-500 underline">
             Log In
-          </a>{" "}
+          </Link>{" "}
           instead
         </p>
       </div>

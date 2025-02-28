@@ -19,6 +19,8 @@ React Router (RR) lets us define routes and layouts for our project in [one file
     - `toast.success()`
     - `toast()`
 
+- Always use the `<Link>` components when linking to pages from **FORWARD**. Due to the nature of the project, you should never use an `<a>` tag because linking to external sites is explicity against the security requirements.
+
 - The user authentication state is stored in the LocalStorage of each user's browser as a stringified [User](./app/lib/useUser.ts) object. This is rechecked on each route update, however as above, please keep in mind that secure information distribution should ***ALWAYS*** originate from the source of truth backend via an authenticated API call.
 
 - Everything should be strongly typed via TypeScript to ensure no data disparity between components, and if possible, every non-component function meant for general consumption should have a [JSDoc](https://jsdoc.app/) description for inline documentation. If time allows, defining types with both TypeScript and the `@param` tag in JSDoc is preferred.

@@ -7,11 +7,12 @@ import { useClient } from "@/lib/useClient";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
+import { Link } from "react-router";
 
 export default function Header() {
   const { logout } = useAuth();
   const { windowDimensions } = useClient();
-  const user = useSelector((state: RootState)=>state.user.user)
+  const user = useSelector((state: RootState) => state.user.user);
 
   const [open, setOpen] = React.useState(false);
 
@@ -22,9 +23,9 @@ export default function Header() {
           user ? "pl-12 pr-8" : "px-12"
         } h-18 w-full`}
       >
-        <a href="/" className="text-xl font-medi">
+        <Link to="/" className="text-xl font-medi">
           FORWARD
-        </a>
+        </Link>
 
         {/* This is the mobile menu */}
 
@@ -32,13 +33,13 @@ export default function Header() {
         {windowDimensions.width > 1024 ? (
           <ul className="flex list-none gap-6 ml-auto items-center font-medium">
             <li>
-              <a href="/dashboard">Dashboard</a>
+              <Link to={"/dashboard"}>Dashboard</Link>
             </li>
             <li>
-              <a href="/lessons">Lessons</a>
+              <Link to={"/lessons"}>Lessons</Link>
             </li>
             <li>
-              <a href="/activities">Activities</a>
+              <Link to={"/activities"}>Activities</Link>
             </li>
             <li>
               {/* BUG: radixui applies a data-scroll-lock css class to the body with the
@@ -75,7 +76,7 @@ export default function Header() {
                   </DropdownMenu.DropdownMenuContent>
                 </DropdownMenu.DropdownMenu>
               ) : (
-                <a href="/login">Log In</a>
+                <Link to={"/login"}>Log In</Link>
               )}
             </li>
           </ul>
@@ -87,9 +88,9 @@ export default function Header() {
             <Sheet.SheetContent className="bg-gray-100 flex flex-col px-4">
               <Sheet.SheetTitle>FORWARD Navigation</Sheet.SheetTitle>
               <div className="flex flex-col *:bg-white *:flex *:justify-between *:p-4 space-y-1 *:active:bg-gray-200 *:rounded-xl">
-                <a href="/dashboard">Dashboard</a>
-                <a href="/lessons">Lessons</a>
-                <a href="/activities">Activities</a>
+                <Link to={"/dashboard"}>Dashboard</Link>
+                <Link to={"/lessons"}>Lessons</Link>
+                <Link to={"/activities"}>Activities</Link>
               </div>
               {user ? (
                 <div className="flex flex-col mt-auto gap-4">
@@ -119,12 +120,12 @@ export default function Header() {
                   </button>
                 </div>
               ) : (
-                <a
-                  href="/login"
+                <Link
+                  to="/login"
                   className="mt-auto text-center bg-cyan-500 text-white p-3 w-full"
                 >
                   Login
-                </a>
+                </Link>
               )}
             </Sheet.SheetContent>
           </Sheet.Sheet>
