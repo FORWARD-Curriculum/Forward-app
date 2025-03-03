@@ -45,7 +45,7 @@ export default function Login() {
         displayName: result.data.user.display_name,
         facility_id: result.data.facility_id,
         profilePicture: result.data.user.profile_picture||undefined,
-        consent: false,
+        consent: result.data.user.consent,
       };
 
       login(user);

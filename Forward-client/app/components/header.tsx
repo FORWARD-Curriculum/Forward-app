@@ -52,7 +52,26 @@ export default function Header() {
               {user ? (
                 <DropdownMenu.DropdownMenu>
                   <DropdownMenu.DropdownMenuTrigger className="flex gap-4 items-center rounded-none hover:bg-cyan-400 transition-colors duration-200 p-3">
-                    <img src="pfp.png" className="h-10 w-10 rounded-full" />
+                    <div
+                      className={`w-10 h-10 rounded-full overflow-hidden flex justify-center items-center ${
+                        user.profilePicture
+                          ? ""
+                          : "border-1 border-solid border-white"
+                      }`}
+                    >
+                      {user.profilePicture ? (
+                        <img
+                          src={user.profilePicture}
+                          className=" object-cover"
+                        />
+                      ) : (
+                        <p className="text-xl font-light">
+                          {(user.displayName || "   ")
+                            .substring(0, 2)
+                            .toUpperCase()}
+                        </p>
+                      )}
+                    </div>
                   </DropdownMenu.DropdownMenuTrigger>
                   <DropdownMenu.DropdownMenuContent className="bg-white rounded-sm w-full border-none p-0 *:p-0">
                     <DropdownMenu.DropdownMenuItem>
@@ -105,11 +124,28 @@ export default function Header() {
               {user ? (
                 <div className="flex flex-col mt-auto gap-4">
                   <Link to="/account" className="w-full flex gap-3 ">
-                    <img src="pfp.png" className="h-10 w-10 rounded-full" />
+                    <div
+                      className={`w-10 h-10 rounded-full overflow-hidden flex justify-center items-center ${
+                        user.profilePicture
+                          ? ""
+                          : "border-1 border-solid border-gray-700"
+                      }`}
+                    >
+                      {user.profilePicture ? (
+                        <img
+                          src={user.profilePicture}
+                          className=" object-cover"
+                        />
+                      ) : (
+                        <p className="text-xl font-light">
+                          {(user.displayName || "   ")
+                            .substring(0, 2)
+                            .toUpperCase()}
+                        </p>
+                      )}
+                    </div>
                     <div className="flex flex-col text-left">
-                      <p>
-                        {user.displayName}
-                      </p>
+                      <p>{user.displayName}</p>
                       <p className="text-xs text-gray-500">{user.username}</p>
                     </div>
                   </Link>

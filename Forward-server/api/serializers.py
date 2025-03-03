@@ -111,3 +111,35 @@ class UserLoginSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+    
+class UserUpdateSerializer(serializers.Serializer):
+    display_name = serializers.CharField(required=False)
+    profile_picture = serializers.CharField(required=False, allow_null=True)
+    consent = serializers.BooleanField(required=False)
+    
+    def validate(self, attrs: dict):
+        return attrs
+    
+    def update(self, instance, validated_data):
+        """
+        Updates a User instance with new data.
+        
+        This method:
+        1. Validates thhe user data follows spec
+        2. Replaces any old user info if new info is passed on
+        
+        Args:
+            validated_data (dict): Validated data from the serializer
+            
+        Returns:
+            instance: an updated user instance
+        """
+        # Update the instance with validated data
+        instance.display_name = validated_data.get('display_name', instance.display_name)
+        instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)
+        instance.consent = validated_data.get('consent', instance.consent)
+        
+        # Save the instance
+        instance.save()
+        
+        return instance

@@ -11,7 +11,7 @@ export interface User {
   id: string;
   facility_id?: string;
   profilePicture?: string;
-  consent?: boolean;
+  consent: boolean;
 }
 
 const initialState: { user: User | null } = { user: null };

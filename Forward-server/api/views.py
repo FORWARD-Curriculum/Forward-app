@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserLoginSerializer, UserRegistrationSerializer
+from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer
 from core.services import UserService
 from .utils import json_go_brrr
 
@@ -36,7 +36,7 @@ class UserRegistrationView(generics.CreateAPIView):
             message="Registration successful",
             data=user_data,
             status=status.HTTP_201_CREATED
-        )
+        )  
     
 class SessionView(APIView):
     """
@@ -102,4 +102,34 @@ class CurrentUserView(APIView):
                 }
             },
             status=status.HTTP_200_OK
+        )
+
+    def patch(self, request, *args, **kwargs):
+        """
+        Update the current user's information.
+        Only accessible to authenticated users.
+        """
+        user = request.user
+        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            updated_user = serializer.save()  # Saves the changes to the user model
+            return json_go_brrr(
+                message="User information updated successfully",
+                data={
+                    'user': {
+                        'id': updated_user.id,
+                        'username': updated_user.username,
+                        'display_name': updated_user.display_name,
+                        'facility_id': updated_user.facility_id,
+                        'profile_picture': updated_user.profile_picture,
+                        'consent': updated_user.consent
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+
+        return json_go_brrr(
+            message="Failed to update user information",
+            data=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
         )

@@ -3,6 +3,8 @@ import { ChevronDown, ChevronUp, Expand, FileVolume } from "lucide-react";
 import Pie from "../components/progress";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
+import type { User } from "@/lib/userSlice";
+import { Link } from "react-router";
 
 interface Lesson {
   name: string;
@@ -61,7 +63,7 @@ export default function Dashboard({ className = "" }: { className?: string }) {
   const [sortType, setSortType] = useState<"recent" | "date" | "progress">(
     "progress"
   );
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useSelector((state: RootState) => state.user.user) as User;
 
   /* TODO: grab from api instead of hardcoding*/
   const lessons: Lesson[] = [
@@ -182,14 +184,28 @@ export default function Dashboard({ className = "" }: { className?: string }) {
           </div>
           <div className="col-span-4 flex flex-col">
             <div className="bg-white rounded-3xl p-4 flex items-center gap-3 h-fit w-full">
-              <img src="/pfp.png" className="max-w-16" />
+              <div
+                className={`w-16 h-16 rounded-full overflow-hidden flex justify-center items-center ${
+                  user.profilePicture
+                    ? ""
+                    : "border-1 border-solid border-gray-700"
+                }`}
+              >
+                {user.profilePicture ? (
+                  <img src={user.profilePicture} className=" object-cover" />
+                ) : (
+                  <p className="text-2xl font-light">
+                    {(user.displayName || "   ").substring(0, 2).toUpperCase()}
+                  </p>
+                )}
+              </div>
               <div className="text-left">
-                <h3 className="text-lg">
-                  {user?.displayName} {user?.last_name}
-                </h3>
+                <h3 className="text-lg">{user.displayName}</h3>
                 <p className="text-sm text-gray-400">{user?.username}</p>
               </div>
-              <button className="ml-auto">Edit</button>
+              <Link className="ml-auto" to="/account">
+                Edit
+              </Link>
             </div>
             <div>
               <p className="font-medium text-left">Your Progress</p>
