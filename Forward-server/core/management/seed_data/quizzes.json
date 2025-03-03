@@ -1,0 +1,24 @@
+[
+    {
+        "lesson": "Going to College",
+        "title": "College Types Quiz",
+        "instructions": "Select the type of college you would choose to attend for each career path.",
+        "order": 4,
+        "passing_score": 3,
+        "feedback_config": {
+            "passing": "Great job! You understand the different types of colleges.",
+            "failing": "You might want to review the types of colleges section again."
+        }
+    },
+    {
+        "lesson": "Financial Literacy",
+        "title": "Budgeting Basics Quiz",
+        "instructions": "Test your knowledge of basic budgeting concepts.",
+        "order": 2,
+        "passing_score": 2,
+        "feedback_config": {
+            "passing": "Nice work! You understand the fundamentals of budgeting.",
+            "failing": "Review the budgeting section again to strengthen your understanding."
+        }
+    }
+]
