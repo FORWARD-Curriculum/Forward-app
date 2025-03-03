@@ -2,8 +2,7 @@ from rest_framework.views import exception_handler
 from rest_framework.exceptions import ValidationError
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework.response import Response
-
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 def mistakes_were_made(
         exc: Exception,
@@ -21,7 +20,7 @@ def mistakes_were_made(
     """
     # First, get the standard error response
     response = exception_handler(exc, context)
-    
+
     # If this is a Django validation error, convert it to DRF validation error
     if isinstance(exc, DjangoValidationError):
         exc = ValidationError(detail=exc.messages)
@@ -41,24 +40,32 @@ def mistakes_were_made(
     return response
 
 def json_go_brrr(
-        message: str | list[str] | None = None,
-        data: dict | None = None,
-        status: int | None = None):
+        message: Union[str,list[str],None],
+        data: Union[dict,None],
+        status: Union[int, None]):
     """
     The magical JSON formatter that makes your responses look so fresh and so clean.
     Like Marie Kondo, but for your API responses.
-    
+
     Args:
         message: Words of wisdom to share with the world
         data: The precious payload that sparked joy
         status: HTTP status code (hopefully 200, but we're not judging)
     """
     response_data = {}
-    
+
     if message:
         response_data['detail'] = message
-        
+
     if data:
         response_data['data'] = data
-        
+
     return Response(response_data, status=status)
+
+messages = {
+    "successful_id": "successfully found resource by given id",
+    "err404": "cannot find resource with the given id/ resource does not exist",
+    "unauth": "you must be logged in, in order to access",
+    "forbidden": "this action is not allowed for the current user",
+    "created": "successfully created new resource",
+}

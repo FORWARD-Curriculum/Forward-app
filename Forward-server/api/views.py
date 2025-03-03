@@ -6,11 +6,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer
 from core.services import UserService
-from .utils import json_go_brrr
+from .utils import json_go_brrr, messages
+from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, Writing, Question
 
 class UserRegistrationView(generics.CreateAPIView):
     """
-    API endpoint for user registration.    
+    API endpoint for user registration.
     Endpoint: POST /api/register/
     """
     serializer_class = UserRegistrationSerializer # Handles data validation and user creation
@@ -23,7 +24,7 @@ class UserRegistrationView(generics.CreateAPIView):
         2. Creates the user if validation passes
         3. Returns the newly created user's details
         4. Logs in the new user
-                
+
         Raises:
             ValidationError: If the registration data is invalid
         """
@@ -36,12 +37,12 @@ class UserRegistrationView(generics.CreateAPIView):
             message="Registration successful",
             data=user_data,
             status=status.HTTP_201_CREATED
-        )  
-    
+        )
+
 class SessionView(APIView):
     """
     API endpoint for managing user sessions.
-    
+
     POST: Create a new session (login)
     DELETE: Terminate the session (logout)
     """
@@ -79,7 +80,7 @@ class SessionView(APIView):
             message="Logout successful",
             status=status.HTTP_200_OK
         )
-        
+
 class CurrentUserView(APIView):
     """Endpoint for retrieving current user information"""
     permission_classes = [IsAuthenticated]
@@ -133,3 +134,107 @@ class CurrentUserView(APIView):
             data=serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+
+class QuizView(APIView):
+    '''
+    tests endpoint/ endpoints
+    '''
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        '''
+        gets a quiz by its lesson id
+        '''
+        [id] = kwargs.values()
+        quiz = Quiz.objects.get(lesson_id=id)
+
+        if not quiz:
+            return Response({"detail":"cannot find quiz with this id"}, status=status.HTTP_404_NOT_FOUND)
+
+        questions = Question.objects.filter(quiz_id=quiz.id)
+
+        return Response({
+            "detail": messages['successful_id'],
+            "data": {
+                "quiz":quiz.to_dict(),
+                "questions": [q.to_dict() for q in questions]}},
+            status=status.HTTP_200_OK
+            )
+
+
+    def post(self, req, *args, **kwargs):
+        '''
+        submits a quiz by creating a new userdata row in db
+        '''
+
+        # need to make user data table to save to. TBD
+
+class LessonView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        '''
+        gets lesson by id
+        '''
+        [id] = kwargs.values()
+        lesson = Lesson.objects.get(id=id)
+
+        if not lesson:
+            return Response({"detail": "cannot find a lesson with this id"}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({
+            "detail": messages['successful_id'],
+            "data": lesson.to_dict()},
+            status=status.HTTP_200_OK)
+
+class TextContentView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        '''
+        gets text content by lesson id
+        '''
+        [id] = kwargs.values()
+        text_content = TextContent.objects.filter(lesson_id=id)
+
+        if not text_content:
+            return Response({"detail": "cannot find text content with this lesson id"}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({
+            "detail": messages['successful_id'],
+            "data": [t.to_dict() for t in text_content]},
+            status=status.HTTP_200_OK)
+
+class WritingView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        [id] = kwargs.values()
+        writing = Writing.objects.filter(lesson_id=id)
+
+        if not writing:
+            return Response({"detail": "cannot find writing activity with this lesson id"}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({
+            "detail": messages['successful_id'],
+            "data": [w.to_dict() for w in writing]},
+            status=status.HTTP_200_OK)
+
+class PollView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        [id] = kwargs.values()
+        poll = Poll.objects.get(lesson_id=id)
+
+        if not poll:
+            return Response({"detail": "cannot find poll with this lesson id"}, status=status.HTTP_404_NOT_FOUND)
+
+        poll_qs = PollQuestion.objects.filter(poll_id=poll.id)
+
+        return Response({
+            "detail": messages['successful_id'],
+            "data": {
+                "poll": poll.to_dict(),
+                "pollQuestions": [q.to_dict() for q in poll_qs]}},
+            status=status.HTTP_200_OK)
