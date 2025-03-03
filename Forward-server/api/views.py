@@ -95,8 +95,10 @@ class CurrentUserView(APIView):
                 'user': {
                     'id': user.id,
                     'username': user.username,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
+                    'display_name': user.display_name,
+                    'facility_id': user.facility_id,
+                    'profile_picture': user.profile_picture,
+                    'consent': user.consent
                 }
             },
             status=status.HTTP_200_OK

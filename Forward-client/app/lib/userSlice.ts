@@ -2,13 +2,16 @@ import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 /**
  * Represents a User, usually provided by the server
+ * @field profile_picture - A url to CDN 
  * @interface
  */
 export interface User {
-  firstName: string;
-  lastName: string;
+  displayName: string;
   username: string;
   id: string;
+  facility_id?: string;
+  profilePicture?: string;
+  consent?: boolean;
 }
 
 const initialState: { user: User | null } = { user: null };

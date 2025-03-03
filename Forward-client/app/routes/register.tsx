@@ -68,8 +68,9 @@ export default function Login() {
       const user: User = {
         id: result.data.user.id,
         username: result.data.user.username,
-        firstName: result.data.user.first_name,
-        lastName: result.data.user.last_name,
+        displayName: result.data.user.first_name,
+        profilePicture: result.data.user.profile_picture||undefined,
+        consent: false,
       };
 
       login(user);

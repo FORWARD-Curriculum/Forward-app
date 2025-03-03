@@ -168,8 +168,8 @@ user's information.
       "username": "JohnSmith",
       "password": "secret password",
       "password_confirm": "secret password",
-      "firstName": "John",
-      "lastName": "Smith"
+      "display_name": "John",
+      "facility_id": "234"
     }
     ```
 
@@ -185,8 +185,10 @@ user's information.
         "user": {
           "id": 1,
           "username": "JohnSmith",
-          "firstName": "John",
-          "lastName": "Smith"
+          "display_name": "John",
+          "facility_id": "234",
+          "profile_picture": "",
+          "consent":false,
         }
       }
     }
@@ -204,8 +206,8 @@ user's information.
         "username": "This field is required.",
         "password": "This field is required.",
         "password_confirm": "This field is required.",
-        "first_name": "This field is required.",
-        "last_name": "This field is required."
+        "display_name": "This field is required.",
+        "facility_id": "This field is required."
       },
     }
     ```
@@ -237,8 +239,7 @@ user's information.
     ```json
     {
       "detail": {
-        "first_name": "Ensure this field has at least 2 characters.",
-        "last_name": "Ensure this field has at least 2 characters.",
+        "display_name": "Ensure this field has at least 2 characters.",
       }
     }
     ```

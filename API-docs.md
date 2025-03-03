@@ -91,7 +91,7 @@ information.
 
     ```json
     {
-      "credential": "john.smith@gmail.com",
+      "credential": "js01ca28",
       "password": "secret password"
     }
     ```
@@ -108,10 +108,11 @@ information.
       "data": {
         "user": {
           "id": 1,
-          "firstName": "John",
-          "lastName": "Smith",
-          "email": "john.smith@gmail.com",
-          "username": "JohnSmith"
+          "username": "js01ca28",
+          "display_name": "John Smith",
+          "facility_id": "94805897432092394720",
+          "profile_picture": "cdn://user/1?height=100&width=100",
+          "consent": false
         }
       },
     }

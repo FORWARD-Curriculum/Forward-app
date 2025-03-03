@@ -38,11 +38,14 @@ export default function Login() {
         throw new Error(result.detail||"Login error.");
       } 
 
+      /* TODO: cdn domain for picture*/
       const user: User = {
         id: result.data.user.id,
         username: result.data.user.username,
-        firstName: result.data.user.first_name,
-        lastName: result.data.user.last_name,
+        displayName: result.data.user.display_name,
+        facility_id: result.data.facility_id,
+        profilePicture: result.data.user.profile_picture||undefined,
+        consent: false,
       };
 
       login(user);

@@ -185,7 +185,7 @@ export default function Dashboard({ className = "" }: { className?: string }) {
               <img src="/pfp.png" className="max-w-16" />
               <div className="text-left">
                 <h3 className="text-lg">
-                  {user?.firstName} {user?.lastName}
+                  {user?.displayName} {user?.last_name}
                 </h3>
                 <p className="text-sm text-gray-400">{user?.username}</p>
               </div>

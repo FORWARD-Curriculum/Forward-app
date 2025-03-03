@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from "@/lib/useAuth";
 import * as Sheet from "@/components/ui/sheet";
-import { Menu, ChevronRight } from "lucide-react";
+import { Menu } from "lucide-react";
 import * as DropdownMenu from "@/components/ui/dropdown-menu";
 import { useClient } from "@/lib/useClient";
 import { toast } from "sonner";
@@ -55,7 +55,14 @@ export default function Header() {
                     <img src="pfp.png" className="h-10 w-10 rounded-full" />
                   </DropdownMenu.DropdownMenuTrigger>
                   <DropdownMenu.DropdownMenuContent className="bg-white rounded-sm w-full border-none p-0 *:p-0">
-                    <DropdownMenu.DropdownMenuItem></DropdownMenu.DropdownMenuItem>
+                    <DropdownMenu.DropdownMenuItem>
+                      <Link
+                        to="/account"
+                        className="w-full text-left hover:underline hover:bg-gray-100 p-3"
+                      >
+                        Account
+                      </Link>
+                    </DropdownMenu.DropdownMenuItem>
                     <DropdownMenu.DropdownMenuItem>
                       <button
                         onClick={() => {
@@ -85,7 +92,10 @@ export default function Header() {
             <Sheet.SheetTrigger className="ml-auto">
               <Menu className="h-8 w-8" />
             </Sheet.SheetTrigger>
-            <Sheet.SheetContent className="bg-gray-100 flex flex-col px-4">
+            <Sheet.SheetContent
+              className="bg-gray-100 flex flex-col px-4"
+              aria-describedby="A slide out from the right of the screen containing the navigation in a mobile-friendly way."
+            >
               <Sheet.SheetTitle>FORWARD Navigation</Sheet.SheetTitle>
               <div className="flex flex-col *:bg-white *:flex *:justify-between *:p-4 space-y-1 *:active:bg-gray-200 *:rounded-xl">
                 <Link to={"/dashboard"}>Dashboard</Link>
@@ -94,15 +104,15 @@ export default function Header() {
               </div>
               {user ? (
                 <div className="flex flex-col mt-auto gap-4">
-                  <div className="w-full flex gap-3 ">
+                  <Link to="/account" className="w-full flex gap-3 ">
                     <img src="pfp.png" className="h-10 w-10 rounded-full" />
                     <div className="flex flex-col text-left">
                       <p>
-                        {user.firstName} {user.lastName}
+                        {user.displayName}
                       </p>
                       <p className="text-xs text-gray-500">{user.username}</p>
                     </div>
-                  </div>
+                  </Link>
                   <button
                     onClick={() => {
                       logout()

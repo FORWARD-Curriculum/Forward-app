@@ -22,28 +22,50 @@ class User(AbstractUser):
     )
 
     # User's first name - minimum 2 characters required
-    first_name = models.CharField(
-        'first name',
+    display_name = models.CharField(
+        'display name',
         max_length=50,
-        validators=[MinLengthValidator(2)]
+        validators=[MinLengthValidator(2)],
     )
 
-    # User's last name - minimum 2 characters required
-    last_name = models.CharField(
-        'last name',
+    # Facility Id - Still need to decide how we are implementing
+    facility_id = models.CharField(
+        'facility id',
         max_length=50,
+        validators=[MinLengthValidator(2)],
+        blank=True
+    )
+
+    # Optional
+    profile_picture = models.CharField(
+        'profile picture link',
+        max_length=50,
+        null=True,
+        blank=True,
         validators=[MinLengthValidator(2)]
+    )
+    # Consent to participate in study, alsays assume false
+    consent = models.BooleanField(
+        'tracking consent',
+        max_length=1,
+        default=False
     )
 
     # Automatically set when the user is created and updated
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # This is not data we collect, its ugly but the other option is to inherit 
+    # from AbstractBaseUser and all the stuff that comes with that
+    first_name = None
+    last_name = None
+
 
     def get_full_name(self):
         """
         Return the user's full name
         """
-        full_name = f'{self.first_name} {self.last_name}'
+        full_name = f'{self.display_name} {self.username}'
         return full_name.strip()
     
     def __str__(self):

@@ -2,27 +2,27 @@
     {
         "username": "admin",
         "password": "adminpassword",
-        "first_name": "Admin",
-        "last_name": "User",
+        "display_name": "Admin",
         "is_staff": true,
         "is_superuser": true
     },
     {
         "username": "student1",
         "password": "password1",
-        "first_name": "Student1",
-        "last_name": "User"
+        "display_name": "Student1",
+        "facility_id": "1",
+        "profile_picture": "/pfp.png",
+        "consent": true
     },
     {
         "username": "student2",
         "password": "password2",
-        "first_name": "Student2",
-        "last_name": "User"
+        "display_name": "Student2"
     },
     {
         "username": "student3",
         "password": "password3",
-        "first_name": "Student3",
-        "last_name": "User"
+        "display_name": "Student3",
+        "consent": false
     }
 ]

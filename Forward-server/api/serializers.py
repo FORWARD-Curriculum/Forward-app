@@ -32,13 +32,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'username',
             'password',
             'password_confirm',
-            'first_name',
-            'last_name',
+            'display_name',
+            'facility_id',
+            'consent'
         ]
         # Override default optional fields to make them required
         extra_kwargs = {
-            'first_name': {'required': True},
-            'last_name': {'required': True}
+            'display_name': {'required': True},
         }
 
     def validate(self, attrs):

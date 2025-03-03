@@ -10,9 +10,10 @@ class UserServiceTests(TestCase):
             'username': 'testuser',
             'password': 'StrongPass123!',
             'email': 'test@example.com',
-            'first_name': 'Test',
-            'last_name': 'User',
-            'date_of_birth': date(1990, 1, 1)
+            'display_name': 'Test',
+            'facility_id': '2781',
+            'profile_picture': '/pfp.png',
+            'consent': False
         }
 
     def test_create_user_success(self):
@@ -22,9 +23,10 @@ class UserServiceTests(TestCase):
         self.assertIsInstance(user, User)
         self.assertEqual(user.username, self.valid_user_data['username'])
         self.assertEqual(user.email, self.valid_user_data['email'])
-        self.assertEqual(user.first_name, self.valid_user_data['first_name'])
-        self.assertEqual(user.last_name, self.valid_user_data['last_name'])
-        self.assertEqual(user.date_of_birth, self.valid_user_data['date_of_birth'])
+        self.assertEqual(user.display_name, self.valid_user_data['display_name'])
+        self.assertEqual(user.facility_id, self.valid_user_data['facility_id'])
+        self.assertEqual(user.profile_picture, self.valid_user_data['profile_picture'])
+        self.assertEqual(user.consent,self.valid_user_data['consent'])
         self.assertTrue(user.check_password(self.valid_user_data['password']))
 
     def test_create_user_without_optional_fields(self):
@@ -32,8 +34,7 @@ class UserServiceTests(TestCase):
         data = {
             'username': 'testuser',
             'password': 'StrongPass123!',
-            'first_name': 'Test',
-            'last_name': 'User'
+            'display_name': 'Test',
         }
         user = UserService.create_user(data)
         
@@ -52,7 +53,7 @@ class UserServiceTests(TestCase):
     def test_create_user_missing_required_field(self):
         """Test user creation with missing required field fails"""
         data = self.valid_user_data.copy()
-        del data['first_name']
+        del data['display_name']
         
         with self.assertRaises(ValidationError):
             UserService.create_user(data)
