@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserLoginSerializer, UserRegistrationSerializer
+from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer
 from core.services import UserService
 from .utils import json_go_brrr, messages
 from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, Writing, Question
@@ -12,7 +12,7 @@ from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, Writing, 
 class UserRegistrationView(generics.CreateAPIView):
     """
     API endpoint for user registration.
-    Endpoint: POST /api/register/
+    Endpoint: POST /api/users/
     """
     serializer_class = UserRegistrationSerializer # Handles data validation and user creation
     permission_classes = [AllowAny] # Allows anyone to register (no authentication required)
@@ -82,7 +82,12 @@ class SessionView(APIView):
         )
 
 class CurrentUserView(APIView):
-    """Endpoint for retrieving current user information"""
+    """
+    Endpoint for retrieving/updating current user information
+    
+    GET: Get the current user session
+    PATCH: Update the current user
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
@@ -96,11 +101,43 @@ class CurrentUserView(APIView):
                 'user': {
                     'id': user.id,
                     'username': user.username,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
+                    'display_name': user.display_name,
+                    'facility_id': user.facility_id,
+                    'profile_picture': user.profile_picture,
+                    'consent': user.consent
                 }
             },
             status=status.HTTP_200_OK
+        )
+
+    def patch(self, request, *args, **kwargs):
+        """
+        Update the current user's information.
+        Only accessible to authenticated users.
+        """
+        user = request.user
+        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            updated_user = serializer.save()  # Saves the changes to the user model
+            return json_go_brrr(
+                message="User information updated successfully",
+                data={
+                    'user': {
+                        'id': updated_user.id,
+                        'username': updated_user.username,
+                        'display_name': updated_user.display_name,
+                        'facility_id': updated_user.facility_id,
+                        'profile_picture': updated_user.profile_picture,
+                        'consent': updated_user.consent
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+
+        return json_go_brrr(
+            message="Failed to update user information",
+            data=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
         )
 
 class QuizView(APIView):

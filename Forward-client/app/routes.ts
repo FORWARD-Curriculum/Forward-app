@@ -7,6 +7,7 @@ export default [
         route("register", "routes/register.tsx"),
         layout("protected.tsx", [
             route("dashboard", "routes/dashboard.tsx"),
+            route("account", "routes/account.tsx")
         ]),
     ]),
     

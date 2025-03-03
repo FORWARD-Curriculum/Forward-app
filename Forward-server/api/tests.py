@@ -12,9 +12,10 @@ class UserRegistrationViewTests(TestCase):
             'username': 'testuser',
             'password': 'StrongPass123!',
             'password_confirm': 'StrongPass123!',
-            'first_name': 'Test',
-            'last_name': 'User',
-            'date_of_birth': '1990-01-01'
+            'display_name': 'Test',
+            'facility_id': '1',
+            'profile_picture': '',
+            'consent': True
         }
 
     def test_valid_registration(self):
@@ -46,7 +47,7 @@ class UserRegistrationViewTests(TestCase):
     def test_missing_required_fields(self):
         """Test registration fails when required fields are missing"""
         payload = self.valid_payload.copy()
-        del payload['first_name']
+        del payload['display_name']
         
         response = self.client.post(
             self.register_url,
@@ -85,8 +86,7 @@ class UserLoginTests(TestCase):
         self.user_data = {
             'username': 'testuser',
             'password': 'StrongPass123!',
-            'first_name': 'Test',
-            'last_name': 'User'
+            'display_name': 'Test',
         }
         self.user = User.objects.create_user(**self.user_data)
 

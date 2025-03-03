@@ -1,5 +1,6 @@
 import { type User } from "@/lib/userSlice";
 import { useDispatch } from "react-redux";
+import { apiFetch } from "@/lib/utils";
 
 // Function to get the CSRF token from cookies
 const getCookie = (name: string) => {
@@ -20,20 +21,26 @@ export const useAuth = () => {
   };
 
   /**
+   * Updates a user's information. (You could use login for the same thing,
+   * but self-descriptive code is better)
+   * @param {User} user
+   */
+  const update = (user: User) => {
+    dispatch({ type: "user/setUser", payload: user });
+  };
+
+  /**
    * Sends a request to the backend to delete the current user session
    * @throws Logout Error
    * @async
    */
   const logout = async () => {
     try {
-      // TODO: Write an API calling function that automatically adds token for auth
-      const response = await fetch("/api/sessions/", {
+      const response = await apiFetch("sessions", {
         method: "DELETE",
-        headers: {
-          "X-CSRFToken": getCookie("csrftoken") || "",
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
+
       const result = await response.json();
 
       if (!response.ok) {
@@ -46,5 +53,5 @@ export const useAuth = () => {
     }
   };
 
-  return { login, logout };
+  return { login, logout, update };
 };

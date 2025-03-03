@@ -1,17 +1,18 @@
 import React from "react";
 import { useAuth } from "@/lib/useAuth";
 import * as Sheet from "@/components/ui/sheet";
-import { Menu, ChevronRight } from "lucide-react";
+import { Menu } from "lucide-react";
 import * as DropdownMenu from "@/components/ui/dropdown-menu";
 import { useClient } from "@/lib/useClient";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
+import { Link } from "react-router";
 
 export default function Header() {
   const { logout } = useAuth();
   const { windowDimensions } = useClient();
-  const user = useSelector((state: RootState)=>state.user.user)
+  const user = useSelector((state: RootState) => state.user.user);
 
   const [open, setOpen] = React.useState(false);
 
@@ -22,9 +23,9 @@ export default function Header() {
           user ? "pl-12 pr-8" : "px-12"
         } h-18 w-full`}
       >
-        <a href="/" className="text-xl font-medi">
+        <Link to="/" className="text-xl font-medi">
           FORWARD
-        </a>
+        </Link>
 
         {/* This is the mobile menu */}
 
@@ -32,13 +33,13 @@ export default function Header() {
         {windowDimensions.width > 1024 ? (
           <ul className="flex list-none gap-6 ml-auto items-center font-medium">
             <li>
-              <a href="/dashboard">Dashboard</a>
+              <Link to={"/dashboard"}>Dashboard</Link>
             </li>
             <li>
-              <a href="/lessons">Lessons</a>
+              <Link to={"/lessons"}>Lessons</Link>
             </li>
             <li>
-              <a href="/activities">Activities</a>
+              <Link to={"/activities"}>Activities</Link>
             </li>
             <li>
               {/* BUG: radixui applies a data-scroll-lock css class to the body with the
@@ -51,10 +52,36 @@ export default function Header() {
               {user ? (
                 <DropdownMenu.DropdownMenu>
                   <DropdownMenu.DropdownMenuTrigger className="flex gap-4 items-center rounded-none hover:bg-cyan-400 transition-colors duration-200 p-3">
-                    <img src="pfp.png" className="h-10 w-10 rounded-full" />
+                    <div
+                      className={`w-10 h-10 rounded-full overflow-hidden flex justify-center items-center ${
+                        user.profilePicture
+                          ? ""
+                          : "border-1 border-solid border-white"
+                      }`}
+                    >
+                      {user.profilePicture ? (
+                        <img
+                          src={user.profilePicture}
+                          className=" object-cover"
+                        />
+                      ) : (
+                        <p className="text-xl font-light">
+                          {(user.displayName || "   ")
+                            .substring(0, 2)
+                            .toUpperCase()}
+                        </p>
+                      )}
+                    </div>
                   </DropdownMenu.DropdownMenuTrigger>
                   <DropdownMenu.DropdownMenuContent className="bg-white rounded-sm w-full border-none p-0 *:p-0">
-                    <DropdownMenu.DropdownMenuItem></DropdownMenu.DropdownMenuItem>
+                    <DropdownMenu.DropdownMenuItem>
+                      <Link
+                        to="/account"
+                        className="w-full text-left hover:underline hover:bg-gray-100 p-3"
+                      >
+                        Account
+                      </Link>
+                    </DropdownMenu.DropdownMenuItem>
                     <DropdownMenu.DropdownMenuItem>
                       <button
                         onClick={() => {
@@ -75,7 +102,7 @@ export default function Header() {
                   </DropdownMenu.DropdownMenuContent>
                 </DropdownMenu.DropdownMenu>
               ) : (
-                <a href="/login">Log In</a>
+                <Link to={"/login"}>Log In</Link>
               )}
             </li>
           </ul>
@@ -84,24 +111,44 @@ export default function Header() {
             <Sheet.SheetTrigger className="ml-auto">
               <Menu className="h-8 w-8" />
             </Sheet.SheetTrigger>
-            <Sheet.SheetContent className="bg-gray-100 flex flex-col px-4">
+            <Sheet.SheetContent
+              className="bg-gray-100 flex flex-col px-4"
+              aria-describedby="A slide out from the right of the screen containing the navigation in a mobile-friendly way."
+            >
               <Sheet.SheetTitle>FORWARD Navigation</Sheet.SheetTitle>
               <div className="flex flex-col *:bg-white *:flex *:justify-between *:p-4 space-y-1 *:active:bg-gray-200 *:rounded-xl">
-                <a href="/dashboard">Dashboard</a>
-                <a href="/lessons">Lessons</a>
-                <a href="/activities">Activities</a>
+                <Link to={"/dashboard"}>Dashboard</Link>
+                <Link to={"/lessons"}>Lessons</Link>
+                <Link to={"/activities"}>Activities</Link>
               </div>
               {user ? (
                 <div className="flex flex-col mt-auto gap-4">
-                  <div className="w-full flex gap-3 ">
-                    <img src="pfp.png" className="h-10 w-10 rounded-full" />
+                  <Link to="/account" className="w-full flex gap-3 ">
+                    <div
+                      className={`w-10 h-10 rounded-full overflow-hidden flex justify-center items-center ${
+                        user.profilePicture
+                          ? ""
+                          : "border-1 border-solid border-gray-700"
+                      }`}
+                    >
+                      {user.profilePicture ? (
+                        <img
+                          src={user.profilePicture}
+                          className=" object-cover"
+                        />
+                      ) : (
+                        <p className="text-xl font-light">
+                          {(user.displayName || "   ")
+                            .substring(0, 2)
+                            .toUpperCase()}
+                        </p>
+                      )}
+                    </div>
                     <div className="flex flex-col text-left">
-                      <p>
-                        {user.firstName} {user.lastName}
-                      </p>
+                      <p>{user.displayName}</p>
                       <p className="text-xs text-gray-500">{user.username}</p>
                     </div>
-                  </div>
+                  </Link>
                   <button
                     onClick={() => {
                       logout()
@@ -119,12 +166,12 @@ export default function Header() {
                   </button>
                 </div>
               ) : (
-                <a
-                  href="/login"
+                <Link
+                  to="/login"
                   className="mt-auto text-center bg-cyan-500 text-white p-3 w-full"
                 >
                   Login
-                </a>
+                </Link>
               )}
             </Sheet.SheetContent>
           </Sheet.Sheet>

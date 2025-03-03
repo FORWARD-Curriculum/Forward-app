@@ -41,8 +41,8 @@ def mistakes_were_made(
 
 def json_go_brrr(
         message: Union[str,list[str],None],
-        data: Union[dict,None],
-        status: Union[int, None]):
+        status: Union[int, None],
+        data: Union[dict,None] = None):
     """
     The magical JSON formatter that makes your responses look so fresh and so clean.
     Like Marie Kondo, but for your API responses.

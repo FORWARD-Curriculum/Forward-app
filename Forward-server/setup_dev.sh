@@ -8,8 +8,7 @@ set -x
 
 # Create and activate cirtual environment
 python -m venv .venv
-./.venv/Scripts/activate # For windows only
-# source .venv/bin/activate # Uncomment for Mac/Linux
+source .venv/bin/activate # Uncomment for Mac/Linux
 
 # Install dependencies
 pip install django djangorestframework

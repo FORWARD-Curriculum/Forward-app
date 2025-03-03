@@ -6,15 +6,12 @@
 
 ## Testing
 ### Docker
-If you have Docker installed on your system, a system agnostic testing environment is available by running:
-`docker build -t forward-app . && docker run -v ./Forward-server:/app/backend -v ./Forward-client:/app/frontend -p 8000:8000 -p 5173:5173 forward-app`, or if on a UNIX based system: `./run.sh`
+If you have Docker installed on your system, a system agnostic testing environment is available by running `docker compose up`
 
 This docker container will automatically run a development build of the full-scale app that will live update with changes. `^C` (Ctrl-C) to exit the container.
 
 > [!IMPORTANT]  
 > Any data action taken within the context of the container, such as user registration / lesson progress, *will* reflect in your host system, this is due to the fact the folders are being mounted to the container for hot-reloading.
-
-TODO: Seperate servers into their own dockerfiles and use a compose file, will do this when we switch to postgres
 
 ---
 

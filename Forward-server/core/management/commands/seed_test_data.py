@@ -101,8 +101,10 @@ class Command(BaseCommand):
                 username=username,
                 defaults={
                     'password': password,
-                    'first_name': data.get('first_name', ''),
-                    'last_name': data.get('last_name', ''),
+                    'display_name': data.get('display_name', ''),
+                    'facility_id': data.get('last_name', ''),
+                    'consent': data.get('consent',False),
+                    'profile_picture': data.get('profile_picture',''),
                     'is_staff': data.get('is_staff', False),
                     'is_superuser': data.get('is_superuser', False),
                 }
