@@ -24,25 +24,22 @@ This will start the Frontend dev server, making it available at http://localhost
 
 ---
 ### Backend
-1. Create and activate a virtual environment:
+1. Setup development environment. This will:
+    1. Create and activate a virtual environment
+    2. Intall dependencies (via pip)
+    3. Run database migrations
+    4. Seed the database with test data
 ```bash
-python -m venv .venv
-
-# Windows
-venv\Scripts\activate
-
-# Mac/Linux
-source venv/bin/activate
+cd Forward-server
+./setup_dev.sh
 ```
-
-2. Install requirements
+*Note: This only works for windows machines. If you are running MacOS or Linux you replace must this line in setup_dev.sh:*
 ```bash
-pip install django djangorestframework
+./.venv/Scripts/activate # For windows only
 ```
-
-3. Run migrations
+*with:*
 ```bash
-python manage.py migrate
+source .venv/bin/activate
 ```
 
 4. Run the development server
