@@ -85,7 +85,7 @@ export default function Login() {
 
   return (
     <div className="flex justify-center items-center w-screen">
-      <div className="bg-white rounded-3xl w-fit p-6 flex flex-col items-center">
+      <div className="bg-foreground text-secondary-foreground rounded-3xl w-fit p-6 flex flex-col items-center">
         <h1 className="text-xl font-medium">Create an account</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-5 my-6">
           <div className="flex gap-2">
@@ -181,7 +181,7 @@ export default function Login() {
             )}
             <Button
               type="submit"
-              className="button w-full bg-cyan-500 text-white active:bg-cyan-600"
+              className="button w-full bg-primary text-primary-foreground active:brightness-110"
               variant={"outline"}
             >
               Create Account

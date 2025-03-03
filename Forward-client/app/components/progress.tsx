@@ -6,6 +6,7 @@ const cleanPercentage = (percentage: number) => {
   return isNegativeOrNaN ? 0 : isTooHigh ? 100 : +percentage;
 };
 
+
 const Circle = ({ color, percentage, size = 200 }: { percentage?: number; color?: string; size: number }) => {
   const r = size * 0.35; // Make radius relative to size
   const circ = 2 * Math.PI * r;
@@ -17,7 +18,7 @@ const Circle = ({ color, percentage, size = 200 }: { percentage?: number; color?
       cx={size / 2}
       cy={size / 2}
       fill="transparent"
-      stroke={strokePct !== circ ? color : ""}
+      stroke={strokePct !== circ ? (color || "var(--accent, currentColor)") : ""}
       strokeWidth={size * 0.1} // Make stroke width relative to size
       strokeDasharray={circ}
       strokeDashoffset={percentage ? strokePct : 0}
@@ -33,6 +34,7 @@ const Text = ({ percentage, size = 200 }: { percentage: number; size: number }) 
       dominantBaseline="central"
       textAnchor="middle"
       fontSize={`${size * 0.15}px`} // Make font size relative to container size
+      fill="var(--text-secondary-foreground, currentColor)"
     >
       {percentage.toFixed(0)}%
     </text>

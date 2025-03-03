@@ -19,7 +19,7 @@ export default function Header() {
   return (
     <>
       <div
-        className={` flex bg-cyan-500 box-border **:text-white items-center ${
+        className={` flex bg-primary box-border **:text-white items-center ${
           user ? "pl-12 pr-8" : "px-12"
         } h-18 w-full`}
       >
@@ -51,7 +51,7 @@ export default function Header() {
                   custom component or looking further into it. For now, I am choosing to keep it.*/}
               {user ? (
                 <DropdownMenu.DropdownMenu>
-                  <DropdownMenu.DropdownMenuTrigger className="flex gap-4 items-center rounded-none hover:bg-cyan-400 transition-colors duration-200 p-3">
+                  <DropdownMenu.DropdownMenuTrigger className="flex gap-4 items-center rounded-none hover:backdrop-brightness-115 transition-colors duration-200 p-3">
                     <div
                       className={`w-10 h-10 rounded-full overflow-hidden flex justify-center items-center ${
                         user.profilePicture
@@ -73,11 +73,11 @@ export default function Header() {
                       )}
                     </div>
                   </DropdownMenu.DropdownMenuTrigger>
-                  <DropdownMenu.DropdownMenuContent className="bg-white rounded-sm w-full border-none p-0 *:p-0">
+                  <DropdownMenu.DropdownMenuContent className="bg-secondary text-secondary-foreground rounded-sm w-full border-none p-0 *:p-0 **:active:backdrop-brightness-95">
                     <DropdownMenu.DropdownMenuItem>
                       <Link
                         to="/account"
-                        className="w-full text-left hover:underline hover:bg-gray-100 p-3"
+                        className="w-full text-left hover:underline hover:backdrop-brightness-90 p-3"
                       >
                         Account
                       </Link>
@@ -94,7 +94,7 @@ export default function Header() {
                               toast.error(error.message);
                             });
                         }}
-                        className="w-full text-left hover:underline hover:bg-gray-100 p-3"
+                        className="w-full text-left hover:underline hover:backdrop-brightness-90 p-3"
                       >
                         Log Out
                       </button>
@@ -112,23 +112,23 @@ export default function Header() {
               <Menu className="h-8 w-8" />
             </Sheet.SheetTrigger>
             <Sheet.SheetContent
-              className="bg-gray-100 flex flex-col px-4"
+              className="bg-background flex flex-col px-4"
               aria-describedby="A slide out from the right of the screen containing the navigation in a mobile-friendly way."
             >
-              <Sheet.SheetTitle>FORWARD Navigation</Sheet.SheetTitle>
-              <div className="flex flex-col *:bg-white *:flex *:justify-between *:p-4 space-y-1 *:active:bg-gray-200 *:rounded-xl">
+              <Sheet.SheetTitle className="text-secondary-foreground">FORWARD Navigation</Sheet.SheetTitle>
+              <div className="flex flex-col *:bg-secondary *:flex *:justify-between *:p-4 space-y-1 *:active:bg-gray-200/80 *:rounded-xl text-secondary-foreground">
                 <Link to={"/dashboard"}>Dashboard</Link>
                 <Link to={"/lessons"}>Lessons</Link>
                 <Link to={"/activities"}>Activities</Link>
               </div>
               {user ? (
-                <div className="flex flex-col mt-auto gap-4">
-                  <Link to="/account" className="w-full flex gap-3 ">
+                <div className="flex flex-col mt-auto gap-4 ">
+                  <Link to="/account" className="w-full flex gap-3 active:backdrop-brightness-150">
                     <div
                       className={`w-10 h-10 rounded-full overflow-hidden flex justify-center items-center ${
                         user.profilePicture
                           ? ""
-                          : "border-1 border-solid border-gray-700"
+                          : "border-1 border-solid border-muted-foreground"
                       }`}
                     >
                       {user.profilePicture ? (
@@ -137,7 +137,7 @@ export default function Header() {
                           className=" object-cover"
                         />
                       ) : (
-                        <p className="text-xl font-light">
+                        <p className="text-xl font-light text-secondary-foreground">
                           {(user.displayName || "   ")
                             .substring(0, 2)
                             .toUpperCase()}
@@ -145,8 +145,8 @@ export default function Header() {
                       )}
                     </div>
                     <div className="flex flex-col text-left">
-                      <p>{user.displayName}</p>
-                      <p className="text-xs text-gray-500">{user.username}</p>
+                      <p className="text-secondary-foreground">{user.displayName}</p>
+                      <p className="text-xs text-muted-foreground">{user.username}</p>
                     </div>
                   </Link>
                   <button
@@ -160,7 +160,7 @@ export default function Header() {
                           toast.error(error.message);
                         });
                     }}
-                    className="w-full text-center hover:underline bg-red-700 text-white p-3 active:bg-red-900"
+                    className="w-full text-center hover:underline bg-error text-white p-3 active:brightness-85"
                   >
                     Log Out
                   </button>
@@ -168,7 +168,7 @@ export default function Header() {
               ) : (
                 <Link
                   to="/login"
-                  className="mt-auto text-center bg-cyan-500 text-white p-3 w-full"
+                  className="mt-auto text-center bg-primary text-primary-foreground active:brightness-110 p-3 w-full"
                 >
                   Login
                 </Link>

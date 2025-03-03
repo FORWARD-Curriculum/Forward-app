@@ -4,7 +4,7 @@ export default function Footer() {
     return <>
         <div className="
 
-        flex flex-col bg-gray-200 **:!text-gray-400 **:!no-underline  box-border
+        flex flex-col bg-muted **:!text-muted-foreground **:!no-underline  box-border
         items-center px-12 py-4 min-h-25 left-0 bottom-0 right-0 w-full gap-3 lg:gap-0.5
         
         ">

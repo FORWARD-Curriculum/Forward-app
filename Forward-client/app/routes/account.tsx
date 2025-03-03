@@ -100,22 +100,22 @@ export default function account() {
     <div className="flex justify-center items-center w-screen grow">
       <form
         encType="multipart/form-data"
-        className="flex items-center flex-col bg-white justify-center rounded-3xl p-4 leading-none "
+        className="flex items-center flex-col bg-foreground text-secondary-foreground justify-center rounded-3xl p-4 leading-none "
         onSubmit={handleSubmit}
       >
         <h1 className="text-xl w-full lg:text-center">Profile Overview</h1>
         <div className="flex gap-3 flex-col lg:flex-row mt-4">
           <div className="flex flex-row-reverse gap-5 items-center justify-center lg:flex-col lg:gap-2 lg:border-r-gray-200 lg:border-r lg:pr-3">
             <div className="flex flex-col lg:items-center lg:justify-center">
-              <p className="text-3xl lg:text-base">{user.displayName}</p>
-              <p className="text-gray-500 lg:text-xs">{user.username}</p>
+              <p className="text-3xl lg:text-base text-secondary-foreground">{user.displayName}</p>
+              <p className="text-muted-foreground lg:text-xs">{user.username}</p>
             </div>
             <div className="gap-1 flex flex-col items-center">
               <div
                 className={`w-30 h-30 rounded-full overflow-hidden flex justify-center items-center ${
                   profile_pic || (user.profilePicture && !removedPicture)
                     ? ""
-                    : "border-1 border-solid border-gray-700"
+                    : "border-1 border-solid border-muted-foreground"
                 }`}
               >
                 {profile_pic || (user.profilePicture && !removedPicture) ? (
@@ -127,7 +127,7 @@ export default function account() {
                     className=" object-cover"
                   />
                 ) : (
-                  <p className="text-5xl font-light">
+                  <p className="text-5xl font-light text-secondary-foreground">
                     {(user.displayName || "   ").substring(0, 2).toUpperCase()}
                   </p>
                 )}
@@ -135,7 +135,7 @@ export default function account() {
               <div className="flex-col flex gap-0.5">
                 <label
                   htmlFor="pfp"
-                  className="text-sm text-white bg-cyan-500 hover:bg-cyan-400 active:bg-cyan-600 rounded-3xl p-1.5 hover:cursor-pointer"
+                  className="text-sm text-primary-foreground bg-primary brightness-110 hover:brightness-120 active:brightness-100 rounded-3xl p-1.5 hover:cursor-pointer"
                 >
                   Change Picture
                 </label>
@@ -153,7 +153,7 @@ export default function account() {
                 />
                 <button
                   type="button"
-                  className="text-sm bg-red-400 text-white hover:bg-red-300 active:bg-red-700 rounded-3xl p-1.5"
+                  className="text-sm text-primary-foreground !bg-error brightness-110 hover:brightness-120 active:brightness-100 rounded-3xl p-1.5"
                   onClick={() => {
                     setProfilePic(null);
                     setRemovedPicture(true);
@@ -174,14 +174,15 @@ export default function account() {
                   id="display_name"
                   name="display_name"
                   className={`${
-                    displayNameEdit ? "text-gray-500" : "text-black"
+                    displayNameEdit ? "text-muted-foreground" : "text-secondary-foreground"
                   } border-gray-700`}
                   inert={displayNameEdit}
                   defaultValue={user.displayName}
                 />
                 <Button
-                  className="absolute right-0"
+                  className="absolute right-0 active:bg-accent"
                   type="button"
+                  variant={"ghost"}
                   onClick={() => {
                     setDisplayNameEdit(!displayNameEdit);
                   }}
@@ -195,6 +196,7 @@ export default function account() {
                 id="consent"
                 name="consent"
                 defaultChecked={user.consent}
+                className="!bg-transparent !border-secondary-foreground"
               />
               <div className="grid gap-1.5 leading-none">
                 <label
@@ -210,18 +212,18 @@ export default function account() {
               </div>
             </div>
 
-            <div className="flex w-full mt-auto">
+            <div className="flex w-full mt-auto gap-2">
               <Button
                 type="submit"
-                className="button w-full bg-cyan-500 hover:bg-cyan-400 text-white active:bg-cyan-600"
-                variant={"outline"}
+                className="button w-full text-primary-foreground !bg-primary brightness-110 hover:brightness-120 active:brightness-100"
+                variant={"default"}
               >
                 Save Changes
               </Button>
               <Button
                 type="reset"
-                className="button w-full bg-red-400 hover:bg-red-300 text-white active:bg-red-700 mt-auto"
-                variant={"outline"}
+                className="button w-full text-primary-foreground !bg-error brightness-110 hover:brightness-120 active:brightness-100 mt-auto"
+                variant={"default"}
                 onClick={() => {
                   setProfilePic(null);
                   setRemovedPicture(false);
