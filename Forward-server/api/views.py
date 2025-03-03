@@ -12,7 +12,7 @@ from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, Writing, 
 class UserRegistrationView(generics.CreateAPIView):
     """
     API endpoint for user registration.
-    Endpoint: POST /api/register/
+    Endpoint: POST /api/users/
     """
     serializer_class = UserRegistrationSerializer # Handles data validation and user creation
     permission_classes = [AllowAny] # Allows anyone to register (no authentication required)
@@ -82,7 +82,12 @@ class SessionView(APIView):
         )
 
 class CurrentUserView(APIView):
-    """Endpoint for retrieving current user information"""
+    """
+    Endpoint for retrieving/updating current user information
+    
+    GET: Get the current user session
+    PATCH: Update the current user
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
