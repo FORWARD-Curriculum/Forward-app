@@ -1,14 +1,17 @@
-import React, { use } from "react";
+import React from "react";
 import { useAuth } from "@/lib/useAuth";
 import * as Sheet from "@/components/ui/sheet";
 import { Menu, ChevronRight } from "lucide-react";
 import * as DropdownMenu from "@/components/ui/dropdown-menu";
 import { useClient } from "@/lib/useClient";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
 
 export default function Header() {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const { windowDimensions } = useClient();
+  const user = useSelector((state: RootState)=>state.user.user)
 
   const [open, setOpen] = React.useState(false);
 

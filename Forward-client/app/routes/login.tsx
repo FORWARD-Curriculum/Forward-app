@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useAuth } from "@/lib/useAuth";
-import type { User } from "@/lib/useUser";
+import type { User } from "@/lib/userSlice";
 import { toast } from "sonner";
 
 export default function Login() {
@@ -16,7 +16,6 @@ export default function Login() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault(); // Prevent the default form submission behavior
-    console.log("submitting form");
     const formData = new FormData(e.target);
     const data = {
       username: formData.get("username"),
@@ -102,4 +101,3 @@ export default function Login() {
     </div>
   );
 }
-//    const [instructor, setInstructor] = useState(false); {instructor?<Button onClick={()=>{setInstructor(true)}}>I am an instructor</Button>:<></>}

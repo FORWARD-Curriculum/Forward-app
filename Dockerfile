@@ -1,50 +1,38 @@
-# Build stage for Node.js
-FROM node:20-slim AS node-builder
-WORKDIR /app/Forward-client
+FROM node:alpine
+
+# Install required packages
+RUN apk add --no-cache --update \
+    bash \
+    python3 \
+    py3-pip \
+    py3-virtualenv \
+    ca-certificates
+
+# Setup frontend
+WORKDIR /app/frontend
 COPY Forward-client/package*.json ./
-RUN npm ci
-COPY Forward-client/ .
-RUN npm run build
+# Either ensure package-lock.json exists, or use npm install instead of npm ci
+RUN npm install
 
-# Build stage for Python
-FROM python:3.11-slim AS python-builder
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    NODE_ENV=development
+# Setup backend (move virtual environment outside the mounted directory)
+WORKDIR /app/backend
+RUN python3 -m venv /venv
+RUN /venv/bin/pip install django djangorestframework
 
-WORKDIR /app
-
-# Install only required system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    build-essential && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copy and install Python dependencies first
-COPY requirements.txt .
-RUN python -m venv /app/.venv && \
-    . /app/.venv/bin/activate &&
-
-# Copy Python application code
-COPY ./Forward-server .
-
-# Copy built Node.js files from node-builder
-COPY --from=node-builder /app/Forward-client/dist ./Forward-client/dist
-
-# Run migrations
-RUN . /app/.venv/bin/activate && python manage.py migrate
-
-# Create start script
+# Create entrypoint script
 RUN printf '#!/bin/bash\n\
+source /venv/bin/activate\n\
+/venv/bin/python /app/backend/manage.py migrate\n\
 trap "exit" INT TERM\n\
 trap "kill 0" EXIT\n\
-source /app/.venv/bin/activate\n\
-python manage.py runserver 0.0.0.0:8000 &\n\
-cd /app/Forward-client && npm run dev -- --host 0.0.0.0 &\n\
+/venv/bin/python /app/backend/manage.py runserver 0.0.0.0:8000 &\n\
+cd /app/frontend && npm install && npm run dev -- --host 0.0.0.0 &\n\
 wait\n' > /app/start.sh && \
 chmod +x /app/start.sh
 
 EXPOSE 8000 5173
+
+# Mount only the source code; ensure the virtual environment is not overwritten
+VOLUME /app/frontend /app/backend
 
 CMD ["/bin/bash", "/app/start.sh"]

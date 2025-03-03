@@ -1,0 +1,33 @@
+[
+    {
+        "title": "Going to College",
+        "description": "Learn about college preparation, applications, and financing",
+        "objectives": [
+            "Know the different types of higher education and degree types",
+            "Apply for college",
+            "Identify multiple strategies for financing college",
+            "Understand basic vocabulary and terms around college and independent living"
+        ],
+        "order": 1,
+        "tags": [
+            "education",
+            "college",
+            "financing"
+        ]
+    },
+    {
+        "title": "Financial Literacy",
+        "description": "Learn about managing money, budgeting, and financial planning",
+        "objectives": [
+            "Create a personal budget",
+            "Understand credit scores and their importance",
+            "Learn about saving and investing basics"
+        ],
+        "order": 2,
+        "tags": [
+            "finance",
+            "money",
+            "budgeting"
+        ]
+    }
+]
