@@ -7,17 +7,16 @@ set -e
 set -x
 
 # Create and activate cirtual environment
-python3 -m venv .venv
-# ./.venv/Scripts/activate # For windows only
+python -m venv .venv
 source .venv/bin/activate # Uncomment for Mac/Linux
 
 # Install dependencies
 pip install django djangorestframework
 
 # Run migrations
-python3 manage.py migrate
+python manage.py migrate
 
 # Seed database with test data
-python3 manage.py seed_test_data --reset
+python manage.py seed_test_data --reset
 
 echo "Development environment is ready"

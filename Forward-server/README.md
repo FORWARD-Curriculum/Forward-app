@@ -74,7 +74,7 @@ information.
 - Require Authentication: false
 - Request
 
-  - Method: POST
+  - Method `POST`
   - URL: /api/session
   - Headers:
     - Content-Type: application/json
@@ -179,7 +179,7 @@ user's information.
 - Require Authentication: false
 - Request
 
-  - Method: POST
+  - Method `POST`
   - URL: /api/users
   - Headers:
     - Content-Type: application/json
@@ -280,7 +280,7 @@ Confirms the current user is logged in, and returns user info.
 - Require Authentication: true
 - Request
 
-  - Method: GET
+  - Method `GET`
   - URL: /api/users/me
   - Headers:
     - Content-Type: application/json
@@ -318,7 +318,7 @@ Updates the current user's info, or does not change it, depending on the content
 - Require Authentication: true
 - Request
 
-  - Method: PATCH
+  - Method `PATCH`
   - URL: /api/users/me
   - Headers:
     - Content-Type: application/json
@@ -367,7 +367,7 @@ Retrieves a quiz by its ID.
 
 - Request
 
-  - Method: GET
+  - Method `GET`
   - URL: /api/quiz/:id
   - Body: None
 
@@ -403,7 +403,7 @@ submits results of quiz along with its data
 - Require Authentication: true
 - Request
 
-  - Method: POST
+  - Method `POST`
   - URL: /api/test/:id
   - Body:
 
@@ -452,7 +452,7 @@ Returns all the readings
 - Require Authentication: true
 - Request
 
-  - Method: GET
+  - Method `GET`
   - URL: /api/readings/:lessonId
   - Body: none
 
@@ -506,7 +506,7 @@ Retrieves a lesson by its ID.
 
 - Request
 
-  - Method: GET
+  - Method `GET`
   - URL: /api/lessons/:id
   - Body: None
 
@@ -541,7 +541,7 @@ Retrieves video content by its lesson Id.
 
 - Request
 
-  - Method: GET
+  - Method `GET`
   - URL: /api/video-content/:lessonId
   - Body: None
 
@@ -575,7 +575,7 @@ Retrieves a media asset by its videocontent id.
 
 - Request
 
-  - Method: GET
+  - Method `GET`
   - URL: /api/media-asset/:videoContentId
   - Body: None
 
@@ -609,7 +609,7 @@ Retrieves a poll by its lesson id.
 
 - Request
 
-  - Method: GET
+  - Method `GET`
   - URL: /api/poll/:id
   - Body: None
 
@@ -643,7 +643,7 @@ get all poll questions based on the poll id
 
 - Request
 
-  - Method: GET
+  - Method `GET`
   - URL: /api/poll-question/:pollId
   - Body: None
 
@@ -677,7 +677,7 @@ Retrieves a writing activity by its lesson id.
 
 - Request
 
-  - Method: GET
+  - Method `GET`
   - URL: /api/writing-activity/:lessonId
   - Body: None
 
