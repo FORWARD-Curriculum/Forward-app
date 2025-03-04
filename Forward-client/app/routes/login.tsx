@@ -34,9 +34,9 @@ export default function Login() {
       const result = await response.json();
 
       if (!response.ok) {
-        toast.error("Hmm... something went wrong")
-        throw new Error(result.detail||"Login error.");
-      } 
+        toast.error("Hmm... something went wrong");
+        throw new Error(result.detail || "Login error.");
+      }
 
       /* TODO: cdn domain for picture*/
       const user: User = {
@@ -44,8 +44,12 @@ export default function Login() {
         username: result.data.user.username,
         displayName: result.data.user.display_name,
         facility_id: result.data.facility_id,
-        profilePicture: result.data.user.profile_picture||undefined,
+        profilePicture: result.data.user.profile_picture || undefined,
         consent: result.data.user.consent,
+        preferences: {
+          theme: "dark",
+          text_size: "txt-xl",
+        },
       };
 
       login(user);
@@ -60,7 +64,10 @@ export default function Login() {
 
   return (
     <div className="flex justify-center items-center w-screen grow">
-      <div className="bg-foreground rounded-3xl w-fit p-6 flex flex-col items-center text-secondary-foreground">
+      <div
+        className="bg-foreground outline-foreground-border outline-1 rounded-3xl w-fit
+        p-6 flex flex-col items-center text-secondary-foreground"
+      >
         <h1 className="text-xl font-medium">Login to an existing account</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-6 my-6">
           <div>
@@ -86,14 +93,15 @@ export default function Login() {
           </div>
           <Button
             type="submit"
-            className="button w-full bg-primary text-primary-foreground active:brightness-125"
+            className="button w-full bg-primary text-primary-foreground active:brightness-125
+            outline-primary-border outline-1"
             variant={"default"}
           >
             Login
           </Button>
-          {error && <p className="text-red-500 w-full text-center">{error}</p>}
+          {error && <p className="text-error-border w-full text-center">{error}</p>}
         </form>
-        <p className="text-center text-gray-400">
+        <p className="text-center text-muted-foreground">
           Don't have an account? <br />
           <Link to="/register" className="text-blue-500 underline">
             Sign Up

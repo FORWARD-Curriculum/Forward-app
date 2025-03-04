@@ -9,6 +9,7 @@
   --animate-in: fade-in 0.4s ease-in-out;
   --animate-out: fade-out 0.4s ease-in-out;
 
+  /* Dynamic theming */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
@@ -19,7 +20,27 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-error: var(--error);
-  
+  /* Used in accessable color schemes to differentiate elements without
+  affecting non-primarily accessable. Use around elements with the same name */
+  --color-foreground-border: var(--foreground-border);
+  --color-primary-border: var(--primary-border);
+  --color-error-border: var(--error-border);
+  --color-secondary-border: var(--secondary-border);
+
+  /* Dynamic Text Sizes */
+  --text-xs: var(--txt-xs);
+  --text-sm: var(--txt-sm);
+  --text-base: var(--txt-base);
+  --text-lg: var(--txt-lg);
+  --text-xl: var(--txt-xl);
+  --text-2xl: var(--txt-2xl);
+  --text-3xl: var(--txt-3xl);
+  --text-4xl: var(--txt-4xl);
+  --text-5xl: var(--txt-5xl);
+  --text-6xl: var(--txt-6xl);
+  --text-7xl: var(--txt-7xl);
+  --text-8xl: var(--txt-8xl);
+  --text-9xl: var(--txt-9xl);
 
   @keyframes slide-out-to-right {
     from {
@@ -29,7 +50,7 @@
       transform: translateX(100%);
     }
   }
-  
+
   @keyframes slide-in-from-right {
     from {
       transform: translateX(100%);
@@ -56,7 +77,7 @@
       opacity: 0;
     }
   }
-  
+
   @keyframes enter {
     from {
       opacity: var(--tw-enter-opacity, 1);
@@ -89,7 +110,7 @@
         )
         rotate(var(--tw-exit-rotate, 0));
     }
-  } 
+  }
 
   @keyframes slide-in-from-left {
     from {
@@ -159,7 +180,7 @@ body {
 }
 
 .lucide {
-  color: var(--secondary-foreground)
+  color: var(--secondary-foreground);
 }
 
 button {
@@ -168,38 +189,132 @@ button {
 
 @layer base {
   :root {
-    --background: theme('colors.gray.100');
-    --foreground: theme('colors.white');
+    --background: var(--color-gray-100);
+    --foreground: var(--color-white);
+    --foreground-border: var(--color-white);
 
-    --primary: theme('colors.cyan.500');
-    --primary-foreground: theme('colors.white');
+    --primary: var(--color-cyan-500);
+    --primary-foreground: var(--color-white);
+    --primary-border: var(--primary);
 
-    --secondary: theme('colors.white');
-    --secondary-foreground: theme('colors.black');
-    
-    --accent: theme('colors.amber.500');
+    --secondary: var(--color-white);
+    --secondary-foreground: var(--color-black);
+    --secondary-border: var(--color-white);
 
-    --muted: theme('colors.gray.200');
-    --muted-foreground: theme('colors.gray.400');
+    --accent: var(--color-amber-500);
 
-    --error: theme('colors.red.600')
+    --muted: var(--color-gray-200);
+    --muted-foreground: var(--color-gray-400);
+
+    --error: var(--color-red-600);
+    --error-border: var(--color-red-600);
   }
   .dark {
-    
-    --background: theme('colors.gray.800');
-    --foreground: theme('colors.gray.700');
-    --primary: theme('colors.cyan.700');
-    --primary-foreground: theme('colors.white');
+    --background: var(--color-gray-800);
+    --foreground: var(--color-gray-700);
+    --foreground-border: var(--color-gray-700);
 
-    --secondary: theme('colors.gray.700');
-    --secondary-foreground: theme('colors.gray.200');
+    --primary: var(--color-cyan-700);
+    --primary-foreground: var(--color-white);
+    --primary-border: var(--primary);
 
-    --accent: theme('colors.amber.500');
-    
-    --muted: theme('colors.gray.900');
-    --muted-foreground: theme('colors.gray.400');
+    --secondary: var(--color-gray-700);
+    --secondary-foreground: var(--color-gray-200);
+    --secondary-border: var(--color-gray-700);
 
-    --error: theme('colors.red.700')
+    --accent: var(--color-amber-500);
+
+    --muted: var(--color-gray-900);
+    --muted-foreground: var(--color-gray-400);
+
+    --error: var(--color-red-700);
+    --error-border: var(--color-red-700);
+  }
+
+  .high-contrast {
+    --background: var(--color-black);
+    --foreground: var(--color-black);
+    --foreground-border: var(--color-white);
+
+    --primary: var(--color-black);
+    --primary-foreground: var(--color-yellow-500);
+    --primary-border: var(--color-yellow-500);
+
+    --secondary: var(--color-black);
+    --secondary-foreground: var(--color-white);
+    --secondary-border: var(--color-white);
+
+    --accent: var(--color-amber-500);
+
+    --muted: var(--color-black);
+    --muted-foreground: var(--color-yellow-500);
+
+    --error: var(--color-black);
+    --error-border: var(--color-fuchsia-500);
+  }
+
+  .txt-sm {
+    --txt-xs: 0.625rem;
+    --txt-sm: 0.75rem;
+    --txt-base: 0.875rem;
+    --txt-lg: 1rem;
+    --txt-xl: 1.125rem;
+    --txt-2xl: 1.25rem;
+    --txt-3xl: 1.5rem;
+    --txt-4xl: 1.875rem;
+    --txt-5xl: 2.25rem;
+    --txt-6xl: 3rem;
+    --txt-7xl: 3.75rem;
+    --txt-8xl: 4.5rem;
+    --txt-9xl: 6rem;
+  }
+
+  .txt-base {
+    --txt-xs: 0.75rem;
+    --txt-sm: 0.875rem;
+    --txt-base: 1rem;
+    --txt-lg: 1.125rem;
+    --txt-xl: 1.25rem;
+    --txt-2xl: 1.5rem;
+    --txt-3xl: 1.875rem;
+    --txt-4xl: 2.25rem;
+    --txt-5xl: 3rem;
+    --txt-6xl: 3.75rem;
+    --txt-7xl: 4.5rem;
+    --txt-8xl: 6rem;
+    --txt-9xl: 8rem;
+  }
+
+  .txt-lg {
+    --txt-xs: 0.875rem;
+    --txt-sm: 1rem;
+    --txt-base: 1.125rem;
+    --txt-lg: 1.25rem;
+    --txt-xl: 1.5rem;
+    --txt-2xl: 1.875rem;
+    --txt-3xl: 2.25rem;
+    --txt-4xl: 3rem;
+    --txt-5xl: 3.75rem;
+    --txt-6xl: 4.5rem;
+    --txt-7xl: 6rem;
+    --txt-8xl: 8rem;
+    --txt-9xl: 10rem;
+  }
+
+  .txt-xl {
+    --txt-xs: 1rem;
+    --txt-sm: 1.125rem;
+    --txt-base: 1.25rem;
+    --txt-lg: 1.5rem;
+    --txt-xl: 1.875rem;
+    --txt-2xl: 2.25rem;
+    --txt-3xl: 3rem;
+    --txt-4xl: 3.75rem;
+    --txt-5xl: 4.5rem;
+    --txt-6xl: 6rem;
+    --txt-7xl: 8rem;
+    --txt-8xl: 10rem;
+    --txt-9xl: 12rem;
   }
 }
 

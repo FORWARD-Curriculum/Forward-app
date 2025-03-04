@@ -85,7 +85,8 @@ export default function Login() {
 
   return (
     <div className="flex justify-center items-center w-screen">
-      <div className="bg-foreground text-secondary-foreground rounded-3xl w-fit p-6 flex flex-col items-center">
+      <div className="bg-foreground text-secondary-foreground rounded-3xl w-fit
+      p-6 flex flex-col items-center outline-foreground-border outline-1 my-1">
         <h1 className="text-xl font-medium">Create an account</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-5 my-6">
           <div className="flex gap-2">
@@ -181,15 +182,16 @@ export default function Login() {
             )}
             <Button
               type="submit"
-              className="button w-full bg-primary text-primary-foreground active:brightness-110"
-              variant={"outline"}
+              className="button w-full bg-primary text-primary-foreground active:brightness-110
+              outline-primary-border outline-1"
+              variant={"default"}
             >
               Create Account
             </Button>
           </div>
-          {error && <p className="text-red-500 w-full text-center">{error}</p>}
+          {error && <p className="text-error-border w-full text-center">{error}</p>}
         </form>
-        <p className="text-center text-gray-400">
+        <p className="text-center text-muted-foreground">
           Already have an account? <br />
           <Link to="/login" className="text-blue-500 underline">
             Log In

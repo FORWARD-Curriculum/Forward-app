@@ -21,7 +21,7 @@ export default function Header() {
       <div
         className={` flex bg-primary box-border **:text-white items-center ${
           user ? "pl-12 pr-8" : "px-12"
-        } h-18 w-full`}
+        } h-18 w-full border-b-primary-border border-b-1`}
       >
         <Link to="/" className="text-xl font-medi">
           FORWARD
@@ -31,7 +31,7 @@ export default function Header() {
 
         {/* This is the desktop menu */}
         {windowDimensions.width > 1024 ? (
-          <ul className="flex list-none gap-6 ml-auto items-center font-medium">
+          <ul className="flex list-none gap-6 ml-auto items-center font-medium *:hover:underline">
             <li>
               <Link to={"/dashboard"}>Dashboard</Link>
             </li>
@@ -112,18 +112,26 @@ export default function Header() {
               <Menu className="h-8 w-8" />
             </Sheet.SheetTrigger>
             <Sheet.SheetContent
-              className="bg-background flex flex-col px-4"
+              className={`bg-background flex flex-col px-4 ${
+                user?.preferences?.theme || ""
+              } ${user?.preferences?.text_size || ""}`}
               aria-describedby="A slide out from the right of the screen containing the navigation in a mobile-friendly way."
             >
-              <Sheet.SheetTitle className="text-secondary-foreground">FORWARD Navigation</Sheet.SheetTitle>
-              <div className="flex flex-col *:bg-secondary *:flex *:justify-between *:p-4 space-y-1 *:active:bg-gray-200/80 *:rounded-xl text-secondary-foreground">
+              <Sheet.SheetTitle className="text-secondary-foreground">
+                FORWARD Navigation
+              </Sheet.SheetTitle>
+              <div className="flex flex-col *:bg-secondary *:flex *:justify-between *:p-4 space-y-1 *:active:bg-gray-200/80
+              *:rounded-xl text-secondary-foreground *:outline-secondary-border *:outline-1">
                 <Link to={"/dashboard"}>Dashboard</Link>
                 <Link to={"/lessons"}>Lessons</Link>
                 <Link to={"/activities"}>Activities</Link>
               </div>
               {user ? (
-                <div className="flex flex-col mt-auto gap-4 ">
-                  <Link to="/account" className="w-full flex gap-3 active:backdrop-brightness-150">
+                <div className="flex flex-col mt-auto gap-4 group">
+                  <Link
+                    to="/account"
+                    className="w-full flex gap-3 active:backdrop-brightness-150"
+                  >
                     <div
                       className={`w-10 h-10 rounded-full overflow-hidden flex justify-center items-center ${
                         user.profilePicture
@@ -145,8 +153,12 @@ export default function Header() {
                       )}
                     </div>
                     <div className="flex flex-col text-left">
-                      <p className="text-secondary-foreground">{user.displayName}</p>
-                      <p className="text-xs text-muted-foreground">{user.username}</p>
+                      <p className="text-secondary-foreground text-base group-hover:underline">
+                        {user.displayName}
+                      </p>
+                      <p className="text-xs text-muted-foreground group-hover:underline">
+                        {user.username}
+                      </p>
                     </div>
                   </Link>
                   <button
@@ -160,7 +172,7 @@ export default function Header() {
                           toast.error(error.message);
                         });
                     }}
-                    className="w-full text-center hover:underline bg-error text-white p-3 active:brightness-85"
+                    className="w-full text-center hover:underline bg-error text-white p-3 active:brightness-85 outline-error-border outline-1"
                   >
                     Log Out
                   </button>

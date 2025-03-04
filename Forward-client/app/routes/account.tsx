@@ -1,6 +1,7 @@
 import type { User } from "@/lib/userSlice";
+import React, { useEffect, useRef } from "react";
 import type { RootState } from "@/store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,59 @@ import { PenIcon, PenOffIcon } from "lucide-react";
 import { apiFetch } from "@/lib/utils";
 import { useAuth } from "@/lib/useAuth";
 import { toast } from "sonner";
+
+const ThemeOption = React.forwardRef<
+  HTMLInputElement,
+  {
+    themeName: NonNullable<User["preferences"]>["theme"];
+    themeBG: string;
+    themePrimary: string;
+  } & React.LabelHTMLAttributes<HTMLLabelElement>
+>(({ themeName, themeBG, themePrimary, className, ...props }, ref) => {
+  return (
+    <div>
+      <input
+        ref={ref}
+        type="radio"
+        id={`theme_${themeName}`}
+        className="peer hidden"
+        name="theme"
+        value={themeName}
+      />
+      <label
+        htmlFor={`theme_${themeName}`}
+        className={`block peer-checked:outline-secondary-foreground peer-checked:outline-2 outline-offset-4 rounded-xl h-10 overflow-hidden ${className}`}
+        {...props}
+      >
+        <svg
+          viewBox="0 0 100 100"
+          width="40"
+          height="40"
+          xmlns="http://www.w3.org/2000/svg"
+          className=" "
+        >
+          <defs>
+            <linearGradient
+              id={`diag-split-${themeName}`}
+              x1="0"
+              y1="0"
+              x2="1"
+              y2="1"
+            >
+              <stop offset="50%" stopColor={themeBG} />
+              <stop offset="50%" stopColor={themePrimary} />
+            </linearGradient>
+          </defs>
+          <rect
+            width="100"
+            height="100"
+            fill={`url(#diag-split-${themeName})`}
+          />
+        </svg>
+      </label>
+    </div>
+  );
+});
 
 /**
  * HUGE TODO: SEND IMAGE FILE TO SERVER, NOT LOCAL BLOB URL
@@ -46,27 +100,45 @@ async function cropImageToSquare(file: File | undefined): Promise<File | null> {
 
 export default function account() {
   const update = useAuth().update;
+  const dispatch = useDispatch();
   const user = useSelector((s: RootState) => s.user.user) as User;
   const [profile_pic, setProfilePic] = useState<File | null>();
   const [displayNameEdit, setDisplayNameEdit] = useState(true);
   const [removedPicture, setRemovedPicture] = useState(false);
+  const originalTheme = useRef(user.preferences?.theme);
+  const [newTheme, setNewTheme] = useState<
+    NonNullable<User["preferences"]>["theme"] | undefined
+  >(originalTheme.current);
+
+  useEffect(() => {
+    console.log(originalTheme);
+    dispatch({
+      type: "user/setUser",
+      payload: { ...user, preferences: { theme: newTheme } },
+    });
+  }, [newTheme]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault(); // Prevent the default form submission behavior
     const formData = new FormData(e.target);
     const data = {
-      profile_picture: (profile_pic||removedPicture)
-        ? (profile_pic?URL.createObjectURL(profile_pic):null)
-        : user.profilePicture,
+      profile_picture:
+        profile_pic || removedPicture
+          ? profile_pic
+            ? URL.createObjectURL(profile_pic)
+            : null
+          : user.profilePicture,
       display_name: formData.get("display_name"),
       ...(formData.get("consent") ? { consent: true } : { consent: false }),
     };
     try {
       // Error out if the user didnt change anything, but submitted somehow
-      if (user.profilePicture === data.profile_picture&&
-          user.displayName === data.display_name&&
-          user.consent === data.consent
-      ){
+      if (
+        user.profilePicture === data.profile_picture &&
+        user.displayName === data.display_name &&
+        user.consent === data.consent &&
+        originalTheme.current === newTheme
+      ) {
         throw new Error("Please make a change to update account.");
       }
       const response = await apiFetch("users/me", {
@@ -100,15 +172,20 @@ export default function account() {
     <div className="flex justify-center items-center w-screen grow">
       <form
         encType="multipart/form-data"
-        className="flex items-center flex-col bg-foreground text-secondary-foreground justify-center rounded-3xl p-4 leading-none "
+        className="flex items-center flex-col bg-foreground text-secondary-foreground
+        justify-center rounded-3xl p-4 leading-none border-foreground-border border-1"
         onSubmit={handleSubmit}
       >
         <h1 className="text-xl w-full lg:text-center">Profile Overview</h1>
         <div className="flex gap-3 flex-col lg:flex-row mt-4">
           <div className="flex flex-row-reverse gap-5 items-center justify-center lg:flex-col lg:gap-2 lg:border-r-gray-200 lg:border-r lg:pr-3">
             <div className="flex flex-col lg:items-center lg:justify-center">
-              <p className="text-3xl lg:text-base text-secondary-foreground">{user.displayName}</p>
-              <p className="text-muted-foreground lg:text-xs">{user.username}</p>
+              <p className="text-3xl lg:text-base text-secondary-foreground">
+                {user.displayName}
+              </p>
+              <p className="text-muted-foreground lg:text-xs">
+                {user.username}
+              </p>
             </div>
             <div className="gap-1 flex flex-col items-center">
               <div
@@ -135,7 +212,8 @@ export default function account() {
               <div className="flex-col flex gap-0.5">
                 <label
                   htmlFor="pfp"
-                  className="text-sm text-primary-foreground bg-primary brightness-110 hover:brightness-120 active:brightness-100 rounded-3xl p-1.5 hover:cursor-pointer"
+                  className="text-sm text-primary-foreground bg-primary brightness-110 hover:brightness-120
+                  active:brightness-100 rounded-3xl p-1.5 hover:cursor-pointer outline-primary-border outline-1"
                 >
                   Change Picture
                 </label>
@@ -153,7 +231,8 @@ export default function account() {
                 />
                 <button
                   type="button"
-                  className="text-sm text-primary-foreground !bg-error brightness-110 hover:brightness-120 active:brightness-100 rounded-3xl p-1.5"
+                  className="text-sm text-primary-foreground !bg-error brightness-110 hover:brightness-120
+                  active:brightness-100 rounded-3xl p-1.5 outline-error-border outline-1"
                   onClick={() => {
                     setProfilePic(null);
                     setRemovedPicture(true);
@@ -174,7 +253,9 @@ export default function account() {
                   id="display_name"
                   name="display_name"
                   className={`${
-                    displayNameEdit ? "text-muted-foreground" : "text-secondary-foreground"
+                    displayNameEdit
+                      ? "text-muted-foreground"
+                      : "text-secondary-foreground"
                   } border-gray-700`}
                   inert={displayNameEdit}
                   defaultValue={user.displayName}
@@ -211,24 +292,53 @@ export default function account() {
                 </p>
               </div>
             </div>
+            <div className="flex flex-row gap-3">
+              <ThemeOption
+                themeName="dark"
+                themeBG="var(--color-gray-800)"
+                themePrimary="var(--color-cyan-700)"
+                onClick={() => {
+                  setNewTheme("dark");
+                }}
+              />
+              <ThemeOption
+                themeName="light"
+                themeBG="var(--color-gray-200)"
+                themePrimary="var(--color-cyan-500)"
+                onClick={() => {
+                  setNewTheme("light");
+                }}
+              />
+              <ThemeOption
+                themeName="high-contrast"
+                themeBG="var(--color-black)"
+                themePrimary="var(--color-fuchsia-600)"
+                onClick={() => {
+                  setNewTheme("high-contrast");
+                }}
+              />
+            </div>
 
             <div className="flex w-full mt-auto gap-2">
               <Button
                 type="submit"
-                className="button w-full text-primary-foreground !bg-primary brightness-110 hover:brightness-120 active:brightness-100"
+                className="button w-full text-primary-foreground !bg-primary brightness-110 hover:brightness-120 active:brightness-100
+                outline-primary-border outline-1"
                 variant={"default"}
               >
                 Save Changes
               </Button>
               <Button
                 type="reset"
-                className="button w-full text-primary-foreground !bg-error brightness-110 hover:brightness-120 active:brightness-100 mt-auto"
+                className="button w-full text-primary-foreground !bg-error brightness-110 hover:brightness-120 active:brightness-100
+                outline-error-border outline-1"
                 variant={"default"}
                 onClick={() => {
                   setProfilePic(null);
                   setRemovedPicture(false);
                   setDisplayNameEdit(true);
-                  toast.success("Successfully reverted changes.")
+                  setNewTheme(originalTheme.current);
+                  toast.success("Successfully reverted changes.");
                 }}
               >
                 Discard Changes
