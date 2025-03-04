@@ -9,10 +9,21 @@ React Router (RR) lets us define routes and layouts for our project in [one file
 > [!WARNING]
 > While the user is redirected from protected routes, this is a client side check, and so any secure information should always be retrieved via an authenticated API call.
 
+## Todos
+### General
+- [ ] Add theme preferences to user model and allow selection/update on account page
+- [ ] Change font sizing options to be variable for More accability options
+- [ ] Rework user registration for automatic user name creation
+- [ ] Look into screen reader capaabilities
+### Curriculum
+- [ ] Get list of lesson metadatas and dynamically populate `/dashboard` and `/lessons`
+- [ ] Create and implement a `curriculumSlice` and `lessonSlice` 
+- [ ] Have general structure and loading set up for activities
+
 ## Important Notes
 - When accessing any data on load from the backend RR's [Route.clientLoader](https://reactrouter.com/start/framework/data-loading#client-data-loading) function should be used to simultaneously load the route and page data, as fetching within the default function can create long network waterfalls and out of date data.
 
-- While it is yet to be implemented the `authFetch()` function from [app/lib/api](./app/lib/api.ts) wraps the builtin `fetch()` function with the required CSRF headers to authenticate the request to the server.
+- While it is yet to be implemented the `apiFetch()` function from [app/lib/utils](./app/lib/utils.ts) wraps the builtin `fetch()` function with the required CSRF headers to authenticate the request to the server.
 
 - shadcn provides a useful feedback component called a [Sonner](https://ui.shadcn.com/docs/components/sonner) ([Docs](https://sonner.emilkowal.ski/)), most importantly, the Sonner component provides a global Toast. We can take advantage of this to provide feedback to the user such as:
     - `toast.error()`
@@ -21,7 +32,7 @@ React Router (RR) lets us define routes and layouts for our project in [one file
 
 - Always use the `<Link>` components when linking to pages from **FORWARD**. Due to the nature of the project, you should never use an `<a>` tag because linking to external sites is explicity against the security requirements.
 
-- The user authentication state is stored in the LocalStorage of each user's browser as a stringified [User](./app/lib/useUser.ts) object. This is rechecked on each route update, however as above, please keep in mind that secure information distribution should ***ALWAYS*** originate from the source of truth backend via an authenticated API call.
+- The user authentication state is stored in the LocalStorage of each user's browser as a stringified [User](./app/lib/userSlice.ts) object. This is rechecked on each route update, however as above, please keep in mind that secure information distribution should ***ALWAYS*** originate from the source of truth backend via an authenticated API call.
 
 - Everything should be strongly typed via TypeScript to ensure no data disparity between components, and if possible, every non-component function meant for general consumption should have a [JSDoc](https://jsdoc.app/) description for inline documentation. If time allows, defining types with both TypeScript and the `@param` tag in JSDoc is preferred.
 
