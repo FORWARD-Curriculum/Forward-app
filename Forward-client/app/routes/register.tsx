@@ -68,10 +68,14 @@ export default function Login() {
       const user: User = {
         id: result.data.user.id,
         username: result.data.user.username,
-        displayName: result.data.user.display_name,
+        display_name: result.data.user.display_name,
         facility_id: result.data.facility_id,
-        profilePicture: result.data.user.profile_picture||undefined,
+        profile_picture: result.data.user.profile_picture || undefined,
         consent: result.data.user.consent,
+        preferences: {
+          theme: result.data.user.preferences.theme,
+          text_size: result.data.user.preferences.text_size,
+        },
       };
 
       login(user);
@@ -84,10 +88,10 @@ export default function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center w-screen">
-      <div className="bg-white rounded-3xl w-fit p-6 flex flex-col items-center">
+    <div className="flex w-screen items-center justify-center">
+      <div className="bg-foreground text-secondary-foreground outline-foreground-border my-1 flex w-fit flex-col items-center rounded-3xl p-6 outline-1">
         <h1 className="text-xl font-medium">Create an account</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5 my-6">
+        <form onSubmit={handleSubmit} className="my-6 flex flex-col gap-5">
           <div className="flex gap-2">
             <div>
               <label htmlFor="first_name">First Name</label>
@@ -170,6 +174,7 @@ export default function Login() {
           <div className="flex gap-2">
             {!instructor && (
               <Button
+                aria-label="Switch to instructor onboarding"
                 variant={"outline"}
                 className="px-4"
                 onClick={() => {
@@ -180,16 +185,19 @@ export default function Login() {
               </Button>
             )}
             <Button
+              aria-label="Create Account"
               type="submit"
-              className="button w-full bg-cyan-500 text-white active:bg-cyan-600"
-              variant={"outline"}
+              className="button bg-primary text-primary-foreground outline-primary-border w-full outline-1 active:brightness-110"
+              variant={"default"}
             >
               Create Account
             </Button>
           </div>
-          {error && <p className="text-red-500 w-full text-center">{error}</p>}
+          {error && (
+            <p className="text-error-border w-full text-center">{error}</p>
+          )}
         </form>
-        <p className="text-center text-gray-400">
+        <p className="text-muted-foreground text-center">
           Already have an account? <br />
           <Link to="/login" className="text-blue-500 underline">
             Log In

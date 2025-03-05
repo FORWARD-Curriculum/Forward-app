@@ -1,4 +1,5 @@
 import type { User } from "@/lib/userSlice";
+import React, { useEffect, useRef } from "react";
 import type { RootState } from "@/store";
 import { useSelector } from "react-redux";
 import { Input } from "@/components/ui/input";
@@ -9,66 +10,120 @@ import { PenIcon, PenOffIcon } from "lucide-react";
 import { apiFetch } from "@/lib/utils";
 import { useAuth } from "@/lib/useAuth";
 import { toast } from "sonner";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { PopoverClose } from "@radix-ui/react-popover";
 
-/**
- * HUGE TODO: SEND IMAGE FILE TO SERVER, NOT LOCAL BLOB URL
- */
-
-async function cropImageToSquare(file: File | undefined): Promise<File | null> {
-  if (!file) return null;
-  const croppedBlob: Blob | null = await new Promise((resolve) => {
-    const img = new Image();
-    img.src = URL.createObjectURL(file);
-    img.onload = () => {
-      const size = Math.min(img.width, img.height); // Square size
-      const canvas = document.createElement("canvas");
-      [canvas.width, canvas.height] = [size, size];
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return resolve(null);
-      // Crop from the center
-      const [offsetX, offsetY] = [
-        (img.width - size) / 2,
-        (img.height - size) / 2,
-      ];
-      ctx.drawImage(img, offsetX, offsetY, size, size, 0, 0, size, size);
-      canvas.toBlob((blob) => resolve(blob), "image/png");
-    };
-    img.onerror = () => resolve(null);
-  });
-  // Return a png on success, null if else
-  const croppedFile = croppedBlob
-    ? new File([croppedBlob], file.name, {
-        type: "image/png",
-      })
-    : null;
-  return croppedFile;
+function ThemeOption({
+  themeName,
+  themeBG,
+  themePrimary,
+  className,
+  ...props
+}: {
+  themeName: NonNullable<User["preferences"]>["theme"];
+  themeBG: string;
+  themePrimary: string;
+} & React.LabelHTMLAttributes<HTMLLabelElement>) {
+  return (
+    <div>
+      <input
+        aria-label={themeName + " theme"}
+        type="radio"
+        id={`theme_${themeName}`}
+        className="peer hidden"
+        name="theme"
+        value={themeName}
+      />
+      <label
+        htmlFor={`theme_${themeName}`}
+        className={`peer-checked:outline-secondary-foreground block h-10 overflow-hidden rounded-xl outline-offset-4 peer-checked:outline-2 ${className}`}
+        {...props}
+      >
+        <svg
+          viewBox="0 0 100 100"
+          width="40"
+          height="40"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient
+              id={`diag-split-${themeName}`}
+              x1="0"
+              y1="0"
+              x2="1"
+              y2="1"
+            >
+              <stop offset="50%" stopColor={themeBG} />
+              <stop offset="50%" stopColor={themePrimary} />
+            </linearGradient>
+          </defs>
+          <rect
+            width="100"
+            height="100"
+            fill={`url(#diag-split-${themeName})`}
+          />
+        </svg>
+      </label>
+    </div>
+  );
 }
 
 export default function account() {
-  const update = useAuth().update;
+  const updateUser = useAuth().update;
   const user = useSelector((s: RootState) => s.user.user) as User;
-  const [profile_pic, setProfilePic] = useState<File | null>();
-  const [displayNameEdit, setDisplayNameEdit] = useState(true);
-  const [removedPicture, setRemovedPicture] = useState(false);
+
+  // Reactive
+  const [formState, setFormState] = useState({
+    profilePic: null as string | null,
+    displayNameEdit: true,
+    removedPicture: false,
+    theme: user.preferences?.theme,
+    textSize: user.preferences?.text_size,
+  });
+
+  const originalState = useRef({
+    theme: user.preferences?.theme,
+    textSize: user.preferences?.text_size,
+    profilePicture: user.profile_picture,
+    displayName: user.display_name,
+    consent: user.consent,
+  });
+
+  useEffect(() => {
+    updateUser({
+      ...user,
+      preferences: { theme: formState.theme, text_size: formState.textSize },
+    });
+  }, [formState.theme, formState.textSize]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault(); // Prevent the default form submission behavior
-    const formData = new FormData(e.target);
+    const formData = new FormData(e.target as HTMLFormElement);
+
+    /*
+     * Because the user model does not have a nested preferences field, we
+     * format it linearly to match, but keep the nesting on the client for
+     * niceties.
+     */
     const data = {
-      profile_picture: (profile_pic||removedPicture)
-        ? (profile_pic?URL.createObjectURL(profile_pic):null)
-        : user.profilePicture,
+      profile_picture: formState.profilePic,
       display_name: formData.get("display_name"),
-      ...(formData.get("consent") ? { consent: true } : { consent: false }),
+      consent: formData.has("consent"),
+      theme: formState.theme,
+      text_size: formState.textSize,
     };
+
+    // Error out if the user didnt change anything, but submitted somehow
+    if (JSON.stringify(originalState.current) === JSON.stringify(data)) {
+      return toast.error("Please make a change to update account.");
+    }
+
+    // Send updated prefs to server and update from source of truth.
     try {
-      // Error out if the user didnt change anything, but submitted somehow
-      if (user.profilePicture === data.profile_picture&&
-          user.displayName === data.display_name&&
-          user.consent === data.consent
-      ){
-        throw new Error("Please make a change to update account.");
-      }
       const response = await apiFetch("users/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -80,16 +135,9 @@ export default function account() {
         throw new Error(result.detail || "Login error.");
       }
 
-      const _user: User = {
-        id: result.data.user.id,
-        username: result.data.user.username,
-        displayName: result.data.user.display_name,
-        facility_id: result.data.facility_id,
-        profilePicture: result.data.user.profile_picture || undefined,
-        consent: result.data.user.consent,
-      };
-
-      update(_user);
+      updateUser({
+        ...result.data.user /*, preferences: result.data.user.preferences*/,
+      });
       toast.success("Successfully updated user information.");
     } catch (err: any) {
       toast.error(err.message);
@@ -97,66 +145,92 @@ export default function account() {
   };
 
   return (
-    <div className="flex justify-center items-center w-screen grow">
+    <div className="flex w-screen grow items-center justify-center">
       <form
         encType="multipart/form-data"
-        className="flex items-center flex-col bg-white justify-center rounded-3xl p-4 leading-none "
+        className="bg-foreground text-secondary-foreground border-foreground-border flex flex-col items-center justify-center rounded-3xl border-1 p-4 leading-none"
         onSubmit={handleSubmit}
       >
-        <h1 className="text-xl w-full lg:text-center">Profile Overview</h1>
-        <div className="flex gap-3 flex-col lg:flex-row mt-4">
-          <div className="flex flex-row-reverse gap-5 items-center justify-center lg:flex-col lg:gap-2 lg:border-r-gray-200 lg:border-r lg:pr-3">
+        <h1 className="w-full text-xl lg:text-center">Profile Overview</h1>
+        <div className="mt-4 flex flex-col gap-3 lg:flex-row">
+          <div className="flex flex-row-reverse items-center justify-center gap-5 lg:flex-col lg:gap-2 lg:border-r lg:border-r-gray-200 lg:pr-3">
             <div className="flex flex-col lg:items-center lg:justify-center">
-              <p className="text-3xl lg:text-base">{user.displayName}</p>
-              <p className="text-gray-500 lg:text-xs">{user.username}</p>
+              <p className="text-secondary-foreground text-3xl lg:text-base">
+                {user.display_name}
+              </p>
+              <p className="text-muted-foreground lg:text-xs">
+                {user.username}
+              </p>
             </div>
-            <div className="gap-1 flex flex-col items-center">
+            <div className="flex flex-col items-center gap-1">
               <div
-                className={`w-30 h-30 rounded-full overflow-hidden flex justify-center items-center ${
-                  profile_pic || (user.profilePicture && !removedPicture)
+                className={`flex h-30 w-30 items-center justify-center overflow-hidden rounded-full ${
+                  formState.profilePic ||
+                  (user.profile_picture && !formState.removedPicture)
                     ? ""
-                    : "border-1 border-solid border-gray-700"
+                    : "border-muted-foreground border-1 border-solid"
                 }`}
               >
-                {profile_pic || (user.profilePicture && !removedPicture) ? (
+                {formState.profilePic ||
+                (user.profile_picture && !formState.removedPicture) ? (
                   <img
-                    src={
-                      (profile_pic ? URL.createObjectURL(profile_pic) : null) ||
-                      user.profilePicture
-                    }
-                    className=" object-cover"
+                    src={formState.profilePic || user.profile_picture}
+                    className="object-cover"
                   />
                 ) : (
-                  <p className="text-5xl font-light">
-                    {(user.displayName || "   ").substring(0, 2).toUpperCase()}
+                  <p className="text-secondary-foreground text-5xl font-light">
+                    {(user.display_name || "   ").substring(0, 2).toUpperCase()}
                   </p>
                 )}
               </div>
-              <div className="flex-col flex gap-0.5">
-                <label
-                  htmlFor="pfp"
-                  className="text-sm text-white bg-cyan-500 hover:bg-cyan-400 active:bg-cyan-600 rounded-3xl p-1.5 hover:cursor-pointer"
-                >
-                  Change Picture
-                </label>
-                <Input
-                  type="file"
-                  id="pfp"
-                  multiple={false}
-                  className="hidden"
-                  onChange={(e) => {
-                    cropImageToSquare(e.target.files?.[0]).then((file) => {
-                      setProfilePic(file);
-                    });
-                  }}
-                  accept=".png, .jpg, .jpeg"
-                />
+              <div className="flex flex-col gap-1.5">
+                <Popover>
+                  <PopoverTrigger
+                    type="button"
+                    className="text-primary-foreground bg-primary outline-primary-border rounded-3xl p-1.5 text-sm outline-1 brightness-110 hover:cursor-pointer hover:brightness-120 active:brightness-100"
+                  >
+                    Change Picture
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className={`${
+                      user?.preferences?.theme ||
+                      "" + user?.preferences?.text_size ||
+                      ""
+                    } bg-foreground border-secondary-foreground w-fit flex flex-col items-center align-middle text-secondary-foreground`}
+                  >
+                    <h2 className="text-wrap w-fit">
+                      Select new Profile Picture
+                    </h2>
+                    <div className=" grid grid-cols-3 justify-items-center items-center grid-rows-3 w-fit">
+                      {Array(9)
+                        .fill(0)
+                        .map((_, i) => (
+                          <PopoverClose
+                            className="overflow-hidden h-15 rounded-full m-1"
+                            onClick={() => {
+                              setFormState({
+                                ...formState,
+                                profilePic: `/profile_pictures/${i + 1}.jpg`,
+                              });
+                            }}
+                          >
+                            <img
+                              key={i}
+                              src={`/profile_pictures/${i + 1}.jpg`}
+                              className="h-full"
+                            />
+                          </PopoverClose>
+                        ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 <button
+                  aria-label="Remove the current profile picture"
                   type="button"
-                  className="text-sm bg-red-400 text-white hover:bg-red-300 active:bg-red-700 rounded-3xl p-1.5"
+                  className="text-primary-foreground !bg-error outline-error-border rounded-3xl p-1.5 text-sm outline-1 brightness-110 hover:brightness-120 active:brightness-100"
                   onClick={() => {
-                    setProfilePic(null);
-                    setRemovedPicture(true);
+                    setFormState({ ...formState, profilePic: null });
+                    setFormState({ ...formState, removedPicture: true });
                   }}
                 >
                   Remove Picture
@@ -164,75 +238,196 @@ export default function account() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col items-center space-y-7">
-            <div className="flex flex-col w-full">
+          <dl className="flex flex-col items-center space-y-7">
+            <dt className="flex w-full flex-col">
               <label htmlFor="display_name" className="text-sm">
                 Edit Display Name
               </label>
-              <div className="flex relative w-full">
+              <div className="relative flex w-full">
                 <Input
+                  aria-label="Edit Display Name"
                   id="display_name"
                   name="display_name"
                   className={`${
-                    displayNameEdit ? "text-gray-500" : "text-black"
+                    formState.displayNameEdit
+                      ? "text-muted-foreground"
+                      : "text-secondary-foreground"
                   } border-gray-700`}
-                  inert={displayNameEdit}
-                  defaultValue={user.displayName}
+                  inert={formState.displayNameEdit}
+                  defaultValue={user.display_name}
                 />
                 <Button
-                  className="absolute right-0"
+                  aria-label="Allow edits to display name"
+                  className="active:bg-accent absolute right-0"
                   type="button"
+                  variant={"ghost"}
                   onClick={() => {
-                    setDisplayNameEdit(!displayNameEdit);
+                    setFormState({
+                      ...formState,
+                      displayNameEdit: !formState.displayNameEdit,
+                    });
                   }}
                 >
-                  {displayNameEdit ? <PenIcon /> : <PenOffIcon />}
+                  {formState.displayNameEdit ? <PenIcon /> : <PenOffIcon />}
                 </Button>
               </div>
-            </div>
-            <div className="flex items-top gap-2">
+            </dt>
+            <dt className="items-top flex gap-2">
               <Checkbox
                 id="consent"
                 name="consent"
                 defaultChecked={user.consent}
+                className="!border-secondary-foreground !bg-transparent"
               />
               <div className="grid gap-1.5 leading-none">
                 <label
                   htmlFor="consent"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Agree to participate in FORWARD research program.
                 </label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   You agree to the collection of anonymized data concerning how
                   you use this platform.
                 </p>
               </div>
-            </div>
+            </dt>
+            <dt className="flex flex-col items-center gap-7 lg:flex-row lg:items-start">
+              <fieldset className="flex h-full w-full flex-col items-center">
+                <legend className="mb-1 h-5 text-center">Change theme:</legend>
+                <div className="flex flex-row gap-3">
+                  <ThemeOption
+                    themeName="dark"
+                    themeBG="var(--color-gray-800)"
+                    themePrimary="var(--color-cyan-700)"
+                    onClick={() => {
+                      setFormState({ ...formState, theme: "dark" });
+                    }}
+                  />
+                  <ThemeOption
+                    themeName="light"
+                    themeBG="var(--color-gray-200)"
+                    themePrimary="var(--color-cyan-500)"
+                    onClick={() => {
+                      setFormState({ ...formState, theme: "light" });
+                    }}
+                  />
+                  <ThemeOption
+                    themeName="high-contrast"
+                    themeBG="var(--color-black)"
+                    themePrimary="var(--color-fuchsia-600)"
+                    onClick={() => {
+                      setFormState({ ...formState, theme: "high-contrast" });
+                    }}
+                  />
+                </div>
+              </fieldset>
+              <fieldset className="flex w-[110%] flex-col items-center">
+                <legend className="mb-5 h-5 text-center">
+                  Change Font Size:
+                </legend>
+                <div className="relative flex flex-col items-center lg:mx-6">
+                  <input
+                    aria-label="Change text size"
+                    style={{
+                      appearance: "none",
+                      width: "100%",
+                      height: "4px",
+                      background: "var(--secondary-foreground)", // Track color
+                      borderRadius: "0px",
+                      outline: "none",
+                      cursor: "pointer",
+                      zIndex: "11",
+                      // Thumb styles
+                      WebkitAppearance: "none",
+                      MozAppearance: "none",
+                    }}
+                    type="range"
+                    step={1}
+                    min={0}
+                    max={3}
+                    value={
+                      user.preferences?.text_size
+                        ? ["txt-sm", "txt-base", "txt-lg", "txt-xl"].indexOf(
+                            user.preferences.text_size,
+                          )
+                        : 1
+                    }
+                    onChange={(e) => {
+                      setFormState({
+                        ...formState,
+                        textSize: ["txt-sm", "txt-base", "txt-lg", "txt-xl"][
+                          parseInt(e.target.value, 10)
+                        ] as "txt-sm" | "txt-base" | "txt-lg" | "txt-xl",
+                      });
+                    }}
+                  />
+                  <div className="text-secondary-foreground pointer-events-none absolute -top-[calc(0.5rem-2px)] z-10 flex w-[104%] justify-between text-[1rem] font-bold">
+                    <p>|</p>
+                    <p>|</p>
+                    <p>|</p>
+                    <p>|</p>
+                  </div>
+                </div>
+                <style>
+                  {`
+                  input[type="range"]::-webkit-slider-thumb {
+                    appearance: none;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    background: white;
+                    border-radius: 50%;
+                    border: 2px solid var(--secondary-foreground);
+                    cursor: pointer;
+                    transform: scaleX(0.8);
+                  }
 
-            <div className="flex w-full mt-auto">
+                  input[type="range" i]::-webkit-slider-runnable-track {
+                    transform: scaleX(1.2);
+                  }
+                         
+                  input[type="range"]::-moz-range-thumb {
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    background: #cccccc;
+                    border-radius: 50%;
+                    border-color: black;
+                    cursor: pointer;
+                    transform: scaleX(0.8);
+                  }
+                `}
+                </style>
+              </fieldset>
+            </dt>
+            <dt className="mt-auto flex w-full gap-2">
               <Button
+                aria-label="Submit changes"
                 type="submit"
-                className="button w-full bg-cyan-500 hover:bg-cyan-400 text-white active:bg-cyan-600"
-                variant={"outline"}
+                className="button text-primary-foreground !bg-primary outline-primary-border w-full outline-1 brightness-110 hover:brightness-120 active:brightness-100"
+                variant={"default"}
               >
                 Save Changes
               </Button>
               <Button
+                aria-label="Reset changes"
                 type="reset"
-                className="button w-full bg-red-400 hover:bg-red-300 text-white active:bg-red-700 mt-auto"
-                variant={"outline"}
+                className="button text-primary-foreground !bg-error outline-error-border w-full outline-1 brightness-110 hover:brightness-120 active:brightness-100"
+                variant={"default"}
                 onClick={() => {
-                  setProfilePic(null);
-                  setRemovedPicture(false);
-                  setDisplayNameEdit(true);
-                  toast.success("Successfully reverted changes.")
+                  setFormState({
+                    profilePic: null,
+                    removedPicture: false,
+                    displayNameEdit: true,
+                    theme: originalState.current.theme,
+                    textSize: originalState.current.textSize,
+                  });
+                  toast.success("Successfully reverted changes.");
                 }}
               >
                 Discard Changes
               </Button>
-            </div>
-          </div>
+            </dt>
+          </dl>
         </div>
       </form>
     </div>

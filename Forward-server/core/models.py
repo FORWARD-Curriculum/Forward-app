@@ -50,6 +50,18 @@ class User(AbstractUser):
         max_length=1,
         default=False
     )
+    
+    theme = models.CharField(
+        'theme preference',
+        max_length=1,
+        default="light"
+    )
+    
+    text_size = models.CharField(
+        'text size preference',
+        max_length=1,
+        default="txt-base"
+    )
 
     # Automatically set when the user is created and updated
     created_at = models.DateTimeField(auto_now_add=True)

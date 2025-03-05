@@ -70,7 +70,11 @@ class UserService:
                     'display_name': user.display_name,
                     'facility_id': user.facility_id,
                     'profile_picture': user.profile_picture,
-                    'consent': user.consent
+                    'consent': user.consent,
+                    'preferences': {
+                        'theme': user.theme,
+                        'text_size': user.text_size
+                    }
                 }
             }
         except Exception as e:
