@@ -4,6 +4,8 @@ services:
     build: ./Forward-server
     volumes:
       - ./Forward-server:/app/server
+    ports:
+      - "127.0.0.1:8000:8000"
 
   frontend:
     image: FORWARD/frontend
