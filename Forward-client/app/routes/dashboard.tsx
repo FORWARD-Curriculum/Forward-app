@@ -19,13 +19,15 @@ export async function clientLoader() {}
 function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
   return (
     <div className="bg-background rounded-2xl pt-3">
-      <div className="flex gap-4 items-center mx-4 pb-3">
+      <div className="mx-4 flex items-center gap-4 pb-3">
         <img src={props.lesson?.image} className="h-full max-w-20"></img>
         <div className="flex flex-col text-left">
-          <h1 className=" text-accent text-xl">{props.lesson?.name}</h1>
-          <p className="text-secondary-foreground text-base">{props.lesson?.description}</p>
+          <h1 className="text-accent text-xl">{props.lesson?.name}</h1>
+          <p className="text-secondary-foreground text-base">
+            {props.lesson?.description}
+          </p>
         </div>
-        <div className="flex flex-col gap-2 lg:ml-30 h-full">
+        <div className="flex h-full flex-col gap-2 lg:ml-30">
           <Expand fill="var(--text-secondary-foreground)" />
           <FileVolume />
         </div>
@@ -38,7 +40,7 @@ function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
 function Accordion(props: { children?: ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="flex flex-col  text-secondary-foreground">
+    <div className="text-secondary-foreground flex flex-col">
       <div
         className={`overflow-hidden transition-all duration-400 ease-in-out ${
           open ? "max-h-screen" : "max-h-0"
@@ -47,10 +49,10 @@ function Accordion(props: { children?: ReactNode }) {
         <div>{props.children}</div>
       </div>
 
-      <div className="bg-muted/50 border-t-1 border-muted rounded-b-2xl flex justify-end px-4 items-center py-0.5">
+      <div className="bg-muted/50 border-muted flex items-center justify-end rounded-b-2xl border-t-1 px-4 py-0.5">
         <button
           aria-label="View lesson overview"
-          className="text-sm flex gap-1.5 items-center"
+          className="flex items-center gap-1.5 text-sm"
           onClick={() => setOpen(!open)}
         >
           View {open ? <ChevronUp /> : <ChevronDown />}
@@ -62,7 +64,7 @@ function Accordion(props: { children?: ReactNode }) {
 
 export default function Dashboard({ className = "" }: { className?: string }) {
   const [sortType, setSortType] = useState<"recent" | "date" | "progress">(
-    "progress"
+    "progress",
   );
   const user = useSelector((state: RootState) => state.user.user) as User;
 
@@ -109,12 +111,12 @@ export default function Dashboard({ className = "" }: { className?: string }) {
 
   return (
     <>
-      <div className="mx-4 lg:mx-[15vw] my-12">
-        <div className="flex gap-3 w-full text-sm mb-4 text-secondary-foreground">
+      <div className="mx-4 my-12 lg:mx-[15vw]">
+        <div className="text-secondary-foreground mb-4 flex w-full gap-3 text-sm">
           <p>Sort By:</p>
           <button
             aria-label="Sort by recent"
-            className="bg-secondary text-center px-8 rounded-md drop-shadow-xs outline-foreground-border outline-1"
+            className="bg-secondary outline-foreground-border rounded-md px-8 text-center outline-1 drop-shadow-xs"
             onClick={() => {
               setSortType("recent");
             }}
@@ -122,8 +124,8 @@ export default function Dashboard({ className = "" }: { className?: string }) {
             Recent
           </button>
           <button
-          aria-label="Sort by date"
-            className="bg-secondary text-center px-8 rounded-md drop-shadow-xs  outline-foreground-border outline-1"
+            aria-label="Sort by date"
+            className="bg-secondary outline-foreground-border rounded-md px-8 text-center outline-1 drop-shadow-xs"
             onClick={() => {
               setSortType("date");
             }}
@@ -132,7 +134,7 @@ export default function Dashboard({ className = "" }: { className?: string }) {
           </button>
           <button
             aria-label="Sort by progress"
-            className="bg-secondary text-center px-8 rounded-md drop-shadow-xs  outline-foreground-border outline-1"
+            className="bg-secondary outline-foreground-border rounded-md px-8 text-center outline-1 drop-shadow-xs"
             onClick={() => {
               setSortType("progress");
             }}
@@ -140,10 +142,12 @@ export default function Dashboard({ className = "" }: { className?: string }) {
             Progress
           </button>
         </div>
-        <div className="flex flex-col gap-8 lg:gap-0 lg:grid lg:grid-cols-12">
+        <div className="flex flex-col gap-8 lg:grid lg:grid-cols-12 lg:gap-0">
           <div className="col-span-8">
-            <div className="bg-foreground rounded-3xl p-4 flex flex-col gap-2 lg:mr-4 outline-foreground-border outline-1">
-              <h1 className="font-medium text-secondary-foreground text-3xl text-left">Lessons</h1>
+            <div className="bg-foreground outline-foreground-border flex flex-col gap-2 rounded-3xl p-4 outline-1 lg:mr-4">
+              <h1 className="text-secondary-foreground text-left text-3xl font-medium">
+                Lessons
+              </h1>
 
               {!lessons ? (
                 <p>Loading...</p>
@@ -187,33 +191,37 @@ export default function Dashboard({ className = "" }: { className?: string }) {
             </div>
           </div>
           <div className="col-span-4 flex flex-col">
-            <div className="bg-foreground rounded-3xl p-4 flex items-center gap-3 h-fit w-full outline-foreground-border outline-1">
+            <div className="bg-foreground outline-foreground-border flex h-fit w-full items-center gap-3 rounded-3xl p-4 outline-1">
               <div
-                className={`w-16 h-16 rounded-full overflow-hidden flex justify-center items-center ${
-                  user.profilePicture
+                className={`flex h-16 w-16 items-center justify-center overflow-hidden rounded-full ${
+                  user.profile_picture
                     ? ""
-                    : "border-1 border-solid border-secondary-foreground"
+                    : "border-secondary-foreground border-1 border-solid"
                 }`}
               >
-                {user.profilePicture ? (
-                  <img src={user.profilePicture} className=" object-cover" />
+                {user.profile_picture ? (
+                  <img src={user.profile_picture} className="object-cover" />
                 ) : (
-                  <p className="text-2xl font-light text-secondary-foreground">
-                    {(user.displayName || "   ").substring(0, 2).toUpperCase()}
+                  <p className="text-secondary-foreground text-2xl font-light">
+                    {(user.display_name || "   ").substring(0, 2).toUpperCase()}
                   </p>
                 )}
               </div>
               <div className="text-left">
-                <h3 className="text-lg text-secondary-foreground">{user.displayName}</h3>
-                <p className="text-sm text-muted-foreground">{user?.username}</p>
+                <h3 className="text-secondary-foreground text-lg">
+                  {user.display_name}
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  {user?.username}
+                </p>
               </div>
-              <Link className="ml-auto text-secondary-foreground" to="/account">
+              <Link className="text-secondary-foreground ml-auto" to="/account">
                 Edit
               </Link>
             </div>
             <div className="text-secondary-foreground">
-              <p className="font-medium text-left">Your Progress</p>
-              <div className="col-start-2 col-end-2 bg-foreground rounded-3xl p-4  outline-foreground-border outline-1">
+              <p className="text-left font-medium">Your Progress</p>
+              <div className="bg-foreground outline-foreground-border col-start-2 col-end-2 rounded-3xl p-4 outline-1">
                 {!lessons ? (
                   <p>Loading...</p>
                 ) : (

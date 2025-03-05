@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
   --animate-slide-in-to-right: slide-in-from-right 0.4s ease-in-out;
   --animate-slide-out-to-right: slide-out-to-right 0.4s ease-in-out;
@@ -286,19 +287,19 @@ button {
   }
 
   .txt-lg {
-    --txt-xs:   0.875rem;
-    --txt-sm:   1rem;
+    --txt-xs: 0.875rem;
+    --txt-sm: 1rem;
     --txt-base: 1.125rem;
-    --txt-lg:   1.25rem;
-    --txt-xl:   1.5rem;
-    --txt-2xl:  1.875rem;
-    --txt-3xl:  2.25rem;
-    --txt-4xl:  3rem;
-    --txt-5xl:  3.75rem;
-    --txt-6xl:  4.5rem;
-    --txt-7xl:  6rem;
-    --txt-8xl:  8rem;
-    --txt-9xl:  10rem;
+    --txt-lg: 1.25rem;
+    --txt-xl: 1.5rem;
+    --txt-2xl: 1.875rem;
+    --txt-3xl: 2.25rem;
+    --txt-4xl: 3rem;
+    --txt-5xl: 3.75rem;
+    --txt-6xl: 4.5rem;
+    --txt-7xl: 6rem;
+    --txt-8xl: 8rem;
+    --txt-9xl: 10rem;
   }
 
   .txt-xl {

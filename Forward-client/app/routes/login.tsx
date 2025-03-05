@@ -32,7 +32,7 @@ export default function Login() {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      console.log(result)
+      console.log(result);
 
       if (!response.ok) {
         toast.error("Hmm... something went wrong");
@@ -43,16 +43,16 @@ export default function Login() {
       const user: User = {
         id: result.data.user.id,
         username: result.data.user.username,
-        displayName: result.data.user.display_name,
+        display_name: result.data.user.display_name,
         facility_id: result.data.facility_id,
-        profilePicture: result.data.user.profile_picture || undefined,
+        profile_picture: result.data.user.profile_picture || undefined,
         consent: result.data.user.consent,
         preferences: {
           theme: result.data.user.preferences.theme,
           text_size: result.data.user.preferences.text_size,
         },
       };
-      console.log(user)
+      console.log(user);
       login(user);
 
       // Redirect to the route user attempted to access prior to logging in
@@ -64,13 +64,10 @@ export default function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center w-screen grow">
-      <div
-        className="bg-foreground outline-foreground-border outline-1 rounded-3xl w-fit
-        p-6 flex flex-col items-center text-secondary-foreground"
-      >
+    <div className="flex w-screen grow items-center justify-center">
+      <div className="bg-foreground outline-foreground-border text-secondary-foreground flex w-fit flex-col items-center rounded-3xl p-6 outline-1">
         <h1 className="text-xl font-medium">Login to an existing account</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 my-6">
+        <form onSubmit={handleSubmit} className="my-6 flex flex-col gap-6">
           <div>
             <label htmlFor="username">Username</label>
             <Input
@@ -96,15 +93,16 @@ export default function Login() {
           <Button
             aria-label="Login"
             type="submit"
-            className="button w-full bg-primary text-primary-foreground active:brightness-125
-            outline-primary-border outline-1"
+            className="button bg-primary text-primary-foreground outline-primary-border w-full outline-1 active:brightness-125"
             variant={"default"}
           >
             Login
           </Button>
-          {error && <p className="text-error-border w-full text-center">{error}</p>}
+          {error && (
+            <p className="text-error-border w-full text-center">{error}</p>
+          )}
         </form>
-        <p className="text-center text-muted-foreground">
+        <p className="text-muted-foreground text-center">
           Don't have an account? <br />
           <Link to="/register" className="text-blue-500 underline">
             Sign Up

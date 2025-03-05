@@ -4,10 +4,10 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import path from "path";
 
-console.log(process.env)
+console.log(process.env);
 export default defineConfig({
   server: {
-    host: '0.0.0.0',
+    host: "0.0.0.0",
     port: 5173,
     proxy: {
       "/api": {
@@ -20,7 +20,7 @@ export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'app'),
+      "@": path.resolve(__dirname, "app"),
     },
   },
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const cleanPercentage = (percentage: number) => {
   const isNegativeOrNaN = !Number.isFinite(+percentage) || percentage < 0;
@@ -6,8 +6,15 @@ const cleanPercentage = (percentage: number) => {
   return isNegativeOrNaN ? 0 : isTooHigh ? 100 : +percentage;
 };
 
-
-const Circle = ({ color, percentage, size = 200 }: { percentage?: number; color?: string; size: number }) => {
+const Circle = ({
+  color,
+  percentage,
+  size = 200,
+}: {
+  percentage?: number;
+  color?: string;
+  size: number;
+}) => {
   const r = size * 0.35; // Make radius relative to size
   const circ = 2 * Math.PI * r;
   if (!percentage) percentage = 0;
@@ -18,7 +25,7 @@ const Circle = ({ color, percentage, size = 200 }: { percentage?: number; color?
       cx={size / 2}
       cy={size / 2}
       fill="transparent"
-      stroke={strokePct !== circ ? (color || "var(--accent, currentColor)") : ""}
+      stroke={strokePct !== circ ? color || "var(--accent, currentColor)" : ""}
       strokeWidth={size * 0.1} // Make stroke width relative to size
       strokeDasharray={circ}
       strokeDashoffset={percentage ? strokePct : 0}
@@ -26,7 +33,13 @@ const Circle = ({ color, percentage, size = 200 }: { percentage?: number; color?
   );
 };
 
-const Text = ({ percentage, size = 200 }: { percentage: number; size: number }) => {
+const Text = ({
+  percentage,
+  size = 200,
+}: {
+  percentage: number;
+  size: number;
+}) => {
   return (
     <text
       x="50%"
@@ -43,9 +56,17 @@ const Text = ({ percentage, size = 200 }: { percentage: number; size: number }) 
 /**
  * A circle who's border represents something's progress
  * @param {number} percentage - 0-100
- * @returns 
+ * @returns
  */
-const Pie = ({ percentage, color, size = 200 }: { percentage: number; color: string; size: number }) => {
+const Pie = ({
+  percentage,
+  color,
+  size = 200,
+}: {
+  percentage: number;
+  color: string;
+  size: number;
+}) => {
   const pct = cleanPercentage(percentage);
   return (
     <svg width={size} height={size}>

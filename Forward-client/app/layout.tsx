@@ -14,12 +14,12 @@ export default function Layout() {
   return (
     <>
       <div
-        className={`bg-background relative min-h-[100vh] flex content-evenly flex-col text-base ${
+        className={`bg-background relative flex min-h-[100vh] flex-col content-evenly text-base ${
           user?.preferences?.theme || ""
         } ${user?.preferences?.text_size || ""}`}
       >
         <Header />
-        <div className="flex-grow flex">
+        <div className="flex flex-grow">
           <Outlet />
         </div>
         <Footer />
