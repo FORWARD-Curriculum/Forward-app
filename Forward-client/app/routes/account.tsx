@@ -22,6 +22,7 @@ const ThemeOption = React.forwardRef<
   return (
     <div>
       <input
+        aria-label={themeName + " theme"}
         ref={ref}
         type="radio"
         id={`theme_${themeName}`}
@@ -233,6 +234,7 @@ export default function account() {
                   Change Picture
                 </label>
                 <Input
+                  aria-label="Change the current profile picture"
                   type="file"
                   id="pfp"
                   multiple={false}
@@ -245,6 +247,7 @@ export default function account() {
                   accept=".png, .jpg, .jpeg"
                 />
                 <button
+                  aria-label="Remove the current profile picture"
                   type="button"
                   className="text-sm text-primary-foreground !bg-error brightness-110 hover:brightness-120
                   active:brightness-100 rounded-3xl p-1.5 outline-error-border outline-1"
@@ -265,6 +268,7 @@ export default function account() {
               </label>
               <div className="flex relative w-full">
                 <Input
+                  aria-label="Edit Display Name"
                   id="display_name"
                   name="display_name"
                   className={`${
@@ -276,6 +280,7 @@ export default function account() {
                   defaultValue={user.displayName}
                 />
                 <Button
+                  aria-label="Allow edits to display name"
                   className="absolute right-0 active:bg-accent"
                   type="button"
                   variant={"ghost"}
@@ -343,6 +348,7 @@ export default function account() {
                 </legend>
                 <div className="relative flex flex-col items-center lg:mx-6">
                   <input
+                    aria-label="Change text size"
                     style={{
                       appearance: "none",
                       width: "100%",
@@ -415,6 +421,7 @@ export default function account() {
 
             <div className="flex w-full mt-auto gap-2">
               <Button
+                aria-label="Submit changes"
                 type="submit"
                 className="button w-full text-primary-foreground !bg-primary brightness-110 hover:brightness-120 active:brightness-100
                 outline-primary-border outline-1"
@@ -423,6 +430,7 @@ export default function account() {
                 Save Changes
               </Button>
               <Button
+                aria-label="Reset changes"
                 type="reset"
                 className="button w-full text-primary-foreground !bg-error brightness-110 hover:brightness-120 active:brightness-100
                 outline-error-border outline-1"

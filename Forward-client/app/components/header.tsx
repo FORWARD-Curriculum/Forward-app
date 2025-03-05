@@ -84,6 +84,7 @@ export default function Header() {
                     </DropdownMenu.DropdownMenuItem>
                     <DropdownMenu.DropdownMenuItem>
                       <button
+                        aria-label="Log Out"
                         onClick={() => {
                           logout()
                             .then(() => {
@@ -162,6 +163,7 @@ export default function Header() {
                     </div>
                   </Link>
                   <button
+                  aria-label="Log Out"
                     onClick={() => {
                       logout()
                         .then(() => {

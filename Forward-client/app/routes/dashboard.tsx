@@ -49,6 +49,7 @@ function Accordion(props: { children?: ReactNode }) {
 
       <div className="bg-muted/50 border-t-1 border-muted rounded-b-2xl flex justify-end px-4 items-center py-0.5">
         <button
+          aria-label="View lesson overview"
           className="text-sm flex gap-1.5 items-center"
           onClick={() => setOpen(!open)}
         >
@@ -110,8 +111,9 @@ export default function Dashboard({ className = "" }: { className?: string }) {
     <>
       <div className="mx-4 lg:mx-[15vw] my-12">
         <div className="flex gap-3 w-full text-sm mb-4 text-secondary-foreground">
-          <p>Filter By:</p>
+          <p>Sort By:</p>
           <button
+            aria-label="Sort by recent"
             className="bg-secondary text-center px-8 rounded-md drop-shadow-xs outline-foreground-border outline-1"
             onClick={() => {
               setSortType("recent");
@@ -120,6 +122,7 @@ export default function Dashboard({ className = "" }: { className?: string }) {
             Recent
           </button>
           <button
+          aria-label="Sort by date"
             className="bg-secondary text-center px-8 rounded-md drop-shadow-xs  outline-foreground-border outline-1"
             onClick={() => {
               setSortType("date");
@@ -128,6 +131,7 @@ export default function Dashboard({ className = "" }: { className?: string }) {
             Date
           </button>
           <button
+            aria-label="Sort by progress"
             className="bg-secondary text-center px-8 rounded-md drop-shadow-xs  outline-foreground-border outline-1"
             onClick={() => {
               setSortType("progress");

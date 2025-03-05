@@ -15,12 +15,14 @@ const PasswordInput = React.forwardRef<HTMLInputElement, React.ComponentProps<"i
 	return (
 		<div className="relative">
 			<Input
+				aria-label='Password Input'
 				type={showPassword ? 'text' : 'password'}
 				className={cn('hide-password-toggle pr-10', className)}
 				ref={ref}
 				{...props}
 			/>
 			<Button
+				aria-label={showPassword?"Hide Password":"Show Password"}
 				type="button"
 				variant="ghost"
 				size="sm"

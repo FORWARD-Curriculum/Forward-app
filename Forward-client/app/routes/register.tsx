@@ -175,6 +175,7 @@ export default function Login() {
           <div className="flex gap-2">
             {!instructor && (
               <Button
+                aria-label="Switch to instructor onboarding"
                 variant={"outline"}
                 className="px-4"
                 onClick={() => {
@@ -185,6 +186,7 @@ export default function Login() {
               </Button>
             )}
             <Button
+              aria-label="Create Account"
               type="submit"
               className="button w-full bg-primary text-primary-foreground active:brightness-110
               outline-primary-border outline-1"

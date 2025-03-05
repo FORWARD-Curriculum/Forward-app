@@ -74,6 +74,7 @@ export default function Login() {
           <div>
             <label htmlFor="username">Username</label>
             <Input
+              aria-label="Input username"
               type="text"
               name="username"
               id="username"
@@ -93,6 +94,7 @@ export default function Login() {
             />
           </div>
           <Button
+            aria-label="Login"
             type="submit"
             className="button w-full bg-primary text-primary-foreground active:brightness-125
             outline-primary-border outline-1"
