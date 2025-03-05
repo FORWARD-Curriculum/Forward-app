@@ -237,8 +237,8 @@ button {
     --foreground-border: var(--color-white);
 
     --primary: var(--color-black);
-    --primary-foreground: var(--color-yellow-500);
-    --primary-border: var(--color-yellow-500);
+    --primary-foreground: var(--color-yellow-300);
+    --primary-border: var(--color-yellow-300);
 
     --secondary: var(--color-black);
     --secondary-foreground: var(--color-white);
@@ -247,7 +247,7 @@ button {
     --accent: var(--color-amber-500);
 
     --muted: var(--color-black);
-    --muted-foreground: var(--color-yellow-500);
+    --muted-foreground: var(--color-yellow-300);
 
     --error: var(--color-black);
     --error-border: var(--color-fuchsia-500);
@@ -286,19 +286,19 @@ button {
   }
 
   .txt-lg {
-    --txt-xs: 0.875rem;
-    --txt-sm: 1rem;
+    --txt-xs:   0.875rem;
+    --txt-sm:   1rem;
     --txt-base: 1.125rem;
-    --txt-lg: 1.25rem;
-    --txt-xl: 1.5rem;
-    --txt-2xl: 1.875rem;
-    --txt-3xl: 2.25rem;
-    --txt-4xl: 3rem;
-    --txt-5xl: 3.75rem;
-    --txt-6xl: 4.5rem;
-    --txt-7xl: 6rem;
-    --txt-8xl: 8rem;
-    --txt-9xl: 10rem;
+    --txt-lg:   1.25rem;
+    --txt-xl:   1.5rem;
+    --txt-2xl:  1.875rem;
+    --txt-3xl:  2.25rem;
+    --txt-4xl:  3rem;
+    --txt-5xl:  3.75rem;
+    --txt-6xl:  4.5rem;
+    --txt-7xl:  6rem;
+    --txt-8xl:  8rem;
+    --txt-9xl:  10rem;
   }
 
   .txt-xl {

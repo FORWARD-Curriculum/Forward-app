@@ -105,18 +105,26 @@ export default function account() {
   const [profile_pic, setProfilePic] = useState<File | null>();
   const [displayNameEdit, setDisplayNameEdit] = useState(true);
   const [removedPicture, setRemovedPicture] = useState(false);
+
+  // Theming Live-update - use ref stores pre-changes for discard/restu button
   const originalTheme = useRef(user.preferences?.theme);
   const [newTheme, setNewTheme] = useState<
     NonNullable<User["preferences"]>["theme"] | undefined
   >(originalTheme.current);
 
+  // Text sizing live update
+  const originalTxt = useRef(user.preferences?.text_size);
+  const [newTxt, setNewTxt] = useState<
+    NonNullable<User["preferences"]>["text_size"] | undefined
+  >(originalTxt.current);
+
+  // Update local user object to reflect theme changes
   useEffect(() => {
-    console.log(originalTheme);
     dispatch({
       type: "user/setUser",
-      payload: { ...user, preferences: { theme: newTheme } },
+      payload: { ...user, preferences: { theme: newTheme, text_size: newTxt } },
     });
-  }, [newTheme]);
+  }, [newTheme, newTxt]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault(); // Prevent the default form submission behavior
@@ -130,6 +138,8 @@ export default function account() {
           : user.profilePicture,
       display_name: formData.get("display_name"),
       ...(formData.get("consent") ? { consent: true } : { consent: false }),
+      theme: newTheme,
+      text_size: newTxt,
     };
     try {
       // Error out if the user didnt change anything, but submitted somehow
@@ -137,7 +147,8 @@ export default function account() {
         user.profilePicture === data.profile_picture &&
         user.displayName === data.display_name &&
         user.consent === data.consent &&
-        originalTheme.current === newTheme
+        originalTheme.current === newTheme &&
+        originalTxt.current == newTxt
       ) {
         throw new Error("Please make a change to update account.");
       }
@@ -159,6 +170,10 @@ export default function account() {
         facility_id: result.data.facility_id,
         profilePicture: result.data.user.profile_picture || undefined,
         consent: result.data.user.consent,
+        preferences: {
+          theme: result.data.user.preferences.theme,
+          text_size: result.data.user.preferences.text_size,
+        },
       };
 
       update(_user);
@@ -292,31 +307,110 @@ export default function account() {
                 </p>
               </div>
             </div>
-            <div className="flex flex-row gap-3">
-              <ThemeOption
-                themeName="dark"
-                themeBG="var(--color-gray-800)"
-                themePrimary="var(--color-cyan-700)"
-                onClick={() => {
-                  setNewTheme("dark");
-                }}
-              />
-              <ThemeOption
-                themeName="light"
-                themeBG="var(--color-gray-200)"
-                themePrimary="var(--color-cyan-500)"
-                onClick={() => {
-                  setNewTheme("light");
-                }}
-              />
-              <ThemeOption
-                themeName="high-contrast"
-                themeBG="var(--color-black)"
-                themePrimary="var(--color-fuchsia-600)"
-                onClick={() => {
-                  setNewTheme("high-contrast");
-                }}
-              />
+            <div className="flex flex-col lg:flex-row gap-7 items-center lg:items-start">
+              <fieldset className="flex flex-col items-center h-full w-full">
+                <legend className="text-center h-5 mb-1">Change theme:</legend>
+                <div className="flex flex-row gap-3">
+                  <ThemeOption
+                    themeName="dark"
+                    themeBG="var(--color-gray-800)"
+                    themePrimary="var(--color-cyan-700)"
+                    onClick={() => {
+                      setNewTheme("dark");
+                    }}
+                  />
+                  <ThemeOption
+                    themeName="light"
+                    themeBG="var(--color-gray-200)"
+                    themePrimary="var(--color-cyan-500)"
+                    onClick={() => {
+                      setNewTheme("light");
+                    }}
+                  />
+                  <ThemeOption
+                    themeName="high-contrast"
+                    themeBG="var(--color-black)"
+                    themePrimary="var(--color-fuchsia-600)"
+                    onClick={() => {
+                      setNewTheme("high-contrast");
+                    }}
+                  />
+                </div>
+              </fieldset>
+              <fieldset className="flex flex-col items-center w-[110%]">
+                <legend className="h-5 mb-5 text-center">
+                  Change Font Size:
+                </legend>
+                <div className="relative flex flex-col items-center lg:mx-6">
+                  <input
+                    style={{
+                      appearance: "none",
+                      width: "100%",
+                      height: "4px",
+                      background: "var(--secondary-foreground)", // Track color
+                      borderRadius: "0px",
+                      outline: "none",
+                      cursor: "pointer",
+                      zIndex: "11",
+                      // Thumb styles
+                      WebkitAppearance: "none",
+                      MozAppearance: "none",
+                    }}
+                    type="range"
+                    step={1}
+                    min={0}
+                    max={3}
+                    value={
+                      user.preferences?.text_size
+                        ? ["txt-sm", "txt-base", "txt-lg", "txt-xl"].indexOf(
+                            user.preferences.text_size
+                          )
+                        : 1
+                    }
+                    onChange={(e) => {
+                      setNewTxt(
+                        ["txt-sm", "txt-base", "txt-lg", "txt-xl"][
+                          parseInt(e.target.value, 10)
+                        ] as "txt-sm" | "txt-base" | "txt-lg" | "txt-xl"
+                      );
+                    }}
+                  />
+                  <div className="flex justify-between w-[104%] absolute -top-[calc(0.5rem-2px)] pointer-events-none text-[1rem] font-bold text-secondary-foreground z-10">
+                    <p>|</p>
+                    <p>|</p>
+                    <p>|</p>
+                    <p>|</p>
+                  </div>
+                </div>
+                <style>
+                  {`
+                  input[type="range"]::-webkit-slider-thumb {
+                    appearance: none;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    background: white;
+                    border-radius: 50%;
+                    border: 2px solid var(--secondary-foreground);
+                    cursor: pointer;
+                    transform: scaleX(0.8);
+                  }
+
+                  input[type="range" i]::-webkit-slider-runnable-track {
+                    transform: scaleX(1.2);
+                  }
+                         
+                  input[type="range"]::-moz-range-thumb {
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    background: #cccccc;
+                    border-radius: 50%;
+                    border-color: black;
+                    cursor: pointer;
+                    transform: scaleX(0.8);
+                  }
+                `}
+                </style>
+              </fieldset>
             </div>
 
             <div className="flex w-full mt-auto gap-2">
@@ -338,6 +432,7 @@ export default function account() {
                   setRemovedPicture(false);
                   setDisplayNameEdit(true);
                   setNewTheme(originalTheme.current);
+                  setNewTxt(originalTxt.current);
                   toast.success("Successfully reverted changes.");
                 }}
               >

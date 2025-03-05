@@ -116,8 +116,26 @@ class UserUpdateSerializer(serializers.Serializer):
     display_name = serializers.CharField(required=False)
     profile_picture = serializers.CharField(required=False, allow_null=True)
     consent = serializers.BooleanField(required=False)
+    theme= serializers.CharField(required=False)
+    text_size = serializers.CharField(required=False)
     
     def validate(self, attrs: dict):
+        theme = attrs.get('theme')
+        text_size = attrs.get('text_size')
+        if theme:
+            if not theme in ['light', 'dark', 'high-contrast']:
+                raise serializers.ValidationError(
+                    'Theme is not a valid option.',
+                    code='validation'
+                )
+
+        if text_size:
+            if not text_size in ['txt-sm', 'txt-base', 'txt-lg', 'txt-xl']:
+                raise serializers.ValidationError(
+                    'Text size is not a valid option.',
+                    code='validation'
+                )
+                
         return attrs
     
     def update(self, instance, validated_data):
@@ -138,6 +156,8 @@ class UserUpdateSerializer(serializers.Serializer):
         instance.display_name = validated_data.get('display_name', instance.display_name)
         instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)
         instance.consent = validated_data.get('consent', instance.consent)
+        instance.theme = validated_data.get('theme', instance.theme)
+        instance.text_size = validated_data.get('text_size', instance.text_size)
         
         # Save the instance
         instance.save()

@@ -12,7 +12,7 @@ export interface User {
   facility_id?: string;
   profilePicture?: string;
   consent: boolean;
-  preferences?: {
+  preferences: {
     theme: "light"|"dark"|"high-contrast";
     text_size: "txt-sm"|"txt-base"|"txt-lg"|"txt-xl";
   }

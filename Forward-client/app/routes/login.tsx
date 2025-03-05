@@ -32,6 +32,7 @@ export default function Login() {
         body: JSON.stringify(data),
       });
       const result = await response.json();
+      console.log(result)
 
       if (!response.ok) {
         toast.error("Hmm... something went wrong");
@@ -47,11 +48,11 @@ export default function Login() {
         profilePicture: result.data.user.profile_picture || undefined,
         consent: result.data.user.consent,
         preferences: {
-          theme: "dark",
-          text_size: "txt-xl",
+          theme: result.data.user.preferences.theme,
+          text_size: result.data.user.preferences.text_size,
         },
       };
-
+      console.log(user)
       login(user);
 
       // Redirect to the route user attempted to access prior to logging in

@@ -104,7 +104,11 @@ class CurrentUserView(APIView):
                     'display_name': user.display_name,
                     'facility_id': user.facility_id,
                     'profile_picture': user.profile_picture,
-                    'consent': user.consent
+                    'consent': user.consent,
+                    'preferences': {
+                        'theme': user.theme,
+                        'text_size': user.text_size
+                    }
                 }
             },
             status=status.HTTP_200_OK
@@ -128,7 +132,11 @@ class CurrentUserView(APIView):
                         'display_name': updated_user.display_name,
                         'facility_id': updated_user.facility_id,
                         'profile_picture': updated_user.profile_picture,
-                        'consent': updated_user.consent
+                        'consent': updated_user.consent,
+                        'preferences': {
+                            'theme': user.theme,
+                            'text_size': user.text_size
+                        }
                     }
                 },
                 status=status.HTTP_200_OK

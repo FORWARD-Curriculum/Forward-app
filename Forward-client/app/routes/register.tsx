@@ -70,8 +70,12 @@ export default function Login() {
         username: result.data.user.username,
         displayName: result.data.user.display_name,
         facility_id: result.data.facility_id,
-        profilePicture: result.data.user.profile_picture||undefined,
+        profilePicture: result.data.user.profile_picture || undefined,
         consent: result.data.user.consent,
+        preferences: {
+          theme: result.data.user.preferences.theme,
+          text_size: result.data.user.preferences.text_size,
+        },
       };
 
       login(user);
