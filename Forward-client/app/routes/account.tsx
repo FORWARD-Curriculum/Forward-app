@@ -110,7 +110,7 @@ export default function account() {
      * niceties.
      */
     const data = {
-      profile_picture: formState.profilePic,
+      profile_picture: formState.profilePic || formState.removedPicture ? null:user.profile_picture,
       display_name: formData.get("display_name"),
       consent: formData.has("consent"),
       theme: formState.theme,
@@ -118,6 +118,7 @@ export default function account() {
     };
 
     // Error out if the user didnt change anything, but submitted somehow
+    // BUG: these two dont have anything in common
     if (JSON.stringify(originalState.current) === JSON.stringify(data)) {
       return toast.error("Please make a change to update account.");
     }
