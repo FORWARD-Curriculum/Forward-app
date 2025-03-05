@@ -22,11 +22,13 @@ function ThemeOption({
   themeBG,
   themePrimary,
   className,
+  checked,
   ...props
 }: {
   themeName: NonNullable<User["preferences"]>["theme"];
   themeBG: string;
   themePrimary: string;
+  checked: boolean;
 } & React.LabelHTMLAttributes<HTMLLabelElement>) {
   return (
     <div>
@@ -37,6 +39,7 @@ function ThemeOption({
         className="peer hidden"
         name="theme"
         value={themeName}
+        defaultChecked={checked}
       />
       <label
         htmlFor={`theme_${themeName}`}
@@ -304,6 +307,7 @@ export default function account() {
                     onClick={() => {
                       setFormState({ ...formState, theme: "dark" });
                     }}
+                    checked={formState.theme === "dark"}
                   />
                   <ThemeOption
                     themeName="light"
@@ -312,6 +316,7 @@ export default function account() {
                     onClick={() => {
                       setFormState({ ...formState, theme: "light" });
                     }}
+                    checked={formState.theme === "light"}
                   />
                   <ThemeOption
                     themeName="high-contrast"
@@ -320,6 +325,7 @@ export default function account() {
                     onClick={() => {
                       setFormState({ ...formState, theme: "high-contrast" });
                     }}
+                    checked={formState.theme === "high-contrast"}
                   />
                 </div>
               </fieldset>
