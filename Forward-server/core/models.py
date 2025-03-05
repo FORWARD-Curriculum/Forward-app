@@ -72,14 +72,6 @@ class User(AbstractUser):
     first_name = None
     last_name = None
 
-
-    def get_full_name(self):
-        """
-        Return the user's full name
-        """
-        full_name = f'{self.display_name} {self.username}'
-        return full_name.strip()
-
     def __str__(self):
         """
         String representation of the user - returns username
@@ -91,10 +83,7 @@ class User(AbstractUser):
         return {
             "id": self.id,
             "username": self.username,
-            "email": self.email,
-            "fullName": self.get_full_name(),
-            # "created_at": self.created_at.isoformat(),
-            # "updated_at": self.updated_at.isoformat(),
+            "displayName": self.display_name,
         }
 
 class Lesson(models.Model):
