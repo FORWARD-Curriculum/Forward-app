@@ -22,11 +22,13 @@ function ThemeOption({
   themeBG,
   themePrimary,
   className,
+  checked,
   ...props
 }: {
   themeName: NonNullable<User["preferences"]>["theme"];
   themeBG: string;
   themePrimary: string;
+  checked: boolean;
 } & React.LabelHTMLAttributes<HTMLLabelElement>) {
   return (
     <div>
@@ -37,6 +39,7 @@ function ThemeOption({
         className="peer hidden"
         name="theme"
         value={themeName}
+        defaultChecked={checked}
       />
       <label
         htmlFor={`theme_${themeName}`}
@@ -110,7 +113,7 @@ export default function account() {
      * niceties.
      */
     const data = {
-      profile_picture: formState.profilePic,
+      profile_picture: formState.removedPicture ? null:(formState.profilePic??user.profile_picture??null),
       display_name: formData.get("display_name"),
       consent: formData.has("consent"),
       theme: formState.theme,
@@ -118,6 +121,7 @@ export default function account() {
     };
 
     // Error out if the user didnt change anything, but submitted somehow
+    // BUG: these two dont have anything in common
     if (JSON.stringify(originalState.current) === JSON.stringify(data)) {
       return toast.error("Please make a change to update account.");
     }
@@ -164,14 +168,9 @@ export default function account() {
             </div>
             <div className="flex flex-col items-center gap-1">
               <div
-                className={`flex h-30 w-30 items-center justify-center overflow-hidden rounded-full ${
-                  formState.profilePic ||
-                  (user.profile_picture && !formState.removedPicture)
-                    ? ""
-                    : "border-muted-foreground border-1 border-solid"
-                }`}
+                className={`flex h-30 w-30 items-center justify-center overflow-hidden rounded-full ${!((formState.profilePic && !formState.removedPicture) || (user.profile_picture && !formState.removedPicture)) && "border-muted-foreground border-1 border-solid"}`}
               >
-                {formState.profilePic ||
+                {(formState.profilePic && !formState.removedPicture) ||
                 (user.profile_picture && !formState.removedPicture) ? (
                   <img
                     src={formState.profilePic || user.profile_picture}
@@ -196,21 +195,22 @@ export default function account() {
                       user?.preferences?.theme ||
                       "" + user?.preferences?.text_size ||
                       ""
-                    } bg-foreground border-secondary-foreground w-fit flex flex-col items-center align-middle text-secondary-foreground`}
+                    } bg-foreground border-secondary-foreground text-secondary-foreground flex w-fit flex-col items-center align-middle`}
                   >
-                    <h2 className="text-wrap w-fit">
+                    <h2 className="w-fit text-wrap">
                       Select new Profile Picture
                     </h2>
-                    <div className=" grid grid-cols-3 justify-items-center items-center grid-rows-3 w-fit">
+                    <div className="grid w-fit grid-cols-3 grid-rows-3 items-center justify-items-center">
                       {Array(9)
                         .fill(0)
                         .map((_, i) => (
                           <PopoverClose
-                            className="overflow-hidden h-15 rounded-full m-1"
+                            className="active:outline-secondary-foreground hover:outline-muted-foreground m-1 h-15 overflow-hidden rounded-full outline-offset-2 hover:outline-2 active:outline-2"
                             onClick={() => {
                               setFormState({
                                 ...formState,
                                 profilePic: `/profile_pictures/${i + 1}.jpg`,
+                                removedPicture: false,
                               });
                             }}
                           >
@@ -303,6 +303,7 @@ export default function account() {
                     onClick={() => {
                       setFormState({ ...formState, theme: "dark" });
                     }}
+                    checked={formState.theme === "dark"}
                   />
                   <ThemeOption
                     themeName="light"
@@ -311,6 +312,7 @@ export default function account() {
                     onClick={() => {
                       setFormState({ ...formState, theme: "light" });
                     }}
+                    checked={formState.theme === "light"}
                   />
                   <ThemeOption
                     themeName="high-contrast"
@@ -319,6 +321,7 @@ export default function account() {
                     onClick={() => {
                       setFormState({ ...formState, theme: "high-contrast" });
                     }}
+                    checked={formState.theme === "high-contrast"}
                   />
                 </div>
               </fieldset>
