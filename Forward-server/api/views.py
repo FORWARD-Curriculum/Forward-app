@@ -152,7 +152,7 @@ class QuizView(APIView):
     '''
     tests endpoint/ endpoints
     '''
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         '''
@@ -183,7 +183,7 @@ class QuizView(APIView):
         # need to make user data table to save to. TBD
 
 class LessonView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         '''
@@ -201,7 +201,7 @@ class LessonView(APIView):
             status=status.HTTP_200_OK)
 
 class TextContentView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         '''
@@ -219,7 +219,7 @@ class TextContentView(APIView):
             status=status.HTTP_200_OK)
 
 class WritingView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         [id] = kwargs.values()
@@ -234,7 +234,7 @@ class WritingView(APIView):
             status=status.HTTP_200_OK)
 
 class PollView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         [id] = kwargs.values()
