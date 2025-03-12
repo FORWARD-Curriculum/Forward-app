@@ -32,13 +32,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'username',
             'password',
             'password_confirm',
-            'first_name',
-            'last_name',
+            'display_name',
+            'facility_id',
+            'consent'
         ]
         # Override default optional fields to make them required
         extra_kwargs = {
-            'first_name': {'required': True},
-            'last_name': {'required': True}
+            'display_name': {'required': True},
         }
 
     def validate(self, attrs):
@@ -111,3 +111,55 @@ class UserLoginSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+    
+class UserUpdateSerializer(serializers.Serializer):
+    display_name = serializers.CharField(required=False)
+    profile_picture = serializers.CharField(required=False, allow_null=True)
+    consent = serializers.BooleanField(required=False)
+    theme= serializers.CharField(required=False)
+    text_size = serializers.CharField(required=False)
+    
+    def validate(self, attrs: dict):
+        theme = attrs.get('theme')
+        text_size = attrs.get('text_size')
+        if theme:
+            if not theme in ['light', 'dark', 'high-contrast']:
+                raise serializers.ValidationError(
+                    'Theme is not a valid option.',
+                    code='validation'
+                )
+
+        if text_size:
+            if not text_size in ['txt-sm', 'txt-base', 'txt-lg', 'txt-xl']:
+                raise serializers.ValidationError(
+                    'Text size is not a valid option.',
+                    code='validation'
+                )
+                
+        return attrs
+    
+    def update(self, instance, validated_data):
+        """
+        Updates a User instance with new data.
+        
+        This method:
+        1. Validates thhe user data follows spec
+        2. Replaces any old user info if new info is passed on
+        
+        Args:
+            validated_data (dict): Validated data from the serializer
+            
+        Returns:
+            instance: an updated user instance
+        """
+        # Update the instance with validated data
+        instance.display_name = validated_data.get('display_name', instance.display_name)
+        instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)
+        instance.consent = validated_data.get('consent', instance.consent)
+        instance.theme = validated_data.get('theme', instance.theme)
+        instance.text_size = validated_data.get('text_size', instance.text_size)
+        
+        # Save the instance
+        instance.save()
+        
+        return instance

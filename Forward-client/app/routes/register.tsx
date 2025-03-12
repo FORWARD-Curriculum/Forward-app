@@ -3,8 +3,8 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useAuth } from "@/lib/useAuth";
-import type { User } from "@/lib/useUser";
 import { toast } from "sonner";
+import { Link } from "react-router";
 
 export default function Login() {
   const [error, setError] = useState(null);
@@ -15,12 +15,17 @@ export default function Login() {
     e.preventDefault();
 
     const formData = new FormData(e.target);
+    const username = (formData.get("first_name")?.toString().toLowerCase().slice(0,2)??"")
+                    +(formData.get("last_name")?.toString().toLowerCase().slice(0,2)??"")
+                    +(formData.get("birth_month")??"00")
+                    +(formData.get("birth_year")?.slice(2,5)??"XX");
     const data = {
-      username: formData.get("username"),
+
+      username,
+      display_name: username,
       password: formData.get("password"),
       password_confirm: formData.get("password2"),
-      first_name: formData.get("first_name"),
-      last_name: formData.get("last_name"),
+
     };
 
     const password = formData.get("password") as string;
@@ -47,10 +52,9 @@ export default function Login() {
       const result = await response.json();
 
       if (!response.ok) {
-       
         if (result.detail) {
           if (typeof result.detail === "object") {
-             // Handle field-specific errors
+            // Handle field-specific errors
             const errorMessages = Object.values(result.detail)
               .map((messages) => (messages as string[]).join("\n"))
               .join("\n");
@@ -59,21 +63,13 @@ export default function Login() {
             // Handle simple string errors
             throw new Error(result.detail);
           }
-          
         }
         // Handle invalid server responses / Server non-responses
-        toast.error("Registration failed. Please try again.")
-        throw new Error("Registration failed. Please try again.")
+        toast.error("Registration failed. Please try again.");
+        throw new Error("Registration failed. Please try again.");
       }
 
-      const user: User = {
-        id: result.data.user.id,
-        username: result.data.user.username,
-        firstName: result.data.user.first_name,
-        lastName: result.data.user.last_name,
-      };
-
-      login(user);
+      login({...result.data.user});
 
       // Redirect to the dashboard on success
       window.location.href = "/dashboard";
@@ -83,14 +79,15 @@ export default function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center w-screen">
-      <div className="bg-white rounded-3xl w-fit p-6 flex flex-col items-center">
+    <div className="flex w-screen items-center justify-center">
+      <div className="bg-foreground text-secondary-foreground outline-foreground-border my-1 flex w-fit flex-col items-center rounded-3xl p-6 outline-1">
         <h1 className="text-xl font-medium">Create an account</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5 my-6">
+        <form onSubmit={handleSubmit} className="my-6 flex flex-col gap-5">
           <div className="flex gap-2">
             <div>
-              <label htmlFor="first_name">First Name</label>
+              <label htmlFor="first_name">First Name <span className="text-error">*</span></label>
               <Input
+                minLength={2}
                 type="text"
                 name="first_name"
                 id="first_name"
@@ -100,8 +97,9 @@ export default function Login() {
               />
             </div>
             <div>
-              <label htmlFor="last_name">Last Name</label>
+              <label htmlFor="last_name">Last Name <span className="text-error">*</span></label>
               <Input
+                minLength={2}
                 type="text"
                 name="last_name"
                 id="last_name"
@@ -111,19 +109,52 @@ export default function Login() {
               />
             </div>
           </div>
-          <div>
-            <label htmlFor="username">Username</label>
-            <Input
-              type="text"
-              name="username"
-              id="username"
-              placeholder="ex: jsmith"
-              className="input min-w-[25vw]"
-              required
-            />
+          <div className="flex gap-2">
+            <div className="flex flex-1 flex-col">
+              <label htmlFor="birth-month">Birth Month <span className="text-error">*</span></label>
+              <select
+                required
+                id="birth-month"
+                name="birth_month"
+                className="bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-xl border px-3 py-2 text-base"
+              >
+                <option value="" disabled selected>Select Birth Month</option>
+                <option value={"01"}>01 - January</option>
+                <option value={"02"}>02 - February</option>
+                <option value={"03"}>03 - March</option>
+                <option value={"04"}>04 - April</option>
+                <option value={"05"}>05 - May</option>
+                <option value={"06"}>06 - June</option>
+                <option value={"07"}>07 - July</option>
+                <option value={"08"}>08 - August</option>
+                <option value={"09"}>09 - September</option>
+                <option value={"10"}>10 - October</option>
+                <option value={"11"}>11 - November</option>
+                <option value={"12"}>12 - December</option>
+              </select>
+            </div>
+            <div className="flex flex-1 flex-col">
+              <label htmlFor="birth-year">Birth Year <span className="text-error">*</span></label>
+              <select
+                required
+                id="birth-year"
+                name="birth_year"
+                className="bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-xl border px-3 py-2 text-base"
+              >
+                <option value="" disabled selected>Select Birth Year</option>
+                {Array.from(
+                  { length: 100 },
+                  (_, i) => new Date().getFullYear() - i,
+                ).map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div>
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Password <span className="text-error">*</span></label>
             <PasswordInput
               name="password"
               id="password"
@@ -133,13 +164,14 @@ export default function Login() {
             />
           </div>
           <div>
-            <label htmlFor="password">Confirm Password</label>
+            <label htmlFor="password">Confirm Password <span className="text-error">*</span></label>
             <PasswordInput
               name="password2"
               id="password2"
               placeholder="Password"
               className="input"
               disabled={false}
+              required
             />
           </div>
           <div>
@@ -150,7 +182,6 @@ export default function Login() {
               id="institution"
               placeholder="Institution ID"
               className="input min-w-[25vw]"
-              required
             />
           </div>
           {instructor && (
@@ -169,6 +200,7 @@ export default function Login() {
           <div className="flex gap-2">
             {!instructor && (
               <Button
+                aria-label="Switch to instructor onboarding"
                 variant={"outline"}
                 className="px-4"
                 onClick={() => {
@@ -179,20 +211,23 @@ export default function Login() {
               </Button>
             )}
             <Button
+              aria-label="Create Account"
               type="submit"
-              className="button w-full bg-cyan-500 text-white active:bg-cyan-600"
-              variant={"outline"}
+              className="button bg-primary text-primary-foreground outline-primary-border w-full outline-1 active:brightness-110"
+              variant={"default"}
             >
               Create Account
             </Button>
           </div>
-          {error && <p className="text-red-500 w-full text-center">{error}</p>}
+          {error && (
+            <p className="text-error-border w-full text-center">{error}</p>
+          )}
         </form>
-        <p className="text-center text-gray-400">
+        <p className="text-muted-foreground text-center">
           Already have an account? <br />
-          <a href="/login" className="text-blue-500 underline">
+          <Link to="/login" className="text-blue-500 underline">
             Log In
-          </a>{" "}
+          </Link>{" "}
           instead
         </p>
       </div>

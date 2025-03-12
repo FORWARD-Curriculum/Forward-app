@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -32,19 +32,27 @@ export default function Login() {
         body: JSON.stringify(data),
       });
       const result = await response.json();
+      console.log(result);
 
       if (!response.ok) {
-        toast.error("Hmm... something went wrong")
-        throw new Error(result.detail||"Login error.");
-      } 
+        toast.error("Hmm... something went wrong");
+        throw new Error(result.detail || "Login error.");
+      }
 
+      /* TODO: cdn domain for picture*/
       const user: User = {
         id: result.data.user.id,
         username: result.data.user.username,
-        firstName: result.data.user.first_name,
-        lastName: result.data.user.last_name,
+        display_name: result.data.user.display_name,
+        facility_id: result.data.facility_id,
+        profile_picture: result.data.user.profile_picture || undefined,
+        consent: result.data.user.consent,
+        preferences: {
+          theme: result.data.user.preferences.theme,
+          text_size: result.data.user.preferences.text_size,
+        },
       };
-
+      console.log(user);
       login(user);
 
       // Redirect to the route user attempted to access prior to logging in
@@ -56,13 +64,14 @@ export default function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center w-screen grow">
-      <div className="bg-white rounded-3xl w-fit p-6 flex flex-col items-center">
+    <div className="flex w-screen grow items-center justify-center">
+      <div className="bg-foreground outline-foreground-border text-secondary-foreground flex w-fit flex-col items-center rounded-3xl p-6 outline-1">
         <h1 className="text-xl font-medium">Login to an existing account</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 my-6">
+        <form onSubmit={handleSubmit} className="my-6 flex flex-col gap-6">
           <div>
             <label htmlFor="username">Username</label>
             <Input
+              aria-label="Input username"
               type="text"
               name="username"
               id="username"
@@ -82,19 +91,22 @@ export default function Login() {
             />
           </div>
           <Button
+            aria-label="Login"
             type="submit"
-            className="button w-full bg-cyan-500 text-white active:bg-cyan-600"
-            variant={"outline"}
+            className="button bg-primary text-primary-foreground outline-primary-border w-full outline-1 active:brightness-125"
+            variant={"default"}
           >
             Login
           </Button>
-          {error && <p className="text-red-500 w-full text-center">{error}</p>}
+          {error && (
+            <p className="text-error-border w-full text-center">{error}</p>
+          )}
         </form>
-        <p className="text-center text-gray-400">
+        <p className="text-muted-foreground text-center">
           Don't have an account? <br />
-          <a href="/register" className="text-blue-500 underline">
+          <Link to="/register" className="text-blue-500 underline">
             Sign Up
-          </a>{" "}
+          </Link>{" "}
           instead
         </p>
       </div>

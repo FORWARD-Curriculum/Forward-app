@@ -14,7 +14,7 @@ class UserService:
         
         Args:
             data (dict): Dictionary containing user data including:
-                        username, password, email, first_name, last_name, date_of_birth
+                        username, password, email, display_name, facility_id, profile_picture, consent
         
         Returns:
             User: Created user instance
@@ -29,8 +29,7 @@ class UserService:
             # Create user instance but don't save yet
             user = User(
                 username=data['username'],
-                first_name=data['first_name'],
-                last_name=data['last_name'],
+                display_name=data['display_name'],
             )
             
             # Set password (this handles the hashing)
@@ -68,8 +67,14 @@ class UserService:
                 'user': {
                     'id': user.id,
                     'username': user.username,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
+                    'display_name': user.display_name,
+                    'facility_id': user.facility_id,
+                    'profile_picture': user.profile_picture,
+                    'consent': user.consent,
+                    'preferences': {
+                        'theme': user.theme,
+                        'text_size': user.text_size
+                    }
                 }
             }
         except Exception as e:

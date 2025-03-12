@@ -1,44 +1,45 @@
 import React from "react";
 import { useAuth } from "@/lib/useAuth";
 import * as Sheet from "@/components/ui/sheet";
-import { Menu, ChevronRight } from "lucide-react";
+import { Menu } from "lucide-react";
 import * as DropdownMenu from "@/components/ui/dropdown-menu";
 import { useClient } from "@/lib/useClient";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
+import { Link } from "react-router";
 
 export default function Header() {
   const { logout } = useAuth();
   const { windowDimensions } = useClient();
-  const user = useSelector((state: RootState)=>state.user.user)
+  const user = useSelector((state: RootState) => state.user.user);
 
   const [open, setOpen] = React.useState(false);
 
   return (
     <>
       <div
-        className={` flex bg-cyan-500 box-border **:text-white items-center ${
-          user ? "pl-12 pr-8" : "px-12"
-        } h-18 w-full`}
+        className={`bg-primary box-border flex items-center **:text-white ${
+          user ? "pr-8 pl-12" : "px-12"
+        } border-b-primary-border h-18 w-full border-b-1`}
       >
-        <a href="/" className="text-xl font-medi">
+        <Link to="/" className="font-medi text-xl">
           FORWARD
-        </a>
+        </Link>
 
         {/* This is the mobile menu */}
 
         {/* This is the desktop menu */}
         {windowDimensions.width > 1024 ? (
-          <ul className="flex list-none gap-6 ml-auto items-center font-medium">
+          <ul className="ml-auto flex list-none items-center gap-6 font-medium *:hover:underline">
             <li>
-              <a href="/dashboard">Dashboard</a>
+              <Link to={"/dashboard"}>Dashboard</Link>
             </li>
             <li>
-              <a href="/lessons">Lessons</a>
+              <Link to={"/lessons"}>Lessons</Link>
             </li>
             <li>
-              <a href="/activities">Activities</a>
+              <Link to={"/activities"}>Activities</Link>
             </li>
             <li>
               {/* BUG: radixui applies a data-scroll-lock css class to the body with the
@@ -50,13 +51,40 @@ export default function Header() {
                   custom component or looking further into it. For now, I am choosing to keep it.*/}
               {user ? (
                 <DropdownMenu.DropdownMenu>
-                  <DropdownMenu.DropdownMenuTrigger className="flex gap-4 items-center rounded-none hover:bg-cyan-400 transition-colors duration-200 p-3">
-                    <img src="pfp.png" className="h-10 w-10 rounded-full" />
+                  <DropdownMenu.DropdownMenuTrigger className="flex items-center gap-4 rounded-none p-3 transition-colors duration-200 hover:backdrop-brightness-115">
+                    <div
+                      className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full ${
+                        user.profile_picture
+                          ? ""
+                          : "border-1 border-solid border-white"
+                      }`}
+                    >
+                      {user.profile_picture ? (
+                        <img
+                          src={user.profile_picture}
+                          className="object-cover"
+                        />
+                      ) : (
+                        <p className="text-xl font-light">
+                          {(user.display_name || "   ")
+                            .substring(0, 2)
+                            .toUpperCase()}
+                        </p>
+                      )}
+                    </div>
                   </DropdownMenu.DropdownMenuTrigger>
-                  <DropdownMenu.DropdownMenuContent className="bg-white rounded-sm w-full border-none p-0 *:p-0">
-                    <DropdownMenu.DropdownMenuItem></DropdownMenu.DropdownMenuItem>
+                  <DropdownMenu.DropdownMenuContent className="bg-secondary text-secondary-foreground w-full rounded-sm border-none p-0 *:p-0 **:active:backdrop-brightness-95">
+                    <DropdownMenu.DropdownMenuItem>
+                      <Link
+                        to="/account"
+                        className="w-full p-3 text-left hover:underline hover:backdrop-brightness-90"
+                      >
+                        Account
+                      </Link>
+                    </DropdownMenu.DropdownMenuItem>
                     <DropdownMenu.DropdownMenuItem>
                       <button
+                        aria-label="Log Out"
                         onClick={() => {
                           logout()
                             .then(() => {
@@ -67,7 +95,7 @@ export default function Header() {
                               toast.error(error.message);
                             });
                         }}
-                        className="w-full text-left hover:underline hover:bg-gray-100 p-3"
+                        className="w-full p-3 text-left hover:underline hover:backdrop-brightness-90"
                       >
                         Log Out
                       </button>
@@ -75,7 +103,7 @@ export default function Header() {
                   </DropdownMenu.DropdownMenuContent>
                 </DropdownMenu.DropdownMenu>
               ) : (
-                <a href="/login">Log In</a>
+                <Link to={"/login"}>Log In</Link>
               )}
             </li>
           </ul>
@@ -84,25 +112,57 @@ export default function Header() {
             <Sheet.SheetTrigger className="ml-auto">
               <Menu className="h-8 w-8" />
             </Sheet.SheetTrigger>
-            <Sheet.SheetContent className="bg-gray-100 flex flex-col px-4">
-              <Sheet.SheetTitle>FORWARD Navigation</Sheet.SheetTitle>
-              <div className="flex flex-col *:bg-white *:flex *:justify-between *:p-4 space-y-1 *:active:bg-gray-200 *:rounded-xl">
-                <a href="/dashboard">Dashboard</a>
-                <a href="/lessons">Lessons</a>
-                <a href="/activities">Activities</a>
+            <Sheet.SheetContent
+              className={`bg-background flex flex-col px-4 ${
+                user?.preferences?.theme || ""
+              } ${user?.preferences?.text_size || ""}`}
+              aria-describedby="A slide out from the right of the screen containing the navigation in a mobile-friendly way."
+            >
+              <Sheet.SheetTitle className="text-secondary-foreground">
+                FORWARD Navigation
+              </Sheet.SheetTitle>
+              <div className="*:bg-secondary text-secondary-foreground *:outline-secondary-border flex flex-col space-y-1 *:flex *:justify-between *:rounded-xl *:p-4 *:outline-1 *:active:bg-gray-200/80">
+                <Link to={"/dashboard"}>Dashboard</Link>
+                <Link to={"/lessons"}>Lessons</Link>
+                <Link to={"/activities"}>Activities</Link>
               </div>
               {user ? (
-                <div className="flex flex-col mt-auto gap-4">
-                  <div className="w-full flex gap-3 ">
-                    <img src="pfp.png" className="h-10 w-10 rounded-full" />
-                    <div className="flex flex-col text-left">
-                      <p>
-                        {user.firstName} {user.lastName}
-                      </p>
-                      <p className="text-xs text-gray-500">{user.username}</p>
+                <div className="group mt-auto flex flex-col gap-4">
+                  <Link
+                    to="/account"
+                    className="flex w-full gap-3 active:backdrop-brightness-150"
+                  >
+                    <div
+                      className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full ${
+                        user.profile_picture
+                          ? ""
+                          : "border-muted-foreground border-1 border-solid"
+                      }`}
+                    >
+                      {user.profile_picture ? (
+                        <img
+                          src={user.profile_picture}
+                          className="object-cover"
+                        />
+                      ) : (
+                        <p className="text-secondary-foreground text-xl font-light">
+                          {(user.display_name || "   ")
+                            .substring(0, 2)
+                            .toUpperCase()}
+                        </p>
+                      )}
                     </div>
-                  </div>
+                    <div className="flex flex-col text-left">
+                      <p className="text-secondary-foreground text-base group-hover:underline">
+                        {user.display_name}
+                      </p>
+                      <p className="text-muted-foreground text-xs group-hover:underline">
+                        {user.username}
+                      </p>
+                    </div>
+                  </Link>
                   <button
+                    aria-label="Log Out"
                     onClick={() => {
                       logout()
                         .then(() => {
@@ -113,18 +173,18 @@ export default function Header() {
                           toast.error(error.message);
                         });
                     }}
-                    className="w-full text-center hover:underline bg-red-700 text-white p-3 active:bg-red-900"
+                    className="bg-error outline-error-border w-full p-3 text-center text-white outline-1 hover:underline active:brightness-85"
                   >
                     Log Out
                   </button>
                 </div>
               ) : (
-                <a
-                  href="/login"
-                  className="mt-auto text-center bg-cyan-500 text-white p-3 w-full"
+                <Link
+                  to="/login"
+                  className="bg-primary text-primary-foreground mt-auto w-full p-3 text-center active:brightness-110"
                 >
                   Login
-                </a>
+                </Link>
               )}
             </Sheet.SheetContent>
           </Sheet.Sheet>

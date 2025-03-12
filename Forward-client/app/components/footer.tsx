@@ -1,40 +1,43 @@
+import { Link } from "react-router";
+
 export default function Footer() {
-    return <>
-        <div className="
-
-        flex flex-col bg-gray-200 **:!text-gray-400 **:!no-underline  box-border
-        items-center px-12 py-4 min-h-25 left-0 bottom-0 right-0 w-full gap-3 lg:gap-0.5
-        
-        ">
-            <a href="/" className="text-2xl lg:text-xl font-medium text-center lg:text-left w-full">FORWARD</a>
-            <ul className=" list-none flex flex-col lg:flex-row gap-1 items-center">
-                <li>
-                    <a href="/accessibility">Accessibility</a>
-                </li>
-                <li className="hidden lg:block">|</li>
-                <li>
-                    <a href="/technical-help">Technical Help</a>
-                </li>
-                <li className="hidden lg:block">|</li>
-                <li>
-                    <a href="/feedback">Feedback</a>
-                </li>
-                <li className="hidden lg:block">|</li>
-                <li>
-                    <a href="/privacy-policy">Privacy Policy</a>
-                </li>
-                <li className="hidden lg:block">|</li>
-                <li>
-                    <a href="/cookie-settings">Cookie Settings</a>
-                </li>
-                <li className="hidden lg:block">|</li>
-                <li>
-                    <a href="/cookie-settings">Cookie Settings</a>
-                </li>
-                <li className="hidden lg:block">|</li>
-                <li className="mt-4 lg:mt-0">©2025 Anne Grayson</li>
-
-            </ul>
-        </div>
+  return (
+    <>
+      <div className="bg-muted **:!text-muted-foreground right-0 bottom-0 left-0 box-border flex min-h-25 w-full flex-col items-center gap-3 px-12 py-4 no-underline lg:gap-0.5">
+        <Link
+          to="/"
+          className="w-full text-center text-2xl font-medium lg:text-left lg:text-xl"
+        >
+          FORWARD
+        </Link>
+        <ul className="flex list-none flex-col items-center gap-1 *:hover:underline lg:flex-row">
+          <li>
+            <Link to="/Linkccessibility">Accessibility</Link>
+          </li>
+          <li className="hidden lg:block">|</li>
+          <li>
+            <Link to="/technical-help">Technical Help</Link>
+          </li>
+          <li className="hidden lg:block">|</li>
+          <li>
+            <Link to="/feedback">Feedback</Link>
+          </li>
+          <li className="hidden lg:block">|</li>
+          <li>
+            <Link to="/privacy-policy">Privacy Policy</Link>
+          </li>
+          <li className="hidden lg:block">|</li>
+          <li>
+            <Link to="/cookie-settings">Cookie Settings</Link>
+          </li>
+          <li className="hidden lg:block">|</li>
+          <li>
+            <Link to="/cookie-settings">Cookie Settings</Link>
+          </li>
+          <li className="hidden lg:block">|</li>
+          <li className="mt-4 !no-underline lg:mt-0">©2025 Anne Grayson</li>
+        </ul>
+      </div>
     </>
+  );
 }

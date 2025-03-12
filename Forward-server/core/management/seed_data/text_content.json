@@ -1,0 +1,26 @@
+[
+    {
+        "lesson": "Going to College",
+        "title": "Types of College",
+        "content": "There are many types of colleges and ways to receive post-secondary education. There are also different types of degrees that you can get, providing various levels of expertise. Sometimes you won't know what a college offers until you ask, so it's all a matter of finding the perfect fit for you!",
+        "order": 1
+    },
+    {
+        "lesson": "Going to College",
+        "title": "Trade and Technical Schools",
+        "content": "Trade and technical schools, sometimes called vocational training schools, are schools that provide education for a specific focus area without requiring general education classes. These schools typically provide certificates or associates degrees, take 1-3 years to complete, and often incorporate lots of hands-on experience.",
+        "order": 2
+    },
+    {
+        "lesson": "Going to College",
+        "title": "Community Colleges",
+        "content": "Community colleges provide education for a variety of subjects, including general education and more career-specific classes. Most community colleges offer 2-year associates degrees and certificates. Some community colleges have begun offering 4-year bachelor's degrees as well.",
+        "order": 3
+    },
+    {
+        "lesson": "Financial Literacy",
+        "title": "Introduction to Budgeting",
+        "content": "A budget is a plan for your money. It helps you track your income and expenses so you can make smart financial decisions.",
+        "order": 1
+    }
+]
