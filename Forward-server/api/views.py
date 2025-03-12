@@ -84,7 +84,7 @@ class SessionView(APIView):
 class CurrentUserView(APIView):
     """
     Endpoint for retrieving/updating current user information
-    
+
     GET: Get the current user session
     PATCH: Update the current user
     """
@@ -184,6 +184,20 @@ class QuizView(APIView):
 
 class LessonView(APIView):
     permission_classes = [IsAuthenticated]
+
+    def index(self, request, *args, **kwargs):
+        '''
+        get all lessons meta data
+        '''
+        lessons = Lesson.objects.all()
+
+        if not lessons:
+            return Response({"detail": "there seems to be an error querying the data"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({
+            "detail": "successful query of all lessons",
+            "data": [one_l.to_dict() for one_l in lessons]},
+            status=status.HTTP_200_OK)
 
     def get(self, request, *args, **kwargs):
         '''

@@ -14,9 +14,11 @@ source .venv/bin/activate # Uncomment for Mac/Linux
 pip install django djangorestframework
 
 # Run migrations
-python manage.py migrate
+python app/server/manage.py migrate
 
 # Seed database with test data
-python manage.py seed_test_data --reset
+python app/server/manage.py seed_test_data --reset
+
+python app/server/manage.py runserver
 
 echo "Development environment is ready"
