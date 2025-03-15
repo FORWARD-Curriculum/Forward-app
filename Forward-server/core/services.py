@@ -3,7 +3,7 @@ from django.db import transaction
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import User
+from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing
 
 class UserService:
     @staticmethod
@@ -96,3 +96,50 @@ class UserService:
             logout(request)
         except Exception as e:
             raise ValidationError('logout failed. Please try again.')
+        
+class LessonService:
+    @staticmethod
+    def get_lesson_content(lesson_id):
+        """
+        Retrieve all content associated with a lesson.
+        
+        Args:
+            lesson_id (int): The ID of the lesson
+            
+        Returns:
+            dict: All content associated with the lesson
+            
+        Raises:
+            Lesson.DoesNotExist: If the lesson doesn't exist
+        """
+        lesson = Lesson.objects.get(id=lesson_id)
+        lesson_dict = lesson.to_dict()
+
+        text_contents = TextContent.objects.filter(lesson_id=lesson_id).order_by('order')
+
+        quizzes = []
+        for quiz in Quiz.objects.filter(lesson_id=lesson_id).order_by('order'):
+            questions = Question.objects.filter(quiz_id=quiz.id).order_by('order')
+            quizzes.append({
+                "quiz": quiz.to_dict(),
+                "questions": [q.to_dict() for q in questions]
+            })
+
+        polls = []
+        for poll in Poll.objects.filter(lesson_id=lesson_id).order_by('order'):
+            poll_questions = PollQuestion.objects.filter(id=poll.id).order_by('order')
+            polls.append({
+                "poll": poll.to_dict(),
+                "questions": [q.to_dict() for q in poll_questions]
+            })
+
+        writing_activities = Writing.objects.filter(lesson_id=lesson_id)
+
+        lesson_dict['text_contents'] = [t.to_dict() for t in text_contents]
+        lesson_dict['quizzes'] = quizzes
+        lesson_dict['polls'] = polls
+        lesson_dict['writings'] = [w.to_dict() for w in writing_activities]
+
+        return {
+            "lesson": lesson_dict
+        }

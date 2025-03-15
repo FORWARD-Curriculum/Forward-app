@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer
-from core.services import UserService
+from core.services import UserService, LessonService
 from .utils import json_go_brrr, messages
 from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, Writing, Question
 
@@ -199,6 +199,19 @@ class LessonView(APIView):
             "detail": messages['successful_id'],
             "data": lesson.to_dict()},
             status=status.HTTP_200_OK)
+    
+class LessonContentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, requst, *args, **kwargs):
+        lesson_id = kwargs.get('id')
+        content = LessonService.get_lesson_content(lesson_id=lesson_id)
+
+        return json_go_brrr(
+            message="Successfully retrieved lesson content",
+            data=content,
+            status=status.HTTP_200_OK
+        )
 
 class TextContentView(APIView):
     permission_classes = [IsAuthenticated]
