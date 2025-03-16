@@ -115,30 +115,37 @@ class LessonService:
         lesson = Lesson.objects.get(id=lesson_id)
         lesson_dict = lesson.to_dict()
 
-        text_contents = TextContent.objects.filter(lesson_id=lesson_id).order_by('order')
+        lesson_dict['activities'] = {}
+        
+        # Process text content
+        text_contents = list(TextContent.objects.filter(lesson_id=lesson_id).order_by('order'))
+        for content in text_contents:
+            activity_dict = content.to_dict()
+            activity_dict['type'] = 'TextContent'
+            lesson_dict['activities'][content.order] = activity_dict
 
-        quizzes = []
+        # Process quizzes
         for quiz in Quiz.objects.filter(lesson_id=lesson_id).order_by('order'):
             questions = Question.objects.filter(quiz_id=quiz.id).order_by('order')
-            quizzes.append({
-                "quiz": quiz.to_dict(),
-                "questions": [q.to_dict() for q in questions]
-            })
+            quiz_dict = quiz.to_dict()
+            quiz_dict['questions'] = [q.to_dict() for q in questions]
+            quiz_dict['type'] = 'Quiz'
+            lesson_dict['activities'][quiz.order] = quiz_dict
 
-        polls = []
+        # Process polls
         for poll in Poll.objects.filter(lesson_id=lesson_id).order_by('order'):
-            poll_questions = PollQuestion.objects.filter(id=poll.id).order_by('order')
-            polls.append({
-                "poll": poll.to_dict(),
-                "questions": [q.to_dict() for q in poll_questions]
-            })
+            poll_questions = PollQuestion.objects.filter(poll_id=poll.id).order_by('order')
+            poll_dict = poll.to_dict()
+            poll_dict['questions'] = [pq.to_dict() for pq in poll_questions]
+            poll_dict['type'] = 'Poll'
+            lesson_dict['activities'][poll.order] = poll_dict
 
-        writing_activities = Writing.objects.filter(lesson_id=lesson_id)
-
-        lesson_dict['text_contents'] = [t.to_dict() for t in text_contents]
-        lesson_dict['quizzes'] = quizzes
-        lesson_dict['polls'] = polls
-        lesson_dict['writings'] = [w.to_dict() for w in writing_activities]
+        # Process writing activities
+        writing_activities = list(Writing.objects.filter(lesson_id=lesson_id))
+        for writing in writing_activities:
+            writing_dict = writing.to_dict()
+            writing_dict['type'] = 'Writing'
+            lesson_dict['activities'][writing.order] = writing_dict
 
         return {
             "lesson": lesson_dict
