@@ -191,13 +191,18 @@ class TextContent(models.Model):
     def __str__(self):
         return f"Text Content: {self.title}"
 
+    @property
+    def activity_type(self):
+        return self.__class__.__name__
+
     def to_dict(self):
         return {
             "id": self.id,
             "lessonId": self.lesson_id,
+            "type": self.activity_type,
             "title": self.title,
             "content": self.content,
-            "order": self.order,
+            "order": self.order
         }
 
 class BaseActivity(models.Model):
@@ -237,14 +242,19 @@ class BaseActivity(models.Model):
 
     def __str__(self):
         return f"{self.__class__.__name__} - {self.title}"
+    
+    @property
+    def activity_type(self):
+        return self.__class__.__name__
 
     def to_dict(self):
         return {
             "id": self.id,
             "lessonId": self.lesson_id,
+            "type": self.activity_type,
             "title": self.title,
             "instructions": self.instructions,
-            "order": self.order,
+            "order": self.order
         }
 
 class Writing(BaseActivity):

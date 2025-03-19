@@ -121,7 +121,6 @@ class LessonService:
         text_contents = list(TextContent.objects.filter(lesson_id=lesson_id).order_by('order'))
         for content in text_contents:
             activity_dict = content.to_dict()
-            activity_dict['type'] = 'TextContent'
             lesson_dict['activities'][content.order] = activity_dict
 
         # Process quizzes
@@ -129,7 +128,6 @@ class LessonService:
             questions = Question.objects.filter(quiz_id=quiz.id).order_by('order')
             quiz_dict = quiz.to_dict()
             quiz_dict['questions'] = [q.to_dict() for q in questions]
-            quiz_dict['type'] = 'Quiz'
             lesson_dict['activities'][quiz.order] = quiz_dict
 
         # Process polls
@@ -137,14 +135,12 @@ class LessonService:
             poll_questions = PollQuestion.objects.filter(poll_id=poll.id).order_by('order')
             poll_dict = poll.to_dict()
             poll_dict['questions'] = [pq.to_dict() for pq in poll_questions]
-            poll_dict['type'] = 'Poll'
             lesson_dict['activities'][poll.order] = poll_dict
 
         # Process writing activities
         writing_activities = list(Writing.objects.filter(lesson_id=lesson_id))
         for writing in writing_activities:
             writing_dict = writing.to_dict()
-            writing_dict['type'] = 'Writing'
             lesson_dict['activities'][writing.order] = writing_dict
 
         return {
