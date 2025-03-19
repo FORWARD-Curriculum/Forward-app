@@ -3,8 +3,7 @@ import type { Lesson } from "./lessonSlice";
 
 const initialState: {
   lessons: Lesson[] | null;
-  currentLessonId: number | null;
-} = { lessons: null, currentLessonId: null };
+} = { lessons: null};
 
 export const curriculumSlice = createSlice({
   name: "curriculum",

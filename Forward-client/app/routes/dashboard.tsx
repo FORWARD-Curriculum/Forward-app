@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Expand, FileVolume } from "lucide-react";
 import Pie from "../components/progress";
 import { useDispatch, useSelector } from "react-redux";
@@ -72,7 +72,9 @@ export default function Dashboard({ loaderData }: Route.ComponentProps ) {
     "progress",
   );
   const dispatch = useDispatch();
-  dispatch({ type: "curriculum/setCurriculum", payload: loaderData });
+  useEffect(() => {
+    dispatch({ type: "curriculum/setCurriculum", payload: loaderData });
+  }, [loaderData, dispatch]);
   
   const lessons = useSelector((state: RootState) => state.curriculum.lessons);
   const user = useSelector((state: RootState) => state.user.user) as User;

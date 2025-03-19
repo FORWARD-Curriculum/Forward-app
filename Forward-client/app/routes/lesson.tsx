@@ -1,11 +1,32 @@
-import type { BaseActivity, Lesson, TextContent } from "@/lib/lessonSlice";
+import type {
+  BaseActivity,
+  Lesson,
+  TextContent as TextContentType,
+  Poll as PollType,
+  Quiz as QuizType,
+  Writing as WritingType,
+} from "@/lib/lessonSlice";
 import type { Route } from "./+types/lesson";
 import { apiFetch } from "@/lib/utils";
-import { Outlet } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { type RootState } from "@/store";
+import { useEffect } from "react";
+import TextContent from "@/components/curriculum/textcontent";
+import Poll from "@/components/curriculum/poll";
+import Quiz from "@/components/curriculum/quiz";
+import Writing from "@/components/curriculum/writing";
+import { useClient } from "@/lib/useClient";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { ArrowRightIcon } from "lucide-react";
 
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
+export async function clientLoader({
+  params,
+}: Route.ClientLoaderArgs): Promise<Lesson | void> {
   const response = await apiFetch(`/lessons/${params.lessonId}/content`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
@@ -19,17 +40,17 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 export function Activity({
   activity,
 }: {
-  activity: BaseActivity | TextContent | undefined;
+  activity: BaseActivity | TextContentType | undefined;
 }) {
   switch (activity?.type) {
     case "Writing":
-      return <p>Writing </p>;
+      return <Writing writing={activity as WritingType} />;
     case "Quiz":
-      return <p>Quiz</p>;
+      return <Quiz quiz={activity as QuizType} />;
     case "Poll":
-      return <p>Poll</p>;
+      return <Poll poll={activity as PollType} />;
     case "TextContent":
-      return <p>Text Content {activity.type}</p>;
+      return <TextContent textContent={activity} />;
     default:
       return <p>Invalid</p>;
   }
@@ -37,26 +58,95 @@ export function Activity({
 
 export default function Lesson({ loaderData }: Route.ComponentProps) {
   const dispatch = useDispatch();
-  dispatch({ type: "lesson/setLesson", payload: loaderData });
+  const client = useClient();
+  useEffect(() => {
+    if (loaderData) dispatch({ type: "lesson/setLesson", payload: loaderData });
+  }, [loaderData, dispatch]);
+
   const lesson = useSelector((state: RootState) => state.lesson);
+  const activity = lesson.lesson?.activities[lesson.currentActivity - 1];
 
   return (
-    <>
-      {lesson.lesson?.activities.map((activity) => {
-        return (
-          <button className="hover:underline">
-            {activity.order}.) {activity.title}
+    <div className="mx-4 my-12 flex w-full flex-col items-center lg:flex-row">
+      {client.windowDimensions.width >= 1024 ? (
+        <div className="flex flex-col items-start text-left">
+          {lesson.lesson?.activities.map((activityListing) => {
+            return (
+              <button
+                className={`hover:underline ${activityListing ? "" : "text-secondary-foreground"}`}
+                onClick={() =>
+                  dispatch({
+                    type: "lesson/setActivity",
+                    payload: activityListing.order,
+                  })
+                }
+              >
+                {activityListing.order}.) {activityListing.title}
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <Accordion type="single" collapsible className="mb-6 w-full">
+          <AccordionItem value="1">
+            <AccordionTrigger className="bg-secondary text-secondary-foreground border-muted-foreground/50 rounded-t-3xl rounded-b-none border-0 p-4 data-[state=closed]:rounded-3xl data-[state=open]:border-b-1">
+              <h1 className="text-xl font-bold">
+                {lesson.lesson?.title}: Table of Contents
+              </h1>
+            </AccordionTrigger>
+            <AccordionContent className="bg-secondary text-secondary-foreground rounded-b-3xl pb-0">
+              <div className="flex flex-col items-start text-left">
+                {lesson.lesson?.activities.map((activityIndex) => {
+                  return (
+                    <button
+                      className={`${activityIndex.order===lesson.currentActivity?"bg-accent/40":""} flex h-10 w-full flex-row items-center justify-between rounded-sm first:rounded-t-none last:rounded-b-3xl px-8 font-bold hover:underline active:backdrop-brightness-90`}
+                      onClick={() =>
+                        dispatch({
+                          type: "lesson/setActivity",
+                          payload: activityIndex.order,
+                        })
+                      }
+                    >
+                      <p>{activityIndex.order}.</p>
+                      <p> {activityIndex.title}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      )}
+
+      <div className="bg-secondary text-secondary-foreground flex w-full flex-col rounded-3xl p-4 lg:w-3/4">
+        <h1 className="text-2xl font-bold">
+          <span className="text-accent">
+            {
+              {
+                Writing: "Writing",
+                Quiz: "Quiz",
+                TextContent: "Info",
+                Poll: "Poll",
+                Default: "Activity",
+              }[activity?.type || "Default"]
+            }
+            :{" "}
+          </span>
+          {activity?.title}
+        </h1>
+        <Activity activity={activity} />
+        <div className="flex">
+          <button
+            className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2"
+            onClick={() => {
+              dispatch({ type: "lesson/nextActivity" });
+            }}
+          >
+            Save and Continue
+            <ArrowRightIcon className="!text-primary-foreground" />
           </button>
-        );
-      })}
-      <Activity activity={lesson.lesson?.activities[lesson.currentActivity]} />
-      <button
-        onClick={() => {
-          dispatch({ type: "lesson/nextActivity" });
-        }}
-      >
-        next activity
-      </button>
-    </>
+        </div>
+      </div>
+    </div>
   );
 }

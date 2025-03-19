@@ -39,9 +39,9 @@ export interface Quiz extends BaseActivity {
 }
 
 export interface Question {
-  question_text: string;
-  question_type: "multiple_choice" | "true_false" | "multiple_select";
-  has_correct_answer: boolean;
+  questionText: string;
+  questionType: "multiple_choice" | "true_false" | "multiple_select";
+  hasCorrectAnswer: boolean;
   choices: {
     options: {
       id: number;
@@ -53,7 +53,7 @@ export interface Question {
       incorrect: string;
     };
   }
-  is_required: boolean;
+  isRequired: boolean;
 }
 
 export interface Poll extends BaseActivity {

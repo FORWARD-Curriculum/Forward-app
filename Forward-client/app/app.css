@@ -9,6 +9,8 @@
   --animate-slide-out-to-right: slide-out-to-right 0.4s ease-in-out;
   --animate-in: fade-in 0.4s ease-in-out;
   --animate-out: fade-out 0.4s ease-in-out;
+  --animate-slide-up: slideUp 0.3s ease-in;
+  --animate-slide-down: slideDown 0.3s ease-out;
 
   /* Dynamic theming */
   --color-background: var(--background);
@@ -49,6 +51,24 @@
     }
     to {
       transform: translateX(100%);
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
     }
   }
 
