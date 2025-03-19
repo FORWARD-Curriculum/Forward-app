@@ -128,7 +128,7 @@ export default function account() {
 
     // Send updated prefs to server and update from source of truth.
     try {
-      const response = await apiFetch("users/me", {
+      const response = await apiFetch("/users/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

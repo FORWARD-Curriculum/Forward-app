@@ -1,28 +1,33 @@
 import { type ReactNode, useState } from "react";
 import { ChevronDown, ChevronUp, Expand, FileVolume } from "lucide-react";
 import Pie from "../components/progress";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import type { User } from "@/lib/userSlice";
 import { Link } from "react-router";
+import type { Route } from "./+types/dashboard";
+import { apiFetch } from "@/lib/utils";
+import type { Lesson } from "@/lib/lessonSlice";
 
-interface Lesson {
-  name: string;
-  description: string;
-  image: string;
-  progress: number;
-  last_date: Date;
+export async function clientLoader({}: Route.ClientLoaderArgs) {
+  const response = await apiFetch("/lessons", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (response.ok){
+    const json = await response.json();
+    return json.data as Array<any>;
+  }
 }
 
-export async function clientLoader() {}
-
 function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
+  const dispatch = useDispatch();
   return (
     <div className="bg-background rounded-2xl pt-3">
       <div className="mx-4 flex items-center gap-4 pb-3">
-        <img src={props.lesson?.image} className="h-full max-w-20"></img>
+        <img src={props.lesson?.image || "grad_cap.png"} className="h-full max-w-20"></img>
         <div className="flex flex-col text-left">
-          <h1 className="text-accent text-xl">{props.lesson?.name}</h1>
+          <Link to={"/lesson/"+props.lesson?.id} className="text-accent text-xl">{props.lesson?.title}</Link>
           <p className="text-secondary-foreground text-base">
             {props.lesson?.description}
           </p>
@@ -62,39 +67,18 @@ function Accordion(props: { children?: ReactNode }) {
   );
 }
 
-export default function Dashboard({ className = "" }: { className?: string }) {
+export default function Dashboard({ loaderData }: Route.ComponentProps ) {
   const [sortType, setSortType] = useState<"recent" | "date" | "progress">(
     "progress",
   );
+  const dispatch = useDispatch();
+  dispatch({ type: "curriculum/setCurriculum", payload: loaderData });
+  
+  const lessons = useSelector((state: RootState) => state.curriculum.lessons);
   const user = useSelector((state: RootState) => state.user.user) as User;
 
   /* TODO: grab from api instead of hardcoding*/
-  const lessons: Lesson[] = [
-    {
-      name: "Going to College",
-      description:
-        "This lesson is a guide to navigating the path to higher education. You'll learn about different tupes of colleges, degrees, so you can decide what's right for you.",
-      image: "/grad_cap.png",
-      progress: 100,
-      last_date: new Date("Jan 30, 2023"),
-    },
-    {
-      name: "Introduction to Soft Skills",
-      description:
-        "This lesson focuses on understanding and enhancing soft skills-personal attributes that enable individuals to interact effectively and harmoniously with others.",
-      image: "/tools.png",
-      progress: 30,
-      last_date: new Date("Nov 26, 2024"),
-    },
-    {
-      name: "Personal Finance Management",
-      description:
-        "In this lesson learn the basics of managing money, including the differencebetween debit and credit, strategies to avoid debt, and creating a monthly budget.",
-      image: "/money.png",
-      progress: 0,
-      last_date: new Date("Feb 2, 2025"),
-    },
-  ];
+
 
   //const [lessons, setLessons] = useState<Lesson[] | null>(null);
   /*
@@ -152,21 +136,7 @@ export default function Dashboard({ className = "" }: { className?: string }) {
               {!lessons ? (
                 <p>Loading...</p>
               ) : (
-                [...lessons]
-                  .sort((a, b) => {
-                    switch (sortType) {
-                      case "recent":
-                        return (
-                          +a.last_date.toUTCString - +b.last_date.toUTCString
-                        );
-                      case "date":
-                        return (
-                          +b.last_date.toUTCString - +a.last_date.toUTCString
-                        );
-                      case "progress":
-                        return a.progress - b.progress;
-                    }
-                  })
+                lessons
                   .map((e) => (
                     <LessonCard lesson={e}>
                       <Accordion>
@@ -227,8 +197,8 @@ export default function Dashboard({ className = "" }: { className?: string }) {
                 ) : (
                   lessons.map((e) => (
                     <div className="flex items-center">
-                      <Pie size={120} percentage={e.progress} color="" />
-                      <h2 className="text-base">{e.name}</h2>
+                      <Pie size={120} percentage={20} color="" />
+                      <h2 className="text-base">{e.title}</h2>
                     </div>
                   ))
                 )}

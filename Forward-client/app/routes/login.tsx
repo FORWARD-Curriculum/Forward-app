@@ -24,7 +24,7 @@ export default function Login() {
 
     try {
       /* TODO: change api domain*/
-      const response = await fetch("/api/sessions/", {
+      const response = await fetch("/api/sessions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

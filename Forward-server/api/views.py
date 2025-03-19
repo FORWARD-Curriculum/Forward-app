@@ -182,6 +182,23 @@ class QuizView(APIView):
 
         # need to make user data table to save to. TBD
 
+class CurriculumView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
+        '''
+        gets all lessons
+        '''
+        lessons = Lesson.objects.all()
+
+        if not lessons:
+            return Response({"detail": "cannot find any lessons"}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({
+            "detail": messages['successful_id'],
+            "data": [l.to_dict() for l in lessons]},
+            status=status.HTTP_200_OK)
+
 class LessonView(APIView):
     permission_classes = [IsAuthenticated]
 

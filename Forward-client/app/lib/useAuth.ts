@@ -36,7 +36,7 @@ export const useAuth = () => {
    */
   const logout = async () => {
     try {
-      const response = await apiFetch("sessions", {
+      const response = await apiFetch("/sessions", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });

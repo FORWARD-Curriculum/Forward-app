@@ -2,14 +2,19 @@ import {
   configureStore,
   type StateFromReducersMapObject,
 } from "@reduxjs/toolkit";
-import { userSlice } from "./lib/userSlice";
+import { userSlice } from "@/lib/userSlice";
+import { curriculumSlice } from "@/lib/curriculumSlice";
+import { lessonSlice } from "@/lib/lessonSlice";
 
 /**
  * Add reducers here to enforce type safety
  */
 const reducer = {
   user: userSlice.reducer,
+  curriculum: curriculumSlice.reducer,
+  lesson: lessonSlice.reducer,
 };
+
 /**
  * This type is good for using useSelector((s: RootState)=>s.<something>)
  * Type-Safe store access

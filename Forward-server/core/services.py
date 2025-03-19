@@ -146,6 +146,8 @@ class LessonService:
             writing_dict = writing.to_dict()
             writing_dict['type'] = 'Writing'
             lesson_dict['activities'][writing.order] = writing_dict
+            
+        lesson_dict['activities'] = list(lesson_dict['activities'].values())
 
         return {
             "lesson": lesson_dict
