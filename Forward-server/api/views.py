@@ -214,6 +214,32 @@ class LessonView(APIView):
             "data": lesson.to_dict()},
             status=status.HTTP_200_OK)
 
+    def mega(self, request, *args, **kwargs):
+        '''
+        gets all activities for a given lesson by the lesson id
+        '''
+        [id] = kwargs.values()
+
+        quizzes = Quiz.objects.get(lesson_id=id)
+        questions = 'tbd'
+        polls = Poll.objects.get(lesson_id=id)
+        poll_qs = 'tbd'
+        texts = TextContent.objects.get(lesson_id=id)
+        writings = Writing.objects.get(lesson_id=id)
+'''
+lessons/<lesson-id>
+return {
+  "id":1 -- lessons id
+  ...lesson data,
+  "activites": {
+    1: {quiz.to_dict()},
+    2: {poll.to_dict()}
+
+    ADD TYPE TO MODELS MAYBE
+  }
+}
+'''
+
 class TextContentView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -251,6 +277,9 @@ class PollView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
+        '''
+        this structure wont work for multiple polls unless we add a limit to these
+        '''
         [id] = kwargs.values()
         poll = Poll.objects.get(lesson_id=id)
 

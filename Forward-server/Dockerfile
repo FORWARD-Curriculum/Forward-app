@@ -3,7 +3,7 @@ FROM python:3
 # Install required packages for venv creation
 RUN apt-get update && apt-get install -y python3-venv
 
-WORKDIR /
+WORKDIR /app/server
 COPY ./setup_dev.sh ./
 
 EXPOSE 8000
