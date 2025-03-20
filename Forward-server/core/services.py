@@ -3,7 +3,7 @@ from django.db import transaction
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import User
+from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing
 
 class UserService:
     @staticmethod
@@ -96,3 +96,57 @@ class UserService:
             logout(request)
         except Exception as e:
             raise ValidationError('logout failed. Please try again.')
+        
+class LessonService:
+    @staticmethod
+    def get_lesson_content(lesson_id):
+        """
+        Retrieve all content associated with a lesson.
+        
+        Args:
+            lesson_id (int): The ID of the lesson
+            
+        Returns:
+            dict: All content associated with the lesson
+            
+        Raises:
+            Lesson.DoesNotExist: If the lesson doesn't exist
+        """
+        lesson = Lesson.objects.get(id=lesson_id)
+        lesson_dict = lesson.to_dict()
+
+        lesson_dict['activities'] = {}
+        
+        # Process text content
+        text_contents = list(TextContent.objects.filter(lesson_id=lesson_id).order_by('order'))
+        for content in text_contents:
+            activity_dict = content.to_dict()
+            activity_dict['type'] = 'TextContent'
+            lesson_dict['activities'][content.order] = activity_dict
+
+        # Process quizzes
+        for quiz in Quiz.objects.filter(lesson_id=lesson_id).order_by('order'):
+            questions = Question.objects.filter(quiz_id=quiz.id).order_by('order')
+            quiz_dict = quiz.to_dict()
+            quiz_dict['questions'] = [q.to_dict() for q in questions]
+            quiz_dict['type'] = 'Quiz'
+            lesson_dict['activities'][quiz.order] = quiz_dict
+
+        # Process polls
+        for poll in Poll.objects.filter(lesson_id=lesson_id).order_by('order'):
+            poll_questions = PollQuestion.objects.filter(poll_id=poll.id).order_by('order')
+            poll_dict = poll.to_dict()
+            poll_dict['questions'] = [pq.to_dict() for pq in poll_questions]
+            poll_dict['type'] = 'Poll'
+            lesson_dict['activities'][poll.order] = poll_dict
+
+        # Process writing activities
+        writing_activities = list(Writing.objects.filter(lesson_id=lesson_id))
+        for writing in writing_activities:
+            writing_dict = writing.to_dict()
+            writing_dict['type'] = 'Writing'
+            lesson_dict['activities'][writing.order] = writing_dict
+
+        return {
+            "lesson": lesson_dict
+        }
