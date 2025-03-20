@@ -7,7 +7,7 @@ from rest_framework import status
 from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer
 from core.services import UserService, LessonService
 from .utils import json_go_brrr, messages
-from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, Writing, Question
+from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, Writing, Question, ResponseData
 
 class UserRegistrationView(generics.CreateAPIView):
     """
@@ -84,7 +84,7 @@ class SessionView(APIView):
 class CurrentUserView(APIView):
     """
     Endpoint for retrieving/updating current user information
-    
+
     GET: Get the current user session
     PATCH: Update the current user
     """
@@ -199,7 +199,7 @@ class LessonView(APIView):
             "detail": messages['successful_id'],
             "data": lesson.to_dict()},
             status=status.HTTP_200_OK)
-    
+
 class LessonContentView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -212,6 +212,16 @@ class LessonContentView(APIView):
             data=content,
             status=status.HTTP_200_OK
         )
+
+    def post(self, request, *args, **kwargs):
+        data_type = request.body.data_type
+        time = request.body.time
+        score = request.body.score
+        responses = request.body.responses
+        new_data = ResponseData(data_type=data_type,time=time,score=score,responses=responses)
+        new_data.save()
+        return Response({"detail": 'successfully saved data'}, status=status.HTTP_200_OK)
+
 
 class TextContentView(APIView):
     permission_classes = [IsAuthenticated]

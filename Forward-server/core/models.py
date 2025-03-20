@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinLengthValidator
+from django.core.validators import MinLengthValidator, MinValueValidator
 from django.urls import reverse
 
 
@@ -50,13 +50,13 @@ class User(AbstractUser):
         max_length=1,
         default=False
     )
-    
+
     theme = models.CharField(
         'theme preference',
         max_length=1,
         default="light"
     )
-    
+
     text_size = models.CharField(
         'text size preference',
         max_length=1,
@@ -66,8 +66,8 @@ class User(AbstractUser):
     # Automatically set when the user is created and updated
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
-    # This is not data we collect, its ugly but the other option is to inherit 
+
+    # This is not data we collect, its ugly but the other option is to inherit
     # from AbstractBaseUser and all the stuff that comes with that
     first_name = None
     last_name = None
@@ -420,3 +420,26 @@ class PollQuestion(models.Model):
             "allowMultiple": self.allow_multiple,
             "order": self.order,
         }
+
+class ResponseData(models.Model):
+    data_type = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Type for categorizing what data is what"
+    )
+
+    time = models.TimeField(
+        null=True,
+        blank=True,
+        help_text="Time taken during test"
+    )
+
+    score = models.IntegerField(
+        validators=[MinValueValidator(0)],
+        help_text="Score must be a non-negative integer"
+    )
+
+    responses = models.JSONField(
+        default=list,
+        help_text='Needs question id as well as response chosen and is correct flag'
+    )

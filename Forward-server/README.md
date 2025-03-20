@@ -533,6 +533,250 @@ Retrieves a lesson by its ID.
     ```
     </details>
 
+### /api/lessons/:id/content
+
+<details>
+<summary>GET - Get all lesson content by the lesson id </summary>
+Retrieves the lessons content and formats it in order by lesson Id
+
+- Request
+
+  - Method `GET`
+  - URL: /api/lessons/:lessonId/content
+  - Body: None
+
+- Response
+  - Status Code: 200
+  - Headers:
+    - Content-Type: application/json
+  - Body:
+    ```json
+    {
+    "detail": "Successfully retrieved lesson content",
+    "data": {
+        "id": 23,
+        "title": "Going to College",
+        "description": "Learn about college preparation, applications, and financing",
+        "objectives": [
+            "Know the different types of higher education and degree types",
+            "Apply for college",
+            "Identify multiple strategies for financing college",
+            "Understand basic vocabulary and terms around college and independent living"
+        ],
+        "order": 1,
+        "tags": [
+            "education",
+            "college",
+            "financing"
+        ],
+        "activities": {
+            "1": {
+                "id": 45,
+                "lessonId": 23,
+                "title": "Types of College",
+                "content": "There are many types of colleges and ways to receive post-secondary education. There are also different types of degrees that you can get, providing various levels of expertise. Sometimes you won't know what a college offers until you ask, so it's all a matter of finding the perfect fit for you!",
+                "order": 1,
+                "type": "TextContent"
+            },
+            "2": {
+                "id": 46,
+                "lessonId": 23,
+                "title": "Trade and Technical Schools",
+                "content": "Trade and technical schools, sometimes called vocational training schools, are schools that provide education for a specific focus area without requiring general education classes. These schools typically provide certificates or associates degrees, take 1-3 years to complete, and often incorporate lots of hands-on experience.",
+                "order": 2,
+                "type": "TextContent"
+            },
+            "3": {
+                "id": 47,
+                "lessonId": 23,
+                "title": "Community Colleges",
+                "content": "Community colleges provide education for a variety of subjects, including general education and more career-specific classes. Most community colleges offer 2-year associates degrees and certificates. Some community colleges have begun offering 4-year bachelor's degrees as well.",
+                "order": 3,
+                "type": "TextContent"
+            },
+            "4": {
+                "id": 23,
+                "lessonId": 23,
+                "title": "College Types Quiz",
+                "instructions": "Select the type of college you would choose to attend for each career path.",
+                "order": 4,
+                "passingScore": 3,
+                "feedbackConfig": {
+                    "passing": "Great job! You understand the different types of colleges.",
+                    "failing": "You might want to review the types of colleges section again."
+                },
+                "questions": [
+                    {
+                        "id": 34,
+                        "quizId": 23,
+                        "questionText": "Which type of college might you choose to attend to become a doctor?",
+                        "questionType": "multiple_choice",
+                        "hasCorrectAnswer": true,
+                        "choices": {
+                            "options": [
+                                {
+                                    "id": 1,
+                                    "text": "Trade school",
+                                    "is_correct": false
+                                },
+                                {
+                                    "id": 2,
+                                    "text": "Community college",
+                                    "is_correct": false
+                                },
+                                {
+                                    "id": 3,
+                                    "text": "4-year college",
+                                    "is_correct": false
+                                },
+                                {
+                                    "id": 4,
+                                    "text": "University",
+                                    "is_correct": true
+                                }
+                            ],
+                            "feedback": {
+                                "correct": "If you want to become a doctor, you will need to first obtain a bachelor's degree and possibly some additional graduate school training before attending medical school, offered through a University.",
+                                "incorrect": "To become a doctor requires medical school, which is offered at universities."
+                            }
+                        },
+                        "isRequired": true,
+                        "order": 1
+                    },
+                    {
+                        "id": 35,
+                        "quizId": 23,
+                        "questionText": "Which type of college might you choose to attend to become a welder?",
+                        "questionType": "multiple_choice",
+                        "hasCorrectAnswer": true,
+                        "choices": {
+                            "options": [
+                                {
+                                    "id": 1,
+                                    "text": "Trade school",
+                                    "is_correct": true
+                                },
+                                {
+                                    "id": 2,
+                                    "text": "Community college",
+                                    "is_correct": true
+                                },
+                                {
+                                    "id": 3,
+                                    "text": "4-year college",
+                                    "is_correct": false
+                                },
+                                {
+                                    "id": 4,
+                                    "text": "University",
+                                    "is_correct": false
+                                }
+                            ],
+                            "feedback": {
+                                "correct": "If you want to become a welder, you would likely attend a trade school or maybe a community college offering a certificate or associate's degree in welding.",
+                                "incorrect": "Welding is a trade that is typically taught at trade schools or community colleges."
+                            }
+                        },
+                        "isRequired": true,
+                        "order": 2
+                    }
+                ],
+                "type": "Quiz"
+            },
+            "5": {
+                "id": 23,
+                "lessonId": 23,
+                "title": "Your Educational Plans",
+                "instructions": "Share your thoughts about your educational goals. There are no right or wrong answers.",
+                "order": 5,
+                "config": {
+                    "show_results": true,
+                    "allow_anonymous": true
+                },
+                "questions": [
+                    {
+                        "id": 45,
+                        "pollId": 23,
+                        "questionText": "Which degree would you like to have?",
+                        "options": [
+                            {
+                                "id": 1,
+                                "text": "High school diploma"
+                            },
+                            {
+                                "id": 2,
+                                "text": "GED"
+                            },
+                            {
+                                "id": 3,
+                                "text": "Associate degree"
+                            },
+                            {
+                                "id": 4,
+                                "text": "Bachelor's degree"
+                            },
+                            {
+                                "id": 5,
+                                "text": "Master's degree"
+                            },
+                            {
+                                "id": 6,
+                                "text": "Professional degree"
+                            },
+                            {
+                                "id": 7,
+                                "text": "Doctoral degree"
+                            }
+                        ],
+                        "allowMultiple": false,
+                        "order": 1
+                    },
+                    {
+                        "id": 46,
+                        "pollId": 23,
+                        "questionText": "Which degree do you think would be the hardest to get?",
+                        "options": [
+                            {
+                                "id": 1,
+                                "text": "High school diploma"
+                            },
+                            {
+                                "id": 2,
+                                "text": "GED"
+                            },
+                            {
+                                "id": 3,
+                                "text": "Associate degree"
+                            },
+                            {
+                                "id": 4,
+                                "text": "Bachelor's degree"
+                            },
+                            {
+                                "id": 5,
+                                "text": "Master's degree"
+                            },
+                            {
+                                "id": 6,
+                                "text": "Professional degree"
+                            },
+                            {
+                                "id": 7,
+                                "text": "Doctoral degree"
+                            }
+                        ],
+                        "allowMultiple": false,
+                        "order": 2
+                    }
+                ],
+                "type": "Poll"
+            }
+        }
+    }
+  }
+    ```
+</details>
+
 ### /api/video-content/:lessonId
 
 <details>

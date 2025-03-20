@@ -11,48 +11,48 @@ class UserService:
     def create_user(data: dict):
         """
         Create a new user with validated data
-        
+
         Args:
             data (dict): Dictionary containing user data including:
                         username, password, email, display_name, facility_id, profile_picture, consent
-        
+
         Returns:
             User: Created user instance
-            
+
         Raises:
             ValidationError: If password validation fails or required fields are missing
         """
         try:
             # Validate password
             validate_password(data['password'])
-            
+
             # Create user instance but don't save yet
             user = User(
                 username=data['username'],
                 display_name=data['display_name'],
             )
-            
+
             # Set password (this handles the hashing)
             user.set_password(data['password'])
-            
+
             # Save the user
             user.save()
-            
+
             return user
         except ValidationError as e:
             raise ValidationError({'password': e.messages})
         except KeyError as e:
             raise ValidationError(f'Missing required field: {str(e)}')
-        
+
     @staticmethod
     def login_user(request, user: User):
         """
         Log in a user and create a session
-        
+
         Args:
             request: The HTTP request object
             user: The authenticated user instance
-            
+
         Returns:
             dict: User data including authentication token if used
 
@@ -79,15 +79,15 @@ class UserService:
             }
         except Exception as e:
             raise ValidationError('login failed. Please try again.')
-        
+
     @staticmethod
     def logout_user(request):
         """
         Log out a user and destroy the session
-        
+
         Args:
             request: The HTTP request object
-            
+
         Returns:
             dict: User data including authentication token if used
         """
@@ -96,19 +96,19 @@ class UserService:
             logout(request)
         except Exception as e:
             raise ValidationError('logout failed. Please try again.')
-        
+
 class LessonService:
     @staticmethod
     def get_lesson_content(lesson_id):
         """
         Retrieve all content associated with a lesson.
-        
+
         Args:
             lesson_id (int): The ID of the lesson
-            
+
         Returns:
             dict: All content associated with the lesson
-            
+
         Raises:
             Lesson.DoesNotExist: If the lesson doesn't exist
         """
@@ -116,7 +116,7 @@ class LessonService:
         lesson_dict = lesson.to_dict()
 
         lesson_dict['activities'] = {}
-        
+
         # Process text content
         text_contents = list(TextContent.objects.filter(lesson_id=lesson_id).order_by('order'))
         for content in text_contents:
@@ -147,6 +147,4 @@ class LessonService:
             writing_dict['type'] = 'Writing'
             lesson_dict['activities'][writing.order] = writing_dict
 
-        return {
-            "lesson": lesson_dict
-        }
+        return lesson_dict
