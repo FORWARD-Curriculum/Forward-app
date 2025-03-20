@@ -67,58 +67,45 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   const activity = lesson.lesson?.activities[lesson.currentActivity - 1];
 
   return (
-    <div className="mx-4 my-12 flex w-full flex-col items-center lg:flex-row">
-      {client.windowDimensions.width >= 1024 ? (
-        <div className="flex flex-col items-start text-left">
-          {lesson.lesson?.activities.map((activityListing) => {
-            return (
-              <button
-                className={`hover:underline ${activityListing ? "" : "text-secondary-foreground"}`}
-                onClick={() =>
-                  dispatch({
-                    type: "lesson/setActivity",
-                    payload: activityListing.order,
-                  })
-                }
-              >
-                {activityListing.order}.) {activityListing.title}
-              </button>
-            );
-          })}
-        </div>
-      ) : (
-        <Accordion type="single" collapsible className="mb-6 w-full">
-          <AccordionItem value="1">
-            <AccordionTrigger className="bg-secondary text-secondary-foreground border-muted-foreground/50 rounded-t-3xl rounded-b-none border-0 p-4 data-[state=closed]:rounded-3xl data-[state=open]:border-b-1">
-              <h1 className="text-xl font-bold">
-                {lesson.lesson?.title}: Table of Contents
-              </h1>
-            </AccordionTrigger>
-            <AccordionContent className="bg-secondary text-secondary-foreground rounded-b-3xl pb-0">
-              <div className="flex flex-col items-start text-left">
-                {lesson.lesson?.activities.map((activityIndex) => {
-                  return (
-                    <button
-                      className={`${activityIndex.order===lesson.currentActivity?"bg-accent/40":""} flex h-10 w-full flex-row items-center justify-between rounded-sm first:rounded-t-none last:rounded-b-3xl px-8 font-bold hover:underline active:backdrop-brightness-90`}
-                      onClick={() =>
-                        dispatch({
-                          type: "lesson/setActivity",
-                          payload: activityIndex.order,
-                        })
-                      }
-                    >
-                      <p>{activityIndex.order}.</p>
-                      <p> {activityIndex.title}</p>
-                    </button>
-                  );
-                })}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      )}
+    <div className="m-4 flex w-full flex-col items-center lg:items-start gap-4 lg:m-24 lg:flex-row lg:gap-8">
+      <Accordion
+        type="single"
+        collapsible
+        orientation={
+          client.windowDimensions.width >= 1024 ? "horizontal" : "vertical"
+        }
+      >
+        <AccordionItem value="1">
+          <AccordionTrigger className="bg-secondary text-secondary-foreground border-muted-foreground/50 rounded-t-3xl rounded-b-none border-0 p-4 data-[state=closed]:rounded-3xl data-[state=open]:border-b-1 data-[state=closed]:delay-300 duration-50">
+            <h1 className="text-lg font-bold text-nowrap">
+              {lesson.lesson?.title}: Table of Contents
+            </h1>
+          </AccordionTrigger>
+          <AccordionContent className="bg-secondary text-secondary-foreground overflow-hidden rounded-b-3xl pb-0 text-nowrap">
+            <div className="flex flex-col">
+              {lesson.lesson?.activities.map((activityIndex) => {
+                return (
+                  <button
+                    className={`${activityIndex.order === lesson.currentActivity ? "bg-accent/40" : ""} flex h-10 w-full flex-row items-center justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
+                    onClick={() =>
+                      dispatch({
+                        type: "lesson/setActivity",
+                        payload: activityIndex.order,
+                      })
+                    }
+                  >
+                    <p>{activityIndex.order}.</p>
+                    <p>{activityIndex.title}</p>
+                  </button>
+                  
+                );
+              })}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
-      <div className="bg-secondary text-secondary-foreground flex w-full flex-col rounded-3xl p-4 lg:w-3/4">
+      <div className="bg-secondary text-secondary-foreground flex min-h-min w-full flex-col rounded-3xl p-4">
         <h1 className="text-2xl font-bold">
           <span className="text-accent">
             {
@@ -134,8 +121,8 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
           </span>
           {activity?.title}
         </h1>
-        <Activity activity={activity} />
-        <div className="flex">
+        <Activity activity={activity}/>
+        <div className="flex mt-auto">
           <button
             className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2"
             onClick={() => {

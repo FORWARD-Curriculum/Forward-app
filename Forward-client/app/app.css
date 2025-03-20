@@ -11,6 +11,8 @@
   --animate-out: fade-out 0.4s ease-in-out;
   --animate-slide-up: slideUp 0.3s ease-in;
   --animate-slide-down: slideDown 0.3s ease-out;
+  --animate-slide-left: slideLeft 0.115s ease-out 75ms;
+  --animate-slide-right: slideRight 0.115s ease-in;
 
   /* Dynamic theming */
   --color-background: var(--background);
@@ -69,6 +71,28 @@
     }
     to {
       height: 0;
+    }
+  }
+
+  @keyframes slideRight {
+    from {
+      max-width: 0px;
+      max-height: 0px;
+    }
+    to {
+      max-width: var(--radix-accordion-content-width);
+      max-height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes slideLeft {
+    from {
+      max-width: var(--radix-accordion-content-width);
+      max-height: var(--radix-accordion-content-height);
+    }
+    to {
+      max-width: 0px;
+      max-height: 0px;
     }
   }
 

@@ -16,7 +16,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
                   <div className="pl-6 flex">
                     <input
                     className=" bg-primary"
-                    type={question.questionType === "multiple_select"?"checkbox":"radio"}
+                    type={question.questionType == "multiple_select"?"checkbox":"radio"}
                     id={`question-${questionNumber}:option-${choiceNumber}`}
                     name={`question-${questionNumber}`} />
                     <label className="ml-2" htmlFor={"question-"+questionNumber+":option-"+choiceNumber}>{option.text}</label>
