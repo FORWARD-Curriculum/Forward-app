@@ -6,20 +6,28 @@ import { HiMiniStop, HiVolumeOff, HiVolumeUp } from "react-text-to-speech/icons"
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
+import { Def } from "../ui/definition";
 
 function MarkdownText({ text }:{text: string}) {
   const { voices } = useVoices();
   const reactContent = useRemark({
     markdown: text,
-    rehypePlugins: [rehypeRaw, rehypeSanitize],
+    rehypePlugins: [rehypeRaw],
     remarkPlugins: [remarkGfm],
     remarkToRehypeOptions: { allowDangerousHtml: true },
+    rehypeReactOptions:{
+        components:{
+            def: Def,
+        }
+    }
   });
+
   const { Text, speechStatus, start, pause, stop } = useSpeech({
     text: reactContent,
     highlightText: true,
     voiceURI: voices.at(101)?.voiceURI,
   });
+
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
