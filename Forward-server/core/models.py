@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator, MinValueValidator
 from django.urls import reverse
+import uuid
 
 
 # Custom User model that extends Django's AbstractUser
@@ -19,6 +20,13 @@ class User(AbstractUser):
         'email address',
         blank=True,
         null=True
+    )
+
+    # User's generated uuid
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
     )
 
     # User's first name - minimum 2 characters required
@@ -63,6 +71,11 @@ class User(AbstractUser):
         default="txt-base"
     )
 
+    facility_account = models.BooleanField(
+        'is facility account boolean',
+        default=True
+    )
+
     # Automatically set when the user is created and updated
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -93,6 +106,11 @@ class Lesson(models.Model):
     A lesson is the top-level educational unit that contains sections, content,
     and activities. It has specific learning objectives and can track student progress.
     """
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
 
     title = models.CharField(
         max_length=200,
@@ -159,6 +177,12 @@ class TextContent(models.Model):
     Model for text-based content sections within a lesson.
     Can contain formatted text, HTML, or markdown content.
     """
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+
     lesson = models.ForeignKey(
         Lesson,
         on_delete=models.CASCADE,
@@ -207,6 +231,12 @@ class BaseActivity(models.Model):
     This class provides common fields and functionality shared by all
     activity types (Quiz, Poll, Writing Activities)
     """
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+
     lesson = models.ForeignKey(
         Lesson,
         on_delete=models.CASCADE,
@@ -295,11 +325,18 @@ class Quiz(BaseActivity):
 
 class Question(models.Model):
     """Model for individual questions within a quiz."""
+
     QUESTION_TYPES = [
         ('multiple_choice', 'Multiple Choice'),
         ('true_false', 'True/False'),
         ('multiple_select', 'Multiple Select'),
     ]
+
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
 
     quiz = models.ForeignKey(
         Quiz,
@@ -385,6 +422,12 @@ class PollQuestion(models.Model):
         help_text="The poll this poll question belongs to"
     )
 
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+
     question_text = models.TextField(
         help_text="The text of the poll question"
     )
@@ -422,10 +465,18 @@ class PollQuestion(models.Model):
         }
 
 class ResponseData(models.Model):
-    data_type = models.JSONField(
-        default=dict,
-        blank=True,
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+
+    data_type = models.TextField(
         help_text="Type for categorizing what data is what"
+    )
+
+    data_reference_id = models.UUIDField(
+        help_text='the id of the originating activity or survey'
     )
 
     time = models.TimeField(
@@ -435,11 +486,22 @@ class ResponseData(models.Model):
     )
 
     score = models.IntegerField(
+        null=True,
         validators=[MinValueValidator(0)],
         help_text="Score must be a non-negative integer"
     )
 
     responses = models.JSONField(
-        default=list,
+        default=dict,
         help_text='Needs question id as well as response chosen and is correct flag'
     )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "dataType": self.data_type,
+            "dataReferenceId": self.data_reference_id,
+            "time": self.time,
+            "score": self.score,
+            "responses": self.resopnses
+        }

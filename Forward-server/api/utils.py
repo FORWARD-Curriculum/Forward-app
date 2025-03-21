@@ -68,4 +68,5 @@ messages = {
     "unauth": "you must be logged in, in order to access",
     "forbidden": "this action is not allowed for the current user",
     "created": "successfully created new resource",
+    "saved": "data has been saved to the database successfully"
 }

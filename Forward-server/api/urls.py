@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserRegistrationView, SessionView, CurrentUserView, QuizView, LessonView, LessonContentView, TextContentView, WritingView, PollView
+from .views import UserRegistrationView, SessionView, CurrentUserView, QuizView, LessonView, LessonContentView, TextContentView, WritingView, PollView, UserDataView
 
 urlpatterns = [
     path('users/', UserRegistrationView.as_view(), name='user-register'),
@@ -11,4 +11,5 @@ urlpatterns = [
     path('text_content/<int:id>', TextContentView.as_view(), name='text-content'),
     path('writings/<int:id>', WritingView.as_view(), name='writings'),
     path('polls/<int:id>', PollView.as_view(), name='polls'),
+    path('userdata/<int:id>', UserDataView.as_view(), name='userdata')
 ]

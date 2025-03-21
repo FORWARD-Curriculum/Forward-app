@@ -274,3 +274,48 @@ class PollView(APIView):
                 "poll": poll.to_dict(),
                 "pollQuestions": [q.to_dict() for q in poll_qs]}},
             status=status.HTTP_200_OK)
+
+class UserDataView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        '''
+        update the current users responses after they answer a question
+        '''
+        # get with the id of the userdata
+        # we can change this depending on how front end interacts with this route
+
+        # id = request.data_id   <-- does this also work?
+        [id] = kwargs.values()
+
+        data = ResponseData.objects.get(id=id)
+        data.responses = request.responses
+        data.save()
+        # would it be more efficient to not return anything since the frontend might not rely on these responses
+        return Response({"detail": "data has been successfully saved"}, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        '''
+        final submission when done with test/survey
+        '''
+        # id = request.data_id
+        [id] = kwargs.values()
+
+        data = ResponseData.objects.get(id=id)
+
+        if not data:
+            nData = ResponseData(data_type=request.dataType,data_reference_id=request.dataReferenceId,responses=dict())
+            nData.save()
+            return Response({
+                "detail": messages['created'],
+                "data": nData.to_dict()},
+                status=status.HTTP_201_CREATED)
+
+        data.responses = request.responses
+        data.score = request.score
+        data.time = request.time
+        data.save()
+        return Response({
+            "detail": messages['saved'],
+            "data": data.to_dict()},
+            status=status.HTTP_200_OK)

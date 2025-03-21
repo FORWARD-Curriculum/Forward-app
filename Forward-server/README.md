@@ -946,3 +946,112 @@ Retrieves a writing activity by its lesson id.
     }
     ```
     </details>
+
+## User Data Endpoints
+### collect user data from survey
+### update answers for a test
+<details>
+<summary>updates the user responses on every state change to save user test progress OR creates new response data if someone is starting a test</summary>
+- Initial Request
+
+  - Method: `POST`
+  - URL: /api/userdata/:data_id
+  - Headers:
+    - Content-Type: application/json
+  - body:
+    ```json
+    {
+      "dataType": "quiz",
+      "dataReferenceId": "uuid here"
+    }
+    ```
+
+- Initial Response
+  - Status Code: 201
+  - Headers:
+    - Content-Type: application/json
+  - Body:
+    ```json
+    {
+      "detail": " successfully retrieved writing activity by lesson id",
+      "data": {
+        "id": "uuid",
+        "data_type": "quiz",
+        "data_reference_id": "quiz uuid",
+        "responses": {}
+      }
+    }
+    ```
+
+- Update Request
+
+  - Method: `PUT`
+  - URL: /api/userdata/:data_id
+  - Headers:
+    - Content-Type: application/json
+  - body:
+    ```json
+    {
+      "responses": {
+        "1": "a",
+        "2": "b",
+        "3": "or we can actually save responses as strings so its easier data to consume for Annee"
+      }
+    }
+    ```
+- Update Response
+  do we need an update response? will front end actually use/ check for it? can we ignore it?
+  - Status Code: 200
+  - Headers:
+    - Content-Type: application/json
+  - Body:
+    ```json
+    {
+      "detail": "data has been successfully saved"
+    }
+    ```
+
+- Final Request
+
+  - Method: `POST`
+  - URL: /api/userdata/:data_id
+  - Headers:
+    - Content-Type: application/json
+  - body:
+    ```json
+    {
+      "responses": {
+        "1": "a",
+        "2": "b",
+        "3": "or we can actually save responses as strings so its easier data to consume for Annee"
+      },
+      "score": "13/17",
+      "time": "2025-03-20 18:47:21.054722"
+    }
+    ```
+
+- Final Response
+  - Status Code: 200
+  - Headers:
+    - Content-Type: application/json
+  - Body:
+    ```json
+    {
+      "detail": "data has been saved to the database successfully",
+      "data": {
+        "id": "uuid",
+        "data_type": "quiz",
+        "data_reference_id": "quiz uuid",
+        "responses": {
+        "1": "a",
+        "2": "b",
+        "3": "or we can actually save responses as strings so its easier data to consume for Annee"
+      },
+      "score": "13/17",
+      "time": "2025-03-20 18:47:21.054722"
+      }
+    }
+    ```
+</details>
+
+### submit test when finished
