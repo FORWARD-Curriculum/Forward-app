@@ -8,6 +8,7 @@ import { Link } from "react-router";
 import type { Route } from "./+types/dashboard";
 import { apiFetch } from "@/lib/utils";
 import type { Lesson } from "@/lib/lessonSlice";
+import MarkdownTTS from "@/components/ui/markdown-tts";
 
 export async function clientLoader({}: Route.ClientLoaderArgs) {
   const response = await apiFetch("/lessons", {
@@ -24,19 +25,16 @@ function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
   const dispatch = useDispatch();
   return (
     <div className="bg-background rounded-2xl pt-3">
-      <div className="mx-4 flex items-center gap-4 pb-3">
-        <img src={props.lesson?.image || "grad_cap.png"} className="h-full max-w-20"></img>
+      <div className="flex mx-4 items-center gap-4 pb-3">
+      <img src={props.lesson?.image || "grad_cap.png"} className="h-full max-w-20"></img>
+      <MarkdownTTS className="flex flex-row-reverse">
         <div className="flex flex-col text-left">
           <Link to={"/lesson/"+props.lesson?.id} className="text-accent text-xl">{props.lesson?.title}</Link>
           <p className="text-secondary-foreground text-base">
             {props.lesson?.description}
           </p>
         </div>
-        <div className="flex h-full flex-col gap-2 lg:ml-30">
-          <Expand fill="var(--text-secondary-foreground)" />
-          <FileVolume />
-        </div>
-      </div>
+      </MarkdownTTS></div>
       {props.children}
     </div>
   );

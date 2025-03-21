@@ -61,7 +61,8 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   const dispatch = useDispatch();
   const client = useClient();
   useEffect(() => {
-    if (loaderData) dispatch({ type: "lesson/setLesson", payload: loaderData });
+    if (loaderData) {dispatch({ type: "lesson/setLesson", payload: loaderData });
+    dispatch({ type: "lesson/setActivity", payload: 1 })};
   }, [loaderData, dispatch]);
 
   const lesson = useSelector((state: RootState) => state.lesson);
@@ -81,7 +82,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:flex-row lg:items-start lg:gap-8">
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col lg:h-full">
         <Accordion
           type="single"
           collapsible
