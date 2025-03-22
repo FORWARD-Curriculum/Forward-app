@@ -73,7 +73,9 @@ class UserService:
                     'consent': user.consent,
                     'preferences': {
                         'theme': user.theme,
-                        'text_size': user.text_size
+                        'text_size': user.text_size,
+                        'speech_uri_index': user.speech_uri_index,
+                        'speech_speed': user.speech_speed
                     }
                 }
             }

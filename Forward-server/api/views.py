@@ -100,14 +100,16 @@ class CurrentUserView(APIView):
             data={
                 'user': {
                     'id': user.id,
-                    'username': user.username,
-                    'display_name': user.display_name,
-                    'facility_id': user.facility_id,
-                    'profile_picture': user.profile_picture,
-                    'consent': user.consent,
-                    'preferences': {
-                        'theme': user.theme,
-                        'text_size': user.text_size
+                        'username': user.username,
+                        'display_name': user.display_name,
+                        'facility_id': user.facility_id,
+                        'profile_picture': user.profile_picture,
+                        'consent': user.consent,
+                        'preferences': {
+                            'theme': user.theme,
+                            'text_size': user.text_size,
+                            'speech_uri_index': user.speech_uri_index,
+                            'speech_speed': user.speech_speed
                     }
                 }
             },
@@ -127,17 +129,19 @@ class CurrentUserView(APIView):
                 message="User information updated successfully",
                 data={
                     'user': {
-                        'id': updated_user.id,
-                        'username': updated_user.username,
-                        'display_name': updated_user.display_name,
-                        'facility_id': updated_user.facility_id,
-                        'profile_picture': updated_user.profile_picture,
-                        'consent': updated_user.consent,
+                        'id': user.id,
+                        'username': user.username,
+                        'display_name': user.display_name,
+                        'facility_id': user.facility_id,
+                        'profile_picture': user.profile_picture,
+                        'consent': user.consent,
                         'preferences': {
                             'theme': user.theme,
-                            'text_size': user.text_size
-                        }
+                            'text_size': user.text_size,
+                            'speech_uri_index': user.speech_uri_index,
+                            'speech_speed': user.speech_speed
                     }
+                }
                 },
                 status=status.HTTP_200_OK
             )

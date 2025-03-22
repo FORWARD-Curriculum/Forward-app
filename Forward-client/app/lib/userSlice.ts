@@ -15,6 +15,8 @@ export interface User {
   preferences: {
     theme: "light" | "dark" | "high-contrast";
     text_size: "txt-sm" | "txt-base" | "txt-lg" | "txt-xl";
+    speech_uri_index?: number;
+    speech_speed?: number;
   };
 }
 

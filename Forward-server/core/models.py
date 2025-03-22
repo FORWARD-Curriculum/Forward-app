@@ -62,6 +62,18 @@ class User(AbstractUser):
         max_length=1,
         default="txt-base"
     )
+    
+    speech_uri_index = models.PositiveIntegerField(
+        'webSpeech uri',
+        null=True,
+        blank=True,
+    )
+    
+    speech_speed = models.FloatField(
+        'webSpeech speed',
+        null=True,
+        blank=True,
+    )
 
     # Automatically set when the user is created and updated
     created_at = models.DateTimeField(auto_now_add=True)

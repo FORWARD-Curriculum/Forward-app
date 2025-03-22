@@ -91,12 +91,12 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
           }
         >
           <AccordionItem value="1">
-            <AccordionTrigger className="bg-secondary text-secondary-foreground border-muted-foreground/50 rounded-t-3xl rounded-b-none border-0 p-4 duration-50 data-[state=closed]:rounded-3xl data-[state=closed]:delay-300 data-[state=open]:border-b-1">
+            <AccordionTrigger className="bg-secondary border-secondary-border text-secondary-foreground data-[state=open]:border-b-muted-foreground/50 rounded-t-3xl border-1 p-4 duration-50 data-[state=closed]:rounded-3xl data-[state=closed]:delay-300 data-[state=open]:border-b-1 data-[state=open]:rounded-b-none">
               <h1 className="text-lg font-bold text-nowrap">
                 {lesson.lesson?.title}: Table of Contents
               </h1>
             </AccordionTrigger>
-            <AccordionContent className="bg-secondary text-secondary-foreground overflow-hidden rounded-b-3xl pb-0 text-nowrap">
+            <AccordionContent className="bg-secondary text-secondary-foreground overflow-hidden rounded-b-3xl pb-0 text-nowrap border-secondary-border border-1 border-t-0">
               <div className="flex flex-col">
                 {lesson.lesson?.activities.map((activityIndex) => {
                   return (
@@ -136,7 +136,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         )}
       </div>
 
-      <div className="bg-secondary text-secondary-foreground flex min-h-min w-full flex-col rounded-3xl p-4">
+      <div className="bg-secondary border-secondary-border border-1 text-secondary-foreground flex min-h-min w-full flex-col rounded-3xl p-4">
         <h1 className="text-2xl font-bold">
           <span className="text-accent">
             {

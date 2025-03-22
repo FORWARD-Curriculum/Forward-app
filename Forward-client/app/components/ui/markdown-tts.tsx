@@ -1,4 +1,4 @@
-import React, { useRef, useEffect} from "react";
+import React, { useRef, useEffect } from "react";
 import { useRemark } from "react-remarkify";
 import { useSpeech, useVoices } from "react-text-to-speech";
 import rehypeRaw from "rehype-raw";
@@ -10,10 +10,11 @@ import type { ClassNameValue } from "tailwind-merge";
 import { cn } from "@/lib/utils";
 import type { SpeechStatus } from "react-text-to-speech/types";
 import { FileVolume, Play, Square } from "lucide-react";
+import { sortEngFirst } from "@/routes/account";
 
 export interface DefinitionProps extends React.HTMLAttributes<HTMLElement> {
   def?: string;
-  node?: any; // or use the Element type from 'hast' if you need it
+  node?: any;
 }
 
 export const Def: React.FC<DefinitionProps> = ({ def, children }) => {
@@ -28,7 +29,20 @@ export const Def: React.FC<DefinitionProps> = ({ def, children }) => {
           user?.preferences?.theme || ""
         } ${user?.preferences?.text_size || ""} bg-secondary text-secondary-foreground text-base`}
       >
-        {def}
+        <MarkdownTTS className="flex flex-row-reverse items-end gap-2">
+          <h1 className="text-xl font-bold">
+            <span className="text-accent">
+              Definition:<span className="text-[0px] opacity-0">.</span>
+            </span>{" "}
+            {typeof children == "string"
+              ? children.at(0)?.toUpperCase() + children.substring(1)
+              : children}
+          </h1>
+          <p>
+            <span className="text-[0px] opacity-0">.</span>
+            {def}
+          </p>
+        </MarkdownTTS>
       </Popover.PopoverContent>
     </Popover.Popover>
   );
@@ -42,8 +56,8 @@ export default function MarkdownTTS({
 }: {
   controlsClassName?: ClassNameValue;
   className?: ClassNameValue;
-  children: React.ReactNode,
-  controlsOrientation?: "vertical"|"horizontal"
+  children: React.ReactNode;
+  controlsOrientation?: "vertical" | "horizontal";
 }) {
   const { voices } = useVoices();
   const renderedMarkdown = useRemark({
@@ -57,11 +71,12 @@ export default function MarkdownTTS({
       },
     },
   });
+  const user = useSelector((state: RootState) => state.user.user);
 
   const speech = useSpeech({
     text: typeof children == "string" ? renderedMarkdown : children,
     highlightText: true,
-    voiceURI: voices.at(101)?.voiceURI,
+    voiceURI: user?.preferences.speech_uri_index? sortEngFirst(voices).at(user?.preferences.speech_uri_index)?.voiceURI:"",
   });
 
   return (
@@ -81,21 +96,26 @@ export function MarkdownTTSControls({
   className,
   orientation = "vertical",
 }: {
-  speech: ReturnType<typeof useSpeech>
+  speech: ReturnType<typeof useSpeech>;
   className: ClassNameValue;
-  orientation: "vertical"|"horizontal"
+  orientation: "vertical" | "horizontal";
 }) {
-  useEffect(()=>{
-    console.log(speech.speechStatus, speech.isInQueue)
-  },[speech.speechStatus])
+  useEffect(() => {
+    console.log(speech.speechStatus, speech.isInQueue);
+  }, [speech.speechStatus]);
 
   return (
-    <div className={cn(className, `h-fit w-fit rounded-full bg-background gap-2 flex ${orientation == "vertical"?"flex-col py-2 px-1":"flex-row px-2 py-1"}`)}>
-      <FileVolume/>
-      {(speech.speechStatus === "stopped" || speech.speechStatus == "paused")?(
-        <Play className="cursor-pointer"  onClick={speech.start}/>
-      ):(
-        <Square className="cursor-pointer"  onClick={speech.stop}/>
+    <div
+      className={cn(
+        className,
+        `bg-background flex h-fit w-fit gap-2 rounded-full ${orientation == "vertical" ? "flex-col px-1 py-2" : "flex-row px-2 py-1"}`,
+      )}
+    >
+      <FileVolume />
+      {speech.speechStatus === "stopped" || speech.speechStatus == "paused" ? (
+        <Play className="cursor-pointer" onClick={speech.start} />
+      ) : (
+        <Square className="cursor-pointer" onClick={speech.stop} />
       )}
     </div>
   );
@@ -141,9 +161,7 @@ function TtsMDRenderer({
   return (
     <div className="">
       {/* Wrap the rendered content in a ref container */}
-      <div ref={contentRef}>
-        {Text}
-      </div>
+      <div ref={contentRef}>{Text}</div>
     </div>
   );
 }

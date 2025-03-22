@@ -118,6 +118,8 @@ class UserUpdateSerializer(serializers.Serializer):
     consent = serializers.BooleanField(required=False)
     theme= serializers.CharField(required=False)
     text_size = serializers.CharField(required=False)
+    speech_uri_index = serializers.IntegerField(required=False)
+    speech_speed = serializers.FloatField(required=False)
     
     def validate(self, attrs: dict):
         theme = attrs.get('theme')
@@ -158,6 +160,8 @@ class UserUpdateSerializer(serializers.Serializer):
         instance.consent = validated_data.get('consent', instance.consent)
         instance.theme = validated_data.get('theme', instance.theme)
         instance.text_size = validated_data.get('text_size', instance.text_size)
+        instance.speech_uri_index = validated_data.get('speech_uri_index', instance.speech_uri_index)
+        instance.speech_speed = validated_data.get('speech_speed', instance.speech_speed)
         
         # Save the instance
         instance.save()
