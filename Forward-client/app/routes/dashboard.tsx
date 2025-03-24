@@ -11,11 +11,14 @@ import type { Lesson } from "@/lib/lessonSlice";
 import MarkdownTTS from "@/components/ui/markdown-tts";
 
 export async function clientLoader({}: Route.ClientLoaderArgs) {
-  const response = await apiFetch("/lessons", {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
-  if (response.ok){
+  const response = await apiFetch(
+    "/lessons",
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  if (response.ok) {
     const json = await response.json();
     return json.data as Array<any>;
   }
@@ -25,16 +28,25 @@ function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
   const dispatch = useDispatch();
   return (
     <div className="bg-background rounded-2xl pt-3">
-      <div className="flex mx-4 items-center gap-4 pb-3">
-      <img src={props.lesson?.image || "grad_cap.png"} className="h-full max-w-20"></img>
-      <MarkdownTTS className="flex flex-row-reverse">
-        <div className="flex flex-col text-left">
-          <Link to={"/lesson/"+props.lesson?.id} className="text-accent text-xl">{props.lesson?.title}</Link>
-          <p className="text-secondary-foreground text-base">
-            {props.lesson?.description}
-          </p>
-        </div>
-      </MarkdownTTS></div>
+      <div className="mx-4 flex items-center gap-4 pb-3">
+        <img
+          src={props.lesson?.image || "grad_cap.png"}
+          className="h-full max-w-20"
+        ></img>
+        <MarkdownTTS className="flex flex-row-reverse">
+          <div className="flex flex-col text-left">
+            <Link
+              to={"/lesson/" + props.lesson?.id}
+              className="text-accent text-xl"
+            >
+              {props.lesson?.title}
+            </Link>
+            <p className="text-secondary-foreground text-base">
+              {props.lesson?.description}
+            </p>
+          </div>
+        </MarkdownTTS>
+      </div>
       {props.children}
     </div>
   );
@@ -65,7 +77,11 @@ function Accordion(props: { children?: ReactNode }) {
   );
 }
 
-export default function Dashboard({ loaderData }: Route.ComponentProps ) {
+export function meta() {
+  return [{ title: "Dashboard | FORWARD" }];
+}
+
+export default function Dashboard({ loaderData }: Route.ComponentProps) {
   const [sortType, setSortType] = useState<"recent" | "date" | "progress">(
     "progress",
   );
@@ -73,25 +89,11 @@ export default function Dashboard({ loaderData }: Route.ComponentProps ) {
   useEffect(() => {
     dispatch({ type: "curriculum/setCurriculum", payload: loaderData });
   }, [loaderData, dispatch]);
-  
+
   const lessons = useSelector((state: RootState) => state.curriculum.lessons);
   const user = useSelector((state: RootState) => state.user.user) as User;
 
   /* TODO: grab from api instead of hardcoding*/
-
-
-  //const [lessons, setLessons] = useState<Lesson[] | null>(null);
-  /*
-  useEffect(() => {
-    fetch('http://localhost:3000/lessons')
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setLessons(data);
-      });
-  }, []);
-*/
 
   return (
     <>
@@ -136,27 +138,25 @@ export default function Dashboard({ loaderData }: Route.ComponentProps ) {
               {!lessons ? (
                 <p>Loading...</p>
               ) : (
-                lessons
-                  .map((e) => (
-                    <LessonCard lesson={e}>
-                      <Accordion>
-                        This has been left undesigned as the API we need to
-                        build out will dictate how each lesson will be passed
-                        into the frontend. For the sake of showing off the
-                        footer's positioning, have some standard text: <br />
-                        <br />
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                        sed do eiusmod tempor incididunt ut labore et dolore
-                        magna aliqua. Ut enim ad minim veniam, quis nostrud
-                        exercitation ullamco laboris nisi ut aliquip ex ea
-                        commodo consequat. Duis aute irure dolor in
-                        reprehenderit in voluptate velit esse cillum dolore eu
-                        fugiat nulla pariatur. Excepteur sint occaecat cupidatat
-                        non proident, sunt in culpa qui officia deserunt mollit
-                        anim id est laborum.
-                      </Accordion>
-                    </LessonCard>
-                  ))
+                lessons.map((e) => (
+                  <LessonCard key={e.id} lesson={e}>
+                    <Accordion>
+                      This has been left undesigned as the API we need to build
+                      out will dictate how each lesson will be passed into the
+                      frontend. For the sake of showing off the footer's
+                      positioning, have some standard text: <br />
+                      <br />
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                      sed do eiusmod tempor incididunt ut labore et dolore magna
+                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                      ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                      Duis aute irure dolor in reprehenderit in voluptate velit
+                      esse cillum dolore eu fugiat nulla pariatur. Excepteur
+                      sint occaecat cupidatat non proident, sunt in culpa qui
+                      officia deserunt mollit anim id est laborum.
+                    </Accordion>
+                  </LessonCard>
+                ))
               )}
             </div>
           </div>

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/useAuth";
 import { toast } from "sonner";
 import { Link } from "react-router";
+import { apiFetch } from "@/lib/utils";
 
 export default function Login() {
   const [error, setError] = useState(null);
@@ -42,7 +43,7 @@ export default function Login() {
 
     try {
       /* TODO: change api domain*/
-      const response = await fetch("/api/users", {
+      const response = await apiFetch("/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -7,7 +7,7 @@ import type {
   Writing as WritingType,
 } from "@/lib/lessonSlice";
 import type { Route } from "./+types/lesson";
-import { apiFetch } from "@/lib/utils";
+import { apiFetch, useTitle } from "@/lib/utils";
 import { useSelector, useDispatch } from "react-redux";
 import { type RootState } from "@/store";
 import { useEffect } from "react";
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/accordion";
 import { ArrowRightIcon, ArrowUpIcon } from "lucide-react";
 import { useState } from "react";
+import { Link, useLocation } from "react-router";
 
 export async function clientLoader({
   params,
@@ -60,16 +61,31 @@ export function Activity({
 export default function Lesson({ loaderData }: Route.ComponentProps) {
   const dispatch = useDispatch();
   const client = useClient();
-  useEffect(() => {
-    if (loaderData) {dispatch({ type: "lesson/setLesson", payload: loaderData });
-    dispatch({ type: "lesson/setActivity", payload: 1 })};
-  }, [loaderData, dispatch]);
-
+  const { hash } = useLocation();
   const lesson = useSelector((state: RootState) => state.lesson);
   const activity = lesson.lesson?.activities[lesson.currentActivity - 1];
   const [showsScrolBtn, setShowScrolBtn] = useState(false);
 
-  // scr button "hook"
+  // We only want to update the lesson slice when the data loads, no other time
+  useEffect(() => {
+    if (loaderData) {
+      {
+        document.title = loaderData.title+" | FORWARD";
+        if (loaderData.id != lesson.lesson?.id) {
+          dispatch({ type: "lesson/setLesson", payload: loaderData });
+          dispatch({ 
+            type: "lesson/setActivity",
+            payload:
+              hash.length > 0
+                ? parseInt(hash.substring(1).split(".").at(0) || "1")
+                : 1,
+          });
+        }
+      }
+    }
+  }, [loaderData]);
+
+  // Scroll to top button "hook"
   useEffect(() => {
     const handleButtonVisibility = () => {
       window.pageYOffset > 500 ? setShowScrolBtn(true) : setShowScrolBtn(false);
@@ -91,16 +107,18 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
           }
         >
           <AccordionItem value="1">
-            <AccordionTrigger className="bg-secondary border-secondary-border text-secondary-foreground data-[state=open]:border-b-muted-foreground/50 rounded-t-3xl border-1 p-4 duration-50 data-[state=closed]:rounded-3xl data-[state=closed]:delay-300 data-[state=open]:border-b-1 data-[state=open]:rounded-b-none">
+            <AccordionTrigger className="bg-secondary border-secondary-border text-secondary-foreground data-[state=open]:border-b-muted-foreground/50 rounded-t-3xl border-1 p-4 duration-50 data-[state=closed]:rounded-3xl data-[state=closed]:delay-300 data-[state=open]:rounded-b-none data-[state=open]:border-b-1">
               <h1 className="text-lg font-bold text-nowrap">
                 {lesson.lesson?.title}: Table of Contents
               </h1>
             </AccordionTrigger>
-            <AccordionContent className="bg-secondary text-secondary-foreground overflow-hidden rounded-b-3xl pb-0 text-nowrap border-secondary-border border-1 border-t-0">
+            <AccordionContent className="bg-secondary text-secondary-foreground border-secondary-border overflow-hidden rounded-b-3xl border-1 border-t-0 pb-0 text-nowrap">
               <div className="flex flex-col">
                 {lesson.lesson?.activities.map((activityIndex) => {
                   return (
-                    <button
+                    <Link
+                      to={"#" + activityIndex.order}
+                      key={activityIndex.order}
                       className={`${activityIndex.order === lesson.currentActivity ? "bg-accent/40" : ""} flex h-10 w-full flex-row items-center justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                       onClick={() =>
                         dispatch({
@@ -111,7 +129,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                     >
                       <p>{activityIndex.order}.</p>
                       <p>{activityIndex.title}</p>
-                    </button>
+                    </Link>
                   );
                 })}
               </div>
@@ -121,7 +139,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         {client.windowDimensions.width >= 1024 && (
           <button
             id="scrolToTop"
-            className={`group relative rounded-full bg-primary size-12 items-center justify-center flex mt-auto transition-opacity ${showsScrolBtn ? 'opacity-100' : 'opacity-0'}`}
+            className={`group bg-primary relative mt-auto flex size-12 items-center justify-center rounded-full transition-opacity ${showsScrolBtn ? "opacity-100" : "opacity-0"}`}
             onClick={() => {
               window.scrollTo({
                 top: 0,
@@ -130,13 +148,15 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
               });
             }}
           >
-          <ArrowUpIcon className="!text-primary-foreground size-8"/>
-          <p className="absolute text-nowrap top-[120%] opacity-0 group-hover:opacity-100 transition-opacity text-secondary-foreground">Back to top</p>
+            <ArrowUpIcon className="!text-primary-foreground size-8" />
+            <p className="text-secondary-foreground absolute top-[120%] text-nowrap opacity-0 transition-opacity group-hover:opacity-100">
+              Back to top
+            </p>
           </button>
         )}
       </div>
 
-      <div className="bg-secondary border-secondary-border border-1 text-secondary-foreground flex min-h-min w-full flex-col rounded-3xl p-4">
+      <div className="bg-secondary border-secondary-border text-secondary-foreground flex min-h-min w-full flex-col rounded-3xl border-1 p-4">
         <h1 className="text-2xl font-bold">
           <span className="text-accent">
             {
@@ -154,7 +174,8 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         </h1>
         <Activity activity={activity} />
         <div className="mt-auto flex">
-          <button
+          <Link
+            to={"#" + (lesson.currentActivity + 1)}
             className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2"
             onClick={() => {
               dispatch({ type: "lesson/nextActivity" });
@@ -162,7 +183,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
           >
             Save and Continue
             <ArrowRightIcon className="!text-primary-foreground" />
-          </button>
+          </Link>
         </div>
       </div>
     </div>

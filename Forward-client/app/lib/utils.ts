@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 
 /**
@@ -36,10 +37,30 @@ export async function apiFetch(
     headers?: Record<string, string>;
   } = {},
 ): Promise<Response> {
-  const headers = {
+  const headers: Record<string, string> = {
     ...options.headers,
-    "X-CSRFToken": getCookie("csrftoken") || "",
   };
 
-  return fetch("/api" + url , { ...options, headers });
+  headers["X-CSRFToken"] = getCookie("csrftoken") || "";
+
+  return fetch("http://127.0.0.1:8000/api" + url, {
+    ...options,
+    headers,
+  credentials: 'include'
+  });
+}
+
+/**
+ * Update the document title with provided string
+ * @param titleOrFn can be a String or a function.
+ * @param deps? if provided, the title will be updated when one of these values changes
+ */
+export function useTitle(
+  titleOrFn: string | (() => string),
+  ...deps: React.DependencyList
+): void {
+  useEffect(() => {
+    console.log(titleOrFn);
+    document.title = typeof titleOrFn === "function" ? titleOrFn() : titleOrFn;
+  }, [...deps]);
 }

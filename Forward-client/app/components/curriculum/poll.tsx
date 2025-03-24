@@ -4,7 +4,7 @@ export default function Writing({poll}: {poll: Poll}) {
     return (
         <div>
         <p>{poll.instructions}</p>
-        <ul>{poll.questions.map((e)=>{return (<li>{e.question_text}</li>)})}</ul>
+        <ul>{poll.questions.map((e)=>{return (<li>{JSON.stringify(e.options)}</li>)})}</ul>
         </div>
     );
 }

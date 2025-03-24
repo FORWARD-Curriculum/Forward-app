@@ -8,14 +8,14 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
       <ul className="flex flex-col gap-4">
         {quiz.questions.map((question: Question, questionNumber) => {
           return (
-            <li className="pl-4">
+            <li className="pl-4" key={questionNumber}>
               <MarkdownTTS className="flex gap-2" controlsOrientation="vertical">
               <fieldset>
                 <legend>{questionNumber+1}. {question.questionText}</legend>
               
               {question.choices.options.map((option, choiceNumber) => {
                 return (
-                  <div className="pl-6 flex">
+                  <div className="pl-6 flex" key={choiceNumber}>
                     <input
                     className=" bg-primary"
                     type={question.questionType == "multiple_select"?"checkbox":"radio"}

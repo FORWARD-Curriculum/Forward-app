@@ -100,10 +100,7 @@ export function MarkdownTTSControls({
   className: ClassNameValue;
   orientation: "vertical" | "horizontal";
 }) {
-  useEffect(() => {
-    console.log(speech.speechStatus, speech.isInQueue);
-  }, [speech.speechStatus]);
-
+  // TODO: Pausing is not handled by library, at least as far as I can tell
   return (
     <div
       className={cn(
