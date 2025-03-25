@@ -42,7 +42,7 @@ class User(AbstractUser):
         max_length=50,
         null=True,
         blank=True,
-        validators=[MinLengthValidator(2)]
+        default=None
     )
     # Consent to participate in study, alsays assume false
     consent = models.BooleanField(

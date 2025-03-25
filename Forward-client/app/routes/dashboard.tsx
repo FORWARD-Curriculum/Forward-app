@@ -33,7 +33,7 @@ function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
           src={props.lesson?.image || "grad_cap.png"}
           className="h-full max-w-20"
         ></img>
-        <MarkdownTTS className="flex flex-row-reverse">
+        <MarkdownTTS className="" controlsClassName='flex flex-row-reverse'>
           <div className="flex flex-col text-left">
             <Link
               to={"/lesson/" + props.lesson?.id}

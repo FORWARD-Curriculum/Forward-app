@@ -81,12 +81,12 @@ export default function MarkdownTTS({
 
   return (
     <div className={cn(className)}>
+      <div className={cn(controlsClassName)}>
       <MarkdownTTSControls
         speech={speech}
-        className={controlsClassName}
         orientation={controlsOrientation}
       />
-      <TtsMDRenderer Text={speech.Text()} speechStatus={speech.speechStatus} />
+      <TtsMDRenderer Text={speech.Text()} speechStatus={speech.speechStatus} /></div>
     </div>
   );
 }
@@ -97,7 +97,7 @@ export function MarkdownTTSControls({
   orientation = "vertical",
 }: {
   speech: ReturnType<typeof useSpeech>;
-  className: ClassNameValue;
+  className?: ClassNameValue;
   orientation: "vertical" | "horizontal";
 }) {
   // TODO: Pausing is not handled by library, at least as far as I can tell

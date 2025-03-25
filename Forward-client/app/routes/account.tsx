@@ -116,17 +116,15 @@ export default function account() {
   );
 
   const sortedVoices = sortEngFirst(voices);
-  const initialVoiceURI =
-    user.preferences?.speech_uri_index !== undefined &&
-    user.preferences.speech_uri_index < sortedVoices.length
-      ? sortedVoices[user.preferences.speech_uri_index].voiceURI
-      : "";
-  const [voiceURI, setVoiceURI] = useState(initialVoiceURI);
+  const initialVoiceURIIndex =
+    user.preferences?.speech_uri_index ? user.preferences.speech_uri_index
+      : 0;
+  const [voiceURIIndex, setVoiceURIIndex] = useState(initialVoiceURIIndex);
 
   const { Text, speechStatus, start, stop } = useSpeech({
     text: "The birch canoe slid on the smooth planks. Glue the sheet to the dark blue background!",
     highlightText: true,
-    voiceURI,
+    voiceURI: sortedVoices.at(voiceURIIndex)?.voiceURI || [],
     rate: voiceSpeed,
   });
 
@@ -171,11 +169,7 @@ export default function account() {
       consent: formData.has("consent"),
       theme: formState.theme,
       text_size: formState.textSize,
-      speech_uri_index: sortEngFirst(voices)
-        .flatMap((a) => {
-          return a.voiceURI;
-        })
-        .indexOf(voiceURI),
+      speech_uri_index: voiceURIIndex,
       speech_speed: voiceSpeed,
     };
 
@@ -492,13 +486,13 @@ export default function account() {
                   <legend className="mb-3 w-full text-center">Voice</legend>
                   <select
                     id="voice"
-                    value={voiceURI}
-                    onChange={(e) => setVoiceURI(e.target.value)}
+                    value={voiceURIIndex}
+                    onChange={(e) => setVoiceURIIndex(parseInt(e.target.value))}
                     className="bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-50 rounded-xl border px-3 py-2 text-base"
                   >
                     <option value="">Choose a voice</option>
-                    {sortedVoices.map(({ voiceURI }) => (
-                      <option key={voiceURI} value={voiceURI}>
+                    {sortedVoices.map(({ voiceURI },index) => (
+                      <option key={voiceURI} value={index}>
                         {voiceURI}
                       </option>
                     ))}
@@ -581,11 +575,8 @@ export default function account() {
                     theme: originalState.current.theme,
                     textSize: originalState.current.textSize,
                   });
-                  setVoiceURI(
-                    user.preferences?.speech_uri_index !== undefined &&
-                      user.preferences.speech_uri_index < sortedVoices.length
-                      ? sortedVoices[user.preferences.speech_uri_index].voiceURI
-                      : "",
+                  setVoiceURIIndex(
+                    initialVoiceURIIndex,
                   );
                   setVoiceSpeed(user.preferences?.speech_speed || 1);
                   toast.success("Successfully reverted changes.");

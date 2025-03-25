@@ -77,7 +77,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
             type: "lesson/setActivity",
             payload:
               hash.length > 0
-                ? parseInt(hash.substring(1).split(".").at(0) || "1")
+                ? parseInt(hash.substring(1).split("/").at(0) || "1")
                 : 1,
           });
         }
@@ -119,7 +119,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                     <Link
                       to={"#" + activityIndex.order}
                       key={activityIndex.order}
-                      className={`${activityIndex.order === lesson.currentActivity ? "bg-accent/40" : ""} flex h-10 w-full flex-row items-center justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
+                      className={`${activityIndex.order === lesson.currentActivity ? "bg-accent/40" : ""} flex h-10 w-full flex-row items-center ${activity?.order&&activity.order<3?"!text-gray":""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                       onClick={() =>
                         dispatch({
                           type: "lesson/setActivity",
