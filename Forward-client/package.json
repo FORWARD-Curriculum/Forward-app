@@ -53,5 +53,9 @@
     "vite-plugin-mkcert": "^1.17.8",
     "vite-tsconfig-paths": "^5.1.4"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-arm64-gnu": "4.37.0",
+    "@rollup/rollup-linux-arm64-musl": "4.37.0"
+  },
   "proxy": "http://localhost:8000"
 }
