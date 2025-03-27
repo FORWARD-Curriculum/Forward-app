@@ -181,6 +181,12 @@ class QuizView(APIView):
         '''
 
         # need to make user data table to save to. TBD
+class GetLessonIds(APIView):
+    permission_classess = [IsAuthenticated]
+    def get(self,request, *args, **kwargs):
+        lessons = Lesson.objects.all()
+        return Response([le.to_dict() for le in lessons])
+
 
 class LessonView(APIView):
     permission_classes = [IsAuthenticated]
@@ -285,11 +291,11 @@ class UserDataView(APIView):
         # get with the id of the userdata
         # we can change this depending on how front end interacts with this route
 
-        # id = request.data_id   <-- does this also work?
+        # id = self.id
         [id] = kwargs.values()
 
         data = ResponseData.objects.get(id=id)
-        data.responses = request.responses
+        data.responses = {*data.responses, *request.responses}
         data.save()
         # would it be more efficient to not return anything since the frontend might not rely on these responses
         return Response({"detail": "data has been successfully saved"}, status=status.HTTP_200_OK)
@@ -298,7 +304,7 @@ class UserDataView(APIView):
         '''
         final submission when done with test/survey
         '''
-        # id = request.data_id
+        # id = self.request.data_id
         [id] = kwargs.values()
 
         data = ResponseData.objects.get(id=id)

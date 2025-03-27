@@ -24,6 +24,7 @@ class User(AbstractUser):
 
     # User's generated uuid
     id = models.UUIDField(
+        primary_key=True,
         default=uuid.uuid4,
         editable=False,
         help_text='the uuid of the database item'
@@ -40,6 +41,7 @@ class User(AbstractUser):
     facility_id = models.CharField(
         'facility id',
         max_length=50,
+        null=True,
         validators=[MinLengthValidator(2)],
         blank=True
     )
@@ -73,6 +75,7 @@ class User(AbstractUser):
 
     facility_account = models.BooleanField(
         'is facility account boolean',
+        null=True,
         default=True
     )
 
@@ -107,6 +110,7 @@ class Lesson(models.Model):
     and activities. It has specific learning objectives and can track student progress.
     """
     id = models.UUIDField(
+        primary_key=True,
         default=uuid.uuid4,
         editable=False,
         help_text='the uuid of the database item'
@@ -178,6 +182,7 @@ class TextContent(models.Model):
     Can contain formatted text, HTML, or markdown content.
     """
     id = models.UUIDField(
+        primary_key=True,
         default=uuid.uuid4,
         editable=False,
         help_text='the uuid of the database item'
@@ -232,6 +237,7 @@ class BaseActivity(models.Model):
     activity types (Quiz, Poll, Writing Activities)
     """
     id = models.UUIDField(
+        primary_key=True,
         default=uuid.uuid4,
         editable=False,
         help_text='the uuid of the database item'
@@ -333,6 +339,7 @@ class Question(models.Model):
     ]
 
     id = models.UUIDField(
+        primary_key=True,
         default=uuid.uuid4,
         editable=False,
         help_text='the uuid of the database item'
@@ -423,6 +430,7 @@ class PollQuestion(models.Model):
     )
 
     id = models.UUIDField(
+        primary_key=True,
         default=uuid.uuid4,
         editable=False,
         help_text='the uuid of the database item'
@@ -466,16 +474,19 @@ class PollQuestion(models.Model):
 
 class ResponseData(models.Model):
     id = models.UUIDField(
+        primary_key=True,
         default=uuid.uuid4,
         editable=False,
         help_text='the uuid of the database item'
     )
 
     data_type = models.TextField(
+        null=True,
         help_text="Type for categorizing what data is what"
     )
 
     data_reference_id = models.UUIDField(
+        null=True,
         help_text='the id of the originating activity or survey'
     )
 
