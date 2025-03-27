@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-from core.models import User
+from core.models import User, UserQuizResponse, UserQuestionResponse, Quiz, Question
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
@@ -163,3 +163,98 @@ class UserUpdateSerializer(serializers.Serializer):
         instance.save()
         
         return instance
+    
+class UserQuestionResponseSerializer(serializers.Serializer):
+    """
+    Serializer for individual question responses within a quiz submission
+    """
+    question_id = serializers.IntegerField(required=True)
+    response_data = serializers.JSONField(required=True)
+
+    def validate_question_id(self, value):
+        """Validate that the question exists and belongs to the quiz"""
+        quiz_id = self.context.get('quiz_id')
+        if not quiz_id:
+            raise serializers.ValidationError("Quiz ID is required in context")
+        
+        try:
+            question = Question.objects.get(id=value, quiz_id=quiz_id)
+            return value
+        except Question.DoesNotExist:
+            raise serializers.ValidationError(f"Question with ID {value} does not exist in this quiz")
+
+class QuizSubmissionSerializer(serializers.Serializer):
+    """
+    Serializer for submitting a complete quiz response
+    """
+    quiz_id = serializers.IntegerField(required=True)
+    is_complete = serializers.BooleanField(default=True)
+    question_responses = UserQuestionResponseSerializer(many=True)
+
+    def validate_quiz_id(self, value):
+        """Ensure the quiz exists"""
+        try:
+            Quiz.objects.get(id=value)
+            return value
+        except Quiz.DoesNotExist:
+            raise serializers.ValidationError(f"Quiz with ID {value} does not exist")
+        
+    def to_internal_value(self, data):
+        """
+        Override to set quiz_id in context before validation occurs on nested serializers
+        """
+        # Get the quiz_id from the incoming data
+        quiz_id = data.get('quiz_id')
+        if quiz_id:
+            # Update the context for all nested serializers
+            self.context['quiz_id'] = quiz_id
+            
+        # Continue with normal validation process
+        return super().to_internal_value(data)
+
+    def validate(self, data: dict):
+        """Validate that all required questions have responses"""
+        quiz_id = data.get('quiz_id')
+        question_responses = data.get('question_responses', [])
+
+        # Get all questions for this quiz
+        quiz = Quiz.objects.get(id=quiz_id)
+        required_questions = Question.objects.filter(quiz=quiz, is_required=True)
+
+        # Check if all required questions have responses
+        if data.get('is_complete', True):
+            responded_question_ids = [resp['question_id'] for resp in question_responses]
+            missing_questions = []
+
+            for question in required_questions:
+                if question.id not in responded_question_ids:
+                    missing_questions.append(question.id)
+
+            if missing_questions:
+                raise serializers.ValidationError({
+                    'question_responses': f"Missing responses for required questions: {missing_questions}"
+                })
+            
+        # Add quiz_id to context for question validation
+        # for question_response in question_responses:
+        #     self.context['quiz_id'] = quiz_id
+
+        return data
+    
+class UserQuizResponseDetailSerializer(serializers.ModelSerializer):
+    """Serializer for retrieving a user's quiz response with details"""
+    question_responses = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = UserQuizResponse
+        fields = [
+            'id', 'quiz', 'score', 'is_complete', 
+            'started_at', 'completed_at', 'question_responses'
+        ]
+    
+    def get_question_responses(self, obj):
+        """
+        Get all question responses for this quiz response.
+        """
+        question_responses = obj.question_responses.all()
+        return [qr.to_dict() for qr in question_responses]

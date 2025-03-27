@@ -1,9 +1,10 @@
 # Business logic
 from django.db import transaction
+from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing
+from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, UserQuizResponse, UserQuestionResponse
 
 class UserService:
     @staticmethod
@@ -146,3 +147,90 @@ class LessonService:
         return {
             "lesson": lesson_dict
         }
+    
+class QuizResponseService:
+    @staticmethod
+    @transaction.atomic
+    def submit_quiz_response(user: User, data: dict):
+        """
+        Process a user's quiz submission
+
+        Args:
+            user: The user submitting the quiz
+            data: Dictionary containing quiz submission data (validated by serializer)
+
+        Returns:
+            UserQuizResponse: The created/updated quiz response object
+        """
+        quiz_id = data.get('quiz_id')
+        is_complete = data.get('is_complete', True)
+        question_responses_data = data.get('question_responses', [])
+
+        # Get or create a quiz response object
+        quiz_response, created = UserQuizResponse.objects.get_or_create(
+            user=user,
+            quiz_id=quiz_id,
+            defaults={'is_complete': False}
+        )
+
+        # If quiz is being completed, update completion status and time
+        if is_complete and not quiz_response.is_complete:
+            quiz_response.is_complete = True
+            quiz_response.completed_at = timezone.now()
+
+        # If the quiz response is new it needs an ID, so save it now
+        quiz_response.save()
+
+        # Process each question response
+        for response_data in question_responses_data:
+            question_id = response_data.get('question_id')
+            response_content = response_data.get('response_data')
+
+            # Create or update the question response
+            question_response, _ = UserQuestionResponse.objects.update_or_create(
+                quiz_response=quiz_response,
+                question_id=question_id,
+                defaults={'response_data': response_content}
+            )
+
+            # Check correctness
+            question_response.evaluate_correctness()
+
+        # Calculate score if complete
+        if quiz_response.is_complete:
+            quiz_response.calculate_score()
+
+        return quiz_response
+    
+    @staticmethod
+    def get_user_quiz_responses(user, quiz_id=None):
+        """
+        Get a user's responses to quizzes.
+
+        Args:
+            user: The user whose responses to retrieve
+            quiz_id: Optional quiz ID to filter by
+
+        Returns:
+            QuerySet: User's quiz responses
+        """
+        if quiz_id:
+            return UserQuizResponse.objects.filter(user=user, quiz_id=quiz_id)
+        return UserQuizResponse.objects.filter(user=user)
+    
+    @staticmethod
+    def get_quiz_response_details(user, response_id):
+        """
+        Get detailed information about a quiz response.
+        
+        Args:
+            user: The user who submitted the response
+            response_id: ID of the quiz response
+            
+        Returns:
+            UserQuizResponse: The quiz response with question responses
+            
+        Raises:
+            UserQuizResponse.DoesNotExist: If the response doesn't exist or belong to the user
+        """
+        return UserQuizResponse.objects.get(id=response_id, user=user)

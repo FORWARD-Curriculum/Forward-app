@@ -430,3 +430,183 @@ class PollQuestion(models.Model):
             "allowMultiple": self.allow_multiple,
             "order": self.order,
         }
+
+class UserQuizResponse(models.Model):
+    """
+    Stores a user's complete response to a quiz
+    """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='quiz_responses',
+        help_text='The user who submitted this quiz response'
+    )
+
+    quiz = models.ForeignKey(
+        Quiz,
+        on_delete=models.CASCADE,
+        related_name='user_responses',
+        help_text='The quiz that was answered'
+    )
+
+    score = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text="The user's score on this quiz"
+    )
+
+    is_complete = models.BooleanField(
+        default=False,
+        help_text='Whether the quiz has been completed and submitted'
+    )
+
+    started_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text='When the user started the quiz'
+    )
+
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='When the user completed the quiz'
+    )
+
+    class Meta:
+        unique_together = ['user', 'quiz']
+        verbose_name = 'quiz response'
+        verbose_name_plural = 'quiz responses'
+    
+    def __str__(self):
+        return f"{self.user.username}'s response to {self.quiz.title}"
+    
+    def calculate_score(self):
+        """Calculate and set the score based on the question responses"""
+        if not self.is_complete:
+            return None
+        
+        # Only count questions that have correct answers defined
+        gradable_questions = self.question_responses.filter(
+            # self note: This is a field lookup feature in Django's ORM.
+            #  Translates to a single JOIN query instead of having to loop through all responses and check each question
+            question__has_correct_answer=True
+        )
+
+        correct_count = 0
+        total_count = gradable_questions.count()
+
+        if total_count == 0:
+            return None
+        
+        for response in gradable_questions:
+            if response.is_correct:
+                correct_count += 1
+
+        self.score = correct_count
+        self.save()
+
+        return self.score
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "userId": self.user_id,
+            "quizId": self.quiz_id,
+            "score": self.score,
+            "isComplete": self.is_complete,
+            "startedAt": self.started_at,
+            "completedAt": self.completed_at,
+            "questionResponses": [qr.to_dict() for qr in self.question_responses.all()]
+        }
+    
+class UserQuestionResponse(models.Model):
+    """
+    Stores a user's response to an individual question within a quiz
+    """
+    quiz_response = models.ForeignKey(
+        UserQuizResponse,
+        on_delete=models.CASCADE,
+        related_name='question_responses',
+        help_text="The parent quiz response this question response belongs to"
+    )
+
+    question = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE,
+        related_name='user_responses',
+        help_text="The question that was answered"
+    )
+
+    # Store the selected answer(s) as JSON
+    # For multiple choice: {"selected": "option_id"}
+    # For multiple select: {"selected": ["option_id1", "option_id2"]}
+    # For true/false: {"selected": true} or {"selected": false}
+    response_data = models.JSONField(
+        help_text="The user's response data in JSON format"
+    )
+
+    is_correct = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text="Whether this response is correct (null if not automatically gradable)"
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+    
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        unique_together = ['quiz_response', 'question']
+        verbose_name = "question response"
+        verbose_name_plural = "question responses"
+
+    def __str__(self):
+        return f"Response to question {self.question.id} in {self.quiz_response}"
+    
+    def evaluate_correctness(self):
+        """Determine if the response is correct based on question type and correct answer"""
+        if not self.question.has_correct_answer:
+            self.is_correct = None
+            self.save()
+            return None
+        
+        # Get correct answers from the question
+        correct_answers = self.question.choices.get('correct_answers', [])
+        selected = self.response_data.get('selected', None)
+
+        # If nothing's selected, it's incorrect
+        if selected is None:
+            self.is_correct = False
+            self.save()
+            return False
+        
+        # Handle different question types
+        if self.question.question_type == 'multiple_choice':
+            self.is_correct = selected in correct_answers
+        elif self.question.question_type == 'multiple_select':
+            if not isinstance(selected, list):
+                self.is_correct = False
+            else:
+                self.is_correct = sorted(selected) == sorted(correct_answers)
+        elif self.question.question_type == 'true_false':
+            self.is_correct = selected == correct_answers
+        else:
+            # Unknown question type
+            self.is_correct = None
+
+        self.save()
+        return self.is_correct
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "quizResponseId": self.quiz_response_id,
+            "questionId": self.question_id,
+            "responseData": self.response_data,
+            "isCorrect": self.is_correct,
+            "createdAt": self.created_at,
+            "updatedAt": self.updated_at
+        }
