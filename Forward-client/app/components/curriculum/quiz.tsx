@@ -1,26 +1,39 @@
-import type { Quiz, Question } from "@/lib/lessonSlice";
+import type { Quiz, Question, QuestionResponse } from "@/lib/redux/lessonSlice";
 import MarkdownTTS from "@/components/ui/markdown-tts";
 import { Link, useLocation } from "react-router";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Skeleton } from "../ui/skeleton";
+import { useDispatch, useSelector } from "react-redux";
+import { saveUserResponseThunk } from "@/lib/redux/userLessonDataSlice";
+import type { AppDispatch, RootState } from "@/store";
 
 export default function Quiz({ quiz }: { quiz: Quiz }) {
   const { hash } = useLocation();
-  const [currentQuestion, setCurrentQuestion] = useState(parseInt(hash.substring(1).split("/").at(1) || "1"));
+  const dispatch = useDispatch<AppDispatch>();
+  const userResponseData = useSelector((state: RootState)=>state.response);
+  const [currentQuestion, setCurrentQuestion] = useState(
+    parseInt(hash.substring(1).split("/").at(1) || "1"),
+  );
 
   return (
     <div>
       <p className="mb-4 text-sm font-light">{quiz.instructions}</p>
-        {quiz.questions.map((question: Question, questionNumber) => {
-          if ((currentQuestion-1)===questionNumber) return (
+      {quiz.questions.map((question: Question, questionNumber) => {
+        if (currentQuestion - 1 === questionNumber)
+          return (
+            <div className="flex flex-col items-center gap-7">
+              <div className="flex flex-col gap-2">
+                {question.image ? (
+                  <img src={question.image} />
+                ) : (
+                  <Skeleton className="size-70" />
+                )}
+                {question.caption ? (
+                  <p>{question.caption}</p>
+                ) : (
+                  <Skeleton className="h-[var(--txt-base)] w-70" />
+                )}
+              </div>
               <MarkdownTTS
                 className="flex flex-col items-center"
                 controlsClassName="flex gap-2"
@@ -41,6 +54,21 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
                             question.questionType == "multiple_select"
                               ? "checkbox"
                               : "radio"
+                          }
+                          onClick={() =>
+                            dispatch(
+                              saveUserResponseThunk({
+                                type: "Quiz",
+                                order: quiz.order,
+                                response: {
+                                  id: question.id,
+                                  associatedId: quiz.id,
+                                  timeSpent: userResponseData.timeSpent,
+                                  attempts: 1,
+                                  choices: [option.id],
+                                } as QuestionResponse,
+                              }),
+                            )
                           }
                           id={`question-${questionNumber}:option-${choiceNumber}`}
                           name={`question-${questionNumber}`}
@@ -63,27 +91,46 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
                   })}
                 </fieldset>
               </MarkdownTTS>
+            </div>
           );
-        })}
-      <Pagination>
-        <PaginationContent className="-top-full">
+      })}
+      <div className="mx-auto flex w-full justify-center">
+        <div className="grid grid-cols-3 items-center justify-center">
           {currentQuestion != 1 && (
-            <Link to={`#${quiz.order}/${currentQuestion - 1}`} onClick={()=>setCurrentQuestion(currentQuestion-1)}>
+            <button
+              className="bg-primary text-primary-foreground col-span-1 col-start-1 col-end-1 flex h-full w-16 items-center justify-center rounded-md text-center active:brightness-90"
+              onClick={() => {
+                history.replaceState(
+                  null,
+                  "",
+                  `#${quiz.order}/${currentQuestion - 1}`,
+                );
+                setCurrentQuestion(currentQuestion - 1);
+              }}
+            >
               Prev
-            </Link>
+            </button>
           )}
-          <PaginationItem>
+          <p className="col-start-2 col-end-2 w-full rounded-full p-3 text-center">
             {currentQuestion}
-          </PaginationItem>
+          </p>
           {currentQuestion != quiz.questions.length && (
-            <PaginationItem>
-              <Link to={`#${quiz.order}/${currentQuestion + 1}`} onClick={()=>setCurrentQuestion(currentQuestion+1)}>
-                Next
-              </Link>
-            </PaginationItem>
+            <button
+              className="bg-primary text-primary-foreground col-span-1 col-start-3 col-end-3 flex h-full w-16 items-center justify-center rounded-md text-center active:brightness-90"
+              onClick={() => {
+                history.replaceState(
+                  null,
+                  "",
+                  `#${quiz.order}/${currentQuestion + 1}`,
+                );
+                setCurrentQuestion(currentQuestion + 1);
+              }}
+            >
+              Next
+            </button>
           )}
-        </PaginationContent>
-      </Pagination>
+        </div>
+      </div>
     </div>
   );
 }

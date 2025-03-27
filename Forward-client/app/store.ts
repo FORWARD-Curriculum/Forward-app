@@ -2,9 +2,10 @@ import {
   configureStore,
   type StateFromReducersMapObject,
 } from "@reduxjs/toolkit";
-import { userSlice } from "@/lib/userSlice";
-import { curriculumSlice } from "@/lib/curriculumSlice";
-import { lessonSlice } from "@/lib/lessonSlice";
+import { userSlice } from "@/lib/redux/userSlice";
+import { curriculumSlice } from "@/lib/redux/curriculumSlice";
+import { lessonSlice } from "@/lib/redux/lessonSlice";
+import { userLessonDataSlice } from "./lib/redux/userLessonDataSlice";
 
 /**
  * Add reducers here to enforce type safety
@@ -13,6 +14,7 @@ const reducer = {
   user: userSlice.reducer,
   curriculum: curriculumSlice.reducer,
   lesson: lessonSlice.reducer,
+  response: userLessonDataSlice.reducer,
 };
 
 /**
@@ -32,5 +34,7 @@ const store = configureStore({
   preloadedState,
   devTools: import.meta.env.DEV,
 });
+
+export type AppDispatch = typeof store.dispatch
 
 export default store;

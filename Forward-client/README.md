@@ -38,7 +38,7 @@ React Router (RR) lets us define routes and layouts for our project in [one file
   - `toast.success()`
   - `toast()`
 
-- Always use the `<Link>` components when linking to pages from **FORWARD**. Due to the nature of the project, you should never use an `<a>` tag because linking to external sites is explicity against the security requirements.
+- Always use the `<Link prefetch="intent">` components when linking to pages from **FORWARD**. Due to the nature of the project, you should never use an `<a>` tag because linking to external sites is explicity against the security requirements.
 
 - The user authentication state is stored in the LocalStorage of each user's browser as a stringified [User](./app/lib/userSlice.ts) object. This is rechecked on each route update, however as above, please keep in mind that secure information distribution should **_ALWAYS_** originate from the source of truth backend via an authenticated API call.
 

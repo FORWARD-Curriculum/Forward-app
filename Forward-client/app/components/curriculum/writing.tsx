@@ -1,4 +1,4 @@
-import type { Writing } from "@/lib/lessonSlice";
+import type { Writing } from "@/lib/redux/lessonSlice";
 
 export default function Writing({writing}: {writing: Writing}) {
     return (

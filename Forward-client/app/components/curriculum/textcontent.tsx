@@ -1,4 +1,4 @@
-import type { TextContent } from "@/lib/lessonSlice";
+import type { TextContent } from "@/lib/redux/lessonSlice";
 import MarkdownTTS from "@/components/ui/markdown-tts";
 
 export default function TextContent({

@@ -1,4 +1,4 @@
-import type { Poll, PollQuestion } from "@/lib/lessonSlice";
+import type { Poll, PollQuestion } from "@/lib/redux/lessonSlice";
 
 export default function Writing({poll}: {poll: Poll}) {
     return (

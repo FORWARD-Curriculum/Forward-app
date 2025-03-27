@@ -1,15 +1,18 @@
-import type {
-  BaseActivity,
-  Lesson,
-  TextContent as TextContentType,
-  Poll as PollType,
-  Quiz as QuizType,
-  Writing as WritingType,
-} from "@/lib/lessonSlice";
+import {
+  type BaseActivity,
+  type Lesson,
+  type TextContent as TextContentType,
+  type Poll as PollType,
+  type Quiz as QuizType,
+  type Writing as WritingType,
+  setLesson,
+  nextActivity,
+  setActivity,
+} from "@/lib/redux/lessonSlice";
 import type { Route } from "./+types/lesson";
 import { apiFetch, useTitle } from "@/lib/utils";
 import { useSelector, useDispatch } from "react-redux";
-import { type RootState } from "@/store";
+import store, { type RootState } from "@/store";
 import { useEffect } from "react";
 import TextContent from "@/components/curriculum/textcontent";
 import Poll from "@/components/curriculum/poll";
@@ -25,19 +28,37 @@ import {
 import { ArrowRightIcon, ArrowUpIcon } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
+import {
+  incrementHighestActivity,
+  incrementTimeSpent,
+  type LessonResponse,
+  resetTimeSpent,
+  setResponse,
+} from "@/lib/redux/userLessonDataSlice";
 
 export async function clientLoader({
   params,
-}: Route.ClientLoaderArgs): Promise<Lesson | void> {
-  const response = await apiFetch(`/lessons/${params.lessonId}/content`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
-  if (response.ok) {
-    const json = await response.json();
-    return json.data.lesson as Lesson;
+}: Route.ClientLoaderArgs): Promise<{
+  lesson: Lesson;
+  response: LessonResponse | null;
+} | void> {
+  // If lesson is cached, don't fetch
+  if (store.getState().lesson.lesson?.id !== parseInt(params.lessonId)) {
+    const response = await apiFetch(`/lessons/${params.lessonId}/content`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (response.ok) {
+      const json = await response.json();
+      return {
+        lesson: json.data.lesson as Lesson,
+        response: json.data.response as LessonResponse,
+      };
+    }
   }
 }
+
+clientLoader.prefetch = true;
 
 export function Activity({
   activity,
@@ -63,6 +84,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   const client = useClient();
   const { hash } = useLocation();
   const lesson = useSelector((state: RootState) => state.lesson);
+  const response = useSelector((state: RootState) => state.response);
   const activity = lesson.lesson?.activities[lesson.currentActivity - 1];
   const [showsScrolBtn, setShowScrolBtn] = useState(false);
 
@@ -70,16 +92,17 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   useEffect(() => {
     if (loaderData) {
       {
-        document.title = loaderData.title+" | FORWARD";
-        if (loaderData.id != lesson.lesson?.id) {
-          dispatch({ type: "lesson/setLesson", payload: loaderData });
-          dispatch({ 
-            type: "lesson/setActivity",
-            payload:
+        document.title = loaderData.lesson.title + " | FORWARD";
+        if (loaderData.lesson.id != lesson.lesson?.id) {
+          dispatch(setLesson(loaderData.lesson));
+          dispatch(
+            setActivity(
               hash.length > 0
                 ? parseInt(hash.substring(1).split("/").at(0) || "1")
                 : 1,
-          });
+            ),
+          );
+          if (loaderData.response) dispatch(setResponse(loaderData.response));
         }
       }
     }
@@ -87,12 +110,16 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
 
   // Scroll to top button "hook"
   useEffect(() => {
+    const interval = setInterval(() => {
+      dispatch(incrementTimeSpent()); // Correct way to update state
+    }, 1000);
     const handleButtonVisibility = () => {
       window.pageYOffset > 500 ? setShowScrolBtn(true) : setShowScrolBtn(false);
     };
     window.addEventListener("scroll", handleButtonVisibility);
     return () => {
-      window.addEventListener("scroll", handleButtonVisibility);
+      window.removeEventListener("scroll", handleButtonVisibility);
+      clearInterval(interval);
     };
   }, []);
 
@@ -116,20 +143,23 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
               <div className="flex flex-col">
                 {lesson.lesson?.activities.map((activityIndex) => {
                   return (
-                    <Link
-                      to={"#" + activityIndex.order}
+                    <button
+                      disabled={activityIndex.order > response.highestActivity}
                       key={activityIndex.order}
-                      className={`${activityIndex.order === lesson.currentActivity ? "bg-accent/40" : ""} flex h-10 w-full flex-row items-center ${activity?.order&&activity.order<3?"!text-gray":""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
-                      onClick={() =>
-                        dispatch({
-                          type: "lesson/setActivity",
-                          payload: activityIndex.order,
-                        })
-                      }
+                      className={`${activityIndex.order === lesson.currentActivity ? "bg-accent/40" : ""} disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
+                      onClick={() => {
+                        dispatch(setActivity(activityIndex.order));
+                        dispatch(resetTimeSpent());
+                        history.replaceState(
+                          null,
+                          "",
+                          `#${activityIndex.order},`,
+                        );
+                      }}
                     >
                       <p>{activityIndex.order}.</p>
                       <p>{activityIndex.title}</p>
-                    </Link>
+                    </button>
                   );
                 })}
               </div>
@@ -175,10 +205,13 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         <Activity activity={activity} />
         <div className="mt-auto flex">
           <Link
+            prefetch="intent"
             to={"#" + (lesson.currentActivity + 1)}
             className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2"
             onClick={() => {
-              dispatch({ type: "lesson/nextActivity" });
+              dispatch(nextActivity());
+              dispatch(incrementHighestActivity());
+              dispatch(resetTimeSpent());
             }}
           >
             Save and Continue

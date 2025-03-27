@@ -3,11 +3,11 @@ import { ChevronDown, ChevronUp, Expand, FileVolume } from "lucide-react";
 import Pie from "../components/progress";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
-import type { User } from "@/lib/userSlice";
+import type { User } from "@/lib/redux/userSlice";
 import { Link } from "react-router";
 import type { Route } from "./+types/dashboard";
 import { apiFetch } from "@/lib/utils";
-import type { Lesson } from "@/lib/lessonSlice";
+import type { Lesson } from "@/lib/redux/lessonSlice";
 import MarkdownTTS from "@/components/ui/markdown-tts";
 
 export async function clientLoader({}: Route.ClientLoaderArgs) {
@@ -25,7 +25,6 @@ export async function clientLoader({}: Route.ClientLoaderArgs) {
 }
 
 function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
-  const dispatch = useDispatch();
   return (
     <div className="bg-background rounded-2xl pt-3">
       <div className="mx-4 flex items-center gap-4 pb-3">
@@ -35,7 +34,7 @@ function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
         ></img>
         <MarkdownTTS className="" controlsClassName='flex flex-row-reverse'>
           <div className="flex flex-col text-left">
-            <Link
+            <Link prefetch="intent"
               to={"/lesson/" + props.lesson?.id}
               className="text-accent text-xl"
             >
@@ -185,7 +184,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                   {user?.username}
                 </p>
               </div>
-              <Link className="text-secondary-foreground ml-auto" to="/account">
+              <Link prefetch="intent" className="text-secondary-foreground ml-auto" to="/account">
                 Edit
               </Link>
             </div>

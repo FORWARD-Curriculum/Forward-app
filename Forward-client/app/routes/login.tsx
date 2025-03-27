@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useAuth } from "@/lib/useAuth";
-import type { User } from "@/lib/userSlice";
+import type { User } from "@/lib/redux/userSlice";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/utils";
 
@@ -90,7 +90,7 @@ export default function Login() {
         </form>
         <p className="text-muted-foreground text-center">
           Don't have an account? <br />
-          <Link to="/register" className="text-blue-500 underline">
+          <Link prefetch="intent" to="/register" className="text-blue-500 underline">
             Sign Up
           </Link>{" "}
           instead

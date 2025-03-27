@@ -226,7 +226,7 @@ export default function Login() {
         </form>
         <p className="text-muted-foreground text-center">
           Already have an account? <br />
-          <Link to="/login" className="text-blue-500 underline">
+          <Link prefetch="intent" to="/login" className="text-blue-500 underline">
             Log In
           </Link>{" "}
           instead

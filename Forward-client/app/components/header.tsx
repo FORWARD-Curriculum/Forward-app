@@ -23,7 +23,7 @@ export default function Header() {
           user ? "pr-8 pl-12" : "px-12"
         } border-b-primary-border h-18 w-full border-b-1`}
       >
-        <Link to="/" className="font-medi text-xl">
+        <Link prefetch="intent" to="/" className="font-medi text-xl">
           FORWARD
         </Link>
 
@@ -33,13 +33,13 @@ export default function Header() {
         {windowDimensions.width > 1024 ? (
           <ul className="ml-auto flex list-none items-center gap-6 font-medium *:hover:underline">
             <li>
-              <Link to={"/dashboard"}>Dashboard</Link>
+              <Link prefetch="intent" to={"/dashboard"}>Dashboard</Link>
             </li>
             <li>
-              <Link to={"/lessons"}>Lessons</Link>
+              <Link prefetch="intent" to={"/lessons"}>Lessons</Link>
             </li>
             <li>
-              <Link to={"/activities"}>Activities</Link>
+              <Link prefetch="intent" to={"/activities"}>Activities</Link>
             </li>
             <li>
               {/* BUG: radixui applies a data-scroll-lock css class to the body with the
@@ -75,7 +75,7 @@ export default function Header() {
                   </DropdownMenu.DropdownMenuTrigger>
                   <DropdownMenu.DropdownMenuContent className="bg-secondary text-secondary-foreground w-full rounded-sm border-none p-0 *:p-0 **:active:backdrop-brightness-95">
                     <DropdownMenu.DropdownMenuItem>
-                      <Link
+                      <Link prefetch="intent"
                         to="/account"
                         className="w-full p-3 text-left hover:underline hover:backdrop-brightness-90"
                       >
@@ -103,7 +103,7 @@ export default function Header() {
                   </DropdownMenu.DropdownMenuContent>
                 </DropdownMenu.DropdownMenu>
               ) : (
-                <Link to={"/login"}>Log In</Link>
+                <Link prefetch="intent" to={"/login"}>Log In</Link>
               )}
             </li>
           </ul>
@@ -122,13 +122,13 @@ export default function Header() {
                 FORWARD Navigation
               </Sheet.SheetTitle>
               <div className="*:bg-secondary text-secondary-foreground *:outline-secondary-border flex flex-col space-y-1 *:flex *:justify-between *:rounded-xl *:p-4 *:outline-1 *:active:bg-gray-200/80">
-                <Link to={"/dashboard"}>Dashboard</Link>
-                <Link to={"/lessons"}>Lessons</Link>
-                <Link to={"/activities"}>Activities</Link>
+                <Link prefetch="intent" to={"/dashboard"}>Dashboard</Link>
+                <Link prefetch="intent" to={"/lessons"}>Lessons</Link>
+                <Link prefetch="intent" to={"/activities"}>Activities</Link>
               </div>
               {user ? (
                 <div className="group mt-auto flex flex-col gap-4">
-                  <Link
+                  <Link prefetch="intent"
                     to="/account"
                     className="flex w-full gap-3 active:backdrop-brightness-150"
                   >
@@ -179,7 +179,7 @@ export default function Header() {
                   </button>
                 </div>
               ) : (
-                <Link
+                <Link prefetch="intent"
                   to="/login"
                   className="bg-primary text-primary-foreground mt-auto w-full p-3 text-center active:brightness-110"
                 >

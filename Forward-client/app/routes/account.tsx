@@ -1,4 +1,4 @@
-import type { User } from "@/lib/userSlice";
+import type { User } from "@/lib/redux/userSlice";
 import React, { useEffect, useRef } from "react";
 import type { RootState } from "@/store";
 import { useSelector } from "react-redux";
@@ -116,9 +116,9 @@ export default function account() {
   );
 
   const sortedVoices = sortEngFirst(voices);
-  const initialVoiceURIIndex =
-    user.preferences?.speech_uri_index ? user.preferences.speech_uri_index
-      : 0;
+  const initialVoiceURIIndex = user.preferences?.speech_uri_index
+    ? user.preferences.speech_uri_index
+    : 0;
   const [voiceURIIndex, setVoiceURIIndex] = useState(initialVoiceURIIndex);
 
   const { Text, speechStatus, start, stop } = useSpeech({
@@ -144,7 +144,7 @@ export default function account() {
     displayName: user.display_name,
     consent: user.consent,
   });
-  
+
   useEffect(() => {
     updateUser({
       ...user,
@@ -162,9 +162,9 @@ export default function account() {
      * niceties.
      */
     const data = {
-      profile_picture: formState.removedPicture
+      profilePicture: formState.removedPicture
         ? null
-        : (formState.profilePic ?? user.profile_picture ?? null),
+        : (formState.profilePic || user.profile_picture || "").trim() || null,
       display_name: formData.get("display_name"),
       consent: formData.has("consent"),
       theme: formState.theme,
@@ -491,7 +491,7 @@ export default function account() {
                     className="bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-50 rounded-xl border px-3 py-2 text-base"
                   >
                     <option value="">Choose a voice</option>
-                    {sortedVoices.map(({ voiceURI },index) => (
+                    {sortedVoices.map(({ voiceURI }, index) => (
                       <option key={voiceURI} value={index}>
                         {voiceURI}
                       </option>
@@ -575,9 +575,7 @@ export default function account() {
                     theme: originalState.current.theme,
                     textSize: originalState.current.textSize,
                   });
-                  setVoiceURIIndex(
-                    initialVoiceURIIndex,
-                  );
+                  setVoiceURIIndex(initialVoiceURIIndex);
                   setVoiceSpeed(user.preferences?.speech_speed || 1);
                   toast.success("Successfully reverted changes.");
                 }}
