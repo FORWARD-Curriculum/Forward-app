@@ -40,8 +40,8 @@ def mistakes_were_made(
     return response
 
 def json_go_brrr(
-        message: Union[str,list[str],None],
         status: Union[int, None],
+        message: Union[str,list[str],None] = None,
         data: Union[dict,None] = None):
     """
     The magical JSON formatter that makes your responses look so fresh and so clean.
