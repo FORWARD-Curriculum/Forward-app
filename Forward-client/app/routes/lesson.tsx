@@ -30,7 +30,6 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router";
 import {
   incrementHighestActivity,
-  incrementTimeSpent,
   type LessonResponse,
   resetTimeSpent,
   setResponse,
@@ -88,6 +87,20 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   const activity = lesson.lesson?.activities[lesson.currentActivity - 1];
   const [showsScrolBtn, setShowScrolBtn] = useState(false);
 
+  // Mount/Unmount
+  useEffect(() => {
+    const handleButtonVisibility = () => {
+      window.pageYOffset > 500 ? setShowScrolBtn(true) : setShowScrolBtn(false);
+    };
+    window.addEventListener("scroll", handleButtonVisibility);
+    
+    // Deregisters event listener and destroys interval
+    return () => {
+      window.removeEventListener("scroll", handleButtonVisibility);
+    };
+  }, []);
+
+
   // We only want to update the lesson slice when the data loads, no other time
   useEffect(() => {
     if (loaderData) {
@@ -108,21 +121,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
     }
   }, [loaderData]);
 
-  // Scroll to top button "hook"
-  useEffect(() => {
-    const interval = setInterval(() => {
-      dispatch(incrementTimeSpent()); // Correct way to update state
-    }, 1000);
-    const handleButtonVisibility = () => {
-      window.pageYOffset > 500 ? setShowScrolBtn(true) : setShowScrolBtn(false);
-    };
-    window.addEventListener("scroll", handleButtonVisibility);
-    return () => {
-      window.removeEventListener("scroll", handleButtonVisibility);
-      clearInterval(interval);
-    };
-  }, []);
-
+  
   return (
     <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:flex-row lg:items-start lg:gap-8">
       <div className="flex flex-col lg:h-full">

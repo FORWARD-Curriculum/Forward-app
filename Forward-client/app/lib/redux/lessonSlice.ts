@@ -1,5 +1,7 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { useSearchParams } from "react-router";
+
+// BUG: The json exported by the various views on the backend have
+// inconsistent camel/snake case formatting.
 
 export interface Lesson {
   id: number;
@@ -36,8 +38,8 @@ export interface Writing extends BaseActivity {
 
 
 export interface Quiz extends BaseActivity {
-  passing_score: number;
-  feedback_config: {
+  passingScore: number;
+  feedbackConfig: {
     passing: string;
     failing: string;
   };
@@ -56,7 +58,7 @@ export interface Question {
     options: {
       id: number;
       text: string;
-      is_correct: boolean;
+      isCorrect: boolean;
     }[],
     feedback: {
       correct: string;
@@ -68,8 +70,8 @@ export interface Question {
 
 export interface Poll extends BaseActivity {
   config: {
-    show_results: boolean;
-    allow_anonymous: boolean;
+    showResults: boolean;
+    allowAnonymous: boolean;
   }
   questions: PollQuestion[];
 }
@@ -77,41 +79,61 @@ export interface Poll extends BaseActivity {
 export interface PollQuestion {
   id: number;
   pollId: number;
-  question_text: string;
+  questionText: string;
   options: 
     {
       id: number;
       text: string;
     }[]
-  allow_multiple: boolean;
+  allowMultiple: boolean;
   order: number;
 }
 
 /**
+ * @field id - The id recieved on serialization, or null (first time)
+ * responding. A `null` value means that no response was recieved from
+ * the server and it's expected the server will take note and generate
+ * a new entry into the associated table.
  * @field associatedId - ex: quizId, pollId...
  */
-interface LessonResponse {
-  id: number;
+export interface BaseResponse {
+  id: number | null;
   associatedId: number;
+  partialResponse: boolean | null;
   timeSpent: number;
   attempts: number | null;
 }
 
+export interface QuizResponse extends BaseResponse {
+  score: number | null,
+  order: number;
+  highestQuestionReached: number,
+  responses: QuestionResponse[]
+} 
+
 /**
  * @field choices: an array of options by id
+ * @extends BaseResponse
  */
-export interface QuestionResponse extends LessonResponse {
+export interface QuestionResponse extends BaseResponse {
   choices: number[]
+}
+
+export interface QuizResponse {
+  id: number,
+  associatedId: number,
+  isComplete: boolean,
+  questionResponses: QuestionResponse[]
 }
 
 /**
  * @field choices: an array of options by id
  */
-export interface PollQuestionResponse extends LessonResponse  {
+export interface PollQuestionResponse extends BaseResponse  {
   choices: number[]
 }
 
-export interface WritingResponse extends LessonResponse  {
+export interface WritingResponse extends BaseResponse  {
   response: string;
 }
 

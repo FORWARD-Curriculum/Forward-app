@@ -9,7 +9,7 @@ export interface User {
   display_name: string;
   username: string;
   id: string;
-  facility_id?: string;
+  facility_id: string | null;
   profile_picture?: string;
   consent: boolean;
   preferences: {

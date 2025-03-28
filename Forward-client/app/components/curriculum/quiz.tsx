@@ -1,16 +1,16 @@
 import type { Quiz, Question, QuestionResponse } from "@/lib/redux/lessonSlice";
 import MarkdownTTS from "@/components/ui/markdown-tts";
-import { Link, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import { useState } from "react";
 import { Skeleton } from "../ui/skeleton";
 import { useDispatch, useSelector } from "react-redux";
-import { saveUserResponseThunk } from "@/lib/redux/userLessonDataSlice";
+import { resetTimeSpent, saveUserResponseThunk } from "@/lib/redux/userLessonDataSlice";
 import type { AppDispatch, RootState } from "@/store";
 
 export default function Quiz({ quiz }: { quiz: Quiz }) {
   const { hash } = useLocation();
   const dispatch = useDispatch<AppDispatch>();
-  const userResponseData = useSelector((state: RootState)=>state.response);
+  const userResponseData = useSelector((state: RootState) => state.response);
   const [currentQuestion, setCurrentQuestion] = useState(
     parseInt(hash.substring(1).split("/").at(1) || "1"),
   );
@@ -63,7 +63,6 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
                                 response: {
                                   id: question.id,
                                   associatedId: quiz.id,
-                                  timeSpent: userResponseData.timeSpent,
                                   attempts: 1,
                                   choices: [option.id],
                                 } as QuestionResponse,
@@ -91,6 +90,11 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
                   })}
                 </fieldset>
               </MarkdownTTS>
+              {(userResponseData.responseData?.quizzes.findIndex(
+                (q) => q.order === quiz.order,
+              ) || -1) >= 0 && <>
+              
+              </>}
             </div>
           );
       })}
@@ -106,6 +110,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
                   `#${quiz.order}/${currentQuestion - 1}`,
                 );
                 setCurrentQuestion(currentQuestion - 1);
+                dispatch(resetTimeSpent())
               }}
             >
               Prev
@@ -124,6 +129,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
                   `#${quiz.order}/${currentQuestion + 1}`,
                 );
                 setCurrentQuestion(currentQuestion + 1);
+                dispatch(resetTimeSpent())
               }}
             >
               Next

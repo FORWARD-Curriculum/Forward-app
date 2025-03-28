@@ -15,16 +15,7 @@ React Router (RR) lets us define routes and layouts for our project in [one file
 
 ### General
 
-- [ ] Add theme preferences to user model and allow selection/update on account page
-- [ ] Change font sizing options to be variable for More accability options
-- [ ] Rework user registration for automatic user name creation
-- [ ] Look into screen reader capaabilities
-
-### Curriculum
-
-- [ ] Get list of lesson metadatas and dynamically populate `/dashboard` and `/lessons`
-- [ ] Create and implement a `curriculumSlice` and `lessonSlice`
-- [ ] Have general structure and loading set up for activities
+- [ ] Ping server on firstload if user logged in
 
 ## Important Notes
 

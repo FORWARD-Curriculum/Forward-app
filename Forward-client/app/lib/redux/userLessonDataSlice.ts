@@ -4,13 +4,23 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import {
+  type BaseResponse,
   type PollQuestionResponse,
   type QuestionResponse,
+  type QuizResponse,
   type WritingResponse,
 } from "./lessonSlice";
 import { apiFetch } from "../utils";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/store";
 
-function updateResponseData<T extends { id: number; associatedId: number }>(
+/**
+ *
+ * @param responseArray - quizzes, polls...
+ * @param response - one of the response objects
+ * @param order
+ */
+function updateResponseData<T extends BaseResponse>(
   responseArray: Array<{ id: number; order: number; responses: T[] }>,
   response: T,
   order: number,
@@ -23,6 +33,8 @@ function updateResponseData<T extends { id: number; associatedId: number }>(
       (r) => r.id === response.id,
     );
     if (existingResponse) {
+      const totalTimeSpent = existingResponse.timeSpent + response.timeSpent;
+      response.timeSpent = totalTimeSpent;
       Object.assign(existingResponse, response);
     } else {
       existingItem.responses.push(response);
@@ -35,17 +47,21 @@ function updateResponseData<T extends { id: number; associatedId: number }>(
     });
   }
 }
-
+/**
+ * Slice interface that stores all info relating to data the user inputs.
+ * Decoupled from lessonSlice to separate logic, passing only id references
+ * for the server to manage.
+ *
+ * @field timeSpent: The last time since resetting the timeSpent, used
+ * to track the amount of time spent on a response without unnessecarily
+ * updating the store.
+ */
 export interface LessonResponse {
   lessonId: number | null;
   highestActivity: number;
   timeSpent: number;
   responseData: null | {
-    quizzes: {
-      id: number;
-      order: number;
-      responses: QuestionResponse[];
-    }[];
+    quizzes: QuizResponse[];
     polls: {
       id: number;
       order: number;
@@ -62,10 +78,14 @@ export interface LessonResponse {
 const initialState: LessonResponse = {
   lessonId: null,
   highestActivity: 1,
-  timeSpent: 0,
+  timeSpent: Date.now(),
   responseData: { quizzes: [], polls: [], writings: [] },
 };
 
+/**
+ * Posts a user response object to the server to "save" it, then
+ * stores in the slice for local state management.
+ */
 export const saveUserResponseThunk = createAsyncThunk(
   "response/saveUserResponse",
   async (
@@ -76,13 +96,21 @@ export const saveUserResponseThunk = createAsyncThunk(
     },
     thunkAPI,
   ) => {
+    // compute lastTime
+    const state = thunkAPI.getState() as RootState;
+    const lastTime = state.response.timeSpent;
+    data.response.timeSpent = Math.floor((Date.now() - lastTime)/1000);
+    
+    // FIXME: SERVER DOES NOT RECIEVE THE AGGREGATE TIME, MUST ALSO DO THIS IN THE VIEW
     const response = await apiFetch(`/response/${data.type.toLowerCase()}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data.response),
     });
+    
     // TODO: Validate OK status, this is only for not having a backend
     //if (response.ok) {
+      thunkAPI.dispatch(resetTimeSpent())
     return data;
     //}
   },
@@ -105,10 +133,7 @@ export const userLessonDataSlice = createSlice({
       state.highestActivity = action.payload;
     },
     resetTimeSpent: (state) => {
-      state.timeSpent = 0;
-    },
-    incrementTimeSpent: (state) => {
-      state.timeSpent += 1;
+      state.timeSpent = Date.now();
     },
   },
   extraReducers: (builder) => {
@@ -148,8 +173,7 @@ export const {
   incrementHighestActivity,
   decrementHighestActivity,
   setHighestActivity,
-  incrementTimeSpent,
-  resetTimeSpent
+  resetTimeSpent,
 } = userLessonDataSlice.actions;
 
 export default userLessonDataSlice.reducer;
