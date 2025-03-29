@@ -1,9 +1,10 @@
 # Business logic
 from django.db import transaction
+from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing
+from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, UserQuizResponse, UserQuestionResponse
 
 class UserService:
     @staticmethod
@@ -14,7 +15,7 @@ class UserService:
         
         Args:
             data (dict): Dictionary containing user data including:
-                        username, password, email, display_name, facility_id, profile_picture, consent
+                        username, password, email, display_name, facility_id, consent
         
         Returns:
             User: Created user instance
@@ -31,9 +32,19 @@ class UserService:
                 username=data['username'],
                 display_name=data['display_name'],
             )
+
+            # Set additional fields
+            if 'facility_id' in data:
+                user.facility_id = data['facility_id']
+
+            if 'consent' in data:
+                user.consent = data['consent']
             
             # Set password (this handles the hashing)
             user.set_password(data['password'])
+
+            # Validate all fields according to model constraints
+            user.full_clean()
             
             # Save the user
             user.save()
@@ -123,7 +134,6 @@ class LessonService:
         text_contents = list(TextContent.objects.filter(lesson_id=lesson_id).order_by('order'))
         for content in text_contents:
             activity_dict = content.to_dict()
-            activity_dict['type'] = 'TextContent'
             lesson_dict['activities'][content.order] = activity_dict
 
         # Process quizzes
@@ -131,7 +141,6 @@ class LessonService:
             questions = Question.objects.filter(quiz_id=quiz.id).order_by('order')
             quiz_dict = quiz.to_dict()
             quiz_dict['questions'] = [q.to_dict() for q in questions]
-            quiz_dict['type'] = 'Quiz'
             lesson_dict['activities'][quiz.order] = quiz_dict
 
         # Process polls
@@ -139,14 +148,12 @@ class LessonService:
             poll_questions = PollQuestion.objects.filter(poll_id=poll.id).order_by('order')
             poll_dict = poll.to_dict()
             poll_dict['questions'] = [pq.to_dict() for pq in poll_questions]
-            poll_dict['type'] = 'Poll'
             lesson_dict['activities'][poll.order] = poll_dict
 
         # Process writing activities
         writing_activities = list(Writing.objects.filter(lesson_id=lesson_id))
         for writing in writing_activities:
             writing_dict = writing.to_dict()
-            writing_dict['type'] = 'Writing'
             lesson_dict['activities'][writing.order] = writing_dict
             
         lesson_dict['activities'] = list(lesson_dict['activities'].values())
@@ -154,3 +161,142 @@ class LessonService:
         return {
             "lesson": lesson_dict
         }
+    
+class QuizResponseService:
+    @staticmethod
+    def __get_feedback_for_score(quiz, score):
+        """
+        (Private method)
+        Get the appropriate feedback based on the quiz score
+        
+        Args:
+            quiz: The Quiz object
+            score: The user's score
+            
+        Returns:
+            str: The feedback message
+        """
+        if not quiz.feedback_config or 'ranges' not in quiz.feedback_config:
+            return quiz.feedback_config.get('default', '')
+            
+        ranges = quiz.feedback_config.get('ranges', [])
+        default_feedback = quiz.feedback_config.get('default', '')
+        
+        for range_config in ranges:
+            min_score = range_config.get('min', 0)
+            max_score = range_config.get('max', 0)
+            
+            if min_score <= score <= max_score:
+                return range_config.get('feedback', default_feedback)
+        
+        return default_feedback
+
+    @staticmethod
+    @transaction.atomic
+    def submit_quiz_response(user: User, data: dict):
+        """
+        Process a user's quiz submission
+
+        Args:
+            user: The user submitting the quiz
+            data: Dictionary containing quiz submission data (validated by serializer)
+
+        Returns:
+            UserQuizResponse: The created/updated quiz response object
+        """
+        quiz_id = data.get('quiz_id')
+        is_complete = data.get('is_complete', True) # TODO: idk about the default value here
+        question_responses_data = data.get('question_responses', [])
+
+        # Get the quiz object
+        quiz = Quiz.objects.get(id=quiz_id)
+
+        # Get or create a quiz response object
+        quiz_response, created = UserQuizResponse.objects.get_or_create(
+            user=user,
+            quiz_id=quiz_id,
+            defaults={'is_complete': False}
+        )
+
+        # If quiz is being completed, update completion status and time
+        if is_complete and not quiz_response.is_complete:
+            quiz_response.is_complete = True
+            quiz_response.updated_at = timezone.now()
+
+        # If the quiz response is new it needs an ID, so save it now
+        quiz_response.save()
+
+        # Process each question response
+        for response_data in question_responses_data:
+            question_id = response_data.get('question_id')
+            response_content = response_data.get('response_data')
+
+            # Create or update the question response
+            question_response, _ = UserQuestionResponse.objects.update_or_create(
+                quiz_response=quiz_response,
+                question_id=question_id,
+                defaults={'response_data': response_content}
+            )
+
+            # Check correctness
+            question_response.evaluate_correctness()
+
+        # Calculate score if complete
+        if quiz_response.is_complete:
+            quiz_response.calculate_score()
+            feedback = QuizResponseService.__get_feedback_for_score(quiz, quiz_response.score)
+            quiz_response.completion_percentage = 100.0 # Set 100% complete
+        else:
+            feedback = ''
+            
+            # Calculate completion percentage based on answered questions
+            total_quiz_questions = Question.objects.filter(quiz_id=quiz_id).count()
+            answered_questions = quiz_response.question_responses.count()
+
+            if total_quiz_questions > 0:
+                quiz_response.completion_percentage = (answered_questions / total_quiz_questions) * 100
+            else:
+                quiz_response.completion_percentage = 0.0
+
+        # Save the quiz response with updated completion percentage
+        quiz_response.save()
+        
+        # Return both the quiz response and feedback
+        # Feedback is separate from the model because it will likely only be displayed once upon submission
+        return {
+            'quiz_response': quiz_response,
+            'feedback': feedback
+        }
+    
+    @staticmethod
+    def get_user_quiz_responses(user, quiz_id=None):
+        """
+        Get a user's responses to quizzes.
+
+        Args:
+            user: The user whose responses to retrieve
+            quiz_id: Optional quiz ID to filter by
+
+        Returns:
+            QuerySet: User's quiz responses
+        """
+        if quiz_id:
+            return UserQuizResponse.objects.filter(user=user, quiz_id=quiz_id)
+        return UserQuizResponse.objects.filter(user=user)
+    
+    @staticmethod
+    def get_quiz_response_details(user, response_id):
+        """
+        Get detailed information about a quiz response.
+        
+        Args:
+            user: The user who submitted the response
+            response_id: ID of the quiz response
+            
+        Returns:
+            UserQuizResponse: The quiz response with question responses
+            
+        Raises:
+            UserQuizResponse.DoesNotExist: If the response doesn't exist or belong to the user
+        """
+        return UserQuizResponse.objects.get(id=response_id, user=user)
