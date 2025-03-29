@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    UserRegistrationView, SessionView, CurrentUserView, QuizView,
+    QuizResponseStatusView, UserRegistrationView, SessionView, CurrentUserView, QuizView,
     LessonView, LessonContentView, TextContentView, WritingView,
     PollView, QuizResponseView, QuizResponseDetailView, GetLessonIds,
     CurriculumView
@@ -14,6 +14,7 @@ urlpatterns = [
     path('lessons/ids', GetLessonIds.as_view(), name='lesson-ids'),
     path('lessons', CurriculumView.as_view(), name='curriculum'),
     path('quizzes/responses', QuizResponseView.as_view(), name='quiz-responses'),
+    path('quizzes/<int:id>/status', QuizResponseStatusView.as_view(), name='quiz-status'),
     path('quizzes/responses/<int:response_id>', QuizResponseDetailView.as_view(), name='quiz-response-detail'),
     path('lessons/<int:id>', LessonView.as_view(), name='lessons'),
     path('lessons/<int:id>/content', LessonContentView.as_view(), name='lesson-content'),
