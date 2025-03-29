@@ -85,7 +85,7 @@ class SessionView(APIView):
 class CurrentUserView(APIView):
     """
     Endpoint for retrieving/updating current user information
-    
+
     GET: Get the current user session
     PATCH: Update the current user
     """
@@ -186,6 +186,11 @@ class QuizView(APIView):
         '''
 
         # need to make user data table to save to. TBD
+class GetLessonIds(APIView):
+    permission_classess = [IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        lessons = Lesson.objects.all()
+        return Response([le.to_dict() for le in lessons])
 
 class CurriculumView(APIView):
     permission_classes = [IsAuthenticated]
@@ -207,6 +212,20 @@ class CurriculumView(APIView):
 class LessonView(APIView):
     permission_classes = [IsAuthenticated]
 
+    def index(self, request, *args, **kwargs):
+        '''
+        get all lessons meta data
+        '''
+        lessons = Lesson.objects.all()
+
+        if not lessons:
+            return Response({"detail": "there seems to be an error querying the data"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({
+            "detail": "successful query of all lessons",
+            "data": [one_l.to_dict() for one_l in lessons]},
+            status=status.HTTP_200_OK)
+
     def get(self, request, *args, **kwargs):
         '''
         gets lesson by id
@@ -221,7 +240,7 @@ class LessonView(APIView):
             "detail": messages['successful_id'],
             "data": lesson.to_dict()},
             status=status.HTTP_200_OK)
-    
+
 class LessonContentView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -234,6 +253,17 @@ class LessonContentView(APIView):
             data=content,
             status=status.HTTP_200_OK
         )
+
+    def post(self, request, *args, **kwargs):
+        data_type = self.request.body.data_type
+        time = self.request.body.time
+        score = self.request.body.score
+        responses = self.request.body.responses
+        # commented out because well change the response data
+        # new_data = ResponseData(data_type=data_type,time=time,score=score,responses=responses)
+        # new_data.save()
+        return Response({"detail": 'successfully saved data'}, status=status.HTTP_200_OK)
+
 
 class TextContentView(APIView):
     permission_classes = [IsAuthenticated]
@@ -272,6 +302,9 @@ class PollView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
+        '''
+        this structure wont work for multiple polls unless we add a limit to these
+        '''
         [id] = kwargs.values()
         poll = Poll.objects.get(lesson_id=id)
 

@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
 from django.urls import reverse
-
+import uuid
 
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
@@ -20,6 +20,14 @@ class User(AbstractUser):
         blank=True,
         null=True
     )
+        # User's generated uuid
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+
 
     # User's first name - minimum 2 characters required
     display_name = models.CharField(
@@ -31,6 +39,7 @@ class User(AbstractUser):
     # Facility Id - Still need to decide how we are implementing
     facility_id = models.CharField(
         'facility id',
+        null=True,
         max_length=50,
         validators=[MinLengthValidator(2)],
         blank=True
@@ -50,13 +59,13 @@ class User(AbstractUser):
         max_length=1,
         default=False
     )
-    
+
     theme = models.CharField(
         'theme preference',
         max_length=1,
         default="light"
     )
-    
+
     text_size = models.CharField(
         'text size preference',
         max_length=1,
@@ -78,8 +87,8 @@ class User(AbstractUser):
     # Automatically set when the user is created and updated
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
-    # This is not data we collect, its ugly but the other option is to inherit 
+
+    # This is not data we collect, its ugly but the other option is to inherit
     # from AbstractBaseUser and all the stuff that comes with that
     first_name = None
     last_name = None
@@ -105,6 +114,14 @@ class Lesson(models.Model):
     A lesson is the top-level educational unit that contains sections, content,
     and activities. It has specific learning objectives and can track student progress.
     """
+        # User's generated uuid
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+
 
     title = models.CharField(
         max_length=200,
@@ -171,6 +188,15 @@ class TextContent(models.Model):
     Model for text-based content sections within a lesson.
     Can contain formatted text, HTML, or markdown content.
     """
+        # User's generated uuid
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+
+
     lesson = models.ForeignKey(
         Lesson,
         on_delete=models.CASCADE,
@@ -219,6 +245,15 @@ class BaseActivity(models.Model):
     This class provides common fields and functionality shared by all
     activity types (Quiz, Poll, Writing Activities)
     """
+        # User's generated uuid
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+
+
     lesson = models.ForeignKey(
         Lesson,
         on_delete=models.CASCADE,
@@ -312,6 +347,14 @@ class Question(models.Model):
         ('true_false', 'True/False'),
         ('multiple_select', 'Multiple Select'),
     ]
+        # User's generated uuid
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+
 
     quiz = models.ForeignKey(
         Quiz,
@@ -390,6 +433,14 @@ class Poll(BaseActivity):
 
 class PollQuestion(models.Model):
     """Models for individual poll questions within a poll"""
+        # User's generated uuid
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+
     poll = models.ForeignKey(
         Poll,
         on_delete=models.CASCADE,
