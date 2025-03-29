@@ -4,10 +4,10 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer
-from core.services import UserService, LessonService
+from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, QuizSubmissionSerializer, UserQuizResponseDetailSerializer
+from core.services import UserService, LessonService, QuizResponseService
 from .utils import json_go_brrr, messages
-from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, Writing, Question
+from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question
 
 class UserRegistrationView(generics.CreateAPIView):
     """
@@ -149,9 +149,6 @@ class CurrentUserView(APIView):
         )
 
 class QuizView(APIView):
-    '''
-    tests endpoint/ endpoints
-    '''
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
@@ -173,14 +170,6 @@ class QuizView(APIView):
                 "questions": [q.to_dict() for q in questions]}},
             status=status.HTTP_200_OK
             )
-
-
-    def post(self, req, *args, **kwargs):
-        '''
-        submits a quiz by creating a new userdata row in db
-        '''
-
-        # need to make user data table to save to. TBD
 
 class LessonView(APIView):
     permission_classes = [IsAuthenticated]
@@ -264,3 +253,127 @@ class PollView(APIView):
                 "poll": poll.to_dict(),
                 "pollQuestions": [q.to_dict() for q in poll_qs]}},
             status=status.HTTP_200_OK)
+
+class QuizResponseView(APIView):
+    """
+    API endpoint for submitting and retrieving quiz responses.
+
+    POST: Submit a quiz response
+    GET: Retrieve a user's quiz responses
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        """Submit a quiz response"""
+        serializer = QuizSubmissionSerializer(data=request.data)
+        if (serializer.is_valid()):
+            result = QuizResponseService.submit_quiz_response(
+                user=request.user,
+                data=serializer.validated_data
+            )
+
+            quiz_response = result['quiz_response']
+            feedback = result['feedback']
+
+            return json_go_brrr(
+                message="Quiz response submitted successfully",
+                data={
+                    "quiz_response": quiz_response.to_dict(),
+                    "feedback": feedback
+                },
+                status=status.HTTP_201_CREATED
+            )
+        
+        return json_go_brrr(
+            message="Failed to submit quiz response",
+            data=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    def get(self, request, *args, **kwargs):
+        """Retrieve a user's quiz responses, optionally filtered by quiz_id"""
+        quiz_id = request.query_params.get('quiz_id')
+        responses = QuizResponseService.get_user_quiz_responses(request.user, quiz_id)
+
+        return json_go_brrr(
+            message="Quiz responses retrieved successfully",
+            data={'quiz_responses': [response.to_dict() for response in responses]},
+            status=status.HTTP_200_OK
+        )
+    
+class QuizResponseDetailView(APIView):
+    """
+    API endpoint for retrieving a specific quiz response
+    
+    GET: Retrieve details of a specific quiz response
+    """
+    def get(self, request, response_id, *args, **kwargs):
+        try:
+            response = QuizResponseService.get_quiz_response_details(request.user, response_id)
+
+            return json_go_brrr(
+                message="Quiz response details retrieved successfully",
+                data={'quiz_response': response.to_dict()},
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return json_go_brrr(
+                message=str(e),
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+class QuizResponseStatusView(APIView):
+    """
+    API endpoint for tracking quiz status within a lesson.
+    Includes:
+        - Completion status flag
+        - Completion percentage
+        - Score
+    
+    GET: Get the quiz status for a specific lesson for the current user
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        quiz_id = kwargs.get('id')
+        user = request.user
+        
+        try:
+            # Check if the quiz exists
+            _ = Quiz.objects.get(id=quiz_id)
+            
+            # Get the user's response for this quiz if it exists
+            try:
+                quiz_response = UserQuizResponse.objects.get(
+                    user=user,
+                    quiz_id=quiz_id
+                )
+                
+                return json_go_brrr(
+                    message="Retrieved quiz completion status",
+                    data={
+                        'quiz_id': quiz_id,
+                        'is_complete': quiz_response.is_complete,
+                        'completion_percentage': quiz_response.completion_percentage,
+                        'score': quiz_response.score,
+                    },
+                    status=status.HTTP_200_OK
+                )
+            except UserQuizResponse.DoesNotExist:
+                # User hasn't started this quiz yet
+                return json_go_brrr(
+                    message="No response found for this quiz",
+                    data={
+                        'quiz_id': quiz_id,
+                        'is_complete': False,
+                        'completion_percentage': 0.0,
+                        'score': None,
+                    },
+                    status=status.HTTP_200_OK
+                )
+                
+        except Quiz.DoesNotExist:
+            return json_go_brrr(
+                message="Quiz not found",
+                status=status.HTTP_404_NOT_FOUND
+            )

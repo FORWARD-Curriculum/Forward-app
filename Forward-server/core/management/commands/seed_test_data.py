@@ -203,6 +203,7 @@ class Command(BaseCommand):
                     'choices': data.get('choices', {}),
                     'is_required': data.get('is_required', True),
                     'order': data.get('order', 0),
+                    'feedback_config': data.get('feedback_config', {}),
                 }
             )
             status = 'Created' if created else 'Updated'
