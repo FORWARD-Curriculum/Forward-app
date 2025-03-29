@@ -1,3 +1,4 @@
+from api.tests import setup_django
 from django.test import TestCase
 from django.urls import reverse, resolve
 from api.views import (
@@ -36,7 +37,7 @@ class UrlsTests(TestCase):
     def test_quizzes_url(self):
         """Test the quizzes URL."""
         url = reverse('quizes', args=[1])
-        self.assertEqual(url, '/api/quizzes/1')
+        self.assertEqual(url, '/api/quizzes/1/')
         
         resolver = resolve(url)
         self.assertEqual(resolver.func.view_class, QuizView)
@@ -44,7 +45,7 @@ class UrlsTests(TestCase):
     def test_lessons_url(self):
         """Test the lessons URL."""
         url = reverse('lessons', args=[1])
-        self.assertEqual(url, '/api/lessons/1')
+        self.assertEqual(url, '/api/lessons/1/')
         
         resolver = resolve(url)
         self.assertEqual(resolver.func.view_class, LessonView)
@@ -52,7 +53,7 @@ class UrlsTests(TestCase):
     def test_text_content_url(self):
         """Test the text content URL."""
         url = reverse('text-content', args=[1])
-        self.assertEqual(url, '/api/text_content/1')
+        self.assertEqual(url, '/api/text_content/1/')
         
         resolver = resolve(url)
         self.assertEqual(resolver.func.view_class, TextContentView)
@@ -60,7 +61,7 @@ class UrlsTests(TestCase):
     def test_writings_url(self):
         """Test the writings URL."""
         url = reverse('writings', args=[1])
-        self.assertEqual(url, '/api/writings/1')
+        self.assertEqual(url, '/api/writings/1/')
         
         resolver = resolve(url)
         self.assertEqual(resolver.func.view_class, WritingView)
@@ -68,7 +69,7 @@ class UrlsTests(TestCase):
     def test_polls_url(self):
         """Test the polls URL."""
         url = reverse('polls', args=[1])
-        self.assertEqual(url, '/api/polls/1')
+        self.assertEqual(url, '/api/polls/1/')
         
         resolver = resolve(url)
         self.assertEqual(resolver.func.view_class, PollView)

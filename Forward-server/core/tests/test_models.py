@@ -1,7 +1,11 @@
 from django.test import TestCase
+from django.utils import timezone
+from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
-from core.models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing
+from core.models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, UserQuizResponse, UserQuestionResponse
+
+User = get_user_model()
 
 class UserModelTests(TestCase):
     """Test cases for the User model."""
@@ -366,3 +370,378 @@ class WritingModelTests(TestCase):
             writing_dict['prompts'],
             ['Write about your favorite hobby.', 'Describe a challenge you have overcome.']
         )
+
+class QuizResponseModelTests(TestCase):
+    def setUp(self):
+        # Create a user
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpassword',
+            display_name='Test User'
+        )
+        
+        # Create multiple users for testing constraints
+        self.user2 = User.objects.create_user(
+            username='testuser2',
+            password='testpassword',
+            display_name='Test User 2'
+        )
+        
+        self.user3 = User.objects.create_user(
+            username='testuser3',
+            password='testpassword',
+            display_name='Test User 3'
+        )
+        
+        self.user4 = User.objects.create_user(
+            username='testuser4',
+            password='testpassword',
+            display_name='Test User 4'
+        )
+        
+        self.user5 = User.objects.create_user(
+            username='testuser5',
+            password='testpassword',
+            display_name='Test User 5'
+        )
+        
+        # Create a lesson
+        self.lesson = Lesson.objects.create(
+            title='Test Lesson',
+            description='Test lesson description',
+            objectives=['Learn testing']
+        )
+        
+        # Create a quiz
+        self.quiz = Quiz.objects.create(
+            lesson=self.lesson,
+            title='Test Quiz',
+            instructions='Answer all questions',
+            order=1,
+            passing_score=2,
+            feedback_config={'default': 'Good job!'}
+        )
+        
+        # Create questions
+        self.multiple_choice_question = Question.objects.create(
+            quiz=self.quiz,
+            question_text='Multiple choice question',
+            question_type='multiple_choice',
+            has_correct_answer=True,
+            choices={
+                'options': [
+                    {'id': 'option_a', 'text': 'Option A'},
+                    {'id': 'option_b', 'text': 'Option B'},
+                    {'id': 'option_c', 'text': 'Option C'}
+                ],
+                'correct_answers': ['option_a']
+            },
+            is_required=True,
+            order=1
+        )
+        
+        self.multiple_select_question = Question.objects.create(
+            quiz=self.quiz,
+            question_text='Multiple select question',
+            question_type='multiple_select',
+            has_correct_answer=True,
+            choices={
+                'options': [
+                    {'id': 'option_a', 'text': 'Option A'},
+                    {'id': 'option_b', 'text': 'Option B'},
+                    {'id': 'option_c', 'text': 'Option C'}
+                ],
+                'correct_answers': ['option_a', 'option_c']
+            },
+            is_required=True,
+            order=2
+        )
+        
+        self.true_false_question = Question.objects.create(
+            quiz=self.quiz,
+            question_text='True/False question',
+            question_type='true_false',
+            has_correct_answer=True,
+            choices={
+                'options': [
+                    {'id': 'true', 'text': 'True'},
+                    {'id': 'false', 'text': 'False'}
+                ],
+                'correct_answers': True
+            },
+            is_required=True,
+            order=3
+        )
+        
+        self.opinion_question = Question.objects.create(
+            quiz=self.quiz,
+            question_text='Opinion question',
+            question_type='multiple_choice',
+            has_correct_answer=False,
+            choices={
+                'options': [
+                    {'id': 'option_a', 'text': 'Option A'},
+                    {'id': 'option_b', 'text': 'Option B'},
+                    {'id': 'option_c', 'text': 'Option C'}
+                ]
+            },
+            is_required=False,
+            order=4
+        )
+
+    def test_quiz_response_creation(self):
+        """Test that a quiz response can be created"""
+        quiz_response = UserQuizResponse.objects.create(
+            user=self.user,
+            quiz=self.quiz,
+            is_complete=False
+        )
+        
+        self.assertEqual(quiz_response.user, self.user)
+        self.assertEqual(quiz_response.quiz, self.quiz)
+        self.assertFalse(quiz_response.is_complete)
+        self.assertIsNone(quiz_response.score)
+        self.assertIsNotNone(quiz_response.updated_at)
+        self.assertIsNotNone(quiz_response.created_at)
+
+    def test_question_response_creation(self):
+        """Test that question responses can be created"""
+        quiz_response = UserQuizResponse.objects.create(
+            user=self.user,
+            quiz=self.quiz,
+            is_complete=False
+        )
+        
+        # Create a response to the multiple choice question
+        mc_response = UserQuestionResponse.objects.create(
+            quiz_response=quiz_response,
+            question=self.multiple_choice_question,
+            response_data={'selected': 'option_a'}
+        )
+        
+        self.assertEqual(mc_response.quiz_response, quiz_response)
+        self.assertEqual(mc_response.question, self.multiple_choice_question)
+        self.assertEqual(mc_response.response_data, {'selected': 'option_a'})
+        self.assertIsNone(mc_response.is_correct)  # Not evaluated yet
+
+    def test_evaluate_multiple_choice_correctness(self):
+        """Test that multiple choice responses are evaluated correctly"""
+        # Create two separate quiz responses with different users to avoid unique constraint
+        quiz_response1 = UserQuizResponse.objects.create(
+            user=self.user,
+            quiz=self.quiz,
+            is_complete=False
+        )
+        
+        quiz_response2 = UserQuizResponse.objects.create(
+            user=self.user2,  # Different user
+            quiz=self.quiz,
+            is_complete=False
+        )
+        
+        # Correct response
+        correct_response = UserQuestionResponse.objects.create(
+            quiz_response=quiz_response1,
+            question=self.multiple_choice_question,
+            response_data={'selected': 'option_a'}
+        )
+        correct_response.evaluate_correctness()
+        self.assertTrue(correct_response.is_correct)
+        
+        # Incorrect response
+        incorrect_response = UserQuestionResponse.objects.create(
+            quiz_response=quiz_response2,
+            question=self.multiple_choice_question,
+            response_data={'selected': 'option_b'}
+        )
+        incorrect_response.evaluate_correctness()
+        self.assertFalse(incorrect_response.is_correct)
+
+    def test_evaluate_multiple_select_correctness(self):
+        """Test that multiple select responses are evaluated correctly"""
+        # Create separate quiz responses with different users to avoid unique constraint
+        quiz_response1 = UserQuizResponse.objects.create(
+            user=self.user,
+            quiz=self.quiz,
+            is_complete=False
+        )
+        
+        quiz_response2 = UserQuizResponse.objects.create(
+            user=self.user2,
+            quiz=self.quiz,
+            is_complete=False
+        )
+        
+        quiz_response3 = UserQuizResponse.objects.create(
+            user=self.user3,
+            quiz=self.quiz,
+            is_complete=False
+        )
+        
+        quiz_response4 = UserQuizResponse.objects.create(
+            user=self.user4,
+            quiz=self.quiz,
+            is_complete=False
+        )
+        
+        # Correct response (exact match)
+        correct_response = UserQuestionResponse.objects.create(
+            quiz_response=quiz_response1,
+            question=self.multiple_select_question,
+            response_data={'selected': ['option_a', 'option_c']}
+        )
+        correct_response.evaluate_correctness()
+        self.assertTrue(correct_response.is_correct)
+        
+        # Correct response (different order)
+        correct_response2 = UserQuestionResponse.objects.create(
+            quiz_response=quiz_response2,
+            question=self.multiple_select_question,
+            response_data={'selected': ['option_c', 'option_a']}
+        )
+        correct_response2.evaluate_correctness()
+        self.assertTrue(correct_response2.is_correct)
+        
+        # Incorrect response (missing option)
+        incorrect_response1 = UserQuestionResponse.objects.create(
+            quiz_response=quiz_response3,
+            question=self.multiple_select_question,
+            response_data={'selected': ['option_a']}
+        )
+        incorrect_response1.evaluate_correctness()
+        self.assertFalse(incorrect_response1.is_correct)
+        
+        # Incorrect response (extra option)
+        incorrect_response2 = UserQuestionResponse.objects.create(
+            quiz_response=quiz_response4,
+            question=self.multiple_select_question,
+            response_data={'selected': ['option_a', 'option_b', 'option_c']}
+        )
+        incorrect_response2.evaluate_correctness()
+        self.assertFalse(incorrect_response2.is_correct)
+
+    def test_evaluate_true_false_correctness(self):
+        """Test that true/false responses are evaluated correctly"""
+        # Create separate quiz responses with different users
+        quiz_response1 = UserQuizResponse.objects.create(
+            user=self.user,
+            quiz=self.quiz,
+            is_complete=False
+        )
+        
+        quiz_response2 = UserQuizResponse.objects.create(
+            user=self.user2,
+            quiz=self.quiz,
+            is_complete=False
+        )
+        
+        # Correct response
+        correct_response = UserQuestionResponse.objects.create(
+            quiz_response=quiz_response1,
+            question=self.true_false_question,
+            response_data={'selected': True}
+        )
+        correct_response.evaluate_correctness()
+        self.assertTrue(correct_response.is_correct)
+        
+        # Incorrect response
+        incorrect_response = UserQuestionResponse.objects.create(
+            quiz_response=quiz_response2,
+            question=self.true_false_question,
+            response_data={'selected': False}
+        )
+        incorrect_response.evaluate_correctness()
+        self.assertFalse(incorrect_response.is_correct)
+
+    def test_opinion_question_no_correctness(self):
+        """Test that opinion questions don't have correctness evaluation"""
+        quiz_response = UserQuizResponse.objects.create(
+            user=self.user5,  # Use a different user
+            quiz=self.quiz,
+            is_complete=False
+        )
+        
+        # Response to opinion question
+        opinion_response = UserQuestionResponse.objects.create(
+            quiz_response=quiz_response,
+            question=self.opinion_question,
+            response_data={'selected': 'option_b'}
+        )
+        opinion_response.evaluate_correctness()
+        self.assertIsNone(opinion_response.is_correct)
+
+    def test_quiz_score_calculation(self):
+        """Test that quiz scores are calculated correctly"""
+        quiz_response = UserQuizResponse.objects.create(
+            user=self.user,
+            quiz=self.quiz,
+            is_complete=True,
+        )
+        
+        # 2 correct responses, 1 incorrect
+        UserQuestionResponse.objects.create(
+            quiz_response=quiz_response,
+            question=self.multiple_choice_question,
+            response_data={'selected': 'option_a'},
+            is_correct=True
+        )
+        
+        UserQuestionResponse.objects.create(
+            quiz_response=quiz_response,
+            question=self.multiple_select_question,
+            response_data={'selected': ['option_a', 'option_b']},
+            is_correct=False
+        )
+        
+        UserQuestionResponse.objects.create(
+            quiz_response=quiz_response,
+            question=self.true_false_question,
+            response_data={'selected': True},
+            is_correct=True
+        )
+        
+        # Opinion question (not counted in score)
+        UserQuestionResponse.objects.create(
+            quiz_response=quiz_response,
+            question=self.opinion_question,
+            response_data={'selected': 'option_c'},
+            is_correct=None
+        )
+        
+        # Calculate the score
+        score = quiz_response.calculate_score()
+        
+        # Should be 2 (2 correct out of 3 gradable questions)
+        self.assertEqual(score, 2)
+        self.assertEqual(quiz_response.score, 2)
+
+    def test_to_dict_methods(self):
+        """Test that the to_dict methods return the expected structure"""
+        quiz_response = UserQuizResponse.objects.create(
+            user=self.user,
+            quiz=self.quiz,
+            is_complete=True,
+            score=3
+        )
+        
+        question_response = UserQuestionResponse.objects.create(
+            quiz_response=quiz_response,
+            question=self.multiple_choice_question,
+            response_data={'selected': 'option_a'},
+            is_correct=True
+        )
+        
+        # Test question response to_dict
+        qr_dict = question_response.to_dict()
+        self.assertEqual(qr_dict['questionId'], self.multiple_choice_question.id)
+        self.assertEqual(qr_dict['quizResponseId'], quiz_response.id)
+        self.assertEqual(qr_dict['responseData'], {'selected': 'option_a'})
+        self.assertEqual(qr_dict['isCorrect'], True)
+        
+        # Test quiz response to_dict
+        quiz_dict = quiz_response.to_dict()
+        self.assertEqual(quiz_dict['userId'], self.user.id)
+        self.assertEqual(quiz_dict['quizId'], self.quiz.id)
+        self.assertEqual(quiz_dict['score'], 3)
+        self.assertEqual(quiz_dict['isComplete'], True)
+        self.assertEqual(len(quiz_dict['questionResponses']), 1)
