@@ -1092,3 +1092,293 @@ class QuizResponseAPITests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         error_message = str(response.data['data']['question_responses'][0])
         self.assertIn('Missing responses for required questions', error_message)
+
+class QuestionFeedbackTests(TestCase):
+    """Test cases for question-level feedback functionality."""
+
+    def setUp(self):
+        """Set up test client and other test variables."""
+        self.client = APIClient()
+        
+        # Create a test user
+        self.user = User.objects.create_user(
+            username='feedbacktester',
+            password='TestPassword123!',
+            display_name='Feedback Tester'
+        )
+        
+        # Create a lesson
+        self.lesson = Lesson.objects.create(
+            title='Feedback Test Lesson',
+            description='Testing question feedback',
+            objectives=['Test feedback functionality']
+        )
+        
+        # Create a quiz
+        self.quiz = Quiz.objects.create(
+            lesson=self.lesson,
+            title='Feedback Test Quiz',
+            instructions='Answer the questions to test feedback',
+            order=1,
+            passing_score=1,
+            feedback_config={'default': 'Quiz completed!'}
+        )
+        
+        # Create questions with feedback configuration
+        self.question1 = Question.objects.create(
+            quiz=self.quiz,
+            question_text='What is 2+2?',
+            question_type='multiple_choice',
+            has_correct_answer=True,
+            choices={
+                'options': [
+                    {'id': 'a', 'text': '3'},
+                    {'id': 'b', 'text': '4'},
+                    {'id': 'c', 'text': '5'},
+                    {'id': 'd', 'text': '22'}
+                ],
+                'correct_answers': ['b']
+            },
+            feedback_config={
+                'correct': 'That\'s right! 2+2=4.',
+                'incorrect': 'Sorry, the correct answer is 4.',
+                'no_response': 'Please select an answer.'
+            },
+            is_required=True,
+            order=1
+        )
+        
+        self.question2 = Question.objects.create(
+            quiz=self.quiz,
+            question_text='Select all even numbers.',
+            question_type='multiple_select',
+            has_correct_answer=True,
+            choices={
+                'options': [
+                    {'id': 'a', 'text': '2'},
+                    {'id': 'b', 'text': '3'},
+                    {'id': 'c', 'text': '4'},
+                    {'id': 'd', 'text': '5'},
+                    {'id': 'e', 'text': '6'}
+                ],
+                'correct_answers': ['a', 'c', 'e']
+            },
+            feedback_config={
+                'correct': 'Correct! 2, 4, and 6 are even numbers.',
+                'incorrect': 'Not quite. Even numbers are divisible by 2 (2, 4, and 6).'
+            },
+            is_required=True,
+            order=2
+        )
+        
+        # URLs
+        self.quiz_responses_url = reverse('quiz-responses')
+        
+    def test_correct_answer_feedback(self):
+        """Test feedback for correct answers."""
+        self.client.force_authenticate(user=self.user)
+        
+        # Submit a quiz response with correct answers
+        response_data = {
+            'quiz_id': self.quiz.id,
+            'is_complete': True,
+            'question_responses': [
+                {
+                    'question_id': self.question1.id,
+                    'response_data': {'selected': 'b'}  # Correct: 2+2=4
+                },
+                {
+                    'question_id': self.question2.id,
+                    'response_data': {'selected': ['a', 'c', 'e']}  # Correct: 2, 4, 6
+                }
+            ]
+        }
+        
+        response = self.client.post(
+            self.quiz_responses_url,
+            data=json.dumps(response_data),
+            content_type='application/json'
+        )
+        
+        # Check the response status
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        # Get the response details
+        response_id = response.data['data']['quiz_response']['id']
+        detail_url = reverse('quiz-response-detail', args=[response_id])
+        detail_response = self.client.get(detail_url)
+        
+        # Check the feedback in question responses
+        question_responses = detail_response.data['data']['quiz_response']['questionResponses']
+        
+        # Find the response for question1
+        q1_response = next(qr for qr in question_responses if qr['questionId'] == self.question1.id)
+        self.assertEqual(q1_response['isCorrect'], True)
+        self.assertEqual(q1_response['feedback'], "That's right! 2+2=4.")
+        
+        # Find the response for question2
+        q2_response = next(qr for qr in question_responses if qr['questionId'] == self.question2.id)
+        self.assertEqual(q2_response['isCorrect'], True)
+        self.assertEqual(q2_response['feedback'], "Correct! 2, 4, and 6 are even numbers.")
+    
+    def test_incorrect_answer_feedback(self):
+        """Test feedback for incorrect answers."""
+        self.client.force_authenticate(user=self.user)
+        
+        # Submit a quiz response with incorrect answers
+        response_data = {
+            'quiz_id': self.quiz.id,
+            'is_complete': True,
+            'question_responses': [
+                {
+                    'question_id': self.question1.id,
+                    'response_data': {'selected': 'a'}  # Incorrect: 3
+                },
+                {
+                    'question_id': self.question2.id,
+                    'response_data': {'selected': ['a', 'b', 'c']}  # Incorrect: includes 3
+                }
+            ]
+        }
+        
+        response = self.client.post(
+            self.quiz_responses_url,
+            data=json.dumps(response_data),
+            content_type='application/json'
+        )
+        
+        # Check the response status
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        # Get the response details
+        response_id = response.data['data']['quiz_response']['id']
+        detail_url = reverse('quiz-response-detail', args=[response_id])
+        detail_response = self.client.get(detail_url)
+        
+        # Check the feedback in question responses
+        question_responses = detail_response.data['data']['quiz_response']['questionResponses']
+        
+        # Find the response for question1
+        q1_response = next(qr for qr in question_responses if qr['questionId'] == self.question1.id)
+        self.assertEqual(q1_response['isCorrect'], False)
+        self.assertEqual(q1_response['feedback'], "Sorry, the correct answer is 4.")
+        
+        # Find the response for question2
+        q2_response = next(qr for qr in question_responses if qr['questionId'] == self.question2.id)
+        self.assertEqual(q2_response['isCorrect'], False)
+        self.assertEqual(q2_response['feedback'], "Not quite. Even numbers are divisible by 2 (2, 4, and 6).")
+    
+    def test_mixed_answers_feedback(self):
+        """Test feedback for a mix of correct and incorrect answers."""
+        self.client.force_authenticate(user=self.user)
+        
+        # Submit a quiz response with mixed correctness
+        response_data = {
+            'quiz_id': self.quiz.id,
+            'is_complete': True,
+            'question_responses': [
+                {
+                    'question_id': self.question1.id,
+                    'response_data': {'selected': 'b'}  # Correct: 4
+                },
+                {
+                    'question_id': self.question2.id,
+                    'response_data': {'selected': ['a', 'b']}  # Incorrect: missing c, e and has b
+                }
+            ]
+        }
+        
+        response = self.client.post(
+            self.quiz_responses_url,
+            data=json.dumps(response_data),
+            content_type='application/json'
+        )
+        
+        # Check the response status
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        # Get the response details
+        response_id = response.data['data']['quiz_response']['id']
+        detail_url = reverse('quiz-response-detail', args=[response_id])
+        detail_response = self.client.get(detail_url)
+        
+        # Check the feedback in question responses
+        question_responses = detail_response.data['data']['quiz_response']['questionResponses']
+        
+        # Find the response for question1
+        q1_response = next(qr for qr in question_responses if qr['questionId'] == self.question1.id)
+        self.assertEqual(q1_response['isCorrect'], True)
+        self.assertEqual(q1_response['feedback'], "That's right! 2+2=4.")
+        
+        # Find the response for question2
+        q2_response = next(qr for qr in question_responses if qr['questionId'] == self.question2.id)
+        self.assertEqual(q2_response['isCorrect'], False)
+        self.assertEqual(q2_response['feedback'], "Not quite. Even numbers are divisible by 2 (2, 4, and 6).")
+        
+        # Verify overall quiz score
+        self.assertEqual(detail_response.data['data']['quiz_response']['score'], 1)  # 1 correct out of 2
+    
+    def test_empty_feedback_config(self):
+        """Test behavior with empty feedback configuration."""
+        test_quiz = Quiz.objects.create(
+            lesson=self.lesson,
+            title='Missing feedback test quiz',
+            instructions='Answer the questions to test feedback',
+            order=1,
+            passing_score=1,
+            feedback_config={'default': 'Quiz completed!'}
+        )
+
+        # Create a question with no feedback config
+        question_no_feedback = Question.objects.create(
+            quiz=test_quiz,
+            question_text='Is the sky blue?',
+            question_type='true_false',
+            has_correct_answer=True,
+            choices={
+                'options': [
+                    {'id': 'true', 'text': 'True'},
+                    {'id': 'false', 'text': 'False'}
+                ],
+                'correct_answers': 'true'
+            },
+            feedback_config={},  # Empty feedback config
+            is_required=True,
+            order=1
+        )
+        
+        self.client.force_authenticate(user=self.user)
+        
+        # Submit a response
+        response_data = {
+            'quiz_id': test_quiz.id,
+            'is_complete': True,
+            'question_responses': [
+                {
+                    'question_id': question_no_feedback.id,
+                    'response_data': {'selected': 'true'}  # Correct
+                }
+            ]
+        }
+        
+        response = self.client.post(
+            self.quiz_responses_url,
+            data=json.dumps(response_data),
+            content_type='application/json'
+        )
+        
+        # Check the response status
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        # Get the response details
+        response_id = response.data['data']['quiz_response']['id']
+        detail_url = reverse('quiz-response-detail', args=[response_id])
+        detail_response = self.client.get(detail_url)
+        
+        # Find the response for the no-feedback question
+        question_responses = detail_response.data['data']['quiz_response']['questionResponses']
+        q_response = next(qr for qr in question_responses if qr['questionId'] == question_no_feedback.id)
+        
+        # Should be correct but with empty feedback
+        self.assertEqual(q_response['isCorrect'], True)
+        self.assertEqual(q_response['feedback'], "")
