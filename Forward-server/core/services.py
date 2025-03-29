@@ -15,7 +15,7 @@ class UserService:
         
         Args:
             data (dict): Dictionary containing user data including:
-                        username, password, email, display_name, facility_id, profile_picture, consent
+                        username, password, email, display_name, facility_id, consent
         
         Returns:
             User: Created user instance
@@ -32,9 +32,19 @@ class UserService:
                 username=data['username'],
                 display_name=data['display_name'],
             )
+
+            # Set additional fields
+            if 'facility_id' in data:
+                user.facility_id = data['facility_id']
+
+            if 'consent' in data:
+                user.consent = data['consent']
             
             # Set password (this handles the hashing)
             user.set_password(data['password'])
+
+            # Validate all fields according to model constraints
+            user.full_clean()
             
             # Save the user
             user.save()
@@ -150,6 +160,34 @@ class LessonService:
     
 class QuizResponseService:
     @staticmethod
+    def __get_feedback_for_score(quiz, score):
+        """
+        (Private method)
+        Get the appropriate feedback based on the quiz score
+        
+        Args:
+            quiz: The Quiz object
+            score: The user's score
+            
+        Returns:
+            str: The feedback message
+        """
+        if not quiz.feedback_config or 'ranges' not in quiz.feedback_config:
+            return quiz.feedback_config.get('default', '')
+            
+        ranges = quiz.feedback_config.get('ranges', [])
+        default_feedback = quiz.feedback_config.get('default', '')
+        
+        for range_config in ranges:
+            min_score = range_config.get('min', 0)
+            max_score = range_config.get('max', 0)
+            
+            if min_score <= score <= max_score:
+                return range_config.get('feedback', default_feedback)
+        
+        return default_feedback
+
+    @staticmethod
     @transaction.atomic
     def submit_quiz_response(user: User, data: dict):
         """
@@ -163,8 +201,11 @@ class QuizResponseService:
             UserQuizResponse: The created/updated quiz response object
         """
         quiz_id = data.get('quiz_id')
-        is_complete = data.get('is_complete', True)
+        is_complete = data.get('is_complete', True) # TODO: idk about the default value here
         question_responses_data = data.get('question_responses', [])
+
+        # Get the quiz object
+        quiz = Quiz.objects.get(id=quiz_id)
 
         # Get or create a quiz response object
         quiz_response, created = UserQuizResponse.objects.get_or_create(
@@ -176,7 +217,7 @@ class QuizResponseService:
         # If quiz is being completed, update completion status and time
         if is_complete and not quiz_response.is_complete:
             quiz_response.is_complete = True
-            quiz_response.completed_at = timezone.now()
+            quiz_response.updated_at = timezone.now()
 
         # If the quiz response is new it needs an ID, so save it now
         quiz_response.save()
@@ -199,8 +240,29 @@ class QuizResponseService:
         # Calculate score if complete
         if quiz_response.is_complete:
             quiz_response.calculate_score()
+            feedback = QuizResponseService.__get_feedback_for_score(quiz, quiz_response.score)
+            quiz_response.completion_percentage = 100.0 # Set 100% complete
+        else:
+            feedback = ''
+            
+            # Calculate completion percentage based on answered questions
+            total_quiz_questions = Question.objects.filter(quiz_id=quiz_id).count()
+            answered_questions = quiz_response.question_responses.count()
 
-        return quiz_response
+            if total_quiz_questions > 0:
+                quiz_response.completion_percentage = (answered_questions / total_quiz_questions) * 100
+            else:
+                quiz_response.completion_percentage = 0.0
+
+        # Save the quiz response with updated completion percentage
+        quiz_response.save()
+        
+        # Return both the quiz response and feedback
+        # Feedback is separate from the model because it will likely only be displayed once upon submission
+        return {
+            'quiz_response': quiz_response,
+            'feedback': feedback
+        }
     
     @staticmethod
     def get_user_quiz_responses(user, quiz_id=None):

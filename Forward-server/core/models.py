@@ -53,13 +53,13 @@ class User(AbstractUser):
     
     theme = models.CharField(
         'theme preference',
-        max_length=1,
+        max_length=13,
         default="light"
     )
     
     text_size = models.CharField(
         'text size preference',
-        max_length=1,
+        max_length=8,
         default="txt-base"
     )
 
@@ -322,6 +322,12 @@ class Question(models.Model):
         help_text="The text of the question"
     )
 
+    feedback_config = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Feedback configuration for this question, with options for correct/incorrect responses"
+    )
+
     question_type = models.CharField(
         max_length=20,
         choices=QUESTION_TYPES,
@@ -362,6 +368,7 @@ class Question(models.Model):
             "choices": self.choices,
             "isRequired": self.is_required,
             "order": self.order,
+            "feedbackConfig": self.feedback_config
         }
 
 
@@ -460,16 +467,19 @@ class UserQuizResponse(models.Model):
         help_text='Whether the quiz has been completed and submitted'
     )
 
-    started_at = models.DateTimeField(
-        auto_now_add=True,
-        help_text='When the user started the quiz'
+    completion_percentage = models.FloatField(
+        default=0.0,
+        help_text="Percentage completion of the lesson"
     )
 
-    completed_at = models.DateTimeField(
+    time_spent = models.IntegerField(
         null=True,
         blank=True,
-        help_text='When the user completed the quiz'
+        help_text='The total time spent on this question'
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ['user', 'quiz']
@@ -513,8 +523,8 @@ class UserQuizResponse(models.Model):
             "quizId": self.quiz_id,
             "score": self.score,
             "isComplete": self.is_complete,
-            "startedAt": self.started_at,
-            "completedAt": self.completed_at,
+            "completion_percentage": self.completion_percentage,
+            "time_spent": self.time_spent,
             "questionResponses": [qr.to_dict() for qr in self.question_responses.all()]
         }
     
@@ -550,13 +560,20 @@ class UserQuestionResponse(models.Model):
         help_text="Whether this response is correct (null if not automatically gradable)"
     )
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
+    feedback = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Feedback provided for this response"
     )
-    
-    updated_at = models.DateTimeField(
-        auto_now=True
+
+    time_spent = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text='The total time spent on this question'
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ['quiz_response', 'question']
@@ -564,7 +581,7 @@ class UserQuestionResponse(models.Model):
         verbose_name_plural = "question responses"
 
     def __str__(self):
-        return f"Response to question {self.question.id} in {self.quiz_response}"
+        return f"Response to question {self.question.order} in {self.quiz_response}"
     
     def evaluate_correctness(self):
         """Determine if the response is correct based on question type and correct answer"""
@@ -577,9 +594,14 @@ class UserQuestionResponse(models.Model):
         correct_answers = self.question.choices.get('correct_answers', [])
         selected = self.response_data.get('selected', None)
 
+        # Set default feedback
+        feedback_config = self.question.feedback_config or {}
+        default_feedback = feedback_config.get('default', '')
+
         # If nothing's selected, it's incorrect
         if selected is None:
             self.is_correct = False
+            self.feedback = feedback_config.get('no_response', default_feedback)
             self.save()
             return False
         
@@ -597,6 +619,12 @@ class UserQuestionResponse(models.Model):
             # Unknown question type
             self.is_correct = None
 
+        # Set appropriate feedback based on correctness
+        if self.is_correct:
+            self.feedback = feedback_config.get('correct', default_feedback)
+        else:
+            self.feedback = feedback_config.get('incorrect', default_feedback)
+
         self.save()
         return self.is_correct
     
@@ -607,6 +635,6 @@ class UserQuestionResponse(models.Model):
             "questionId": self.question_id,
             "responseData": self.response_data,
             "isCorrect": self.is_correct,
-            "createdAt": self.created_at,
-            "updatedAt": self.updated_at
+            "time_spent": self.time_spent,
+            "feedback": self.feedback
         }

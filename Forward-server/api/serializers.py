@@ -228,7 +228,7 @@ class QuizSubmissionSerializer(serializers.Serializer):
 
             for question in required_questions:
                 if question.id not in responded_question_ids:
-                    missing_questions.append(question.id)
+                    missing_questions.append(question.order)
 
             if missing_questions:
                 raise serializers.ValidationError({

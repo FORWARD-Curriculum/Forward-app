@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    UserRegistrationView, SessionView, CurrentUserView, QuizView,
+    QuizResponseStatusView, UserRegistrationView, SessionView, CurrentUserView, QuizView,
     LessonView, LessonContentView, TextContentView, WritingView,
     PollView, QuizResponseView, QuizResponseDetailView
 )
@@ -10,6 +10,7 @@ urlpatterns = [
     path('users/me/', CurrentUserView.as_view(), name='current-user'),
     path('sessions/', SessionView.as_view(), name='sessions'),
     path('quizzes/<int:id>/', QuizView.as_view(), name='quizes'),
+    path('quizzes/<int:id>/status/', QuizResponseStatusView.as_view(), name='quiz-status'),
     path('quizzes/responses/', QuizResponseView.as_view(), name='quiz-responses'),
     path('quizzes/responses/<int:response_id>/', QuizResponseDetailView.as_view(), name='quiz-response-detail'),
     path('lessons/<int:id>/', LessonView.as_view(), name='lessons'),
