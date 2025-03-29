@@ -9,6 +9,10 @@
   --animate-slide-out-to-right: slide-out-to-right 0.4s ease-in-out;
   --animate-in: fade-in 0.4s ease-in-out;
   --animate-out: fade-out 0.4s ease-in-out;
+  --animate-slide-up: slideUp 0.3s ease-in;
+  --animate-slide-down: slideDown 0.3s ease-out;
+  --animate-slide-left: slideLeft 0.115s ease-out 75ms;
+  --animate-slide-right: slideRight 0.115s ease-in;
 
   /* Dynamic theming */
   --color-background: var(--background);
@@ -49,6 +53,46 @@
     }
     to {
       transform: translateX(100%);
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  @keyframes slideRight {
+    from {
+      max-width: 0px;
+      max-height: 0px;
+    }
+    to {
+      max-width: var(--radix-accordion-content-width);
+      max-height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes slideLeft {
+    from {
+      max-width: var(--radix-accordion-content-width);
+      max-height: var(--radix-accordion-content-height);
+    }
+    to {
+      max-width: 0px;
+      max-height: 0px;
     }
   }
 
@@ -168,6 +212,28 @@
   }
 }
 
+.markdown>*ul {
+  list-style-type: disc !important; 
+  list-style-position: inside !important; 
+}
+
+.markdown>*ol {
+  list-style-type: decimal !important; 
+  list-style-position: inside !important; 
+}
+
+.markdown>*ul ul, ol ul {
+  list-style-type: circle !important; 
+   list-style-position: inside !important; 
+   margin-left: 15px !important; 
+}
+
+.markdown>*ol ol, ul ol {
+  list-style-type: lower-latin !important; 
+   list-style-position: inside !important; 
+   margin-left: 15px !important; 
+}
+
 html,
 body {
   overflow-x: hidden;
@@ -187,6 +253,8 @@ body {
 button {
   cursor: pointer;
 }
+
+
 
 @layer base {
   :root {
@@ -319,6 +387,53 @@ button {
   }
 }
 
+.markdown ul, ol { 
+  display: block;
+  list-style: disc outside none;
+  margin: 1em 0;
+  padding: 0 0 0 40px;
+}
+.markdown ol { 
+  list-style-type: decimal;
+}
+
+.markdown ul ul, ol ul {
+  list-style-type: circle; 
+   list-style-position: inside; 
+   margin-left: 15px; 
+}
+
+.markdown ol ol, ul ol {
+  list-style-type: lower-latin; 
+   list-style-position: inside; 
+   margin-left: 15px; 
+}
+
+.markdown li {
+  display: list-item;
+}
+
+.markdown h1 {
+  font-size: var(--text-2xl);
+  font-weight: bold;
+}
+.markdown h2 {
+  font-size: var(--text-xl);
+  font-weight: bold;
+}
+.markdown h3 {
+  font-size: var(--text-lg);
+  font-weight: bold;
+}
+.markdown h4 {
+  font-size: var(--text-base);
+  font-weight: bold;
+}
+.markdown h5 {
+  font-size: var(--text-sm);
+  font-weight: bold;
+}
+
 .animate-in {
   animation-duration: 150ms;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -337,4 +452,6 @@ button {
   --tw-exit-rotate: initial;
   --tw-exit-translate-x: initial;
   --tw-exit-translate-y: initial;
+
+  
 }

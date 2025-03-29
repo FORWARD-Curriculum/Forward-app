@@ -2,7 +2,7 @@ FROM node:20-alpine AS development-dependencies-env
 
 WORKDIR /app/server
 COPY ./package*.json .
-RUN npm install
+RUN npm install --loglevel verbose
 
 ENV BACKEND_URL="http://backend:8000"
 

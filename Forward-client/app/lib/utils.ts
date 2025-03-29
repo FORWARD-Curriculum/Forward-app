@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 
 /**
@@ -17,6 +18,7 @@ export function cn(...inputs: ClassValue[]): string {
  */
 export const getCookie = (name: string): string | undefined => {
   const value = `; ${document.cookie}`;
+  console.log(document.cookie)
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop()?.split(";").shift();
 };
@@ -41,5 +43,20 @@ export async function apiFetch(
     "X-CSRFToken": getCookie("csrftoken") || "",
   };
 
-  return fetch("/api/" + url + "/", { ...options, headers });
+  return fetch("/api" + url , { ...options, headers });
+}
+
+/**
+ * Update the document title with provided string
+ * @param titleOrFn can be a String or a function.
+ * @param deps? if provided, the title will be updated when one of these values changes
+ */
+export function useTitle(
+  titleOrFn: string | (() => string),
+  ...deps: React.DependencyList
+): void {
+  useEffect(() => {
+    console.log(titleOrFn);
+    document.title = typeof titleOrFn === "function" ? titleOrFn() : titleOrFn;
+  }, [...deps]);
 }

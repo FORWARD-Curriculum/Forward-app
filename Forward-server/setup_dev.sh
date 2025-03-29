@@ -12,7 +12,7 @@ python -m venv .venv
 source .venv/bin/activate # Uncomment for Mac/Linux
 
 # Install dependencies
-pip install django djangorestframework
+pip install django djangorestframework django-cors-headers
 
 # Run migrations
 python manage.py migrate

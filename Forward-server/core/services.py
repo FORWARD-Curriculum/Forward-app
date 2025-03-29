@@ -73,7 +73,9 @@ class UserService:
                     'consent': user.consent,
                     'preferences': {
                         'theme': user.theme,
-                        'text_size': user.text_size
+                        'text_size': user.text_size,
+                        'speech_uri_index': user.speech_uri_index,
+                        'speech_speed': user.speech_speed
                     }
                 }
             }
@@ -146,6 +148,8 @@ class LessonService:
             writing_dict = writing.to_dict()
             writing_dict['type'] = 'Writing'
             lesson_dict['activities'][writing.order] = writing_dict
+            
+        lesson_dict['activities'] = list(lesson_dict['activities'].values())
 
         return {
             "lesson": lesson_dict

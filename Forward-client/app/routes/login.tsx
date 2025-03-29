@@ -4,15 +4,16 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useAuth } from "@/lib/useAuth";
-import type { User } from "@/lib/userSlice";
+import type { User } from "@/lib/redux/userSlice";
 import { toast } from "sonner";
+import { apiFetch } from "@/lib/utils";
 
 export default function Login() {
   const [error, setError] = useState(null);
   const login = useAuth().login;
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/dashboard";
+  const from = location.state?.from || "/dashboard";
 
   const handleSubmit = async (e: any) => {
     e.preventDefault(); // Prevent the default form submission behavior
@@ -24,7 +25,7 @@ export default function Login() {
 
     try {
       /* TODO: change api domain*/
-      const response = await fetch("/api/sessions/", {
+      const response = await apiFetch("/sessions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,28 +33,13 @@ export default function Login() {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      console.log(result);
 
       if (!response.ok) {
         toast.error("Hmm... something went wrong");
         throw new Error(result.detail || "Login error.");
       }
 
-      /* TODO: cdn domain for picture*/
-      const user: User = {
-        id: result.data.user.id,
-        username: result.data.user.username,
-        display_name: result.data.user.display_name,
-        facility_id: result.data.facility_id,
-        profile_picture: result.data.user.profile_picture || undefined,
-        consent: result.data.user.consent,
-        preferences: {
-          theme: result.data.user.preferences.theme,
-          text_size: result.data.user.preferences.text_size,
-        },
-      };
-      console.log(user);
-      login(user);
+      login({...result.data.user})
 
       // Redirect to the route user attempted to access prior to logging in
       navigate(from, { replace: true });
@@ -104,7 +90,7 @@ export default function Login() {
         </form>
         <p className="text-muted-foreground text-center">
           Don't have an account? <br />
-          <Link to="/register" className="text-blue-500 underline">
+          <Link prefetch="intent" to="/register" className="text-blue-500 underline">
             Sign Up
           </Link>{" "}
           instead
