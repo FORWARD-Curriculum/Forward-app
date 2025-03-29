@@ -2,9 +2,9 @@ import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+/*import mkcert from 'vite-plugin-mkcert'*/
 import path from "path";
 
-console.log(process.env);
 export default defineConfig({
   server: {
     host: "0.0.0.0",
@@ -17,7 +17,7 @@ export default defineConfig({
       },
     },
   },
-  plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  plugins: [tailwindcss(), reactRouter(), tsconfigPaths(), /*mkcert()*/],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "app"),

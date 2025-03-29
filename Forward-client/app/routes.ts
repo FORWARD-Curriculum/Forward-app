@@ -13,6 +13,7 @@ export default [
     layout("protected.tsx", [
       route("dashboard", "routes/dashboard.tsx"),
       route("account", "routes/account.tsx"),
+      route("lesson/:lessonId", "routes/lesson.tsx"),
     ]),
   ]),
 ] satisfies RouteConfig;

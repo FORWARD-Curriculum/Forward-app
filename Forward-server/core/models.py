@@ -42,7 +42,7 @@ class User(AbstractUser):
         max_length=50,
         null=True,
         blank=True,
-        validators=[MinLengthValidator(2)]
+        default=None
     )
     # Consent to participate in study, alsays assume false
     consent = models.BooleanField(
@@ -61,6 +61,18 @@ class User(AbstractUser):
         'text size preference',
         max_length=1,
         default="txt-base"
+    )
+    
+    speech_uri_index = models.PositiveIntegerField(
+        'webSpeech uri',
+        null=True,
+        blank=True,
+    )
+    
+    speech_speed = models.FloatField(
+        'webSpeech speed',
+        null=True,
+        blank=True,
     )
 
     # Automatically set when the user is created and updated

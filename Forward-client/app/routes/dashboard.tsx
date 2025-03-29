@@ -1,36 +1,50 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Expand, FileVolume } from "lucide-react";
 import Pie from "../components/progress";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
-import type { User } from "@/lib/userSlice";
+import type { User } from "@/lib/redux/userSlice";
 import { Link } from "react-router";
+import type { Route } from "./+types/dashboard";
+import { apiFetch } from "@/lib/utils";
+import type { Lesson } from "@/lib/redux/lessonSlice";
+import MarkdownTTS from "@/components/ui/markdown-tts";
 
-interface Lesson {
-  name: string;
-  description: string;
-  image: string;
-  progress: number;
-  last_date: Date;
+export async function clientLoader({}: Route.ClientLoaderArgs) {
+  const response = await apiFetch(
+    "/lessons",
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  if (response.ok) {
+    const json = await response.json();
+    return json.data as Array<any>;
+  }
 }
-
-export async function clientLoader() {}
 
 function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
   return (
     <div className="bg-background rounded-2xl pt-3">
       <div className="mx-4 flex items-center gap-4 pb-3">
-        <img src={props.lesson?.image} className="h-full max-w-20"></img>
-        <div className="flex flex-col text-left">
-          <h1 className="text-accent text-xl">{props.lesson?.name}</h1>
-          <p className="text-secondary-foreground text-base">
-            {props.lesson?.description}
-          </p>
-        </div>
-        <div className="flex h-full flex-col gap-2 lg:ml-30">
-          <Expand fill="var(--text-secondary-foreground)" />
-          <FileVolume />
-        </div>
+        <img
+          src={props.lesson?.image || "grad_cap.png"}
+          className="h-full max-w-20"
+        ></img>
+        <MarkdownTTS className="" controlsClassName='flex flex-row-reverse'>
+          <div className="flex flex-col text-left">
+            <Link prefetch="intent"
+              to={"/lesson/" + props.lesson?.id}
+              className="text-accent text-xl"
+            >
+              {props.lesson?.title}
+            </Link>
+            <p className="text-secondary-foreground text-base">
+              {props.lesson?.description}
+            </p>
+          </div>
+        </MarkdownTTS>
       </div>
       {props.children}
     </div>
@@ -62,52 +76,23 @@ function Accordion(props: { children?: ReactNode }) {
   );
 }
 
-export default function Dashboard({ className = "" }: { className?: string }) {
+export function meta() {
+  return [{ title: "Dashboard | FORWARD" }];
+}
+
+export default function Dashboard({ loaderData }: Route.ComponentProps) {
   const [sortType, setSortType] = useState<"recent" | "date" | "progress">(
     "progress",
   );
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch({ type: "curriculum/setCurriculum", payload: loaderData });
+  }, [loaderData, dispatch]);
+
+  const lessons = useSelector((state: RootState) => state.curriculum.lessons);
   const user = useSelector((state: RootState) => state.user.user) as User;
 
   /* TODO: grab from api instead of hardcoding*/
-  const lessons: Lesson[] = [
-    {
-      name: "Going to College",
-      description:
-        "This lesson is a guide to navigating the path to higher education. You'll learn about different tupes of colleges, degrees, so you can decide what's right for you.",
-      image: "/grad_cap.png",
-      progress: 100,
-      last_date: new Date("Jan 30, 2023"),
-    },
-    {
-      name: "Introduction to Soft Skills",
-      description:
-        "This lesson focuses on understanding and enhancing soft skills-personal attributes that enable individuals to interact effectively and harmoniously with others.",
-      image: "/tools.png",
-      progress: 30,
-      last_date: new Date("Nov 26, 2024"),
-    },
-    {
-      name: "Personal Finance Management",
-      description:
-        "In this lesson learn the basics of managing money, including the differencebetween debit and credit, strategies to avoid debt, and creating a monthly budget.",
-      image: "/money.png",
-      progress: 0,
-      last_date: new Date("Feb 2, 2025"),
-    },
-  ];
-
-  //const [lessons, setLessons] = useState<Lesson[] | null>(null);
-  /*
-  useEffect(() => {
-    fetch('http://localhost:3000/lessons')
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setLessons(data);
-      });
-  }, []);
-*/
 
   return (
     <>
@@ -152,41 +137,25 @@ export default function Dashboard({ className = "" }: { className?: string }) {
               {!lessons ? (
                 <p>Loading...</p>
               ) : (
-                [...lessons]
-                  .sort((a, b) => {
-                    switch (sortType) {
-                      case "recent":
-                        return (
-                          +a.last_date.toUTCString - +b.last_date.toUTCString
-                        );
-                      case "date":
-                        return (
-                          +b.last_date.toUTCString - +a.last_date.toUTCString
-                        );
-                      case "progress":
-                        return a.progress - b.progress;
-                    }
-                  })
-                  .map((e) => (
-                    <LessonCard lesson={e}>
-                      <Accordion>
-                        This has been left undesigned as the API we need to
-                        build out will dictate how each lesson will be passed
-                        into the frontend. For the sake of showing off the
-                        footer's positioning, have some standard text: <br />
-                        <br />
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                        sed do eiusmod tempor incididunt ut labore et dolore
-                        magna aliqua. Ut enim ad minim veniam, quis nostrud
-                        exercitation ullamco laboris nisi ut aliquip ex ea
-                        commodo consequat. Duis aute irure dolor in
-                        reprehenderit in voluptate velit esse cillum dolore eu
-                        fugiat nulla pariatur. Excepteur sint occaecat cupidatat
-                        non proident, sunt in culpa qui officia deserunt mollit
-                        anim id est laborum.
-                      </Accordion>
-                    </LessonCard>
-                  ))
+                lessons.map((e) => (
+                  <LessonCard key={e.id} lesson={e}>
+                    <Accordion>
+                      This has been left undesigned as the API we need to build
+                      out will dictate how each lesson will be passed into the
+                      frontend. For the sake of showing off the footer's
+                      positioning, have some standard text: <br />
+                      <br />
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                      sed do eiusmod tempor incididunt ut labore et dolore magna
+                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                      ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                      Duis aute irure dolor in reprehenderit in voluptate velit
+                      esse cillum dolore eu fugiat nulla pariatur. Excepteur
+                      sint occaecat cupidatat non proident, sunt in culpa qui
+                      officia deserunt mollit anim id est laborum.
+                    </Accordion>
+                  </LessonCard>
+                ))
               )}
             </div>
           </div>
@@ -215,7 +184,7 @@ export default function Dashboard({ className = "" }: { className?: string }) {
                   {user?.username}
                 </p>
               </div>
-              <Link className="text-secondary-foreground ml-auto" to="/account">
+              <Link prefetch="intent" className="text-secondary-foreground ml-auto" to="/account">
                 Edit
               </Link>
             </div>
@@ -227,8 +196,8 @@ export default function Dashboard({ className = "" }: { className?: string }) {
                 ) : (
                   lessons.map((e) => (
                     <div className="flex items-center">
-                      <Pie size={120} percentage={e.progress} color="" />
-                      <h2 className="text-base">{e.name}</h2>
+                      <Pie size={120} percentage={20} color="" />
+                      <h2 className="text-base">{e.title}</h2>
                     </div>
                   ))
                 )}

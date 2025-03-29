@@ -1,4 +1,4 @@
-import { type User } from "@/lib/userSlice";
+import { setUser, type User } from "@/lib/redux/userSlice";
 import { useDispatch } from "react-redux";
 import { apiFetch } from "@/lib/utils";
 
@@ -17,7 +17,7 @@ export const useAuth = () => {
    * @param {User} user - The constructed User object from the backend
    */
   const login = (user: User) => {
-    dispatch({ type: "user/setUser", payload: user });
+    dispatch(setUser(user))
   };
 
   /**
@@ -26,7 +26,7 @@ export const useAuth = () => {
    * @param {User} user
    */
   const update = (user: User) => {
-    dispatch({ type: "user/setUser", payload: user });
+    dispatch(setUser(user));
   };
 
   /**
@@ -36,7 +36,7 @@ export const useAuth = () => {
    */
   const logout = async () => {
     try {
-      const response = await apiFetch("sessions", {
+      const response = await apiFetch("/sessions", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
@@ -46,7 +46,7 @@ export const useAuth = () => {
       if (!response.ok) {
         throw new Error(result.detail);
       }
-      dispatch({ type: "user/setUser", payload: null });
+      dispatch(setUser(null));
     } catch (error: any) {
       console.error(error.message || "Logout failed. Please try again.");
       throw error; // This propagates the error to the caller
