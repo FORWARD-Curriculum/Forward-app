@@ -10,7 +10,7 @@ import {
   setActivity,
 } from "@/lib/redux/lessonSlice";
 import type { Route } from "./+types/lesson";
-import { apiFetch, useTitle } from "@/lib/utils";
+import { apiFetch } from "@/lib/utils";
 import { useSelector, useDispatch } from "react-redux";
 import store, { type RootState } from "@/store";
 import { useEffect } from "react";
@@ -31,7 +31,6 @@ import { Link, useLocation } from "react-router";
 import {
   incrementHighestActivity,
   type LessonResponse,
-  resetTimeSpent,
   setResponse,
 } from "@/lib/redux/userLessonDataSlice";
 
@@ -64,17 +63,28 @@ export function Activity({
 }: {
   activity: BaseActivity | TextContentType | undefined;
 }) {
+  /* Generate a unique key based on the activity's identifier
+  * IMPORTANT: The key also makes sure react discards components instead of reusing them on
+  * navigation, which breaks how we handle responses.
+  */
+  const key = activity ? `${activity.type}-${activity.order}` : 'invalid';
+
   switch (activity?.type) {
     case "Writing":
-      return <Writing writing={activity as WritingType} />;
+      // Add the key prop
+      return <Writing key={key} writing={activity as WritingType} />;
     case "Quiz":
-      return <Quiz quiz={activity as QuizType} />;
+      // Add the key prop
+      return <Quiz key={key} quiz={activity as QuizType} />;
     case "Poll":
-      return <Poll poll={activity as PollType} />;
+      // Add the key prop
+      return <Poll key={key} poll={activity as PollType} />;
     case "TextContent":
-      return <TextContent textContent={activity} />;
+      // Add the key prop
+      return <TextContent key={key} textContent={activity} />;
     default:
-      return <p>Invalid</p>;
+      // Add the key prop
+      return <p key={key}>Invalid</p>;
   }
 }
 
@@ -148,11 +158,10 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                       className={`${activityIndex.order === lesson.currentActivity ? "bg-accent/40" : ""} disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                       onClick={() => {
                         dispatch(setActivity(activityIndex.order));
-                        dispatch(resetTimeSpent());
                         history.replaceState(
                           null,
                           "",
-                          `#${activityIndex.order},`,
+                          `#${activityIndex.order}`,
                         );
                       }}
                     >
@@ -210,7 +219,6 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
             onClick={() => {
               dispatch(nextActivity());
               dispatch(incrementHighestActivity());
-              dispatch(resetTimeSpent());
             }}
           >
             Save and Continue

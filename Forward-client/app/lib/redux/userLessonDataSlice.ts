@@ -4,49 +4,22 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import {
+  type BaseActivity,
   type BaseResponse,
+  type PollQuestion,
   type PollQuestionResponse,
+  type Question,
   type QuestionResponse,
   type QuizResponse,
+  type TextContent,
+  type TextContentResponse,
   type WritingResponse,
 } from "./lessonSlice";
 import { apiFetch } from "../utils";
+import type { AppDispatch, RootState } from "@/store";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "@/store";
 
-/**
- *
- * @param responseArray - quizzes, polls...
- * @param response - one of the response objects
- * @param order
- */
-function updateResponseData<T extends BaseResponse>(
-  responseArray: Array<{ id: number; order: number; responses: T[] }>,
-  response: T,
-  order: number,
-) {
-  const existingItem = responseArray.find(
-    (item) => item.id === response.associatedId,
-  );
-  if (existingItem) {
-    const existingResponse = existingItem.responses.find(
-      (r) => r.id === response.id,
-    );
-    if (existingResponse) {
-      const totalTimeSpent = existingResponse.timeSpent + response.timeSpent;
-      response.timeSpent = totalTimeSpent;
-      Object.assign(existingResponse, response);
-    } else {
-      existingItem.responses.push(response);
-    }
-  } else {
-    responseArray.push({
-      id: response.associatedId,
-      order,
-      responses: [response],
-    });
-  }
-}
 /**
  * Slice interface that stores all info relating to data the user inputs.
  * Decoupled from lessonSlice to separate logic, passing only id references
@@ -60,26 +33,99 @@ export interface LessonResponse {
   lessonId: number | null;
   highestActivity: number;
   timeSpent: number;
-  responseData: null | {
-    quizzes: QuizResponse[];
-    polls: {
-      id: number;
-      order: number;
-      responses: PollQuestionResponse[];
-    }[];
-    writings: {
-      id: number;
-      order: number;
-      responses: WritingResponse[];
-    }[];
+  responseData: {
+    TextContent: TextContentResponse[];
+    Quiz: QuizResponse[];
+    Question: QuestionResponse[];
+    Poll: PollQuestionResponse[];
+    Writing: WritingResponse[];
   };
 }
+
+/**
+ * Returns a the outut of a `useState<T>()` to be used on for reactive, managed response
+ * state. Automatically saves the response data to the Redux Store/Backend when the component
+ * is unmounted, or when `saveResponse()` is called.
+ *
+ * @param type - Type of the activity to know what reponse goes where.
+ * @param activity - The activity object to retrieve id from.
+ * @param trackTime - Used in Higher Order Activites (Quiz, Poll) to indicate that time
+ * should not be tracked as a whole, but instead is the aggregate of the children's times.
+ * This is important to ensure that the unmounting of the parent, which if true calls the
+ * `resetTimeSpent()`, and thus tracked time would be inacurate for children.
+ * @param initialFields - Due to the nature of generics, the only fields we can guarantee on
+ * an initialize are those from the LCD response type {@link BaseResponse}, and so to not have
+ * undefined fields can populate them on creation.
+ * @returns `[response, setResponse, saveResponse] as const`
+ * 
+ * @example
+ * ```typescript
+ *  const [response, setResponse, saveResponse] = useResponse<QuestionResponse, Question>("Quiz", quiz, false, { highestQuestionReached: 0 });
+ *  //...
+ *    onClick={()=>setResponse({...response, highestQuestionReached: response.highestQuestionReached + 1})};
+ *  //...
+ * ```
+ */
+export const useResponse = <
+  T extends BaseResponse,
+  E extends BaseActivity | Question | PollQuestion | TextContent,
+>(
+  type: keyof NonNullable<LessonResponse["responseData"]>,
+  activity: E,
+  trackTime: boolean,
+  initialFields?: Partial<T>,
+) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const state = useSelector((state: RootState) =>
+    state.response.responseData[type].find((s) => s.id === activity.id),
+  );
+
+  // Create state as before
+  const [response, setResponse] = useState<T>(
+    state
+      ? (state as unknown as T)
+      : ({
+          id: activity.id,
+          timeSpent: 0,
+          attemptsLeft: 3,
+          ...initialFields,
+        } as T),
+  );
+
+  // Add a ref to track the latest response
+  const responseRef = useRef<T>(response);
+
+  // Update the ref whenever response changes
+  useEffect(() => {
+    responseRef.current = response;
+  }, [response]);
+
+  // Save response to store/server on unmount
+  useEffect(() => {
+    return saveResponse;
+  }, []);
+
+  /**
+   * Dispatch to `saveUserResponseThunk` to save the current response state.
+   */
+  const saveResponse = () => {
+    dispatch(
+      saveUserResponseThunk({
+        type,
+        response: responseRef.current,
+        trackTime,
+      }),
+    );
+  };
+
+  return [response, setResponse, saveResponse] as const;
+};
 
 const initialState: LessonResponse = {
   lessonId: null,
   highestActivity: 1,
   timeSpent: Date.now(),
-  responseData: { quizzes: [], polls: [], writings: [] },
+  responseData: { Quiz: [], Poll: [], Writing: [], Question: [], TextContent: [] },
 };
 
 /**
@@ -90,27 +136,32 @@ export const saveUserResponseThunk = createAsyncThunk(
   "response/saveUserResponse",
   async (
     data: {
-      type: "Quiz" | "Poll" | "Writing";
-      order: number;
-      response: QuestionResponse | PollQuestionResponse | WritingResponse;
+      type: keyof NonNullable<LessonResponse["responseData"]>;
+      response: BaseResponse;
+      trackTime: boolean;
     },
     thunkAPI,
   ) => {
-    // compute lastTime
+    // compute timeSpent
     const state = thunkAPI.getState() as RootState;
     const lastTime = state.response.timeSpent;
-    data.response.timeSpent = Math.floor((Date.now() - lastTime)/1000);
-    
-    // FIXME: SERVER DOES NOT RECIEVE THE AGGREGATE TIME, MUST ALSO DO THIS IN THE VIEW
+    data.response = {
+      ...data.response,
+      timeSpent: data.trackTime
+        ? data.response.timeSpent + Math.round((Date.now() - lastTime) / 1000)
+        : 0,
+    };
+
+    // NOTE: SERVER ***ONLY*** RECIEVES THE AGGREGATE TIME
     const response = await apiFetch(`/response/${data.type.toLowerCase()}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data.response),
     });
-    
+
     // TODO: Validate OK status, this is only for not having a backend
     //if (response.ok) {
-      thunkAPI.dispatch(resetTimeSpent())
+    if (data.trackTime) thunkAPI.dispatch(resetTimeSpent());
     return data;
     //}
   },
@@ -121,7 +172,7 @@ export const userLessonDataSlice = createSlice({
   initialState,
   reducers: {
     setResponse: (state, action: PayloadAction<LessonResponse>) => {
-      state = action.payload;
+      return action.payload;
     },
     incrementHighestActivity: (state) => {
       state.highestActivity += 1;
@@ -139,29 +190,18 @@ export const userLessonDataSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(saveUserResponseThunk.fulfilled, (state, action) => {
       if (state.responseData && action.payload) {
-        const { type, order, response } = action.payload;
-        switch (type) {
-          case "Quiz":
-            updateResponseData(
-              state.responseData.quizzes,
-              response as QuestionResponse,
-              order,
-            );
-            break;
-          case "Poll":
-            updateResponseData(
-              state.responseData.polls,
-              response as PollQuestionResponse,
-              order,
-            );
-            break;
-          case "Writing":
-            updateResponseData(
-              state.responseData.writings,
-              response as WritingResponse,
-              order,
-            );
-            break;
+        const { type, response } = action.payload;
+        const existingResponseIndex = state.responseData[type].findIndex(
+          (s) => s.id === response.id,
+        );
+
+        if (existingResponseIndex >= 0) {
+          state.responseData[type] = state.responseData[type].map(
+            (item, index) =>
+              index === existingResponseIndex ? response : (item as any),
+          );
+        } else {
+          (state.responseData[type] as BaseResponse[]).push(response);
         }
       }
     });

@@ -13,6 +13,7 @@ export interface Lesson {
   image: string | undefined;
   activities: (BaseActivity | TextContent)[];
 }
+//-------------------------- Activities -----------------------------{
 
 export interface BaseActivity {
   lessonId: number;
@@ -89,6 +90,9 @@ export interface PollQuestion {
   order: number;
 }
 
+
+//}----------------------- Responses -----------------
+
 /**
  * @field id - The id recieved on serialization, or null (first time)
  * responding. A `null` value means that no response was recieved from
@@ -97,18 +101,15 @@ export interface PollQuestion {
  * @field associatedId - ex: quizId, pollId...
  */
 export interface BaseResponse {
-  id: number | null;
-  associatedId: number;
+  id: number;
   partialResponse: boolean | null;
   timeSpent: number;
-  attempts: number | null;
+  attemptsLeft: number;
 }
 
 export interface QuizResponse extends BaseResponse {
   score: number | null,
-  order: number;
   highestQuestionReached: number,
-  responses: QuestionResponse[]
 } 
 
 /**
@@ -136,6 +137,11 @@ export interface PollQuestionResponse extends BaseResponse  {
 export interface WritingResponse extends BaseResponse  {
   response: string;
 }
+
+export interface TextContentResponse extends BaseResponse {}
+
+//------------------- State
+
 
 const initialState: {
   lesson: Lesson | null;

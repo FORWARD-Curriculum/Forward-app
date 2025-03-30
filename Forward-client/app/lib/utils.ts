@@ -18,7 +18,6 @@ export function cn(...inputs: ClassValue[]): string {
  */
 export const getCookie = (name: string): string | undefined => {
   const value = `; ${document.cookie}`;
-  console.log(document.cookie)
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop()?.split(";").shift();
 };

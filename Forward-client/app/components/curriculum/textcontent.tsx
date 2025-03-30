@@ -1,11 +1,21 @@
-import type { TextContent } from "@/lib/redux/lessonSlice";
+import type {
+  TextContent as TextContentType,
+  TextContentResponse,
+} from "@/lib/redux/lessonSlice";
 import MarkdownTTS from "@/components/ui/markdown-tts";
+import { useResponse } from "@/lib/redux/userLessonDataSlice";
 
 export default function TextContent({
   textContent,
 }: {
-  textContent: TextContent;
+  textContent: TextContentType;
 }) {
+  useResponse<TextContentResponse, TextContentType>(
+    "TextContent",
+    textContent,
+    true,
+    {attemptsLeft: 0}
+  );
   return (
     <div className="markdown">
       <MarkdownTTS
