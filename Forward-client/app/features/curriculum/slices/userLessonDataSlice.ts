@@ -14,7 +14,7 @@ const initialState: LessonResponse = {
   lessonId: null,
   highestActivity: 1,
   timeSpent: Date.now(),
-  responseData: { Quiz: [], Poll: [], Writing: [], Question: [], TextContent: [] },
+  responseData: { Quiz: [], PollQuestion: [], Writing: [], Question: [], TextContent: [] },
 };
 
 /**
@@ -30,7 +30,7 @@ export const saveUserResponseThunk = createAsyncThunk(
       trackTime: boolean;
     },
     thunkAPI,
-  ) => {
+  ): Promise<{type: keyof NonNullable<LessonResponse["responseData"]>,response: BaseResponse} | undefined> => {
     // compute timeSpent
     const state = thunkAPI.getState() as RootState;
     const lastTime = state.response.timeSpent;
@@ -42,17 +42,18 @@ export const saveUserResponseThunk = createAsyncThunk(
     };
 
     // NOTE: SERVER ***ONLY*** RECIEVES THE AGGREGATE TIME
-    const response = await apiFetch(`/response/${data.type.toLowerCase()}`, {
+    const response = await apiFetch(`/${data.type.toLowerCase()}/response`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data.response),
+      body: JSON.stringify({lessonId: state.lesson.lesson?.id, ...data.response}),
     });
 
-    // TODO: Validate OK status, this is only for not having a backend
-    //if (response.ok) {
-    if (data.trackTime) thunkAPI.dispatch(resetTimeSpent());
-    return data;
-    //}
+
+    if (response.ok) {
+      if (data.trackTime) thunkAPI.dispatch(resetTimeSpent());
+      const json = await response.json();
+      return {type: data.type, response: json.data as BaseResponse};
+    }
   },
 );
 
@@ -81,7 +82,7 @@ export const userLessonDataSlice = createSlice({
       if (state.responseData && action.payload) {
         const { type, response } = action.payload;
         const existingResponseIndex = state.responseData[type].findIndex(
-          (s) => s.id === response.id,
+          (s) => s.associatedActivity === response.associatedActivity,
         );
 
         if (existingResponseIndex >= 0) {

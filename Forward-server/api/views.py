@@ -6,9 +6,9 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, QuizSubmissionSerializer, UserQuizResponseDetailSerializer
-from core.services import UserService, LessonService, QuizResponseService
+from core.services import UserService, LessonService, QuizResponseService, ResponseService
 from .utils import json_go_brrr, messages
-from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question
+from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, TextContentResponse
 
 class UserRegistrationView(generics.CreateAPIView):
     """
@@ -241,13 +241,14 @@ class LessonView(APIView):
 class LessonContentView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, requst, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         lesson_id = kwargs.get('id')
-        content = LessonService.get_lesson_content(lesson_id=lesson_id)
+        lesson = LessonService.get_lesson_content(lesson_id=lesson_id)
+        response = ResponseService.get_response_data(lesson_id=lesson_id,user=request.user)
 
         return json_go_brrr(
             message="Successfully retrieved lesson content",
-            data=content,
+            data={**lesson,**response},
             status=status.HTTP_200_OK
         )
 
@@ -260,7 +261,6 @@ class LessonContentView(APIView):
         # new_data = ResponseData(data_type=data_type,time=time,score=score,responses=responses)
         # new_data.save()
         return Response({"detail": 'successfully saved data'}, status=status.HTTP_200_OK)
-
 
 class TextContentView(APIView):
     permission_classes = [IsAuthenticated]
@@ -280,6 +280,22 @@ class TextContentView(APIView):
             "data": [t.to_dict() for t in text_content]},
             status=status.HTTP_200_OK)
 
+class TextContentResponseView(APIView):
+    
+    permission_classes = [IsAuthenticated]
+    def post(self, request, *args, **kwargs):
+        associated_text_content = TextContent.objects.get(id=request.data.get("associatedActivity"))
+        associated_lesson = Lesson.objects.get(id=request.data.get("lessonId"))
+        text_content_response, created = TextContentResponse.objects.get_or_create(
+            user=request.user,
+            text_content=associated_text_content,
+            lesson=associated_lesson,
+            id=request.data.get("id")
+        )
+        text_content_response.time_spent = request.data.get("timeSpent",0)
+        text_content_response.save()
+        return json_go_brrr(200,"Successfully saved textContent",text_content_response.to_dict())
+        
 class WritingView(APIView):
     permission_classes = [IsAuthenticated]
 

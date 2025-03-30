@@ -2,7 +2,7 @@
 // inconsistent camel/snake case formatting.
 
 export interface Lesson {
-  id: number;
+  id: string;
   title: string;
   description: string;
   objectives: string[];
@@ -14,8 +14,8 @@ export interface Lesson {
 //-------------------------- Activities -----------------------------{
 
 export interface BaseActivity {
-  lessonId: number;
-  id: number;
+  lessonId: string;
+  id: string;
   type: "Writing" | "Quiz" | "Poll";
   title: string;
   instructions: string;
@@ -23,7 +23,7 @@ export interface BaseActivity {
 }
 
 export interface TextContent {
-  id: number;
+  id: string;
   lessonId: number;
   type: "TextContent";
   title: string;
@@ -45,7 +45,7 @@ export interface Quiz extends BaseActivity {
 }
 
 export interface Question {
-  id: number;
+  id: string;
   quizId: number;
   questionText: string;
   questionType: "multiple_choice" | "true_false" | "multiple_select";
@@ -75,7 +75,7 @@ export interface Poll extends BaseActivity {
 }
 
 export interface PollQuestion {
-  id: number;
+  id: string;
   pollId: number;
   questionText: string;
   options: {
@@ -98,14 +98,14 @@ export interface PollQuestion {
  * updating the store.
  */
 export interface LessonResponse {
-  lessonId: number | null;
+  lessonId: string | null;
   highestActivity: number;
   timeSpent: number;
   responseData: {
     TextContent: TextContentResponse[];
     Quiz: QuizResponse[];
     Question: QuestionResponse[];
-    Poll: PollQuestionResponse[];
+    PollQuestion: PollQuestionResponse[];
     Writing: WritingResponse[];
   };
 }
@@ -118,7 +118,8 @@ export interface LessonResponse {
  * @field associatedId - ex: quizId, pollId...
  */
 export interface BaseResponse {
-  id: number;
+  id: null | string;
+  associatedActivity: string;
   partialResponse: boolean | null;
   timeSpent: number;
   attemptsLeft: number;
@@ -127,28 +128,27 @@ export interface BaseResponse {
 export interface QuizResponse extends BaseResponse {
   score: number | null;
   highestQuestionReached: number;
+  isComplete: boolean;
 }
 
 /**
- * @field choices: an array of options by id
+ * @field  Store the selected answer(s) as JSON
+    - For multiple choice: `{"selected": "option_id"}`
+    - For multiple select: `{"selected": ["option_id1", "option_id2"]}`
+    - For true/false: `{"selected": true} or {"selected": false}`
  * @extends BaseResponse
  */
 export interface QuestionResponse extends BaseResponse {
-  choices: number[];
-}
-
-export interface QuizResponse {
-  id: number;
-  associatedId: number;
-  isComplete: boolean;
-  questionResponses: QuestionResponse[];
+  responseData: { selected: number | number[] | boolean };
+  isCorrect?: boolean;
+  quizId: string;
 }
 
 /**
  * @field choices: an array of options by id
  */
 export interface PollQuestionResponse extends BaseResponse {
-  choices: number[];
+  responseData: number[];
 }
 
 export interface WritingResponse extends BaseResponse {

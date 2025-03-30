@@ -39,8 +39,8 @@ export async function clientLoader({
   response: LessonResponse | null;
 } | void> {
   // If lesson is cached, don't fetch
-  if (store.getState().lesson.lesson?.id !== parseInt(params.lessonId)) {
-    const response = await apiFetch(`/lessons/${params.lessonId}/content`, {
+  if (store.getState().lesson.lesson?.id !== params.lessonId) {
+    const response = await apiFetch(`/lesson/${params.lessonId}/content`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
@@ -123,7 +123,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                 : 1,
             ),
           );
-          if (loaderData.response) dispatch(setResponse(loaderData.response));
+          if (loaderData.response) dispatch(setResponse({...loaderData.response, timeSpent: Date.now()}));
         }
       }
     }

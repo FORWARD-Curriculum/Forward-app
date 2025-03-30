@@ -46,7 +46,7 @@ export const useResponse = <
 ) => {
  const dispatch = useDispatch<AppDispatch>();
  const state = useSelector((state: RootState) =>
-   state.response.responseData[type].find((s) => s.id === activity.id),
+   state.response.responseData[type].find((s) => s.associatedActivity === activity.id),
  );
 
  // Create state as before
@@ -54,9 +54,10 @@ export const useResponse = <
    state
      ? (state as unknown as T)
      : ({
-         id: activity.id,
+         id: null,
+         associatedActivity: activity.id,
          timeSpent: 0,
-         attemptsLeft: 3,
+         attemptsLeft: 0,
          ...initialFields,
        } as T),
  );
@@ -71,20 +72,23 @@ export const useResponse = <
 
  // Save response to store/server on unmount
  useEffect(() => {
-   return saveResponse;
+   return () => {
+     void saveResponse();
+   };
  }, []);
 
  /**
   * Dispatch to `saveUserResponseThunk` to save the current response state.
   */
- const saveResponse = () => {
-   dispatch(
+ const saveResponse = async () => {
+   const saved = await dispatch(
      saveUserResponseThunk({
        type,
        response: responseRef.current,
        trackTime,
      }),
    );
+   if (saved.meta.requestStatus === 'fulfilled') setResponse((saved.payload as {response: BaseResponse}).response as T);
  };
 
  return [response, setResponse, saveResponse] as const;

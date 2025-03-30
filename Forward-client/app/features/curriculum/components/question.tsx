@@ -6,14 +6,17 @@ import MarkdownTTS from "../../../components/ui/markdown-tts";
 export default function Question({
   question,
   questionNumber,
+  quizId
 }: {
   question: Question;
   questionNumber: number;
+  quizId: string;
 }) {
   const [response, setResponse] = useResponse<QuestionResponse, Question>(
     "Question",
     question,
     true,
+    {quizId}
   );
 
   return (
@@ -56,7 +59,7 @@ export default function Question({
                     setResponse((prevResp) => ({
                       ...prevResp,
                       attemptsLeft: prevResp.attemptsLeft - 1,
-                      choices: [choiceNumber],
+                      responseData: {selected: choiceNumber},
                     }));
                   }}
                   id={`question-${questionNumber}:option-${choiceNumber}`}

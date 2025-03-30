@@ -44,10 +44,12 @@ export const useAuth = () => {
 
       const result = await response.json();
 
+      dispatch(setUser(null));
+      
       if (!response.ok) {
         throw new Error(result.detail);
       }
-      dispatch(setUser(null));
+      
     } catch (error: any) {
       console.error(error.message || "Logout failed. Please try again.");
       throw error; // This propagates the error to the caller

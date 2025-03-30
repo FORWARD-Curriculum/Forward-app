@@ -28,7 +28,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
       {quiz.questions.map((question: QuestionType, questionNumber) => {
         if (currentQuestion - 1 === questionNumber)
           return (
-            <Question question={question} questionNumber={questionNumber} />
+            <Question question={question} questionNumber={questionNumber} quizId={quiz.id} />
           );
       })}
       <div className="mx-auto flex w-full justify-center">

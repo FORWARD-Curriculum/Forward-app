@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, UserQuizResponse, UserQuestionResponse
+from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, UserQuizResponse, UserQuestionResponse, TextContentResponse, PollQuestionResponse, WritingResponse
 
 class UserService:
     @staticmethod
@@ -161,7 +161,42 @@ class LessonService:
         return {
             "lesson": lesson_dict
         }
-    
+        
+class ResponseService:
+    staticmethod
+    def get_response_data(lesson_id, user):
+        """
+        Retrieve all content associated with a lesson.
+        
+        Args:
+            lesson_id (int): The ID of the lesson
+            
+        Returns:
+            dict: All content associated with the lesson         
+        Raises:
+            Lesson.DoesNotExist: If the lesson doesn't exist
+        """
+        
+        lesson = Lesson.objects.get(id=lesson_id)
+        
+        out_dict = {} 
+        out_dict['lessonId'] = lesson.id
+        out_dict['responseData'] = {}
+        
+        out_dict['responseData']['TextContent'] = [a.to_dict() for a in list(TextContentResponse.objects.filter(lesson=lesson,user=user))]
+        out_dict['responseData']['Quiz'] = []#[a.to_dict() for a in list(QuizResponse.objects.filter(lesson=lesson,user=user))]
+        out_dict['responseData']['Question'] = []#[a.to_dict() for a in list(QuestionResponse.objects.filter(lesson=lesson,user=user))]
+        out_dict['responseData']['PollQuestion'] = [a.to_dict() for a in list(PollQuestionResponse.objects.filter(lesson=lesson,user=user))]
+        out_dict['responseData']['Writing'] = [a.to_dict() for a in list(WritingResponse.objects.filter(lesson=lesson,user=user))]
+        
+        out_dict['highestActivity'] = 0
+        for value in out_dict['responseData'].values():
+            out_dict['highestActivity'] += len(value)
+            
+        return {
+            "response": out_dict
+        }
+        
 class QuizResponseService:
     @staticmethod
     def __get_feedback_for_score(quiz, score):

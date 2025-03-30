@@ -3,22 +3,29 @@ from .views import (
     QuizResponseStatusView, UserRegistrationView, SessionView, CurrentUserView, QuizView,
     LessonView, LessonContentView, TextContentView, WritingView,
     PollView, QuizResponseView, QuizResponseDetailView, GetLessonIds,
-    CurriculumView
+    CurriculumView, TextContentResponseView
 )
 
 urlpatterns = [
     path('users', UserRegistrationView.as_view(), name='user-register'),
     path('users/me', CurrentUserView.as_view(), name='current-user'),
     path('sessions', SessionView.as_view(), name='sessions'),
-    path('quizzes/<str:id>', QuizView.as_view(), name='quizes'),
-    path('lessons/ids', GetLessonIds.as_view(), name='lesson-ids'),
+    
+    
+    path('lesson/ids', GetLessonIds.as_view(), name='lesson-ids'),
     path('lessons', CurriculumView.as_view(), name='curriculum'),
-    path('quizzes/responses', QuizResponseView.as_view(), name='quiz-responses'),
+    path('lesson/<uuid:id>', LessonView.as_view(), name='lessons'),
+    path('lesson/<uuid:id>/content', LessonContentView.as_view(), name='lesson-content'),
+    
+    path('quizzes/<str:id>', QuizView.as_view(), name='quizes'),
     path('quizzes/<str:id>/status', QuizResponseStatusView.as_view(), name='quiz-status'),
-    path('quizzes/responses/<str:response_id>', QuizResponseDetailView.as_view(), name='quiz-response-detail'),
-    path('lessons/<str:id>', LessonView.as_view(), name='lessons'),
-    path('lessons/<str:id>/content', LessonContentView.as_view(), name='lesson-content'),
-    path('text_content/<str:id>', TextContentView.as_view(), name='text-content'),
-    path('writings/<str:id>', WritingView.as_view(), name='writings'),
-    path('polls/<str:id>', PollView.as_view(), name='polls'),
+    path('quizzes/response', QuizResponseView.as_view(), name='quiz-responses'),
+    path('quizzes/response/<uuid:response_id>', QuizResponseDetailView.as_view(), name='quiz-response-detail'),
+    
+    path('textcontent/<uuid:id>', TextContentView.as_view(), name='text-content'),
+    path('textcontent/response', TextContentResponseView.as_view(),name='text-content-response'),
+    
+    path('writing/<uuid:id>', WritingView.as_view(), name='writings'),
+    
+    path('poll/<uuid:id>', PollView.as_view(), name='polls'),
 ]

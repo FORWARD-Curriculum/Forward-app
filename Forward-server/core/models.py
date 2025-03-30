@@ -701,3 +701,102 @@ class UserQuestionResponse(models.Model):
             "time_spent": self.time_spent,
             "feedback": self.feedback
         }
+        
+
+class BaseResponse(models.Model):
+    """
+    Abstract base model for responses.
+    Subclasses MUST define their own 'associatedId' ForeignKey field.
+    """
+    class Meta:
+        abstract = True
+        
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+    
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='%(class)s_lesson',
+        null=False,
+        blank=False,
+        help_text='The lesson related to this response'
+    )
+    
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='%(class)s_response_user',
+        null=False,
+        blank=False,
+        help_text='The user who submitted this response'
+    )
+  
+    partial_response = models.BooleanField(null=True, blank=True)
+    
+    time_spent = models.PositiveIntegerField(default=0)
+    
+    attempts_left = models.PositiveIntegerField(default=0)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "partialResponse": self.partial_response,
+            "timeSpent": self.time_spent,
+            "attemptsLeft": self.attempts_left
+        }
+
+class WritingResponse(BaseResponse):
+    writing = models.ForeignKey(
+        Writing,
+        on_delete=models.CASCADE,
+        related_name='associated_writing',
+        help_text='The writing that was answered'
+    )
+    
+    response = models.CharField(default="",max_length=10000)
+    
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "associatedActivity": self.writing.id,
+            "response": self.response
+            }
+
+class TextContentResponse(BaseResponse):
+    text_content = models.ForeignKey(
+        TextContent,
+        on_delete=models.CASCADE,
+        related_name='associated_textcontent',
+        help_text='The text content associated with this response'
+    )
+    
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "associatedActivity": self.text_content.id,
+            }
+
+class PollQuestionResponse(BaseResponse):
+    response_data = models.JSONField(
+        help_text="The user's response data in JSON format"
+    )
+    
+    poll = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        related_name='associated_poll',
+        help_text="The poll associated with this question"
+    )
+    
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "associatedActivity": self.poll.id,
+            "responseData": self.response_data
+            }
+        
