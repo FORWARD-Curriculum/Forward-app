@@ -1,11 +1,11 @@
 import { Outlet } from "react-router";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
+import Header from "@/components/layout/header";
+import Footer from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/sonner";
 // ^ https://sonner.emilkowal.ski/
-import { useClient } from "@/lib/useClient";
+import { useClient } from "@/hooks/useClient";
 import { useSelector } from "react-redux";
-import type { RootState } from "./store";
+import type { RootState } from "../store";
 
 export default function Layout() {
   const { windowDimensions } = useClient();

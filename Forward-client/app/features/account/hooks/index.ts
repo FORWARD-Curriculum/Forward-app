@@ -1,6 +1,7 @@
-import { setUser, type User } from "@/lib/redux/userSlice";
+import { setUser } from "@/features/account/slices/userSlice";
 import { useDispatch } from "react-redux";
-import { apiFetch } from "@/lib/utils";
+import { apiFetch } from "@/utils/utils";
+import type { User } from "@/features/account/types";
 
 // Function to get the CSRF token from cookies
 const getCookie = (name: string) => {

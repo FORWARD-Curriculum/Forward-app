@@ -1,8 +1,7 @@
-import type { Question, QuestionResponse } from "@/lib/redux/lessonSlice";
-import { useResponse } from "@/lib/redux/userLessonDataSlice";
-import { Skeleton } from "../ui/skeleton";
-import MarkdownTTS from "../ui/markdown-tts";
-import { useEffect } from "react";
+import type { Question, QuestionResponse } from "@/features/curriculum/types";
+import { useResponse } from "@/features/curriculum/hooks";
+import { Skeleton } from "../../../components/ui/skeleton";
+import MarkdownTTS from "../../../components/ui/markdown-tts";
 
 export default function Question({
   question,

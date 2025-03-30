@@ -1,9 +1,9 @@
 import type {
   TextContent as TextContentType,
   TextContentResponse,
-} from "@/lib/redux/lessonSlice";
+} from "@/features/curriculum/types";
 import MarkdownTTS from "@/components/ui/markdown-tts";
-import { useResponse } from "@/lib/redux/userLessonDataSlice";
+import { useResponse } from "@/features/curriculum/hooks";
 
 export default function TextContent({
   textContent,

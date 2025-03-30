@@ -7,10 +7,10 @@ import * as Popover from "./popover";
 import { useSelector } from "react-redux";
 import { type RootState } from "@/store";
 import type { ClassNameValue } from "tailwind-merge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import type { SpeechStatus } from "react-text-to-speech/types";
 import { FileVolume, Play, Square } from "lucide-react";
-import { sortEngFirst } from "@/routes/account";
+import { sortEngFirst } from "@/routes/protected/account";
 
 export interface DefinitionProps extends React.HTMLAttributes<HTMLElement> {
   def?: string;

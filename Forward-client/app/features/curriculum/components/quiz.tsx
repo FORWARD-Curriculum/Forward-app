@@ -2,10 +2,10 @@ import type {
   Quiz,
   Question as QuestionType,
   QuizResponse,
-} from "@/lib/redux/lessonSlice";
+} from "@/features/curriculum/types";
 import { useLocation } from "react-router";
 import { useState } from "react";
-import { useResponse } from "@/lib/redux/userLessonDataSlice";
+import { useResponse } from "@/features/curriculum/hooks";
 import Question from "./question";
 
 export default function Quiz({ quiz }: { quiz: Quiz }) {

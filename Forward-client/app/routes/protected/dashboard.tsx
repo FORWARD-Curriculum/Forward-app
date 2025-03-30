@@ -1,13 +1,13 @@
 import { type ReactNode, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Expand, FileVolume } from "lucide-react";
-import Pie from "../components/progress";
+import Pie from "@/components/ui/progress";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
-import type { User } from "@/lib/redux/userSlice";
+import type { User } from "@/features/account/types";
 import { Link } from "react-router";
 import type { Route } from "./+types/dashboard";
-import { apiFetch } from "@/lib/utils";
-import type { Lesson } from "@/lib/redux/lessonSlice";
+import { apiFetch } from "@/utils/utils";
+import type { Lesson } from "@/features/curriculum/types";
 import MarkdownTTS from "@/components/ui/markdown-tts";
 
 export async function clientLoader({}: Route.ClientLoaderArgs) {

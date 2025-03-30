@@ -2,10 +2,10 @@ import {
   configureStore,
   type StateFromReducersMapObject,
 } from "@reduxjs/toolkit";
-import { userSlice } from "@/lib/redux/userSlice";
-import { curriculumSlice } from "@/lib/redux/curriculumSlice";
-import { lessonSlice } from "@/lib/redux/lessonSlice";
-import { userLessonDataSlice } from "./lib/redux/userLessonDataSlice";
+import { userSlice } from "@/features/account/slices/userSlice";
+import { curriculumSlice } from "@/features/curriculum/slices/curriculumSlice";
+import { lessonSlice } from "@/features/curriculum/slices/lessonSlice";
+import { userLessonDataSlice } from "./features/curriculum/slices/userLessonDataSlice";
 
 /**
  * Add reducers here to enforce type safety

@@ -1,9 +1,9 @@
 import React from "react";
-import { useAuth } from "@/lib/useAuth";
+import { useAuth } from "@/features/account/hooks";
 import * as Sheet from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import * as DropdownMenu from "@/components/ui/dropdown-menu";
-import { useClient } from "@/lib/useClient";
+import { useClient } from "@/hooks/useClient";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";

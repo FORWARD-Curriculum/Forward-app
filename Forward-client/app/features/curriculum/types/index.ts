@@ -1,5 +1,3 @@
-import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
-
 // BUG: The json exported by the various views on the backend have
 // inconsistent camel/snake case formatting.
 
@@ -24,7 +22,7 @@ export interface BaseActivity {
   order: number;
 }
 
-export interface TextContent{
+export interface TextContent {
   id: number;
   lessonId: number;
   type: "TextContent";
@@ -36,7 +34,6 @@ export interface TextContent{
 export interface Writing extends BaseActivity {
   prompts: string[];
 }
-
 
 export interface Quiz extends BaseActivity {
   passingScore: number;
@@ -60,12 +57,12 @@ export interface Question {
       id: number;
       text: string;
       isCorrect: boolean;
-    }[],
+    }[];
     feedback: {
       correct: string;
       incorrect: string;
     };
-  }
+  };
   isRequired: boolean;
 }
 
@@ -73,7 +70,7 @@ export interface Poll extends BaseActivity {
   config: {
     showResults: boolean;
     allowAnonymous: boolean;
-  }
+  };
   questions: PollQuestion[];
 }
 
@@ -81,17 +78,37 @@ export interface PollQuestion {
   id: number;
   pollId: number;
   questionText: string;
-  options: 
-    {
-      id: number;
-      text: string;
-    }[]
+  options: {
+    id: number;
+    text: string;
+  }[];
   allowMultiple: boolean;
   order: number;
 }
 
-
 //}----------------------- Responses -----------------
+
+/**
+ * Slice interface that stores all info relating to data the user inputs.
+ * Decoupled from lessonSlice to separate logic, passing only id references
+ * for the server to manage.
+ *
+ * @field timeSpent: The last time since resetting the timeSpent, used
+ * to track the amount of time spent on a response without unnessecarily
+ * updating the store.
+ */
+export interface LessonResponse {
+  lessonId: number | null;
+  highestActivity: number;
+  timeSpent: number;
+  responseData: {
+    TextContent: TextContentResponse[];
+    Quiz: QuizResponse[];
+    Question: QuestionResponse[];
+    Poll: PollQuestionResponse[];
+    Writing: WritingResponse[];
+  };
+}
 
 /**
  * @field id - The id recieved on serialization, or null (first time)
@@ -108,65 +125,34 @@ export interface BaseResponse {
 }
 
 export interface QuizResponse extends BaseResponse {
-  score: number | null,
-  highestQuestionReached: number,
-} 
+  score: number | null;
+  highestQuestionReached: number;
+}
 
 /**
  * @field choices: an array of options by id
  * @extends BaseResponse
  */
 export interface QuestionResponse extends BaseResponse {
-  choices: number[]
+  choices: number[];
 }
 
 export interface QuizResponse {
-  id: number,
-  associatedId: number,
-  isComplete: boolean,
-  questionResponses: QuestionResponse[]
+  id: number;
+  associatedId: number;
+  isComplete: boolean;
+  questionResponses: QuestionResponse[];
 }
 
 /**
  * @field choices: an array of options by id
  */
-export interface PollQuestionResponse extends BaseResponse  {
-  choices: number[]
+export interface PollQuestionResponse extends BaseResponse {
+  choices: number[];
 }
 
-export interface WritingResponse extends BaseResponse  {
+export interface WritingResponse extends BaseResponse {
   response: string;
 }
 
 export interface TextContentResponse extends BaseResponse {}
-
-//------------------- State
-
-
-const initialState: {
-  lesson: Lesson | null;
-  currentActivity: number;
-} = { lesson: null, currentActivity: 0 };
-
-export const lessonSlice = createSlice({
-  name: "lesson",
-  initialState,
-  reducers: {
-    setLesson: (state, action: PayloadAction<Lesson | null>) => {
-      state.lesson = action.payload;
-    },
-    nextActivity: (state) => {
-      state.currentActivity += 1;
-    },
-    previousActivity: (state) => {
-      state.currentActivity -= 1;
-    },
-    setActivity: (state, action: PayloadAction<number>) => {
-      state.currentActivity = action.payload;
-    }
-  },
-});
-
-export const { setLesson,nextActivity,previousActivity,setActivity } = lessonSlice.actions;
-
-export default lessonSlice.reducer;

@@ -5,20 +5,18 @@ import {
   type Poll as PollType,
   type Quiz as QuizType,
   type Writing as WritingType,
-  setLesson,
-  nextActivity,
-  setActivity,
-} from "@/lib/redux/lessonSlice";
+  type LessonResponse,
+} from "@/features/curriculum/types";
 import type { Route } from "./+types/lesson";
-import { apiFetch } from "@/lib/utils";
+import { apiFetch } from "@/utils/utils";
 import { useSelector, useDispatch } from "react-redux";
 import store, { type RootState } from "@/store";
 import { useEffect } from "react";
-import TextContent from "@/components/curriculum/textcontent";
-import Poll from "@/components/curriculum/poll";
-import Quiz from "@/components/curriculum/quiz";
-import Writing from "@/components/curriculum/writing";
-import { useClient } from "@/lib/useClient";
+import TextContent from "@/features/curriculum/components/textcontent";
+import Poll from "@/features/curriculum/components/poll";
+import Quiz from "@/features/curriculum/components/quiz";
+import Writing from "@/features/curriculum/components/writing";
+import { useClient } from "@/hooks/useClient";
 import {
   Accordion,
   AccordionContent,
@@ -30,9 +28,9 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router";
 import {
   incrementHighestActivity,
-  type LessonResponse,
   setResponse,
-} from "@/lib/redux/userLessonDataSlice";
+} from "@/features/curriculum/slices/userLessonDataSlice";
+import { nextActivity, setActivity, setLesson } from "@/features/curriculum/slices/lessonSlice";
 
 export async function clientLoader({
   params,
