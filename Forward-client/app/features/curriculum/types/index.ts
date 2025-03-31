@@ -50,20 +50,23 @@ export interface Question {
   questionText: string;
   questionType: "multiple_choice" | "true_false" | "multiple_select";
   hasCorrectAnswer: boolean;
+  order: number;
   image?: string;
   caption?: string;
   choices: {
     options: {
       id: number;
       text: string;
-      isCorrect: boolean;
+      is_correct: boolean;
     }[];
-    feedback: {
-      correct: string;
-      incorrect: string;
-    };
+    
   };
   isRequired: boolean;
+  attempts?: number;
+  feedbackConfig: {
+    correct: string;
+    incorrect: string;
+  };
 }
 
 export interface Poll extends BaseActivity {
@@ -139,7 +142,7 @@ export interface QuizResponse extends BaseResponse {
  * @extends BaseResponse
  */
 export interface QuestionResponse extends BaseResponse {
-  responseData: { selected: number | number[] | boolean };
+  responseData: { selected: number[] };
   isCorrect?: boolean;
   quizId: string;
 }

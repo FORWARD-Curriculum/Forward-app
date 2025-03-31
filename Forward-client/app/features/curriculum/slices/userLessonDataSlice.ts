@@ -10,7 +10,7 @@ import {
 import { apiFetch } from "../../../utils/utils";
 import type { RootState } from "@/store";
 
-const initialState: LessonResponse = {
+export const initialLessonResponseState: LessonResponse = {
   lessonId: null,
   highestActivity: 1,
   timeSpent: Date.now(),
@@ -59,7 +59,7 @@ export const saveUserResponseThunk = createAsyncThunk(
 
 export const userLessonDataSlice = createSlice({
   name: "response",
-  initialState,
+  initialState: initialLessonResponseState,
   reducers: {
     setResponse: (state, action: PayloadAction<LessonResponse>) => {
       return action.payload;
