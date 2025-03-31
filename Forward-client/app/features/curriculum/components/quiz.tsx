@@ -18,12 +18,12 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
     "Quiz",
     quiz,
     false,
-    { highestQuestionReached: 0, score: 0, isComplete: false },
+    { highest_question_reached: 0, score: 0 },
   );
 
   return (
     <div>
-      <p>Time spent: {response.timeSpent}</p>
+      <p>Time spent: {response.time_spent}</p>
       <p className="mb-4 text-sm font-light">{quiz.instructions}</p>
       {quiz.questions.map((question: QuestionType, questionNumber) => {
         if (currentQuestion - 1 === questionNumber)
@@ -55,10 +55,10 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
             <button
               className="bg-primary text-primary-foreground col-span-1 col-start-3 col-end-3 flex h-full w-16 items-center justify-center rounded-md text-center active:brightness-90"
               onClick={() => {
-                if (response.highestQuestionReached < currentQuestion + 1)
+                if (response.highest_question_reached < currentQuestion + 1)
                   setResponse({
                     ...response,
-                    highestQuestionReached: currentQuestion + 1,
+                    highest_question_reached: currentQuestion + 1,
                   });
                 history.replaceState(
                   null,

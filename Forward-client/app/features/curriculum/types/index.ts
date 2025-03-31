@@ -1,5 +1,4 @@
-// BUG: The json exported by the various views on the backend have
-// inconsistent camel/snake case formatting.
+// Fields should always be snake_case, and class names should always be ProperCase
 
 export interface Lesson {
   id: string;
@@ -14,7 +13,7 @@ export interface Lesson {
 //-------------------------- Activities -----------------------------{
 
 export interface BaseActivity {
-  lessonId: string;
+  lesson_id: string;
   id: string;
   type: "Writing" | "Quiz" | "Poll";
   title: string;
@@ -24,7 +23,7 @@ export interface BaseActivity {
 
 export interface TextContent {
   id: string;
-  lessonId: number;
+  lesson_id: number;
   type: "TextContent";
   title: string;
   content: string;
@@ -36,8 +35,8 @@ export interface Writing extends BaseActivity {
 }
 
 export interface Quiz extends BaseActivity {
-  passingScore: number;
-  feedbackConfig: {
+  passing_score: number;
+  feedback_config: {
     passing: string;
     failing: string;
   };
@@ -46,10 +45,10 @@ export interface Quiz extends BaseActivity {
 
 export interface Question {
   id: string;
-  quizId: number;
-  questionText: string;
-  questionType: "multiple_choice" | "true_false" | "multiple_select";
-  hasCorrectAnswer: boolean;
+  quiz_id: number;
+  question_text: string;
+  question_type: "multiple_choice" | "true_false" | "multiple_select";
+  has_correct_answer: boolean;
   order: number;
   image?: string;
   caption?: string;
@@ -61,9 +60,9 @@ export interface Question {
     }[];
     
   };
-  isRequired: boolean;
+  is_required: boolean;
   attempts?: number;
-  feedbackConfig: {
+  feedback_config: {
     correct: string;
     incorrect: string;
   };
@@ -71,21 +70,21 @@ export interface Question {
 
 export interface Poll extends BaseActivity {
   config: {
-    showResults: boolean;
-    allowAnonymous: boolean;
+    show_results: boolean;
+    allow_anonymous: boolean;
   };
   questions: PollQuestion[];
 }
 
 export interface PollQuestion {
   id: string;
-  pollId: number;
-  questionText: string;
+  poll_id: number;
+  question_text: string;
   options: {
     id: number;
     text: string;
   }[];
-  allowMultiple: boolean;
+  allow_multiple: boolean;
   order: number;
 }
 
@@ -101,10 +100,10 @@ export interface PollQuestion {
  * updating the store.
  */
 export interface LessonResponse {
-  lessonId: string | null;
-  highestActivity: number;
-  timeSpent: number;
-  responseData: {
+  lesson_id: string | null;
+  highest_activity: number;
+  time_spent: number;
+  response_data: {
     TextContent: TextContentResponse[];
     Quiz: QuizResponse[];
     Question: QuestionResponse[];
@@ -122,16 +121,15 @@ export interface LessonResponse {
  */
 export interface BaseResponse {
   id: null | string;
-  associatedActivity: string;
-  partialResponse: boolean | null;
-  timeSpent: number;
-  attemptsLeft: number;
+  associated_activity: string;
+  partial_response: boolean | null;
+  time_spent: number;
+  attempts_left: number;
 }
 
 export interface QuizResponse extends BaseResponse {
   score: number | null;
-  highestQuestionReached: number;
-  isComplete: boolean;
+  highest_question_reached: number;
 }
 
 /**
@@ -142,16 +140,15 @@ export interface QuizResponse extends BaseResponse {
  * @extends BaseResponse
  */
 export interface QuestionResponse extends BaseResponse {
-  responseData: { selected: number[] };
-  isCorrect?: boolean;
-  quizId: string;
+  response_data: { selected: number[] };
+  quiz_id: string;
 }
 
 /**
  * @field choices: an array of options by id
  */
 export interface PollQuestionResponse extends BaseResponse {
-  responseData: number[];
+  response_data: number[];
 }
 
 export interface WritingResponse extends BaseResponse {

@@ -14,7 +14,7 @@ export default function TextContent({
     "TextContent",
     textContent,
     true,
-    {attemptsLeft: 0}
+    {attempts_left: 0}
   );
   return (
     <div className="markdown">

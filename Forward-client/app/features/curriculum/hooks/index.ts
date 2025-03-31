@@ -39,7 +39,7 @@ export const useResponse = <
   T extends BaseResponse,
   E extends BaseActivity | Question | PollQuestion | TextContent,
 >(
-  type: keyof NonNullable<LessonResponse["responseData"]>,
+  type: keyof NonNullable<LessonResponse["response_data"]>,
   activity: E,
   trackTime: boolean,
   initialFields?: Omit<T, keyof BaseResponse> &
@@ -47,8 +47,8 @@ export const useResponse = <
 ) => {
   const dispatch = useDispatch<AppDispatch>();
   const state = useSelector((state: RootState) =>
-    state.response.responseData[type].find(
-      (s) => s.associatedActivity === activity.id,
+    state.response.response_data[type].find(
+      (s) => s.associated_activity === activity.id,
     ),
   );
 
@@ -59,10 +59,10 @@ export const useResponse = <
       : ({
           ...({
             id: null,
-            associatedActivity: activity.id,
-            timeSpent: 0,
-            attemptsLeft: 0,
-            partialResponse: true,
+            associated_activity: activity.id,
+            time_spent: 0,
+            attempts_left: 0,
+            partial_response: true,
           } satisfies BaseResponse),
           ...(initialFields as Partial<T>),
         } as T),

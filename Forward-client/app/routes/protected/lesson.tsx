@@ -123,7 +123,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                 : 1,
             ),
           );
-          if (loaderData.response) dispatch(setResponse({...loaderData.response, timeSpent: Date.now()}));
+          if (loaderData.response) dispatch(setResponse({...loaderData.response, time_spent: Date.now()}));
         }
       }
     }
@@ -151,7 +151,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                 {lesson.lesson?.activities.map((activityIndex) => {
                   return (
                     <button
-                      disabled={activityIndex.order > response.highestActivity}
+                      disabled={activityIndex.order > response.highest_activity}
                       key={activityIndex.order}
                       className={`${activityIndex.order === lesson.currentActivity ? "bg-accent/40" : ""} disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                       onClick={() => {

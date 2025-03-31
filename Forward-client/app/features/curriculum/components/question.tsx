@@ -17,20 +17,20 @@ export default function Question({
     QuestionResponse,
     Question
   >("Question", question, true, {
-    quizId,
-    responseData: { selected: [] },
-    attemptsLeft: question.attempts || 3,
+    quiz_id: quizId,
+    response_data: { selected: [] },
+    attempts_left: question.attempts || 3,
   });
 
   // question configuration
-  const isMultipleSelect = question.questionType === "multiple_select";
+  const isMultipleSelect = question.question_type === "multiple_select";
   const correctAnswers = question.choices.options.filter(
     (option) => option.is_correct,
   );
-  const selectedAnswers = response.responseData.selected;
+  const selectedAnswers = response.response_data.selected;
 
   // question state
-  const isDisabled = response.attemptsLeft <= 0;
+  const isDisabled = response.attempts_left <= 0;
   const isAnswered =
     selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
 
@@ -49,20 +49,20 @@ export default function Question({
     setResponse((prevResponse) => {
       // new selection state
       const newSelected = isMultipleSelect
-        ? toggleArrayItem(prevResponse.responseData.selected, choiceId)
+        ? toggleArrayItem(prevResponse.response_data.selected, choiceId)
         : [choiceId];
 
       // attempts left
       const newAttemptsLeft = isMultipleSelect
         ? isAnswered
-          ? prevResponse.attemptsLeft - 1
-          : prevResponse.attemptsLeft
-        : prevResponse.attemptsLeft - 1;
+          ? prevResponse.attempts_left - 1
+          : prevResponse.attempts_left
+        : prevResponse.attempts_left - 1;
 
       return {
         ...prevResponse,
-        attemptsLeft: newAttemptsLeft,
-        responseData: { selected: newSelected },
+        attempts_left: newAttemptsLeft,
+        response_data: { selected: newSelected },
       };
     });
   };
@@ -73,8 +73,8 @@ export default function Question({
   const handleSubmit = () => {
     setResponse((prevResponse) => ({
       ...prevResponse,
-      partialResponse: false,
-      attemptsLeft: 0,
+      partial_response: false,
+      attempts_left: 0,
     }));
     saveResponse();
   };
@@ -115,7 +115,7 @@ export default function Question({
         >
           <fieldset>
             <legend className="max-w-[70ch]">
-              {questionNumber + 1}. {question.questionText}
+              {questionNumber + 1}. {question.question_text}
             </legend>
 
             {question.choices.options.map((option) => (
@@ -148,12 +148,12 @@ export default function Question({
             {isCorrect ? (
               <>
                 <span className="text-green-600">Correct!</span>{" "}
-                {question.feedbackConfig.correct}
+                {question.feedback_config.correct}
               </>
             ) : (
               <>
                 <span className="text-error">Not quite!</span>{" "}
-                {question.feedbackConfig.incorrect}
+                {question.feedback_config.incorrect}
               </>
             )}
           </p>
@@ -171,7 +171,7 @@ export default function Question({
         </button>
 
         <p className="text-sm text-gray-600">
-          Attempts left: {response.attemptsLeft}
+          Attempts left: {response.attempts_left}
         </p>
       </div>
     </div>

@@ -11,10 +11,10 @@ import { apiFetch } from "../../../utils/utils";
 import type { RootState } from "@/store";
 
 export const initialLessonResponseState: LessonResponse = {
-  lessonId: null,
-  highestActivity: 1,
-  timeSpent: Date.now(),
-  responseData: { Quiz: [], PollQuestion: [], Writing: [], Question: [], TextContent: [] },
+  lesson_id: null,
+  highest_activity: 1,
+  time_spent: Date.now(),
+  response_data: { Quiz: [], PollQuestion: [], Writing: [], Question: [], TextContent: [] },
 };
 
 /**
@@ -25,19 +25,19 @@ export const saveUserResponseThunk = createAsyncThunk(
   "response/saveUserResponse",
   async (
     data: {
-      type: keyof NonNullable<LessonResponse["responseData"]>;
+      type: keyof NonNullable<LessonResponse["response_data"]>;
       response: BaseResponse;
       trackTime: boolean;
     },
     thunkAPI,
-  ): Promise<{type: keyof NonNullable<LessonResponse["responseData"]>,response: BaseResponse} | undefined> => {
+  ): Promise<{type: keyof NonNullable<LessonResponse["response_data"]>,response: BaseResponse} | undefined> => {
     // compute timeSpent
     const state = thunkAPI.getState() as RootState;
-    const lastTime = state.response.timeSpent;
+    const lastTime = state.response.time_spent;
     data.response = {
       ...data.response,
-      timeSpent: data.trackTime
-        ? data.response.timeSpent + Math.round((Date.now() - lastTime) / 1000)
+      time_spent: data.trackTime
+        ? data.response.time_spent + Math.round((Date.now() - lastTime) / 1000)
         : 0,
     };
 
@@ -65,33 +65,33 @@ export const userLessonDataSlice = createSlice({
       return action.payload;
     },
     incrementHighestActivity: (state) => {
-      state.highestActivity += 1;
+      state.highest_activity += 1;
     },
     decrementHighestActivity: (state) => {
-      state.highestActivity -= 1;
+      state.highest_activity -= 1;
     },
     setHighestActivity: (state, action: PayloadAction<number>) => {
-      state.highestActivity = action.payload;
+      state.highest_activity = action.payload;
     },
     resetTimeSpent: (state) => {
-      state.timeSpent = Date.now();
+      state.time_spent = Date.now();
     },
   },
   extraReducers: (builder) => {
     builder.addCase(saveUserResponseThunk.fulfilled, (state, action) => {
-      if (state.responseData && action.payload) {
+      if (state.response_data && action.payload) {
         const { type, response } = action.payload;
-        const existingResponseIndex = state.responseData[type].findIndex(
-          (s) => s.associatedActivity === response.associatedActivity,
+        const existingResponseIndex = state.response_data[type].findIndex(
+          (s) => s.associated_activity === response.associated_activity,
         );
 
         if (existingResponseIndex >= 0) {
-          state.responseData[type] = state.responseData[type].map(
+          state.response_data[type] = state.response_data[type].map(
             (item, index) =>
               index === existingResponseIndex ? response : (item as any),
           );
         } else {
-          (state.responseData[type] as BaseResponse[]).push(response);
+          (state.response_data[type] as BaseResponse[]).push(response);
         }
       }
     });
