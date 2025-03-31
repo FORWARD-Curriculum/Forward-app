@@ -104,7 +104,7 @@ class User(AbstractUser):
         return {
             "id": self.id,
             "username": self.username,
-            "displayName": self.display_name,
+            "display_name": self.display_name,
         }
 
 class Lesson(models.Model):
@@ -236,7 +236,7 @@ class TextContent(models.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "lessonId": self.lesson_id,
+            "lesson_id": self.lesson_id,
             "type": self.activity_type,
             "title": self.title,
             "content": self.content,
@@ -297,7 +297,7 @@ class BaseActivity(models.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "lessonId": self.lesson_id,
+            "lesson_id": self.lesson_id,
             "type": self.activity_type,
             "title": self.title,
             "instructions": self.instructions,
@@ -344,8 +344,8 @@ class Quiz(BaseActivity):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "passingScore": self.passing_score,
-            "feedbackConfig": self.feedback_config,
+            "passing_score": self.passing_score,
+            "feedback_config": self.feedback_config,
         }
 
 
@@ -416,14 +416,14 @@ class Question(models.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "quizId": self.quiz_id,
-            "questionText": self.question_text,
-            "questionType": self.question_type,
-            "hasCorrectAnswer": self.has_correct_answer,
+            "quiz_id": self.quiz_id,
+            "question_text": self.question_text,
+            "question_type": self.question_type,
+            "has_orrect_answer": self.has_correct_answer,
             "choices": self.choices,
-            "isRequired": self.is_required,
+            "is_required": self.is_required,
             "order": self.order,
-            "feedbackConfig": self.feedback_config
+            "feedback_config": self.feedback_config
         }
 
 
@@ -494,10 +494,10 @@ class PollQuestion(models.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "pollId": self.poll_id,
-            "questionText": self.question_text,
+            "poll_id": self.poll_id,
+            "question_text": self.question_text,
             "options": self.options,
-            "allowMultiple": self.allow_multiple,
+            "allow_multiple": self.allow_multiple,
             "order": self.order,
         }
 
@@ -582,13 +582,13 @@ class UserQuizResponse(models.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "userId": self.user_id,
-            "quizId": self.quiz_id,
+            "user_id": self.user_id,
+            "quiz_id": self.quiz_id,
             "score": self.score,
-            "isComplete": self.is_complete,
+            "is_complete": self.is_complete,
             "completion_percentage": self.completion_percentage,
             "time_spent": self.time_spent,
-            "questionResponses": [qr.to_dict() for qr in self.question_responses.all()]
+            "question_responses": [qr.to_dict() for qr in self.question_responses.all()]
         }
     
 class UserQuestionResponse(models.Model):
@@ -694,10 +694,10 @@ class UserQuestionResponse(models.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "quizResponseId": self.quiz_response_id,
-            "questionId": self.question_id,
-            "responseData": self.response_data,
-            "isCorrect": self.is_correct,
+            "quiz_response_id": self.quiz_response_id,
+            "question_id": self.question_id,
+            "response_data": self.response_data,
+            "is_correct": self.is_correct,
             "time_spent": self.time_spent,
             "feedback": self.feedback
         }
@@ -745,9 +745,9 @@ class BaseResponse(models.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "partialResponse": self.partial_response,
-            "timeSpent": self.time_spent,
-            "attemptsLeft": self.attempts_left
+            "partial_response": self.partial_response,
+            "time_spent": self.time_spent,
+            "attempts_left": self.attempts_left
         }
 
 class WritingResponse(BaseResponse):
@@ -763,7 +763,7 @@ class WritingResponse(BaseResponse):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "associatedActivity": self.writing.id,
+            "associated_activity": self.writing.id,
             "response": self.response
             }
 
@@ -778,7 +778,7 @@ class TextContentResponse(BaseResponse):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "associatedActivity": self.text_content.id,
+            "associated_activity": self.text_content.id,
             }
 
 class PollQuestionResponse(BaseResponse):
@@ -796,7 +796,7 @@ class PollQuestionResponse(BaseResponse):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "associatedActivity": self.poll.id,
-            "responseData": self.response_data
+            "associated_activity": self.poll.id,
+            "response_data": self.response_data
             }
         
