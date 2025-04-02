@@ -92,7 +92,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   const { hash } = useLocation();
   const lesson = useSelector((state: RootState) => state.lesson);
   const response = useSelector((state: RootState) => state.response);
-  const activity = lesson.lesson?.activities[lesson.currentActivity - 1];
+  const activity = lesson.lesson?.activities[lesson.current_activity - 1];
   const [showsScrolBtn, setShowScrolBtn] = useState(false);
 
   // Mount/Unmount
@@ -153,7 +153,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                     <button
                       disabled={activityIndex.order > response.highest_activity}
                       key={activityIndex.order}
-                      className={`${activityIndex.order === lesson.currentActivity ? "bg-accent/40" : ""} disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
+                      className={`${activityIndex.order === lesson.current_activity ? "bg-accent/40" : ""} disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                       onClick={() => {
                         dispatch(setActivity(activityIndex.order));
                         history.replaceState(
@@ -212,7 +212,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         <div className="mt-auto flex">
           <Link
             prefetch="intent"
-            to={"#" + (lesson.currentActivity + 1)}
+            to={"#" + (lesson.current_activity + 1)}
             className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2"
             onClick={() => {
               dispatch(nextActivity());

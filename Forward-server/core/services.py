@@ -180,18 +180,18 @@ class ResponseService:
         lesson = Lesson.objects.get(id=lesson_id)
         
         out_dict = {} 
-        out_dict['lessonId'] = lesson.id
-        out_dict['responseData'] = {}
+        out_dict['lesson_id'] = lesson.id
+        out_dict['response_data'] = {}
         
-        out_dict['responseData']['TextContent'] = [a.to_dict() for a in list(TextContentResponse.objects.filter(lesson=lesson,user=user))]
-        out_dict['responseData']['Quiz'] = []#[a.to_dict() for a in list(QuizResponse.objects.filter(lesson=lesson,user=user))]
-        out_dict['responseData']['Question'] = []#[a.to_dict() for a in list(QuestionResponse.objects.filter(lesson=lesson,user=user))]
-        out_dict['responseData']['PollQuestion'] = [a.to_dict() for a in list(PollQuestionResponse.objects.filter(lesson=lesson,user=user))]
-        out_dict['responseData']['Writing'] = [a.to_dict() for a in list(WritingResponse.objects.filter(lesson=lesson,user=user))]
+        out_dict['response_data']['TextContent'] = [a.to_dict() for a in list(TextContentResponse.objects.filter(lesson=lesson,user=user))]
+        out_dict['response_data']['Quiz'] = []#[a.to_dict() for a in list(QuizResponse.objects.filter(lesson=lesson,user=user))]
+        out_dict['response_data']['Question'] = []#[a.to_dict() for a in list(QuestionResponse.objects.filter(lesson=lesson,user=user))]
+        out_dict['response_data']['PollQuestion'] = [a.to_dict() for a in list(PollQuestionResponse.objects.filter(lesson=lesson,user=user))]
+        out_dict['response_data']['Writing'] = [a.to_dict() for a in list(WritingResponse.objects.filter(lesson=lesson,user=user))]
         
-        out_dict['highestActivity'] = 0
-        for value in out_dict['responseData'].values():
-            out_dict['highestActivity'] += len(value)
+        out_dict['highest_activity'] = 1
+        for value in out_dict['response_data'].values():
+            out_dict['highest_activity'] += len(value)
             
         return {
             "response": out_dict
