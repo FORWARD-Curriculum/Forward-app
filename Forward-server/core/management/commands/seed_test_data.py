@@ -19,8 +19,8 @@ class Command(BaseCommand):
         parser.add_argument(
             '--data-dir',
             type=str,
-            default='seed_data',
-            help='Directory containing JSON seed files (default: seed_data)',
+            default='seed_data_test',
+            help='Directory containing JSON seed files (default: seed_data_test)',
         )
 
     def handle(self, *args, **options):
