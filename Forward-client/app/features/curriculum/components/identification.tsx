@@ -43,12 +43,12 @@ export default function Identification({
 
   return (
     <>
-      <p>Clicked amt: {numberClicked}</p>
+    <p className="mb-4 font-light">{identification.instructions}</p>
       <MarkdownTTS
         customComponents={{ correct: Correct}}
-        controlsOrientation="vertical"
-        controlsClassName="flex flex-row-reverse gap-2"
-        className="remark max-w-[100ch]"
+        controlsOrientation="horizontal"
+        controlsClassName="flex flex-col"
+        className="remark **:max-w-[100ch] !p-16 !pt-10"
       >
         {identification.content}
       </MarkdownTTS>

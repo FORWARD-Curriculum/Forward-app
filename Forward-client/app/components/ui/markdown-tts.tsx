@@ -40,7 +40,7 @@ export const Def: React.FC<DefinitionProps> = ({ def, children }) => {
           user?.preferences?.theme || ""
         } ${user?.preferences?.text_size || ""} bg-secondary text-secondary-foreground text-base`}
       >
-        <MarkdownTTS className="flex flex-row-reverse items-end gap-2">
+        <MarkdownTTS controlsClassName="flex gap-2">
           <h1 className="text-xl font-bold">
             <span className="text-accent">
               Definition:<span className="text-[0px] opacity-0">.</span>

@@ -162,6 +162,7 @@ class Command(BaseCommand):
         for data in identification_data:
             title = data['title']
             lesson_title = data['lesson']
+            instructions = data.get('instructions', '')
             
             if lesson_title not in lessons:
                 self.stdout.write(self.style.ERROR(f'Lesson not found: {lesson_title}'))
@@ -170,6 +171,7 @@ class Command(BaseCommand):
             content, created = Identification.objects.update_or_create(
                 lesson=lessons[lesson_title],
                 title=title,
+                instructions = data.get('instructions', ''),
                 defaults={
                     'content': data.get('content', ''),
                     'order': data.get('order', 0),

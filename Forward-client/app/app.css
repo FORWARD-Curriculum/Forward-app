@@ -468,7 +468,7 @@ Documentation: style.txt
     /* Fonts from the sans-serif generic family are easier to read
     on the screen. Sans-serif means 'without wiggles'. */
     font-family: 'Times New Roman', Times, serif, Sans-serif;
-    color: var(--color-secondary-foreground);
+    color: var(--secondary-foreground) !important;
 
     /* Limit the width of the content. This makes it easier to read. */
 
@@ -484,9 +484,7 @@ Documentation: style.txt
 {
     /* Using more space between lines of text makes it easier to read. */
     line-height: 1.3em;
-
-    /* Push the footer out of sight. */
-    min-height: 100vh;
+    color: var(--color-secondary-foreground);
 }
 
 /* Verbatim content */
@@ -504,7 +502,7 @@ Documentation: style.txt
     font-family: 'Consolas', 'Inconsolata', monospace;
 
     /* Use light blue as a background color. */
-    background-color: hsl(220, 100%, 97%);
+    background-color: var(--color-muted);
 
     /* Give the content margins. */
     margin-top: 1em;
@@ -710,7 +708,6 @@ Documentation: style.txt
 {
     /* Make the font of the defined thing larger. */
     font-size: 1.1em;
-    color: rgb(0, 51, 140);
     padding-bottom: 0em;
 }
 
@@ -942,7 +939,6 @@ in the 'remark-footer' div. */
     /* Make the footer small. */
     font-size: 0.7em;
     /* Make the footer neutrally colored. */
-    color: #716f64;
 }
 
 .remark-footer a 
@@ -994,7 +990,6 @@ in the 'remark-footer' div. */
     padding: 0;
     margin: 0;
     font-size: 1.25em;
-    color: black;
 }
 
 .remark span.Equation-Number:after

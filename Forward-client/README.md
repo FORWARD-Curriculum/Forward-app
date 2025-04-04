@@ -12,7 +12,8 @@ In production `npm run build` builds and bundles the entire application into an 
 
 ## Todos
 
-- Rework activities to send partial response data on leave OR periodically send partial respoinse data.
+- Add custom markdown documentation
+- update views for identification activity
 - Ping server on firstload if user logged in to check for stale session
 - Fully interface backend with userResponseData api
 - Add definition activity type
