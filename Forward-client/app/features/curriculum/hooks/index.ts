@@ -47,9 +47,10 @@ export const useResponse = <
 ) => {
   const dispatch = useDispatch<AppDispatch>();
   const state = useSelector((state: RootState) =>
+    state.response.response_data[type]?
     state.response.response_data[type].find(
       (s) => s.associated_activity === activity.id,
-    ),
+    ):null,
   );
 
   // Create state as before

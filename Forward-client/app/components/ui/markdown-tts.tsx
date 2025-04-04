@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, type JSX, useState } from "react";
 import { useRemark } from "react-remarkify";
 import { useSpeech, useVoices } from "react-text-to-speech";
 import rehypeRaw from "rehype-raw";
@@ -11,6 +11,15 @@ import { cn } from "@/utils/utils";
 import type { SpeechStatus } from "react-text-to-speech/types";
 import { FileVolume, Play, Square } from "lucide-react";
 import { sortEngFirst } from "@/routes/protected/account";
+import type { Components } from "hast-util-to-jsx-runtime";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export interface DefinitionProps extends React.HTMLAttributes<HTMLElement> {
   def?: string;
@@ -53,11 +62,13 @@ export default function MarkdownTTS({
   controlsOrientation = "vertical",
   children,
   className,
+  customComponents,
 }: {
   controlsClassName?: ClassNameValue;
   className?: ClassNameValue;
   children: React.ReactNode;
   controlsOrientation?: "vertical" | "horizontal";
+  customComponents?: Partial<Components>;
 }) {
   const { voices } = useVoices();
   const renderedMarkdown = useRemark({
@@ -68,6 +79,7 @@ export default function MarkdownTTS({
     rehypeReactOptions: {
       components: {
         def: Def,
+        ...customComponents,
       },
     },
   });
@@ -76,17 +88,24 @@ export default function MarkdownTTS({
   const speech = useSpeech({
     text: typeof children == "string" ? renderedMarkdown : children,
     highlightText: true,
-    voiceURI: user?.preferences.speech_uri_index? sortEngFirst(voices).at(user?.preferences.speech_uri_index)?.voiceURI:"",
+    voiceURI: user?.preferences.speech_uri_index
+      ? sortEngFirst(voices).at(user?.preferences.speech_uri_index)?.voiceURI
+      : "",
   });
 
   return (
     <div className={cn(className)}>
       <div className={cn(controlsClassName)}>
-      <MarkdownTTSControls
-        speech={speech}
-        orientation={controlsOrientation}
-      />
-      <TtsMDRenderer Text={speech.Text()} speechStatus={speech.speechStatus} /></div>
+        <MarkdownTTSControls
+          speech={speech}
+          orientation={controlsOrientation}
+          customComponents={customComponents ? true : false}
+        />
+        <TtsMDRenderer
+          Text={speech.Text()}
+          speechStatus={speech.speechStatus}
+        />
+      </div>
     </div>
   );
 }
@@ -95,12 +114,17 @@ export function MarkdownTTSControls({
   speech,
   className,
   orientation = "vertical",
+  customComponents,
 }: {
   speech: ReturnType<typeof useSpeech>;
   className?: ClassNameValue;
   orientation: "vertical" | "horizontal";
+  customComponents: boolean;
 }) {
+  const [warned, setWarned] = useState(!customComponents);
+  const [isWarningDialogOpen, setIsWarningDialogOpen] = useState(false);
   // TODO: Pausing is not handled by library, at least as far as I can tell
+  useEffect(() => {console.log(warned,isWarningDialogOpen)},[warned,isWarningDialogOpen])
   return (
     <div
       className={cn(
@@ -110,10 +134,47 @@ export function MarkdownTTSControls({
     >
       <FileVolume />
       {speech.speechStatus === "stopped" || speech.speechStatus == "paused" ? (
-        <Play className="cursor-pointer" onClick={speech.start} />
+        <Play
+          className="cursor-pointer"
+          onClick={() => {
+            warned ? speech.start() : setIsWarningDialogOpen(true);
+          }}
+        />
       ) : (
         <Square className="cursor-pointer" onClick={speech.stop} />
       )}
+      <Dialog open={isWarningDialogOpen} onOpenChange={setIsWarningDialogOpen}>
+        <DialogContent className="bg-secondary text-secondary-foreground border-1 border-secondary-border">
+          <DialogHeader>
+            <DialogTitle>Warning</DialogTitle>
+            <DialogDescription>
+              Any progress in the current activity will be lost if you start
+              reading the text. Are you sure you want to continue with reading?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-evenly gap-5">
+          <button
+              className="bg-primary text-primary-foreground border-1 border-primary-border rounded px-4 py-2 w-full"
+              onClick={() => {
+                setWarned(true);
+                setIsWarningDialogOpen(false);
+                speech.start();
+              }}
+            >
+              Yes
+            </button>
+            <button
+              className="bg-error text-primary-foreground border-1 border-error-border rounded px-4 py-2 w-full"
+              onClick={() => {
+                setWarned(true);
+                setIsWarningDialogOpen(false);
+              }}
+            >
+              No
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -158,7 +219,7 @@ function TtsMDRenderer({
   return (
     <div className="">
       {/* Wrap the rendered content in a ref container */}
-      <div ref={contentRef}>{Text}</div>
+      <div ref={contentRef} id="remark">{Text}</div>
     </div>
   );
 }

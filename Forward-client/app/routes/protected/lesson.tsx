@@ -6,6 +6,7 @@ import {
   type Quiz as QuizType,
   type Writing as WritingType,
   type LessonResponse,
+  type Identification as IdentificationType,
 } from "@/features/curriculum/types";
 import type { Route } from "./+types/lesson";
 import { apiFetch } from "@/utils/utils";
@@ -16,6 +17,7 @@ import TextContent from "@/features/curriculum/components/textcontent";
 import Poll from "@/features/curriculum/components/poll";
 import Quiz from "@/features/curriculum/components/quiz";
 import Writing from "@/features/curriculum/components/writing";
+import Identification from "@/features/curriculum/components/identification";
 import { useClient } from "@/hooks/useClient";
 import {
   Accordion,
@@ -69,20 +71,17 @@ export function Activity({
 
   switch (activity?.type) {
     case "Writing":
-      // Add the key prop
       return <Writing key={key} writing={activity as WritingType} />;
     case "Quiz":
-      // Add the key prop
       return <Quiz key={key} quiz={activity as QuizType} />;
     case "Poll":
-      // Add the key prop
       return <Poll key={key} poll={activity as PollType} />;
     case "TextContent":
-      // Add the key prop
-      return <TextContent key={key} textContent={activity} />;
+      return <TextContent key={key} textContent={activity as TextContentType} />;
+    case "Identification":
+      return <Identification key={key} identification={activity as IdentificationType}/>
     default:
-      // Add the key prop
-      return <p key={key}>Invalid</p>;
+      return <p>Out of bounds</p>;
   }
 }
 
@@ -202,6 +201,8 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                 TextContent: "Info",
                 Poll: "Poll",
                 Default: "Activity",
+                ConceptMap: "Concept Map",
+                Identification: "Identification",
               }[activity?.type || "Default"]
             }
             :{" "}

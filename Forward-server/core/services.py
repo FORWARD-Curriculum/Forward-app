@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, UserQuizResponse, UserQuestionResponse, TextContentResponse, PollQuestionResponse, WritingResponse
+from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, UserQuizResponse, UserQuestionResponse, TextContentResponse, PollQuestionResponse, WritingResponse, IdentificationResponse, Identification
 
 class UserService:
     @staticmethod
@@ -155,6 +155,11 @@ class LessonService:
         for writing in writing_activities:
             writing_dict = writing.to_dict()
             lesson_dict['activities'][writing.order] = writing_dict
+        
+        identifications = list(Identification.objects.filter(lesson_id=lesson_id).order_by('order'))
+        for ident in identifications:
+            activity_dict = ident.to_dict()
+            lesson_dict['activities'][ident.order] = activity_dict
             
         lesson_dict['activities'] = list(lesson_dict['activities'].values())
 
@@ -188,6 +193,7 @@ class ResponseService:
         out_dict['response_data']['Question'] = []#[a.to_dict() for a in list(QuestionResponse.objects.filter(lesson=lesson,user=user))]
         out_dict['response_data']['PollQuestion'] = [a.to_dict() for a in list(PollQuestionResponse.objects.filter(lesson=lesson,user=user))]
         out_dict['response_data']['Writing'] = [a.to_dict() for a in list(WritingResponse.objects.filter(lesson=lesson,user=user))]
+        out_dict['response_data']['Identification'] = [a.to_dict() for a in list(IdentificationResponse.objects.filter(lesson=lesson,user=user))]
         
         out_dict['highest_activity'] = 1
         for value in out_dict['response_data'].values():

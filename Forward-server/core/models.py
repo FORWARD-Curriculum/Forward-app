@@ -325,6 +325,24 @@ class Writing(BaseActivity):
             "prompts": self.prompts
         }
 
+class Identification(BaseActivity):
+    """Model for students to identify key phrases or concepts in a text."""
+    content = models.CharField(
+        max_length=50000,
+        default="",
+    )
+    
+    minimum_correct = models.PositiveIntegerField(default=0)
+    
+    feedback = models.CharField(max_length=2000,default="")
+    
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content,
+            "minimum_correct": self.minimum_correct,
+            "feedback": self.feedback
+        }
 
 class Quiz(BaseActivity):
     """Model for quiz activities that contain multiple questions and track scores."""
@@ -799,4 +817,17 @@ class PollQuestionResponse(BaseResponse):
             "associated_activity": self.poll.id,
             "response_data": self.response_data
             }
-        
+    
+class IdentificationResponse(BaseResponse):
+    identification = models.ForeignKey(
+        Identification,
+        on_delete=models.CASCADE,
+        related_name='associated_identification',
+        help_text='The identification activity associated with this response'
+    )
+    
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "associated_activity": self.identification.id,
+            }

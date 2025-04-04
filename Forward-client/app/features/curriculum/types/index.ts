@@ -8,26 +8,21 @@ export interface Lesson {
   order: number;
   tags: string[];
   image: string | undefined;
-  activities: (BaseActivity | TextContent)[];
+  activities: BaseActivity[];
 }
 //-------------------------- Activities -----------------------------{
 
 export interface BaseActivity {
-  lesson_id: string;
   id: string;
-  type: "Writing" | "Quiz" | "Poll";
+  lesson_id: string;
+  type: "Writing" | "Quiz" | "Poll" | "ConceptMap" | "TextContent" | "Identification";
   title: string;
-  instructions: string;
+  instructions: string | null;
   order: number;
 }
 
-export interface TextContent {
-  id: string;
-  lesson_id: number;
-  type: "TextContent";
-  title: string;
+export interface TextContent extends BaseActivity {
   content: string;
-  order: number;
 }
 
 export interface Writing extends BaseActivity {
@@ -88,6 +83,25 @@ export interface PollQuestion {
   order: number;
 }
 
+export interface ConceptMap extends BaseActivity {
+  summary: string;
+  items: {
+    term: string;
+    image: string;
+    definition: string;
+  }[]
+}
+
+/**
+ * @field content: A markdown string with <correct></correct> tags
+ * surrounding the correct phrases for the uset to identify.
+ */
+export interface Identification extends BaseActivity {
+  content: string;
+  minimum_correct: number;
+  feedback: string;
+}
+
 //}----------------------- Responses -----------------
 
 /**
@@ -109,6 +123,8 @@ export interface LessonResponse {
     Question: QuestionResponse[];
     PollQuestion: PollQuestionResponse[];
     Writing: WritingResponse[];
+    ConceptMap: ConceptMapResponse[];
+    Identification: IdentificationResponse[];
   };
 }
 
@@ -156,3 +172,5 @@ export interface WritingResponse extends BaseResponse {
 }
 
 export interface TextContentResponse extends BaseResponse {}
+export interface ConceptMapResponse extends BaseResponse {}
+export interface IdentificationResponse extends BaseResponse {}
