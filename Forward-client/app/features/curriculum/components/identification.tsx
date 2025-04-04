@@ -13,7 +13,7 @@ export default function Identification({
 }: {
   identification: Identification;
 }) {
-  useResponse<IdentificationResponse, Identification>(
+  const [response] = useResponse<IdentificationResponse, Identification>(
     "Identification",
     identification,
     true,
@@ -25,7 +25,7 @@ export default function Identification({
     const Component: React.FC<React.HTMLAttributes<HTMLElement>> = ({
       children,
     }) => {
-      const [clicked, setClicked] = useState(false);
+      const [clicked, setClicked] = useState(!response.partial_response);
       return (
         <span
           className={`${clicked ? "bg-yellow-400/80" : ""}`}

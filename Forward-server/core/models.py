@@ -826,11 +826,8 @@ class IdentificationResponse(BaseResponse):
         help_text='The identification activity associated with this response'
     )
     
-    complete = models.BooleanField(default=False)
-    
     def to_dict(self):
         return {
             **super().to_dict(),
             "associated_activity": self.identification.id,
-            "complete": self.complete,
             }

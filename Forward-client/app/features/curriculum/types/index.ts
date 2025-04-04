@@ -173,6 +173,4 @@ export interface WritingResponse extends BaseResponse {
 
 export interface TextContentResponse extends BaseResponse {}
 export interface ConceptMapResponse extends BaseResponse {}
-export interface IdentificationResponse extends BaseResponse {
-  completed: boolean;
-}
+export interface IdentificationResponse extends BaseResponse {}
