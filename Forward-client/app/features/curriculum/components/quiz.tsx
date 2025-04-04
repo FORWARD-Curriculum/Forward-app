@@ -4,7 +4,7 @@ import type {
   QuizResponse,
 } from "@/features/curriculum/types";
 import { useLocation } from "react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useResponse } from "@/features/curriculum/hooks";
 import Question from "./question";
 
@@ -14,12 +14,23 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
     parseInt(hash.substring(1).split("/").at(1) || "1"),
   );
 
-  const [response, setResponse] = useResponse<QuizResponse, Quiz>(
-    "Quiz",
-    quiz,
-    false,
-    { highest_question_reached: 0, score: 0 },
-  );
+  const [response, setResponse] = useResponse<QuizResponse, Quiz>({
+    type: "Quiz",
+    activity: quiz,
+    trackTime: false,
+    initialFields: { highest_question_reached: 1, score: 0 },
+  });
+
+  const [done,setDone] = useState(false);
+
+  useEffect(() => {
+    console.log(done,response.highest_question_reached,quiz.questions.length)
+    if (done && response.highest_question_reached == quiz.questions.length) {
+      setResponse((prevResponse) => ({
+        ...prevResponse,
+        partial_response: false,
+      }));}
+  }, [done]);
 
   return (
     <div>
@@ -28,7 +39,13 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
       {quiz.questions.map((question: QuestionType, questionNumber) => {
         if (currentQuestion - 1 === questionNumber)
           return (
-            <Question key={questionNumber} question={question} questionNumber={questionNumber} quizId={quiz.id} />
+            <Question
+              key={questionNumber}
+              question={question}
+              questionNumber={questionNumber}
+              quizId={quiz.id}
+              setDone={setDone}
+            />
           );
       })}
       <div className="mx-auto flex w-full justify-center">

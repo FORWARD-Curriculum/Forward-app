@@ -130,6 +130,7 @@ export default function MarkdownTTS({
   const speech = useSpeech({
     text: typeof children == "string" ? renderedMarkdown : children,
     highlightText: true,
+    rate: user?.preferences.speech_speed,
     voiceURI: user?.preferences.speech_uri_index
       ? sortEngFirst(voices).at(user?.preferences.speech_uri_index)?.voiceURI
       : "",

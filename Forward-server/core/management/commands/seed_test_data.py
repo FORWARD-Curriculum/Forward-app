@@ -172,6 +172,7 @@ class Command(BaseCommand):
                 lesson=lessons[lesson_title],
                 title=title,
                 instructions = data.get('instructions', ''),
+                minimum_correct=data.get('minimum_correct', 0),
                 defaults={
                     'content': data.get('content', ''),
                     'order': data.get('order', 0),

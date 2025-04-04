@@ -2,7 +2,8 @@ import { setUser } from "@/features/account/slices/userSlice";
 import { useDispatch } from "react-redux";
 import { apiFetch } from "@/utils/utils";
 import type { User } from "@/features/account/types";
-import { initialLessonResponseState, setResponse } from "@/features/curriculum/slices/userLessonDataSlice";
+import { initialLessonResponseState, resetResponseState, setResponse } from "@/features/curriculum/slices/userLessonDataSlice";
+import { resetInitialLessonState } from "@/features/curriculum/slices/lessonSlice";
 
 // Function to get the CSRF token from cookies
 const getCookie = (name: string) => {
@@ -46,7 +47,8 @@ export const useAuth = () => {
       const result = await response.json();
 
       dispatch(setUser(null));
-      dispatch(setResponse(initialLessonResponseState))
+      dispatch(resetResponseState());
+      dispatch(resetInitialLessonState());
       
       if (!response.ok) {
         throw new Error(result.detail);

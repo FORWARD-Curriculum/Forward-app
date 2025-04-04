@@ -117,6 +117,7 @@ export interface LessonResponse {
   lesson_id: string | null;
   highest_activity: number;
   time_spent: number;
+  current_response: BaseResponse | null;
   response_data: {
     TextContent: TextContentResponse[];
     Quiz: QuizResponse[];
@@ -138,7 +139,7 @@ export interface LessonResponse {
 export interface BaseResponse {
   id: null | string;
   associated_activity: string;
-  partial_response: boolean | null;
+  partial_response: boolean;
   time_spent: number;
   attempts_left: number;
 }

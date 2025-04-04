@@ -211,18 +211,22 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         </h1>
         <Activity activity={activity} />
         <div className="mt-auto flex">
-          <Link
-            prefetch="intent"
-            to={"#" + (lesson.current_activity + 1)}
-            className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2"
+          <button
+            disabled={response.current_response?.partial_response || undefined}
+            className="bg-primary disabled:hidden text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2"
             onClick={() => {
               dispatch(nextActivity());
               dispatch(incrementHighestActivity());
+              history.replaceState(
+                  null,
+                  "",
+                  "#" + (lesson.current_activity + 1),
+                );
             }}
           >
             Save and Continue
             <ArrowRightIcon className="!text-primary-foreground" />
-          </Link>
+          </button>
         </div>
       </div>
     </div>

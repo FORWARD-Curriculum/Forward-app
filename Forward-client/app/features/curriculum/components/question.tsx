@@ -8,18 +8,25 @@ export default function Question({
   question,
   questionNumber,
   quizId,
+  setDone,
 }: {
   question: Question;
   questionNumber: number;
   quizId: string;
+  setDone: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [response, setResponse, saveResponse] = useResponse<
     QuestionResponse,
     Question
-  >("Question", question, true, {
-    quiz_id: quizId,
-    response_data: { selected: [] },
-    attempts_left: question.attempts || 3,
+  >({
+    type: "Question",
+    activity: question,
+    initialFields: {
+      quiz_id: quizId,
+      response_data: { selected: [] },
+      attempts_left: question.attempts || 3,
+    },
+    nonRootActivity: true,
   });
 
   // question configuration
@@ -76,6 +83,7 @@ export default function Question({
       partial_response: false,
       attempts_left: 0,
     }));
+    setDone(true);
     saveResponse();
   };
 

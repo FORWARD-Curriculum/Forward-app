@@ -13,6 +13,7 @@ export default function Header() {
   const { logout } = useAuth();
   const { windowDimensions } = useClient();
   const user = useSelector((state: RootState) => state.user.user);
+  const lesson = useSelector((state: RootState) => state.lesson);
 
   const [open, setOpen] = React.useState(false);
 
@@ -36,10 +37,7 @@ export default function Header() {
               <Link prefetch="intent" to={"/dashboard"}>Dashboard</Link>
             </li>
             <li>
-              <Link prefetch="intent" to={"/lessons"}>Lessons</Link>
-            </li>
-            <li>
-              <Link prefetch="intent" to={"/activities"}>Activities</Link>
+            {lesson.lesson &&<Link prefetch="intent" to={"/lesson/"+lesson.lesson.id+"#" + (lesson.current_activity)}>Lesson</Link>}
             </li>
             <li>
               {/* BUG: radixui applies a data-scroll-lock css class to the body with the
@@ -123,8 +121,7 @@ export default function Header() {
               </Sheet.SheetTitle>
               <div className="*:bg-secondary text-secondary-foreground *:outline-secondary-border flex flex-col space-y-1 *:flex *:justify-between *:rounded-xl *:p-4 *:outline-1 *:active:bg-gray-200/80">
                 <Link prefetch="intent" to={"/dashboard"}>Dashboard</Link>
-                <Link prefetch="intent" to={"/lessons"}>Lessons</Link>
-                <Link prefetch="intent" to={"/activities"}>Activities</Link>
+                {lesson.lesson &&<Link prefetch="intent" to={"/lesson/"+lesson.lesson.id+"#" + (lesson.current_activity)}>Lesson</Link>}
               </div>
               {user ? (
                 <div className="group mt-auto flex flex-col gap-4">

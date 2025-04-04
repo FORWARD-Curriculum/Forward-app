@@ -13,10 +13,15 @@ In production `npm run build` builds and bundles the entire application into an 
 ## Todos
 
 - Add custom markdown documentation
-- update views for identification activity
+- update views for identification activity (response data)
 - Ping server on firstload if user logged in to check for stale session
 - Fully interface backend with userResponseData api
-- Add definition activity type
+- Activities to add:
+  * Slideshow
+  * Video
+  * Composite (choose your own order (see end of Going to College lesson))
+  * Concept Map (definition)
+- Collapse responses view to be a switch statement on activity type to reduce URL and View count (`/response/<str:activitytype>, ResponseView.as_view()`)
 
 ## Markdown
 This project uses a custom flavor of markdown FORWARD Markdown (FMD). It is a superset of the CommonMark Markdown standard, which includes extra styling options and functionality. The intent is to allow fast easy access to style raw text into a useful format for expressing concepts. 

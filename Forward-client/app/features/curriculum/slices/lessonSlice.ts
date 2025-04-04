@@ -21,10 +21,13 @@ export const lessonSlice = createSlice({
     },
     setActivity: (state, action: PayloadAction<number>) => {
       state.current_activity = action.payload;
+    },
+    resetInitialLessonState: ()=>{
+      return initialState;
     }
   },
 });
 
-export const { setLesson,nextActivity,previousActivity,setActivity } = lessonSlice.actions;
+export const { setLesson,nextActivity,previousActivity,setActivity, resetInitialLessonState } = lessonSlice.actions;
 
 export default lessonSlice.reducer;

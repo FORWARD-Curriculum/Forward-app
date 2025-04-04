@@ -10,14 +10,15 @@ export default function TextContent({
 }: {
   textContent: TextContentType;
 }) {
-  useResponse<TextContentResponse, TextContentType>(
-    "TextContent",
-    textContent,
-    true,
-    {attempts_left: 0}
+  useResponse<TextContentResponse, TextContentType>({
+    type: "TextContent",
+    activity: textContent,
+    initialFields: {attempts_left: 0, partial_response: false}
+  }
   );
   return (
     <div className="markdown">
+      <p>{textContent.id}</p>
       <MarkdownTTS
         controlsClassName="flex gap-2"
         controlsOrientation="vertical"

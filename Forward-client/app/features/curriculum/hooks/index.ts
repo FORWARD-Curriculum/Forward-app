@@ -9,7 +9,10 @@ import {
 import type { AppDispatch, RootState } from "@/store";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { saveUserResponseThunk } from "@/features/curriculum/slices/userLessonDataSlice";
+import {
+  saveUserResponseThunk,
+  setCurrentResponse,
+} from "@/features/curriculum/slices/userLessonDataSlice";
 
 /**
  * Returns a the outut of a `useState<T>()` to be used on for reactive, managed response
@@ -25,6 +28,8 @@ import { saveUserResponseThunk } from "@/features/curriculum/slices/userLessonDa
  * @param initialFields - Due to the nature of generics, the only fields we can guarantee on
  * an initialize are those from the LCD response type {@link BaseResponse}, and so to not have
  * undefined fields can populate them on creation.
+ * @param nonRootActivity - Used to indicate that this is a non-root activity, and thus, should not
+ * be saved as the "current" response, which is used to lock progress on the lesson.
  * @returns `[response, setResponse, saveResponse] as const`
  *
  * @example
@@ -38,19 +43,27 @@ import { saveUserResponseThunk } from "@/features/curriculum/slices/userLessonDa
 export const useResponse = <
   T extends BaseResponse,
   E extends BaseActivity | Question | PollQuestion | TextContent,
->(
-  type: keyof NonNullable<LessonResponse["response_data"]>,
-  activity: E,
-  trackTime: boolean,
+>({
+  type,
+  activity,
+  trackTime=true,
+  initialFields,
+  nonRootActivity=false,
+}: {
+  type: keyof NonNullable<LessonResponse["response_data"]>;
+  activity: E;
+  trackTime?: boolean;
   initialFields?: Omit<T, keyof BaseResponse> &
-    Partial<Pick<T, keyof BaseResponse>>,
-) => {
+    Partial<Pick<T, keyof BaseResponse>>;
+  nonRootActivity?: boolean;
+}) => {
   const dispatch = useDispatch<AppDispatch>();
   const state = useSelector((state: RootState) =>
-    state.response.response_data[type]?
-    state.response.response_data[type].find(
-      (s) => s.associated_activity === activity.id,
-    ):null,
+    state.response.response_data[type]
+      ? state.response.response_data[type].find(
+          (s) => s.associated_activity === activity.id,
+        )
+      : null,
   );
 
   // Create state as before
@@ -75,6 +88,9 @@ export const useResponse = <
   // Update the ref whenever response changes
   useEffect(() => {
     responseRef.current = response;
+    // TODO: Replace the above ref completely with the currentResponse state from
+    // the store, and pull it in the thunk.
+    if (!nonRootActivity) dispatch(setCurrentResponse(response));
   }, [response]);
 
   // Save response to store/server on unmount

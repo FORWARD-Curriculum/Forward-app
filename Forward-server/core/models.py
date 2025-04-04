@@ -754,7 +754,7 @@ class BaseResponse(models.Model):
         help_text='The user who submitted this response'
     )
   
-    partial_response = models.BooleanField(null=True, blank=True)
+    partial_response = models.BooleanField(default=True)
     
     time_spent = models.PositiveIntegerField(default=0)
     

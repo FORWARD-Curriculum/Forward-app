@@ -284,15 +284,16 @@ class TextContentResponseView(APIView):
     
     permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
-        associated_text_content = TextContent.objects.get(id=request.data.get("associatedActivity"))
-        associated_lesson = Lesson.objects.get(id=request.data.get("lessonId"))
+        associated_text_content = TextContent.objects.get(id=request.data.get("associated_activity"))
+        associated_lesson = Lesson.objects.get(id=request.data.get("lesson_id"))
         text_content_response, created = TextContentResponse.objects.get_or_create(
             user=request.user,
             text_content=associated_text_content,
             lesson=associated_lesson,
-            id=request.data.get("id")
+            id=request.data.get("id"),
+            partial_response=request.data.get("partial_response",False),
         )
-        text_content_response.time_spent = request.data.get("timeSpent",0)
+        text_content_response.time_spent = request.data.get("time_spent",0)
         text_content_response.save()
         return json_go_brrr(200,"Successfully saved textContent",text_content_response.to_dict())
         

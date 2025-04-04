@@ -14,7 +14,8 @@ export const initialLessonResponseState: LessonResponse = {
   lesson_id: null,
   highest_activity: 1,
   time_spent: Date.now(),
-  response_data: { Quiz: [], PollQuestion: [], Writing: [], Question: [], TextContent: [] },
+  current_response: null,
+  response_data: { Quiz: [], PollQuestion: [], Writing: [], Question: [], TextContent: [], ConceptMap: [], Identification: [] },
 };
 
 /**
@@ -45,7 +46,7 @@ export const saveUserResponseThunk = createAsyncThunk(
     const response = await apiFetch(`/${data.type.toLowerCase()}/response`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({lessonId: state.lesson.lesson?.id, ...data.response}),
+      body: JSON.stringify({lesson_id: state.lesson.lesson?.id, ...data.response}),
     });
 
 
@@ -64,6 +65,9 @@ export const userLessonDataSlice = createSlice({
     setResponse: (state, action: PayloadAction<LessonResponse>) => {
       return action.payload;
     },
+    resetResponseState: ()=>{
+      return initialLessonResponseState;
+    },
     incrementHighestActivity: (state) => {
       state.highest_activity += 1;
     },
@@ -75,6 +79,9 @@ export const userLessonDataSlice = createSlice({
     },
     resetTimeSpent: (state) => {
       state.time_spent = Date.now();
+    },
+    setCurrentResponse (state, action: PayloadAction<BaseResponse | null>) {
+      state.current_response = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -104,6 +111,8 @@ export const {
   decrementHighestActivity,
   setHighestActivity,
   resetTimeSpent,
+  setCurrentResponse,
+  resetResponseState
 } = userLessonDataSlice.actions;
 
 export default userLessonDataSlice.reducer;

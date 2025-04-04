@@ -5,7 +5,7 @@ import type {
 import { useResponse } from "@/features/curriculum/hooks";
 import type React from "react";
 import MarkdownTTS from "@/components/ui/markdown-tts";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 
 export default function Identification({
@@ -13,12 +13,15 @@ export default function Identification({
 }: {
   identification: Identification;
 }) {
-  const [response] = useResponse<IdentificationResponse, Identification>(
-    "Identification",
-    identification,
-    true,
-  );
+  const [response, setResponse] = useResponse<IdentificationResponse, Identification>({
+    type: "Identification",
+    activity: identification,
+});
   const [numberClicked, setNumberClicked] = useState(0);
+
+  useEffect(()=>{
+    setResponse(o=>({...o,partial_response: numberClicked < identification.minimum_correct}))
+  },[numberClicked])
 
   // Memoize the Correct component to avoid re-creating it on every render
   const Correct = useMemo(() => {
