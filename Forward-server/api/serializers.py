@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-from core.models import User, UserQuizResponse, UserQuestionResponse, Quiz, Question
+from core.models import User, UserQuizResponse, UserQuestionResponse, Quiz, Question, Poll, PollQuestion
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
@@ -262,3 +262,52 @@ class UserQuizResponseDetailSerializer(serializers.ModelSerializer):
         """
         question_responses = obj.question_responses.all()
         return [qr.to_dict() for qr in question_responses]
+
+class PollQuestionResponseSerializer(serializers.Serializer):
+    """
+    Serializer for individual poll question responses within a poll submission
+    """
+    poll_question_id = serializers.UUIDField(required=True)
+    response_data = serializers.JSONField(required=True)
+
+    def validate_poll_question_id(self, value):
+        """Validate that the poll question exists and belongs to the poll"""
+        poll_id = self.context.get('poll_id')
+        if not poll_id:
+            raise serializers.ValidationError("Poll ID is required in context")
+        
+        try:
+            question = PollQuestion.objects.get(id=value, poll_id=poll_id)
+            return value
+        except PollQuestion.DoesNotExist:
+            raise serializers.ValidationError(f"Poll question with ID {value} does not exist in this poll")
+
+class PollSubmissionSerializer(serializers.Serializer):
+    """
+    Serializer for submitting a complete poll response
+    """
+    poll_id = serializers.UUIDField(required=True)
+    lesson_id = serializers.UUIDField(required=True)
+    is_complete = serializers.BooleanField(default=True)
+    question_responses = PollQuestionResponseSerializer(many=True)
+
+    def validate_poll_id(self, value):
+        """Ensure the poll exists"""
+        try:
+            Poll.objects.get(id=value)
+            return value
+        except Poll.DoesNotExist:
+            raise serializers.ValidationError(f"Poll with ID {value} does not exist")
+    
+    def to_internal_value(self, data):
+        """
+        Override to set poll_id in context before validation occurs on nested serializers
+        """
+        # Get the poll_id from the incoming data
+        poll_id = data.get('poll_id')
+        if poll_id:
+            # Update the context for all nested serializers
+            self.context['poll_id'] = poll_id
+            
+        # Continue with normal validation process
+        return super().to_internal_value(data)

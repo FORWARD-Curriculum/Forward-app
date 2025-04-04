@@ -3,14 +3,13 @@ from .views import (
     QuizResponseStatusView, UserRegistrationView, SessionView, CurrentUserView, QuizView,
     LessonView, LessonContentView, TextContentView, WritingView,
     PollView, QuizResponseView, QuizResponseDetailView, GetLessonIds,
-    CurriculumView, TextContentResponseView
+    CurriculumView, TextContentResponseView, PollResponseView
 )
 
 urlpatterns = [
     path('users', UserRegistrationView.as_view(), name='user-register'),
     path('users/me', CurrentUserView.as_view(), name='current-user'),
     path('sessions', SessionView.as_view(), name='sessions'),
-    
     
     path('lesson/ids', GetLessonIds.as_view(), name='lesson-ids'),
     path('lessons', CurriculumView.as_view(), name='curriculum'),
@@ -23,9 +22,10 @@ urlpatterns = [
     path('quizzes/response/<uuid:response_id>', QuizResponseDetailView.as_view(), name='quiz-response-detail'),
     
     path('textcontent/<uuid:id>', TextContentView.as_view(), name='text-content'),
-    path('textcontent/response', TextContentResponseView.as_view(),name='text-content-response'),
+    path('textcontent/response', TextContentResponseView.as_view(), name='text-content-response'),
     
     path('writing/<uuid:id>', WritingView.as_view(), name='writings'),
     
     path('poll/<uuid:id>', PollView.as_view(), name='polls'),
+    path('polls/response', PollResponseView.as_view(), name='poll-responses'),
 ]

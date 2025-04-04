@@ -5,10 +5,14 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, QuizSubmissionSerializer, UserQuizResponseDetailSerializer
-from core.services import UserService, LessonService, QuizResponseService, ResponseService
+from .serializers import (
+    UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, 
+    QuizSubmissionSerializer, UserQuizResponseDetailSerializer,
+    PollSubmissionSerializer
+)
+from core.services import UserService, LessonService, QuizResponseService, ResponseService, PollResponseService
 from .utils import json_go_brrr, messages
-from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, TextContentResponse
+from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, TextContentResponse, PollQuestionResponse
 
 class UserRegistrationView(generics.CreateAPIView):
     """
@@ -332,6 +336,58 @@ class PollView(APIView):
                 "poll": poll.to_dict(),
                 "pollQuestions": [q.to_dict() for q in poll_qs]}},
             status=status.HTTP_200_OK)
+            
+class PollResponseView(APIView):
+    """
+    API endpoint for submitting and retrieving poll responses.
+    
+    POST: Submit a poll response
+    GET: Retrieve a user's poll responses
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, *args, **kwargs):
+        """Submit a poll response"""
+        serializer = PollSubmissionSerializer(data=request.data)
+        if serializer.is_valid():
+            result = PollResponseService.submit_poll_response(
+                user=request.user,
+                data=serializer.validated_data
+            )
+            
+            return json_go_brrr(
+                message="Poll response submitted successfully",
+                data=result,
+                status=status.HTTP_201_CREATED
+            )
+        
+        return json_go_brrr(
+            message="Failed to submit poll response",
+            data=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    def get(self, request, *args, **kwargs):
+        """Retrieve a user's poll responses, optionally filtered by poll_id"""
+        poll_id = request.query_params.get('poll_id')
+        lesson_id = request.query_params.get('lesson_id')
+        
+        if poll_id and lesson_id:
+            # Get responses for a specific poll and lesson
+            responses = PollResponseService.get_poll_response_details(
+                user=request.user,
+                poll_id=poll_id,
+                lesson_id=lesson_id
+            )
+        else:
+            # Get all responses or filtered by poll_id only
+            responses = PollResponseService.get_user_poll_responses(request.user, poll_id)
+        
+        return json_go_brrr(
+            message="Poll responses retrieved successfully",
+            data={'poll_responses': [response.to_dict() for response in responses]},
+            status=status.HTTP_200_OK
+        )
 
 class QuizResponseView(APIView):
     """

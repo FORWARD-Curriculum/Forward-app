@@ -163,7 +163,7 @@ class LessonService:
         }
         
 class ResponseService:
-    staticmethod
+    @staticmethod
     def get_response_data(lesson_id, user):
         """
         Retrieve all content associated with a lesson.
@@ -240,7 +240,7 @@ class QuizResponseService:
             UserQuizResponse: The created/updated quiz response object
         """
         quiz_id = data.get('quiz_id')
-        is_complete = data.get('is_complete', True) # TODO: idk about the default value here
+        is_complete = data.get('is_complete', True)
         question_responses_data = data.get('question_responses', [])
 
         # Get the quiz object
@@ -335,3 +335,85 @@ class QuizResponseService:
             UserQuizResponse.DoesNotExist: If the response doesn't exist or belong to the user
         """
         return UserQuizResponse.objects.get(id=response_id, user=user)
+        
+class PollResponseService:
+    @staticmethod
+    @transaction.atomic
+    def submit_poll_response(user: User, data: dict):
+        """
+        Process a user's poll submission
+
+        Args:
+            user: The user submitting the poll
+            data: Dictionary containing poll submission data (validated by serializer)
+
+        Returns:
+            dict: Dictionary containing processed poll response data
+        """
+        poll_id = data.get('poll_id')
+        lesson_id = data.get('lesson_id')
+        is_complete = data.get('is_complete', True)
+        question_responses_data = data.get('question_responses', [])
+
+        # Get the poll and lesson objects
+        poll = Poll.objects.get(id=poll_id)
+        lesson = Lesson.objects.get(id=lesson_id)
+        
+        responses = []
+
+        # Process each question response
+        for response_data in question_responses_data:
+            poll_question_id = response_data.get('poll_question_id')
+            response_content = response_data.get('response_data')
+
+            # Create or update the poll question response
+            poll_response, _ = PollQuestionResponse.objects.update_or_create(
+                user=user,
+                poll_id=poll_id,
+                lesson=lesson,
+                defaults={
+                    'response_data': response_content,
+                    'partial_response': not is_complete
+                }
+            )
+            
+            responses.append(poll_response)
+
+        return {
+            'poll_responses': [response.to_dict() for response in responses]
+        }
+    
+    @staticmethod
+    def get_user_poll_responses(user, poll_id=None):
+        """
+        Get a user's responses to polls.
+
+        Args:
+            user: The user whose responses to retrieve
+            poll_id: Optional poll ID to filter by
+
+        Returns:
+            QuerySet: User's poll responses
+        """
+        if poll_id:
+            return PollQuestionResponse.objects.filter(user=user, poll_id=poll_id)
+        return PollQuestionResponse.objects.filter(user=user)
+    
+    @staticmethod
+    def get_poll_response_details(user, poll_id, lesson_id):
+        """
+        Get detailed information about poll responses for a specific poll and lesson.
+        
+        Args:
+            user: The user who submitted the responses
+            poll_id: ID of the poll
+            lesson_id: ID of the lesson
+            
+        Returns:
+            QuerySet: The poll question responses
+        """
+        return PollQuestionResponse.objects.filter(
+            user=user,
+            poll_id=poll_id,
+            lesson_id=lesson_id
+        )
