@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, type JSX, useState } from "react";
 import { useRemark } from "react-remarkify";
+import { visit } from "unist-util-visit";
+import remarkDirective from "remark-directive";
 import { useSpeech, useVoices } from "react-text-to-speech";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
@@ -57,6 +59,46 @@ export const Def: React.FC<DefinitionProps> = ({ def, children }) => {
   );
 };
 
+
+function remarkCenterDirective() {
+  return (tree: {type: string, children: any[]}) => {
+    visit(tree, "containerDirective", (node) => {
+      // Check if the directive name is 'center'
+      if (node.name === "center") {
+        // Ensure the node has a data property
+        const data = node.data || (node.data = {});
+
+        // Set the desired HTML tag name
+        data.hName = "div";
+        data.hProperties = { style: "text-align: center;" };
+
+      }
+    });
+  };
+}
+
+function remarkColumnsDirective() {
+  return (tree: { type: string; children: any[] }) => {
+    visit(tree, "containerDirective", (node) => {
+      const data = node.data || (node.data = {});
+      if (node.name === "columns") {
+        data.hName = "div";
+        // Apply flex container styles
+        data.hProperties = {
+          style: "display: flex; gap: 1rem; flex-wrap: wrap;", // Added flex-wrap for responsiveness
+        };
+      } else if (node.name === "col") {
+        data.hName = "div";
+        // Apply flex item styles
+        data.hProperties = {
+          style: "flex: 1 1 0%; min-width: 0;", // Allow columns to grow/shrink, basis 0, prevent overflow
+        };
+      }
+    });
+  };
+}
+
+
 export default function MarkdownTTS({
   controlsClassName,
   controlsOrientation = "vertical",
@@ -74,7 +116,7 @@ export default function MarkdownTTS({
   const renderedMarkdown = useRemark({
     markdown: typeof children == "string" ? children : "",
     rehypePlugins: [rehypeRaw],
-    remarkPlugins: [remarkGfm],
+    remarkPlugins: [remarkGfm, remarkDirective, remarkCenterDirective, remarkColumnsDirective],
     remarkToRehypeOptions: { allowDangerousHtml: true },
     rehypeReactOptions: {
       components: {

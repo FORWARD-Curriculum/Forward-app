@@ -463,11 +463,12 @@ Documentation: style.txt
 */
 
 /* The 'remark-all'-div contains the 'remark'-div and the 'remark-footer'-div */
-#remark
+.remark
 {
     /* Fonts from the sans-serif generic family are easier to read
     on the screen. Sans-serif means 'without wiggles'. */
     font-family: 'Times New Roman', Times, serif, Sans-serif;
+    color: var(--color-secondary-foreground);
 
     /* Limit the width of the content. This makes it easier to read. */
 
@@ -479,7 +480,7 @@ Documentation: style.txt
 }
 
 /* Remark-generated content is contained in the 'remark'-div. */
-#remark
+.remark
 {
     /* Using more space between lines of text makes it easier to read. */
     line-height: 1.3em;
@@ -489,7 +490,7 @@ Documentation: style.txt
 }
 
 /* Verbatim content */
-#remark pre
+.remark pre
 {
     /* Border with a dotted, one-pixel wide rectangle. */
     /*
@@ -519,7 +520,7 @@ Documentation: style.txt
 }
 
 /* Paragraph */
-#remark p
+.remark p
 {
     margin-left: 0em;
     margin-right: 0em;
@@ -528,30 +529,29 @@ Documentation: style.txt
 }
 
 /* Emphasized text */
-#remark em
+.remark em
 {
-    color: #807000;
     font-style: italic;
 }
 
 /* Emphasized text (alternative) */
-#remark strong
+.remark strong
 {
-    color: #807000;
     font-style: bold;
 }
 
 /* Code */
-#remark code
+.remark code
 {
-    color: #505080;
+    color: var(--color-muted-foreground);
 }
 
 /* Level 1 headings */
-#remark h1
+.remark h1
 {
+   text-align: center;
     clear: left;
-    font-size: 1.6em;
+    font-size: var(--txt-3xl);
     margin: 0;
     margin-bottom: 1em;
 
@@ -563,10 +563,10 @@ Documentation: style.txt
 }
 
 /* Level 2 headings */
-#remark h2 
+.remark h2 
 {
     clear: left;
-    font-size: 1.4em;
+    font-size: var(--txt-2xl);
     margin: 1.5em 0em 1em 0em;
 
     /* Draw a dotted line under the heading. */
@@ -576,60 +576,58 @@ Documentation: style.txt
 }
 
 /* Level 3 headings */
-#remark h3 
+.remark h3 
 {
     clear: left;
     margin: 1.5em 0em 1em 0em;
     font-size: 1.2em;
-    color: #356535;
 }
 
 /* Level 4 headings */
-#remark h4 
+.remark h4 
 {
     clear: left;
     font-size: 1.0em;
-    color: #808080;
     margin: 1.5em 0em 1em 0em;
 }
 
 /* Unordered lists */
-#remark ul 
+.remark ul 
 {
     list-style-type: disc;
     /* Be careful if you decide to make this inside;
     in particular, paragraphs <p> have block-display,
     and so out-of-the-box display under the bullet.*/
     list-style-position: outside;
-
+    padding-left: 2.5em !important;
     margin-top: 1em;
     margin-bottom: 1em;
     padding: 0em;
 }
 
 /* Indent nested lists. */
-#remark ul ul
+.remark ul ul
 {
     margin-top: 0em;
     margin-bottom: 0em;
     padding-left: 2em;
 }
 
-#remark ol ul
+.remark ol ul
 {
     margin-top: 0em;
     margin-bottom: 0em;
     padding-left: 2em;
 }
 
-#remark ul ol
+.remark ul ol
 {
     margin-top: 0em;
     margin-bottom: 0em;
     padding-left: 2em;
 }
 
-#remark ol ol
+.remark ol ol
 {
     margin-top: 0em;
     margin-bottom: 0em;
@@ -637,39 +635,38 @@ Documentation: style.txt
 }
 
 /* Ordered lists */
-#remark ol
+.remark ol
 {
     list-style-type: decimal;
     list-style-position: inside;
 
+    padding-left: 2.5em !important;
     margin-top: 1em;
     margin-bottom: 1em;
     padding: 0em;
 }
 
 /* A list item */
-#remark li
+.remark li
 {
     margin-top: 0.25em;
     margin-bottom: 0.25em;
 }
 
 /* Links */
-#remark a 
+.remark a 
 { 
     text-decoration: none; 
-    color: #505090; 
 }
 
 /* Link with a mouse hovering over it. */
-#remark a:hover 
+.remark a:hover 
 { 
     text-decoration: underline;
-    color: #800000; 
 }
 
 /* Tables */
-#remark table
+.remark table
 {
     border-collapse: collapse;
     margin-left: 0;
@@ -678,15 +675,8 @@ Documentation: style.txt
     width: 100%;
 }
 
-/* Tables and cells*/
-#remark table, th, td
-{
-    /* Give them a one-pixel wide border. */
-    /*border: 1px solid black;*/
-}
-
 /* Tables: Cells */
-#remark td, th
+.remark td, th
 {
     /* Give some empty space around the content of a cell. */
     padding-left: 0.5em;
@@ -697,7 +687,7 @@ Documentation: style.txt
 }
 
 /* Table: Cells: Headers */
-#remark th
+.remark th
 {
     text-align: left;
     color: #356535;
@@ -706,17 +696,17 @@ Documentation: style.txt
 }
 
 /* Table: Cells: Data */
-#remark td
+.remark td
 {
 }
 
 /* Definition lists */
-#remark dl
+.remark dl
 {
 }
 
 /* Definition lists: The thing to define. */
-#remark dt
+.remark dt
 {
     /* Make the font of the defined thing larger. */
     font-size: 1.1em;
@@ -725,20 +715,20 @@ Documentation: style.txt
 }
 
 /* Definition lists: The definition of the thing. */
-#remark dd
+.remark dd
 {
     margin-left: 2em;
 }
 
-#remark dl dd
+.remark dl dd
 {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
 }
 
-#remark .ascii-math,
-#remark .latex-math,
-#remark .display-latex-math
+.remark .ascii-math,
+.remark .latex-math,
+.remark .display-latex-math
 {
     /*
     color: red;
@@ -750,7 +740,7 @@ Documentation: style.txt
 /* ---------- */
 
 /* Styling for ParentList lists. */
-#remark .ParentList ol
+.remark .ParentList ol
 {
     /* Use display: none; to remove ParentList from flow.*/
     display: flex;
@@ -765,19 +755,19 @@ Documentation: style.txt
 }
 
 /* Styling for ParentList list-items. */
-#remark .ParentList li
+.remark .ParentList li
 {
 }
 
 /* Styling for Links in ParentList. */
-#remark .ParentList li a
+.remark .ParentList li a
 { 
     display: block;
     padding-bottom: 0em;
 }
 
 /* Add a '/' between subsequent ParentList list-items. */
-#remark .ParentList li + li ::before
+.remark .ParentList li + li ::before
 {
     content: "/";
     padding-left: 0.5em;
@@ -788,7 +778,7 @@ Documentation: style.txt
 /* ------------ */
 
 /* Syling for DocumentTree lists. */
-#remark .DocumentTree ol
+.remark .DocumentTree ol
 {
     /*
     display: flex;
@@ -803,14 +793,14 @@ Documentation: style.txt
     list-style-type: none;
 }
 
-#remark .DocumentTree ol ol
+.remark .DocumentTree ol ol
 {
     /* Give some indendation to nested lists. */
     padding-left: 2em;
 }
 
 /* Styling for DocumentTree list-items. */ 
-#remark .DocumentTree li a
+.remark .DocumentTree li a
 {
     display: block;
 
@@ -824,7 +814,7 @@ Documentation: style.txt
 /* ----------- */
 
 /* Styling for DocChildren lists. */
-#remark .DocChildren ol
+.remark .DocChildren ol
 {
     /* The items are placed side-by-side, until the
     right-edge and they wrap to the next row. */
@@ -840,7 +830,7 @@ Documentation: style.txt
 }
 
 /* Styling for links in DocChildren. */
-#remark .DocChildren li
+.remark .DocChildren li
 {
     display: block;
 
@@ -850,7 +840,7 @@ Documentation: style.txt
 }
 
 /* Styling for links in DocChildren. */
-#remark .DocChildren li a
+.remark .DocChildren li a
 { 
     /* The links are block-based, for increased area. */
     display: block;
@@ -865,7 +855,7 @@ Documentation: style.txt
 /* -------------- */
 
 /* Styling for SourceChildren lists. */
-#remark .SourceChildren ul
+.remark .SourceChildren ul
 {
     /* List the links vertically. */
     display: block;
@@ -879,7 +869,7 @@ Documentation: style.txt
 }
 
 /* Styling for links in SourceChildren. */
-#remark .SourceChildren li a
+.remark .SourceChildren li a
 { 
     /* The links are block-based, for increased area. */
     display: block;
@@ -894,7 +884,7 @@ Documentation: style.txt
 /* ----- */
 
 /* Styling for Index lists. */
-#remark .Index ol
+.remark .Index ol
 {
     /* The items are placed side-by-side, until the
     right-edge and they wrap to the next row. */
@@ -910,13 +900,13 @@ Documentation: style.txt
 }
 
 /* Styling for Index list-items. */ 
-#remark .Index li
+.remark .Index li
 {
     /* At most 2 columns. */
     min-width: 50%;
 }
 
-#remark .Index li a
+.remark .Index li a
 {
     /* The links are block-based, for increased area. */
     display: block;
@@ -929,7 +919,7 @@ Documentation: style.txt
 /* Remark generates the time-date and the link to itself 
 in the 'remark-footer' div. */
 
-#remark-footer 
+.remark-footer 
 {
     /* Use this to hide the footer. */ 
     /* display: none; */
@@ -946,7 +936,7 @@ in the 'remark-footer' div. */
     margin-right: 0em;
 }
 
-#remark-footer p 
+.remark-footer p 
 {
     margin: 0em;
     /* Make the footer small. */
@@ -955,14 +945,14 @@ in the 'remark-footer' div. */
     color: #716f64;
 }
 
-#remark-footer a 
+.remark-footer a 
 { 
     /* Make links in the footer look neutral. */
     text-decoration: none; 
     color: #716f64;
 }
 
-#remark-footer a:hover 
+.remark-footer a:hover 
 { 
     /* Reveals links in the footer by hovering. */
     text-decoration: underline; 
@@ -971,33 +961,33 @@ in the 'remark-footer' div. */
 
 /* EquationSet */
 
-#remark .EquationSet ol
+.remark .EquationSet ol
 {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
-#remark .EquationSet li
+.remark .EquationSet li
 {
     list-style-type: none;
 }
 
 /* Equation */
 
-#remark .Equation
+.remark .Equation
 {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-#remark .Equation-Body
+.remark .Equation-Body
 {
     padding-left: 4em;
 }
 
-#remark .Equation-Number
+.remark .Equation-Number
 {
     /* Remove the equation-number. */
     display: none;
@@ -1007,19 +997,19 @@ in the 'remark-footer' div. */
     color: black;
 }
 
-#remark span.Equation-Number:after
+.remark span.Equation-Number:after
 {
     content: ")";
 }
 
-#remark span.Equation-Number:before
+.remark span.Equation-Number:before
 {
     content: "(";
 }
 
 /* Example */
 
-#remark .Example
+.remark .Example
 {
     padding: 0.75em;
     margin-top: 1em;
@@ -1032,15 +1022,15 @@ in the 'remark-footer' div. */
 The Example-box already contains padding. 
 Zero margin-top from the first child to avoid heavy margins. 
 */
-#remark .Example > *:first-child,
-#remark .Example > div:first-child > *:first-child
+.remark .Example > *:first-child,
+.remark .Example > div:first-child > *:first-child
 {
     margin-top: 0em;
 }
 
 /* The same for the margin-bottom of the last child. */
-#remark .Example > *:last-child,
-#remark .Example > div:last-child > *:last-child
+.remark .Example > *:last-child,
+.remark .Example > div:last-child > *:last-child
 {
     margin-bottom: 0em;
 }

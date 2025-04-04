@@ -7,6 +7,7 @@ import type React from "react";
 import MarkdownTTS from "@/components/ui/markdown-tts";
 import { useMemo, useState } from "react";
 
+
 export default function Identification({
   identification,
 }: {
@@ -44,9 +45,10 @@ export default function Identification({
     <>
       <p>Clicked amt: {numberClicked}</p>
       <MarkdownTTS
-        customComponents={{ correct: Correct }}
+        customComponents={{ correct: Correct}}
         controlsOrientation="vertical"
-        controlsClassName="flex gap-2"
+        controlsClassName="flex flex-row-reverse gap-2"
+        className="remark max-w-[100ch]"
       >
         {identification.content}
       </MarkdownTTS>
