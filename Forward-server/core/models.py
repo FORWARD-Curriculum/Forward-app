@@ -122,7 +122,6 @@ class Lesson(models.Model):
         help_text='the uuid of the database item'
     )
 
-
     title = models.CharField(
         max_length=200,
         validators=[MinLengthValidator(3)],

@@ -5,10 +5,11 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, QuizSubmissionSerializer, UserQuizResponseDetailSerializer
+from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, QuizSubmissionSerializer, UserQuizResponseDetailSerializer, ResponseSerializer
 from core.services import UserService, LessonService, QuizResponseService, ResponseService
 from .utils import json_go_brrr, messages
 from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, TextContentResponse, Identification, IdentificationResponse, WritingResponse, PollQuestionResponse, BaseResponse, BaseActivity
+from rest_framework import serializers
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -297,6 +298,7 @@ class TextContentView(APIView):
             "data": [t.to_dict() for t in text_content]},
             status=status.HTTP_200_OK)
 
+
 class WritingView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -338,52 +340,62 @@ class PollView(APIView):
 
 class ResponseView(APIView):
     permission_classes = [IsAuthenticated]
-    activity_map: dict[str, tuple[BaseActivity, BaseResponse, dict[str,tuple[str,any]]]] = {}
-    
+    activity_map: dict[str, tuple[BaseActivity,
+                                  BaseResponse, dict[str, tuple[str, any]]]] = {}
+
     """
         Note that update_fields is a kv mapping of Model.<field_name> to request.data.get(<field>,default)
     """
-    def registerActivity(self, ActivityClass: BaseActivity, ResponseClass: BaseResponse, update_fields: dict[str,tuple[str,any]]={}):
-        self.activity_map[ActivityClass.__name__.lower()] = [ActivityClass, ResponseClass,update_fields]
+
+    def registerActivity(self, ActivityClass: BaseActivity, ResponseClass: BaseResponse, update_fields: dict[str, tuple[str, any]] = {}):
+        self.activity_map[ActivityClass.__name__.lower()] = [
+            ActivityClass, ResponseClass, update_fields]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.registerActivity(TextContent, TextContentResponse)
         self.registerActivity(PollQuestion, PollQuestionResponse)
         self.registerActivity(Identification, IdentificationResponse)
-        self.registerActivity(Writing, WritingResponse, {"response": ["response"]})
+        self.registerActivity(Writing, WritingResponse, {
+                              "response": ["response"]})
 
     def post(self, request, *args, **kwargs):
         activity_type: str = kwargs.get("activitytype").lower()
-        
-        ActivityModel, ResponseModel, update_fields  = self.activity_map[activity_type]
+        if not activity_type:
+            return Response({"detail": "Activity type missing in URL path."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # --- Common Data (BaseResponse) ---
-        user = request.user
-        lesson = Lesson.objects.get(id=request.data.get("lesson_id"))
-        associated_activity = ActivityModel.objects.get(id=request.data.get("associated_activity"))
-        response_id = request.data.get("id")  # For get_or_create
-        partial_response = request.data.get("partial_response", True)  # Default to True?
-        time_spent = request.data.get("time_spent", 0)
-        
-        # Get or create off of what we know
-        response_object, created = ResponseModel.objects.get_or_create(
-            user=user,
-            associated_activity=associated_activity,
-            lesson=lesson,
-            id=response_id,
+        activity_config = self.activity_map.get(activity_type.lower())
+        if not activity_config:
+            return Response({"detail": f"Invalid activity type: {activity_type}"}, status=status.HTTP_400_BAD_REQUEST)
+
+        ActivityModel, ResponseModel, update_fields = activity_config
+
+        print(request.data.get("lesson_id"))
+
+        serializer = ResponseSerializer(
+            data=request.data,
+            context={
+                'request': request,
+                'ActivityModel': ActivityModel,
+                'ResponseModel': ResponseModel,
+                'update_fields': update_fields
+            }
         )
-        
-        response_object.partial_response = partial_response
-        response_object.time_spent = time_spent
-        
-        # update fields that are sent along with request
-        for key, value in update_fields.items():
-            setattr(response_object,key, request.data.get(*value))
-            
-        response_object.save()
 
-        return json_go_brrr(200, "Successfully saved "+activity_type, response_object.to_dict())
+        try:
+            serializer.is_valid(raise_exception=True)
+            response_object = serializer.save()
+            return Response(
+                {"detail": "Successfully saved " + activity_type,
+                    "data": response_object.to_dict()},
+                status=status.HTTP_201_CREATED
+            )
+        except serializers.ValidationError as e:
+            # Handles validation errors from serializer or explicit raises
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(f"Internal Server Error: {e}")
+            return Response({"detail": "An internal error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class QuizResponseView(APIView):
