@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/accordion";
 import { ArrowRightIcon, ArrowUpIcon } from "lucide-react";
 import { useState } from "react";
-import { Link, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import {
   incrementHighestActivity,
   setResponse,

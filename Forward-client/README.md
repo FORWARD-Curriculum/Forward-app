@@ -21,7 +21,6 @@ In production `npm run build` builds and bundles the entire application into an 
   * Video
   * Composite (choose your own order (see end of Going to College lesson))
   * Concept Map (definition)
-- Collapse responses view to be a switch statement on activity type to reduce URL and View count (`/response/<str:activitytype>, ResponseView.as_view()`)
 
 ## Markdown
 This project uses a custom flavor of markdown FORWARD Markdown (FMD). It is a superset of the CommonMark Markdown standard, which includes extra styling options and functionality. The intent is to allow fast easy access to style raw text into a useful format for expressing concepts. 
@@ -50,8 +49,10 @@ This project uses a custom flavor of markdown FORWARD Markdown (FMD). It is a su
   :::
   ::::
   ```
+
 > [!IMPORTANT]
 > When nesting directives, as seen in the above example, the innermost directive must have three colons preceding it, and all parent nodes will accumulate one colon per level towards the root directive.
+
 - Correct: This tag is used within an Identification activity type to denote a section of the text that one of the correct sections required to identify to procede. Example:
   ```html
   There is a <correct>section here you must click</correct> to pass!

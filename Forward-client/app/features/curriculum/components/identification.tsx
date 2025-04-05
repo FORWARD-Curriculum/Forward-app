@@ -17,7 +17,7 @@ export default function Identification({
     type: "Identification",
     activity: identification,
 });
-  const [numberClicked, setNumberClicked] = useState(0);
+  const [numberClicked, setNumberClicked] = useState(response.partial_response?0:identification.minimum_correct);
 
   useEffect(()=>{
     setResponse(o=>({...o,partial_response: numberClicked < identification.minimum_correct}))

@@ -753,6 +753,9 @@ class BaseResponse(models.Model):
         blank=False,
         help_text='The user who submitted this response'
     )
+    
+    # Meant to be overwritten by subclasses    
+    associated_activity = None
   
     partial_response = models.BooleanField(default=True)
     
@@ -765,11 +768,12 @@ class BaseResponse(models.Model):
             "id": self.id,
             "partial_response": self.partial_response,
             "time_spent": self.time_spent,
-            "attempts_left": self.attempts_left
+            "attempts_left": self.attempts_left,
+            "associated_activity": self.associated_activity.id,
         }
 
 class WritingResponse(BaseResponse):
-    writing = models.ForeignKey(
+    associated_activity = models.ForeignKey(
         Writing,
         on_delete=models.CASCADE,
         related_name='associated_writing',
@@ -781,12 +785,11 @@ class WritingResponse(BaseResponse):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "associated_activity": self.writing.id,
             "response": self.response
             }
 
 class TextContentResponse(BaseResponse):
-    text_content = models.ForeignKey(
+    associated_activity = models.ForeignKey(
         TextContent,
         on_delete=models.CASCADE,
         related_name='associated_textcontent',
@@ -796,7 +799,6 @@ class TextContentResponse(BaseResponse):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "associated_activity": self.text_content.id,
             }
 
 class PollQuestionResponse(BaseResponse):
@@ -804,7 +806,7 @@ class PollQuestionResponse(BaseResponse):
         help_text="The user's response data in JSON format"
     )
     
-    poll = models.ForeignKey(
+    associated_activity = models.ForeignKey(
         Poll,
         on_delete=models.CASCADE,
         related_name='associated_poll',
@@ -814,12 +816,11 @@ class PollQuestionResponse(BaseResponse):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "associated_activity": self.poll.id,
             "response_data": self.response_data
             }
     
 class IdentificationResponse(BaseResponse):
-    identification = models.ForeignKey(
+    associated_activity = models.ForeignKey(
         Identification,
         on_delete=models.CASCADE,
         related_name='associated_identification',
@@ -829,5 +830,4 @@ class IdentificationResponse(BaseResponse):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "associated_activity": self.identification.id,
             }

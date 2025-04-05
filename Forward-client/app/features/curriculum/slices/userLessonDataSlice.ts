@@ -43,7 +43,7 @@ export const saveUserResponseThunk = createAsyncThunk(
     };
 
     // NOTE: SERVER ***ONLY*** RECIEVES THE AGGREGATE TIME
-    const response = await apiFetch(`/${data.type.toLowerCase()}/response`, {
+    const response = await apiFetch(`/responses/${data.type.toLowerCase()}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({lesson_id: state.lesson.lesson?.id, ...data.response}),
