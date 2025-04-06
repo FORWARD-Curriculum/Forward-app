@@ -496,6 +496,8 @@ class PollQuestion(models.Model):
 
 # TODO: Make quiz and question response inherit from BaseResponse, or make
 # them adhere to the contract enforced by BaseResponse
+
+
 class UserQuizResponse(models.Model):
     """
     Stores a user's complete response to a quiz
@@ -506,7 +508,7 @@ class UserQuizResponse(models.Model):
         related_name='quiz_responses',
         help_text='The user who submitted this quiz response'
     )
-    
+
     lesson = models.ForeignKey(
         Lesson,
         on_delete=models.CASCADE,
@@ -608,7 +610,7 @@ class UserQuestionResponse(models.Model):
         blank=False,
         help_text='The lesson related to this question response'
     )
-    
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -617,7 +619,7 @@ class UserQuestionResponse(models.Model):
         blank=False,
         help_text='The user who submitted this question response'
     )
-    
+
     quiz_response = models.ForeignKey(
         UserQuizResponse,
         on_delete=models.CASCADE,
@@ -861,6 +863,15 @@ class ActivityManager():
     """A centralized management class meant to streamline the process of creating and using a
     activities within the backend.
     """
+    # Enforce a singleton object pattern
+    _instance = None
+    _initialized = False
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     registered_activities: dict[str, tuple[BaseActivity, BaseResponse,
                                            dict[str, tuple[str, any]], bool]] = {}
 
@@ -891,6 +902,9 @@ class ActivityManager():
             ActivityClass, ResponseClass, nonstandard_resp_fields, child_class)
 
     def __init__(self):
+        if self._initialized:
+            return
+        self._initialized = True
         self.registerActivity(TextContent, TextContentResponse)
         self.registerActivity(Identification, IdentificationResponse)
         self.registerActivity(Writing, WritingResponse, {
@@ -898,9 +912,9 @@ class ActivityManager():
         self.registerActivity(Poll, PollResponse)
         self.registerActivity(
             PollQuestion, PollQuestionResponse, child_class=True)
-        self.registerActivity(Quiz,UserQuizResponse)
-        self.registerActivity(Question,UserQuestionResponse, child_class=True)
+        self.registerActivity(Quiz, UserQuizResponse)
+        self.registerActivity(Question, UserQuestionResponse, child_class=True)
 
 
 # Register on launch
-_activity_manager_instance = ActivityManager()
+ActivityManager()
