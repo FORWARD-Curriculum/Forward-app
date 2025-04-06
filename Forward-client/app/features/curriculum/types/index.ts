@@ -10,12 +10,47 @@ export interface Lesson {
   image: string | undefined;
   activities: BaseActivity[];
 }
-//-------------------------- Activities -----------------------------{
+/**
+ * Check out the [ActivityManager class]({@link ../../../../../Forward-server/core/models.py})
+ * defined in the backend.
+ *
+ * KV Format is as follows:
+ * ```javascript
+ *  ActivityNameAsString: [ActivityInterface, ActivityResponseInterface, child_class: boolean]
+ * ```
+ */
+export type ActivityManager = {
+  Identification: [Identification, IdentificationResponse, false];
+  TextContent: [TextContent, TextContentResponse, false];
+  Writing: [Writing, WritingResponse, false];
+  Quiz: [Quiz, QuizResponse, false];
+  Poll: [Poll, PollResponse, false];
+  ConceptMap: [ConceptMap, ConceptMapResponse, false];
+  Question: [Question, QuestionResponse, true];
+  PollQuestion: [PollQuestion, PollQuestionResponse, true];
+};
+
+export const ActivityTypeDisplayNames: Record<BaseActivity["type"] | "Default", string> = {
+  Writing: "Writing",
+  Quiz: "Quiz",
+  TextContent: "Info",
+  Poll: "Poll",
+  Default: "Activity",
+  ConceptMap: "Concept Map",
+  Identification: "Identification",
+}
+
+// #region -------------------------- Activities ---------------------------
 
 export interface BaseActivity {
   id: string;
   lesson_id: string;
-  type: "Writing" | "Quiz" | "Poll" | "ConceptMap" | "TextContent" | "Identification";
+  // The below omits child classes
+  type: {
+    [K in keyof ActivityManager]: ActivityManager[K][2] extends false
+      ? K
+      : never;
+  }[keyof ActivityManager];
   title: string;
   instructions: string | null;
   order: number;
@@ -53,7 +88,6 @@ export interface Question {
       text: string;
       is_correct: boolean;
     }[];
-    
   };
   is_required: boolean;
   attempts?: number;
@@ -89,7 +123,7 @@ export interface ConceptMap extends BaseActivity {
     term: string;
     image: string;
     definition: string;
-  }[]
+  }[];
 }
 
 /**
@@ -102,7 +136,9 @@ export interface Identification extends BaseActivity {
   feedback: string;
 }
 
-//}----------------------- Responses -----------------
+// #endregion -------------------------- Activities ---------------------------
+
+// #region -------------------------- Responses ----------------------------
 
 /**
  * Slice interface that stores all info relating to data the user inputs.
@@ -119,13 +155,7 @@ export interface LessonResponse {
   time_spent: number;
   current_response: BaseResponse | null;
   response_data: {
-    TextContent: TextContentResponse[];
-    Quiz: QuizResponse[];
-    Question: QuestionResponse[];
-    PollQuestion: PollQuestionResponse[];
-    Writing: WritingResponse[];
-    ConceptMap: ConceptMapResponse[];
-    Identification: IdentificationResponse[];
+    [K in keyof ActivityManager]: ActivityManager[K][1][];
   };
 }
 
@@ -175,3 +205,6 @@ export interface WritingResponse extends BaseResponse {
 export interface TextContentResponse extends BaseResponse {}
 export interface ConceptMapResponse extends BaseResponse {}
 export interface IdentificationResponse extends BaseResponse {}
+export interface PollResponse extends BaseResponse {}
+
+// #endregion -------------------------- Responses ----------------------------
