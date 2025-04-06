@@ -288,7 +288,7 @@ class DynamicActivityPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     """
 
     def get_queryset(self):
-        ActivityModel = self.context.get('ActivityModel')
+        ActivityModel = self.context.get('activity_config')[0]
         # Check if ActivityModel is provided
         if not ActivityModel:
             raise ImproperlyConfigured(
@@ -311,7 +311,7 @@ class ResponseSerializer(serializers.Serializer):
     attempts_left = serializers.IntegerField(default=0)
 
     def validate(self, attrs):
-        if 'ResponseModel' not in self.context or 'ActivityModel' not in self.context:
+        if 'activity_config' not in self.context:
             raise serializers.ValidationError(
                 "Serializer context is missing required models.")
         return attrs
@@ -319,7 +319,7 @@ class ResponseSerializer(serializers.Serializer):
     def save(self, **kwargs):
         """Handles get_or_create/update logic based on context and input."""
         validated_data = {**self.validated_data, **kwargs}
-        ResponseModel: BaseResponse = self.context['ResponseModel']
+        ResponseModel: BaseResponse = self.context['activity_config'][1]
 
         try:
             response_object, created = ResponseModel.objects.get_or_create(
@@ -335,7 +335,7 @@ class ResponseSerializer(serializers.Serializer):
             response_object.attempts_left = validated_data.get(
                 "attempts_left", 0)
 
-            for key, value in self.context['update_fields'].items():
+            for key, value in self.context['activity_config'][2].items():
                 setattr(response_object, key,
                         self.context['request'].data.get(*value))
 

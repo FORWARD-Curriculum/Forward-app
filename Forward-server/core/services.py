@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, UserQuizResponse, UserQuestionResponse, TextContentResponse, PollQuestionResponse, WritingResponse, IdentificationResponse, Identification
+from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse
 
 class UserService:
     @staticmethod
@@ -125,43 +125,22 @@ class LessonService:
         Raises:
             Lesson.DoesNotExist: If the lesson doesn't exist
         """
-        lesson = Lesson.objects.get(id=lesson_id)
+        try:
+            lesson = Lesson.objects.get(id=lesson_id)
+        except Lesson.DoesNotExist:
+            raise 
         lesson_dict = lesson.to_dict()
 
-        lesson_dict['activities'] = {}
+        activity_list = []
         
-        # Process text content
-        text_contents = list(TextContent.objects.filter(lesson_id=lesson_id).order_by('order'))
-        for content in text_contents:
-            activity_dict = content.to_dict()
-            lesson_dict['activities'][content.order] = activity_dict
-
-        # Process quizzes
-        for quiz in Quiz.objects.filter(lesson_id=lesson_id).order_by('order'):
-            questions = Question.objects.filter(quiz_id=quiz.id).order_by('order')
-            quiz_dict = quiz.to_dict()
-            quiz_dict['questions'] = [q.to_dict() for q in questions]
-            lesson_dict['activities'][quiz.order] = quiz_dict
-
-        # Process polls
-        for poll in Poll.objects.filter(lesson_id=lesson_id).order_by('order'):
-            poll_questions = PollQuestion.objects.filter(poll_id=poll.id).order_by('order')
-            poll_dict = poll.to_dict()
-            poll_dict['questions'] = [pq.to_dict() for pq in poll_questions]
-            lesson_dict['activities'][poll.order] = poll_dict
-
-        # Process writing activities
-        writing_activities = list(Writing.objects.filter(lesson_id=lesson_id))
-        for writing in writing_activities:
-            writing_dict = writing.to_dict()
-            lesson_dict['activities'][writing.order] = writing_dict
+        for value in ActivityManager.registered_activities.values():
+            [ActivityModel, _, _, child_class] = value
+            if not child_class:
+                activities = list(ActivityModel.objects.filter(lesson=lesson).order_by('order'))
+                for activity in activities:
+                    activity_list.append(activity.to_dict())
         
-        identifications = list(Identification.objects.filter(lesson_id=lesson_id).order_by('order'))
-        for ident in identifications:
-            activity_dict = ident.to_dict()
-            lesson_dict['activities'][ident.order] = activity_dict
-            
-        lesson_dict['activities'] = list(lesson_dict['activities'].values())
+        lesson_dict["activities"] = sorted(activity_list, key=lambda x: x["order"])
 
         return {
             "lesson": lesson_dict
@@ -187,13 +166,9 @@ class ResponseService:
         out_dict = {} 
         out_dict['lesson_id'] = lesson.id
         out_dict['response_data'] = {}
-        
-        out_dict['response_data']['TextContent'] = [a.to_dict() for a in list(TextContentResponse.objects.filter(lesson=lesson,user=user))]
-        out_dict['response_data']['Quiz'] = []#[a.to_dict() for a in list(QuizResponse.objects.filter(lesson=lesson,user=user))]
-        out_dict['response_data']['Question'] = []#[a.to_dict() for a in list(QuestionResponse.objects.filter(lesson=lesson,user=user))]
-        out_dict['response_data']['PollQuestion'] = [a.to_dict() for a in list(PollQuestionResponse.objects.filter(lesson=lesson,user=user))]
-        out_dict['response_data']['Writing'] = [a.to_dict() for a in list(WritingResponse.objects.filter(lesson=lesson,user=user))]
-        out_dict['response_data']['Identification'] = [a.to_dict() for a in list(IdentificationResponse.objects.filter(lesson=lesson,user=user))]
+        for value in ActivityManager.registered_activities.values():
+            [Activity, Response] = value[:2]
+            out_dict['response_data'][Activity.__name__] = [a.to_dict() for a in list(Response.objects.filter(lesson=lesson,user=user))]
         
         out_dict['highest_activity'] = 1
         for value in out_dict['response_data'].values():
