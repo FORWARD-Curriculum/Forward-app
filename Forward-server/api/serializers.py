@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson
+from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager
 from django.core.exceptions import ImproperlyConfigured
 
 
@@ -320,29 +320,33 @@ class ResponseSerializer(serializers.Serializer):
         """Handles get_or_create/update logic based on context and input."""
         validated_data = {**self.validated_data, **kwargs}
         ResponseModel: BaseResponse = self.context['activity_config'][1]
+        ActivityModel = self.context['activity_config'][0]
 
-        try:
-            response_object, created = ResponseModel.objects.get_or_create(
-                user=self.context['request'].user,
-                associated_activity=validated_data.get('associated_activity'),
-                lesson=validated_data.get("lesson_id"),
-                id=validated_data.get('id', None),
+        if ActivityModel in ActivityManager.registered_services["response"]:
+            return ActivityManager.registered_services["response"][ActivityModel.__name__.lower()](
             )
+        else:
+            try:
+                response_object, created = ResponseModel.objects.get_or_create(
+                    user=self.context['request'].user,
+                    associated_activity=validated_data.get(
+                        'associated_activity'),
+                    lesson=validated_data.get("lesson_id"),
+                    id=validated_data.get('id', None),
+                )
+                response_object.partial_response = validated_data.get(
+                    "partial_response", True)
+                response_object.time_spent = validated_data.get(
+                    "time_spent", 0)
+                response_object.attempts_left = validated_data.get(
+                    "attempts_left", 0)
+                for key, value in self.context['activity_config'][2].items():
+                    setattr(response_object, key,
+                            self.context['request'].data.get(*value))
+                response_object.save()
+            except:
+                # If ID provided but not found for user, treat as error
+                raise serializers.ValidationError(
+                    {"response_object": f"{ResponseModel.__name__} could not be created or found."})
 
-            response_object.partial_response = validated_data.get(
-                "partial_response", True)
-            response_object.time_spent = validated_data.get("time_spent", 0)
-            response_object.attempts_left = validated_data.get(
-                "attempts_left", 0)
-
-            for key, value in self.context['activity_config'][2].items():
-                setattr(response_object, key,
-                        self.context['request'].data.get(*value))
-
-            response_object.save()
-        except:
-            # If ID provided but not found for user, treat as error
-            raise serializers.ValidationError(
-                {"response_object": f"{ResponseModel.__name__} could not be created or found."})
-
-        return response_object
+            return response_object

@@ -874,7 +874,8 @@ class ActivityManager():
 
     registered_activities: dict[str, tuple[BaseActivity, BaseResponse,
                                            dict[str, tuple[str, any]], bool]] = {}
-
+    registered_services: dict[str, dict[BaseActivity, callable]] = {"response": {}}
+    
     def registerActivity(self,
                          ActivityClass: BaseActivity,
                          ResponseClass: BaseResponse,
@@ -899,7 +900,22 @@ class ActivityManager():
             class. This is used in the lesson_service to ensure the activity is not repeated. Defaults to False.
         """
         self.registered_activities[ActivityClass.__name__.lower()] = (
-            ActivityClass, ResponseClass, nonstandard_resp_fields, child_class)
+            ActivityClass, ResponseClass, nonstandard_resp_fields, child_class, {})
+    
+    def registerService(self, service_type: str, ActivityClass: BaseActivity, service: callable):
+        """Registers a service to an activity. This is used to allow for custom services to be registered
+        to an activity, such as a custom quiz service. Used for legacy/complex activities to provide more
+        behavior than possible with unified API's services.
+
+        Args:
+            ActivityClass (BaseActivity): The activity class to register the service to.
+            service_name (str): The name of the service.
+            service (callable): The service to register.
+        """
+        if service_type not in self.registered_services:
+            raise ValueError(
+                f"{service_type} is an invalid service type.")
+        self.registered_activities[service_type][ActivityClass.__name__.lower()] = service
 
     def __init__(self):
         if self._initialized:

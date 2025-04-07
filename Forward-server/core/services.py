@@ -134,7 +134,7 @@ class LessonService:
         activity_list = []
         
         for value in ActivityManager.registered_activities.values():
-            [ActivityModel, _, _, child_class] = value
+            ActivityModel, child_class = value[0],value[3]
             if not child_class:
                 activities = list(ActivityModel.objects.filter(lesson=lesson).order_by('order'))
                 for activity in activities:
@@ -316,3 +316,6 @@ class QuizResponseService:
             UserQuizResponse.DoesNotExist: If the response doesn't exist or belong to the user
         """
         return UserQuizResponse.objects.get(id=response_id, user=user)
+    
+    def __init__(self):
+        ActivityManager.registerService(ActivityManager, "response", Quiz, QuizResponseService)
