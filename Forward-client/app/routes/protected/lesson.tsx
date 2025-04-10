@@ -1,12 +1,9 @@
 import {
   type BaseActivity,
   type Lesson,
-  type TextContent as TextContentType,
-  type Poll as PollType,
-  type Quiz as QuizType,
-  type Writing as WritingType,
   type LessonResponse,
-  type Identification as IdentificationType,
+  type ActivityManager,
+  ActivityTypeDisplayNames,
 } from "@/features/curriculum/types";
 import type { Route } from "./+types/lesson";
 import { apiFetch } from "@/utils/utils";
@@ -32,7 +29,11 @@ import {
   incrementHighestActivity,
   setResponse,
 } from "@/features/curriculum/slices/userLessonDataSlice";
-import { nextActivity, setActivity, setLesson } from "@/features/curriculum/slices/lessonSlice";
+import {
+  nextActivity,
+  setActivity,
+  setLesson,
+} from "@/features/curriculum/slices/lessonSlice";
 
 export async function clientLoader({
   params,
@@ -58,28 +59,39 @@ export async function clientLoader({
 
 clientLoader.prefetch = true;
 
-export function Activity({
-  activity,
-}: {
-  activity: BaseActivity | TextContentType | undefined;
-}) {
+export function Activity({ activity }: { activity: BaseActivity }) {
   /* Generate a unique key based on the activity's identifier
-  * IMPORTANT: The key also makes sure react discards components instead of reusing them on
-  * navigation, which breaks how we handle responses.
-  */
-  const key = activity ? `${activity.type}-${activity.order}` : 'invalid';
+   * IMPORTANT: The key also makes sure react discards components instead of reusing them on
+   * navigation, which breaks how we handle responses.
+   */
+  const key = activity ? `${activity.type}-${activity.order}` : "invalid";
 
-  switch (activity?.type) {
+  switch (activity.type) {
     case "Writing":
-      return <Writing key={key} writing={activity as WritingType} />;
+      return (
+        <Writing
+          key={key}
+          writing={activity as ActivityManager["Writing"][0]}
+        />
+      );
     case "Quiz":
-      return <Quiz key={key} quiz={activity as QuizType} />;
+      return <Quiz key={key} quiz={activity as ActivityManager["Quiz"][0]} />;
     case "Poll":
-      return <Poll key={key} poll={activity as PollType} />;
+      return <Poll key={key} poll={activity as ActivityManager["Poll"][0]} />;
     case "TextContent":
-      return <TextContent key={key} textContent={activity as TextContentType} />;
+      return (
+        <TextContent
+          key={key}
+          textContent={activity as ActivityManager["TextContent"][0]}
+        />
+      );
     case "Identification":
-      return <Identification key={key} identification={activity as IdentificationType}/>
+      return (
+        <Identification
+          key={key}
+          identification={activity as ActivityManager["Identification"][0]}
+        />
+      );
     default:
       return <p>Out of bounds</p>;
   }
@@ -100,13 +112,12 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
       window.pageYOffset > 500 ? setShowScrolBtn(true) : setShowScrolBtn(false);
     };
     window.addEventListener("scroll", handleButtonVisibility);
-    
+
     // Deregisters event listener and destroys interval
     return () => {
       window.removeEventListener("scroll", handleButtonVisibility);
     };
   }, []);
-
 
   // We only want to update the lesson slice when the data loads, no other time
   useEffect(() => {
@@ -122,13 +133,15 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                 : 1,
             ),
           );
-          if (loaderData.response) dispatch(setResponse({...loaderData.response, time_spent: Date.now()}));
+          if (loaderData.response)
+            dispatch(
+              setResponse({ ...loaderData.response, time_spent: Date.now() }),
+            );
         }
       }
     }
   }, [loaderData]);
 
-  
   return (
     <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:flex-row lg:items-start lg:gap-8">
       <div className="flex flex-col lg:h-full">
@@ -194,34 +207,23 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
       <div className="bg-secondary border-secondary-border text-secondary-foreground flex min-h-min w-full flex-col rounded-3xl border-1 p-4">
         <h1 className="text-2xl font-bold">
           <span className="text-accent">
-            {
-              {
-                Writing: "Writing",
-                Quiz: "Quiz",
-                TextContent: "Info",
-                Poll: "Poll",
-                Default: "Activity",
-                ConceptMap: "Concept Map",
-                Identification: "Identification",
-              }[activity?.type || "Default"]
-            }
-            :{" "}
+            {ActivityTypeDisplayNames[activity?.type || "Default"]}:{" "}
           </span>
           {activity?.title}
         </h1>
-        <Activity activity={activity} />
+        {activity && <Activity activity={activity} />}
         <div className="mt-auto flex">
           <button
             disabled={response.current_response?.partial_response || undefined}
-            className="bg-primary disabled:hidden text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2"
+            className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden"
             onClick={() => {
               dispatch(nextActivity());
               dispatch(incrementHighestActivity());
               history.replaceState(
-                  null,
-                  "",
-                  "#" + (lesson.current_activity + 1),
-                );
+                null,
+                "",
+                "#" + (lesson.current_activity + 1),
+              );
             }}
           >
             Save and Continue

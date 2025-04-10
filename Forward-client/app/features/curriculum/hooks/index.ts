@@ -4,7 +4,6 @@ import {
   type LessonResponse,
   type PollQuestion,
   type Question,
-  type TextContent,
 } from "@/features/curriculum/types";
 import type { AppDispatch, RootState } from "@/store";
 import { useEffect, useRef, useState } from "react";
@@ -42,7 +41,7 @@ import {
  */
 export const useResponse = <
   T extends BaseResponse,
-  E extends BaseActivity | Question | PollQuestion | TextContent,
+  E extends BaseActivity | Question | PollQuestion,
 >({
   type,
   activity,

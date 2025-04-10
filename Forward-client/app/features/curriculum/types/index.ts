@@ -10,12 +10,67 @@ export interface Lesson {
   image: string | undefined;
   activities: BaseActivity[];
 }
-//-------------------------- Activities -----------------------------{
+ /**
+  * A mapping between activity names and their corresponding interface types.
+  *
+  * Each entry in the mapping uses a key-value structure where:
+  * - **Key**: A string representing the activity name (in PascalCase).
+  * - **Value**: An array tuple containing:
+  *    1. The Activity Interface.
+  *    2. The Activity Response Interface.
+  *    3. A boolean flag indicating whether the activity is a child class.
+  *
+  * The KV format is:
+  * ```javascript
+  *   ActivityName: [ActivityInterface, ActivityResponseInterface, child_class]
+  * ```
+  *
+  * This structure mirrors the backend implementation in the 
+  * [ActivityManager class]({@link ../../../../../Forward-server/core/models.py}),
+  * which centralizes activity management. In the backend, the ActivityManager
+  * registers each activity with its corresponding response type and any additional
+  * non-standard response fields via a method signature similar to:
+  * ```js
+  *   registerActivity(ActivityClass, ResponseClass, nonstandard_resp_fields, child_class)
+  * ```
+  */
+export type ActivityManager = {
+  Identification: [Identification, IdentificationResponse, false];
+  TextContent: [TextContent, TextContentResponse, false];
+  Writing: [Writing, WritingResponse, false];
+  Quiz: [Quiz, QuizResponse, false];
+  Poll: [Poll, PollResponse, false];
+  ConceptMap: [ConceptMap, ConceptMapResponse, false];
+  Question: [Question, QuestionResponse, true];
+  PollQuestion: [PollQuestion, PollQuestionResponse, true];
+};
+
+/**
+ * Provides the "Human Readable" names for the activity classes to be displayed to the user,
+ * this must be seperate from the ActivityManager interface because TypeScript does not exist
+ * at runtime.
+ */
+export const ActivityTypeDisplayNames: Record<BaseActivity["type"] | "Default", string> = {
+  Writing: "Writing",
+  Quiz: "Quiz",
+  TextContent: "Info",
+  Poll: "Poll",
+  Default: "Activity",
+  ConceptMap: "Concept Map",
+  Identification: "Identification",
+}
+
+// #region -------------------------- Activities ---------------------------
 
 export interface BaseActivity {
   id: string;
   lesson_id: string;
-  type: "Writing" | "Quiz" | "Poll" | "ConceptMap" | "TextContent" | "Identification";
+  // The below omits child classes
+  type: {
+    [K in keyof ActivityManager]: ActivityManager[K][2] extends false
+      ? K
+      : never;
+  }[keyof ActivityManager];
   title: string;
   instructions: string | null;
   order: number;
@@ -53,7 +108,6 @@ export interface Question {
       text: string;
       is_correct: boolean;
     }[];
-    
   };
   is_required: boolean;
   attempts?: number;
@@ -89,7 +143,7 @@ export interface ConceptMap extends BaseActivity {
     term: string;
     image: string;
     definition: string;
-  }[]
+  }[];
 }
 
 /**
@@ -102,7 +156,9 @@ export interface Identification extends BaseActivity {
   feedback: string;
 }
 
-//}----------------------- Responses -----------------
+// #endregion -------------------------- Activities ---------------------------
+
+// #region -------------------------- Responses ----------------------------
 
 /**
  * Slice interface that stores all info relating to data the user inputs.
@@ -119,13 +175,7 @@ export interface LessonResponse {
   time_spent: number;
   current_response: BaseResponse | null;
   response_data: {
-    TextContent: TextContentResponse[];
-    Quiz: QuizResponse[];
-    Question: QuestionResponse[];
-    PollQuestion: PollQuestionResponse[];
-    Writing: WritingResponse[];
-    ConceptMap: ConceptMapResponse[];
-    Identification: IdentificationResponse[];
+    [K in keyof ActivityManager]: ActivityManager[K][1][];
   };
 }
 
@@ -175,3 +225,6 @@ export interface WritingResponse extends BaseResponse {
 export interface TextContentResponse extends BaseResponse {}
 export interface ConceptMapResponse extends BaseResponse {}
 export interface IdentificationResponse extends BaseResponse {}
+export interface PollResponse extends BaseResponse {}
+
+// #endregion -------------------------- Responses ----------------------------

@@ -15,7 +15,16 @@ export const initialLessonResponseState: LessonResponse = {
   highest_activity: 1,
   time_spent: Date.now(),
   current_response: null,
-  response_data: { Quiz: [], PollQuestion: [], Writing: [], Question: [], TextContent: [], ConceptMap: [], Identification: [] },
+  response_data: {
+    Quiz: [],
+    PollQuestion: [],
+    Writing: [],
+    Question: [],
+    TextContent: [],
+    ConceptMap: [],
+    Identification: [],
+    Poll: [],
+  },
 };
 
 /**
@@ -31,7 +40,13 @@ export const saveUserResponseThunk = createAsyncThunk(
       trackTime: boolean;
     },
     thunkAPI,
-  ): Promise<{type: keyof NonNullable<LessonResponse["response_data"]>,response: BaseResponse} | undefined> => {
+  ): Promise<
+    | {
+        type: keyof NonNullable<LessonResponse["response_data"]>;
+        response: BaseResponse;
+      }
+    | undefined
+  > => {
     // compute timeSpent
     const state = thunkAPI.getState() as RootState;
     const lastTime = state.response.time_spent;
@@ -46,14 +61,16 @@ export const saveUserResponseThunk = createAsyncThunk(
     const response = await apiFetch(`/responses/${data.type.toLowerCase()}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({lesson_id: state.lesson.lesson?.id, ...data.response}),
+      body: JSON.stringify({
+        lesson_id: state.lesson.lesson?.id,
+        ...data.response,
+      }),
     });
-
 
     if (response.ok) {
       if (data.trackTime) thunkAPI.dispatch(resetTimeSpent());
       const json = await response.json();
-      return {type: data.type, response: json.data as BaseResponse};
+      return { type: data.type, response: json.data as BaseResponse };
     }
   },
 );
@@ -65,7 +82,7 @@ export const userLessonDataSlice = createSlice({
     setResponse: (state, action: PayloadAction<LessonResponse>) => {
       return action.payload;
     },
-    resetResponseState: ()=>{
+    resetResponseState: () => {
       return initialLessonResponseState;
     },
     incrementHighestActivity: (state) => {
@@ -80,7 +97,7 @@ export const userLessonDataSlice = createSlice({
     resetTimeSpent: (state) => {
       state.time_spent = Date.now();
     },
-    setCurrentResponse (state, action: PayloadAction<BaseResponse | null>) {
+    setCurrentResponse(state, action: PayloadAction<BaseResponse | null>) {
       state.current_response = action.payload;
     },
   },
@@ -112,7 +129,7 @@ export const {
   setHighestActivity,
   resetTimeSpent,
   setCurrentResponse,
-  resetResponseState
+  resetResponseState,
 } = userLessonDataSlice.actions;
 
 export default userLessonDataSlice.reducer;

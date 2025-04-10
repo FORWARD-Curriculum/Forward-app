@@ -8,7 +8,7 @@ from rest_framework import status
 from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, QuizSubmissionSerializer, UserQuizResponseDetailSerializer, ResponseSerializer
 from core.services import UserService, LessonService, QuizResponseService, ResponseService
 from .utils import json_go_brrr, messages
-from core.models import Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, TextContentResponse, Identification, IdentificationResponse, WritingResponse, PollQuestionResponse, BaseResponse, BaseActivity
+from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question
 from rest_framework import serializers
 
 
@@ -340,35 +340,15 @@ class PollView(APIView):
 
 class ResponseView(APIView):
     permission_classes = [IsAuthenticated]
-    activity_map: dict[str, tuple[BaseActivity,
-                                  BaseResponse, dict[str, tuple[str, any]]]] = {}
-
-    """
-        Note that update_fields is a kv mapping of Model.<field_name> to request.data.get(<field>,default)
-    """
-
-    def registerActivity(self, ActivityClass: BaseActivity, ResponseClass: BaseResponse, update_fields: dict[str, tuple[str, any]] = {}):
-        self.activity_map[ActivityClass.__name__.lower()] = [
-            ActivityClass, ResponseClass, update_fields]
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.registerActivity(TextContent, TextContentResponse)
-        self.registerActivity(PollQuestion, PollQuestionResponse)
-        self.registerActivity(Identification, IdentificationResponse)
-        self.registerActivity(Writing, WritingResponse, {
-                              "response": ["response"]})
-
+    
     def post(self, request, *args, **kwargs):
         activity_type: str = kwargs.get("activitytype").lower()
         if not activity_type:
             return Response({"detail": "Activity type missing in URL path."}, status=status.HTTP_400_BAD_REQUEST)
 
-        activity_config = self.activity_map.get(activity_type.lower())
+        activity_config = ActivityManager.registered_activities.get(activity_type.lower())
         if not activity_config:
             return Response({"detail": f"Invalid activity type: {activity_type}"}, status=status.HTTP_400_BAD_REQUEST)
-
-        ActivityModel, ResponseModel, update_fields = activity_config
 
         print(request.data.get("lesson_id"))
 
@@ -376,9 +356,7 @@ class ResponseView(APIView):
             data=request.data,
             context={
                 'request': request,
-                'ActivityModel': ActivityModel,
-                'ResponseModel': ResponseModel,
-                'update_fields': update_fields
+                'activity_config': activity_config
             }
         )
 
