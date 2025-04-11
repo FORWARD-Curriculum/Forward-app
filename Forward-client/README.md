@@ -12,10 +12,52 @@ In production `npm run build` builds and bundles the entire application into an 
 
 ## Todos
 
-- Rework activities to send partial response data on leave OR periodically send partial respoinse data.
+- Add custom markdown documentation
+- update views for identification activity (response data)
 - Ping server on firstload if user logged in to check for stale session
 - Fully interface backend with userResponseData api
-- Add definition activity type
+- Activities to add:
+  * Slideshow
+  * Video
+  * Composite (choose your own order (see end of Going to College lesson))
+  * Concept Map (definition)
+
+## Markdown
+This project uses a custom flavor of markdown FORWARD Markdown (FMD). It is a superset of the CommonMark Markdown standard, which includes extra styling options and functionality. The intent is to allow fast easy access to style raw text into a useful format for expressing concepts. 
+<details>
+<summary>FMD Markdown Syntax</summary>
+
+- Definition: You are able to define a word/phrase inline using the `<def>` tag. The def tag has an attribute "`def`" which is the actual definition of the word the `<def>` tag surrounds. Here is an example use:
+  
+  ```html
+  <def def="a long winded definition/clarifcation for a complex word or phrase">supercalifragilisticexpialidocious</def>
+  ```
+- Center: To center an element withing a markdown section, you must use the `:::center` directive, the opening and closing of which must be on their own line as so:
+  ```markdown
+  :::center
+  # An Important Centered Header
+  :::
+  ```
+- Columns: To use a multi-columned format, you can use the `::::columns` and `:::col` directives. The amount of columns does not matter, as all columns will be distributed as evenly as possible within their row. This has a similar restriction as the above centering directive:
+  ```markdown
+  ::::columns
+  :::col
+  - Column one's stuff
+  :::
+  :::col
+  ### Column two's stuff
+  :::
+  ::::
+  ```
+
+> [!IMPORTANT]
+> When nesting directives, as seen in the above example, the innermost directive must have three colons preceding it, and all parent nodes will accumulate one colon per level towards the root directive.
+
+- Correct: This tag is used within an Identification activity type to denote a section of the text that one of the correct sections required to identify to procede. Example:
+  ```html
+  There is a <correct>section here you must click</correct> to pass!
+  ```
+</details>
 
 ## Important Notes
 
@@ -35,8 +77,8 @@ In production `npm run build` builds and bundles the entire application into an 
 
 - React Router (RR) lets us define routes and layouts for our project in [one file](./app/routes.ts). Generally, there is a global layout that provides a Header and Footer to every page on the site (that is not a 404 for the time being). Any routes that require general user authentication, for the sake of UX should be defined as a subroute of the `protected.tsx` layout. This will automatically redirect users that are not logged in to the login/registration page.
 
-  > [!WARNING]
-  > While the user is redirected from protected routes, this is a client side check, and so any secure information should always be retrieved via an authenticated API call.
+> [!WARNING]
+> While the user is redirected from protected routes, this is a client side check, and so any secure information should always be retrieved via an authenticated API call.
 
 - Everything should be strongly typed via TypeScript to ensure no data disparity between components, and if possible, every non-component function meant for general consumption should have a [JSDoc](https://jsdoc.app/) description for inline documentation. If time allows, defining types with both TypeScript and the `@param` tag in JSDoc is preferred.
 

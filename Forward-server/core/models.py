@@ -7,6 +7,8 @@ import uuid
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
 # while allowing us to add our own custom fields and methods
+
+
 class User(AbstractUser):
     class Meta:
         verbose_name = 'user'
@@ -20,14 +22,13 @@ class User(AbstractUser):
         blank=True,
         null=True
     )
-        # User's generated uuid
+    # User's generated uuid
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
         editable=False,
         help_text='the uuid of the database item'
     )
-
 
     # User's first name - minimum 2 characters required
     display_name = models.CharField(
@@ -71,13 +72,13 @@ class User(AbstractUser):
         max_length=8,
         default="txt-base"
     )
-    
+
     speech_uri_index = models.PositiveIntegerField(
         'webSpeech uri',
         null=True,
         blank=True,
     )
-    
+
     speech_speed = models.FloatField(
         'webSpeech speed',
         null=True,
@@ -104,8 +105,9 @@ class User(AbstractUser):
         return {
             "id": self.id,
             "username": self.username,
-            "displayName": self.display_name,
+            "display_name": self.display_name,
         }
+
 
 class Lesson(models.Model):
     """
@@ -114,14 +116,13 @@ class Lesson(models.Model):
     A lesson is the top-level educational unit that contains sections, content,
     and activities. It has specific learning objectives and can track student progress.
     """
-        # User's generated uuid
+    # User's generated uuid
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
         editable=False,
         help_text='the uuid of the database item'
     )
-
 
     title = models.CharField(
         max_length=200,
@@ -183,65 +184,6 @@ class Lesson(models.Model):
             "tags": self.tags,
         }
 
-class TextContent(models.Model):
-    """
-    Model for text-based content sections within a lesson.
-    Can contain formatted text, HTML, or markdown content.
-    """
-        # User's generated uuid
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        help_text='the uuid of the database item'
-    )
-
-
-    lesson = models.ForeignKey(
-        Lesson,
-        on_delete=models.CASCADE,
-        related_name='text_contents',
-        help_text="The lesson this content belongs to"
-    )
-
-    title = models.CharField(
-        max_length=200,
-        validators=[MinLengthValidator(3)],
-        help_text="The title of this content section"
-    )
-
-    content = models.TextField(
-        help_text="The main content text, can include HTML/markdown formatting"
-    )
-
-    order = models.PositiveIntegerField(
-        help_text="Order within the lesson"
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['order', 'created_at']
-        verbose_name = "text content"
-        verbose_name_plural = "text contents"
-
-    def __str__(self):
-        return f"Text Content: {self.title}"
-
-    @property
-    def activity_type(self):
-        return self.__class__.__name__
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "lessonId": self.lesson_id,
-            "type": self.activity_type,
-            "title": self.title,
-            "content": self.content,
-            "order": self.order
-        }
 
 class BaseActivity(models.Model):
     """
@@ -250,7 +192,7 @@ class BaseActivity(models.Model):
     This class provides common fields and functionality shared by all
     activity types (Quiz, Poll, Writing Activities)
     """
-        # User's generated uuid
+    # User's generated uuid
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -258,11 +200,11 @@ class BaseActivity(models.Model):
         help_text='the uuid of the database item'
     )
 
-
     lesson = models.ForeignKey(
         Lesson,
         on_delete=models.CASCADE,
-        related_name="%(class)s_activities",  # Will create writing_activities, quiz_activities, poll_activities
+        # Will create writing_activities, quiz_activities, poll_activities
+        related_name="%(class)s_activities",
         help_text="The lesson this activity belongs to"
     )
 
@@ -273,6 +215,7 @@ class BaseActivity(models.Model):
     )
 
     instructions = models.TextField(
+        null=True,
         help_text="Instructions for completing the activity"
     )
 
@@ -289,7 +232,7 @@ class BaseActivity(models.Model):
 
     def __str__(self):
         return f"{self.__class__.__name__} - {self.title}"
-    
+
     @property
     def activity_type(self):
         return self.__class__.__name__
@@ -297,12 +240,42 @@ class BaseActivity(models.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "lessonId": self.lesson_id,
+            "lesson_id": self.lesson_id,
             "type": self.activity_type,
             "title": self.title,
             "instructions": self.instructions,
             "order": self.order
         }
+
+
+class TextContent(BaseActivity):
+    """
+    Model for text-based content sections within a lesson.
+    Can contain formatted text, HTML, or markdown content.
+    """
+    # User's generated uuid
+    content = models.TextField(
+        help_text="The main content text, can include HTML/markdown formatting"
+    )
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "text content"
+        verbose_name_plural = "text contents"
+
+    def __str__(self):
+        return f"Text Content: {self.title}"
+
+    @property
+    def activity_type(self):
+        return self.__class__.__name__
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content,
+        }
+
 
 class Writing(BaseActivity):
     """Model for writing activities where students provide written responses."""
@@ -326,6 +299,26 @@ class Writing(BaseActivity):
         }
 
 
+class Identification(BaseActivity):
+    """Model for students to identify key phrases or concepts in a text."""
+    content = models.CharField(
+        max_length=50000,
+        default="",
+    )
+
+    minimum_correct = models.PositiveIntegerField(default=0)
+
+    feedback = models.CharField(max_length=2000, default="")
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content,
+            "minimum_correct": self.minimum_correct,
+            "feedback": self.feedback
+        }
+
+
 class Quiz(BaseActivity):
     """Model for quiz activities that contain multiple questions and track scores."""
     passing_score = models.PositiveIntegerField(
@@ -344,10 +337,10 @@ class Quiz(BaseActivity):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "passingScore": self.passing_score,
-            "feedbackConfig": self.feedback_config,
+            "passing_score": self.passing_score,
+            "feedback_config": self.feedback_config,
+            "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')]
         }
-
 
 
 class Question(models.Model):
@@ -357,14 +350,13 @@ class Question(models.Model):
         ('true_false', 'True/False'),
         ('multiple_select', 'Multiple Select'),
     ]
-        # User's generated uuid
+    # User's generated uuid
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
         editable=False,
         help_text='the uuid of the database item'
     )
-
 
     quiz = models.ForeignKey(
         Quiz,
@@ -416,16 +408,15 @@ class Question(models.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "quizId": self.quiz_id,
-            "questionText": self.question_text,
-            "questionType": self.question_type,
-            "hasCorrectAnswer": self.has_correct_answer,
+            "quiz_id": self.quiz_id,
+            "question_text": self.question_text,
+            "question_type": self.question_type,
+            "has_orrect_answer": self.has_correct_answer,
             "choices": self.choices,
-            "isRequired": self.is_required,
+            "is_required": self.is_required,
             "order": self.order,
-            "feedbackConfig": self.feedback_config
+            "feedback_config": self.feedback_config
         }
-
 
 
 class Poll(BaseActivity):
@@ -445,12 +436,14 @@ class Poll(BaseActivity):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "config": self.config
+            "config": self.config,
+            "questions": [q.to_dict() for q in PollQuestion.objects.filter(poll__id=self.id).order_by('order')]
         }
+
 
 class PollQuestion(models.Model):
     """Models for individual poll questions within a poll"""
-        # User's generated uuid
+    # User's generated uuid
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -494,12 +487,16 @@ class PollQuestion(models.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "pollId": self.poll_id,
-            "questionText": self.question_text,
+            "poll_id": self.poll_id,
+            "question_text": self.question_text,
             "options": self.options,
-            "allowMultiple": self.allow_multiple,
+            "allow_multiple": self.allow_multiple,
             "order": self.order,
         }
+
+# TODO: Make quiz and question response inherit from BaseResponse, or make
+# them adhere to the contract enforced by BaseResponse
+
 
 class UserQuizResponse(models.Model):
     """
@@ -510,6 +507,15 @@ class UserQuizResponse(models.Model):
         on_delete=models.CASCADE,
         related_name='quiz_responses',
         help_text='The user who submitted this quiz response'
+    )
+
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='%(class)s_lesson',
+        null=False,
+        blank=False,
+        help_text='The lesson related to this quiz response'
     )
 
     quiz = models.ForeignKey(
@@ -548,15 +554,15 @@ class UserQuizResponse(models.Model):
         unique_together = ['user', 'quiz']
         verbose_name = 'quiz response'
         verbose_name_plural = 'quiz responses'
-    
+
     def __str__(self):
         return f"{self.user.username}'s response to {self.quiz.title}"
-    
+
     def calculate_score(self):
         """Calculate and set the score based on the question responses"""
         if not self.is_complete:
             return None
-        
+
         # Only count questions that have correct answers defined
         gradable_questions = self.question_responses.filter(
             # self note: This is a field lookup feature in Django's ORM.
@@ -569,7 +575,7 @@ class UserQuizResponse(models.Model):
 
         if total_count == 0:
             return None
-        
+
         for response in gradable_questions:
             if response.is_correct:
                 correct_count += 1
@@ -578,23 +584,42 @@ class UserQuizResponse(models.Model):
         self.save()
 
         return self.score
-    
+
     def to_dict(self):
         return {
             "id": self.id,
-            "userId": self.user_id,
-            "quizId": self.quiz_id,
+            "user_id": self.user_id,
+            "quiz_id": self.quiz_id,
             "score": self.score,
-            "isComplete": self.is_complete,
+            "is_complete": self.is_complete,
             "completion_percentage": self.completion_percentage,
             "time_spent": self.time_spent,
-            "questionResponses": [qr.to_dict() for qr in self.question_responses.all()]
+            "question_responses": [qr.to_dict() for qr in self.question_responses.all()]
         }
-    
+
+
 class UserQuestionResponse(models.Model):
     """
     Stores a user's response to an individual question within a quiz
     """
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='%(class)s_lesson',
+        null=False,
+        blank=False,
+        help_text='The lesson related to this question response'
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='%(class)s_response_user',
+        null=False,
+        blank=False,
+        help_text='The user who submitted this question response'
+    )
+
     quiz_response = models.ForeignKey(
         UserQuizResponse,
         on_delete=models.CASCADE,
@@ -645,14 +670,14 @@ class UserQuestionResponse(models.Model):
 
     def __str__(self):
         return f"Response to question {self.question.order} in {self.quiz_response}"
-    
+
     def evaluate_correctness(self):
         """Determine if the response is correct based on question type and correct answer"""
         if not self.question.has_correct_answer:
             self.is_correct = None
             self.save()
             return None
-        
+
         # Get correct answers from the question
         correct_answers = self.question.choices.get('correct_answers', [])
         selected = self.response_data.get('selected', None)
@@ -664,10 +689,11 @@ class UserQuestionResponse(models.Model):
         # If nothing's selected, it's incorrect
         if selected is None:
             self.is_correct = False
-            self.feedback = feedback_config.get('no_response', default_feedback)
+            self.feedback = feedback_config.get(
+                'no_response', default_feedback)
             self.save()
             return False
-        
+
         # Handle different question types
         if self.question.question_type == 'multiple_choice':
             self.is_correct = selected in correct_answers
@@ -690,14 +716,221 @@ class UserQuestionResponse(models.Model):
 
         self.save()
         return self.is_correct
-    
+
     def to_dict(self):
         return {
             "id": self.id,
-            "quizResponseId": self.quiz_response_id,
-            "questionId": self.question_id,
-            "responseData": self.response_data,
-            "isCorrect": self.is_correct,
+            "quiz_response_id": self.quiz_response_id,
+            "question_id": self.question_id,
+            "response_data": self.response_data,
+            "is_correct": self.is_correct,
             "time_spent": self.time_spent,
             "feedback": self.feedback
         }
+
+
+class BaseResponse(models.Model):
+    """
+    Abstract base model for responses.
+    Subclasses MUST define their own 'associatedId' ForeignKey field.
+    """
+    class Meta:
+        abstract = True
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='%(class)s_lesson',
+        null=False,
+        blank=False,
+        help_text='The lesson related to this response'
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='%(class)s_response_user',
+        null=False,
+        blank=False,
+        help_text='The user who submitted this response'
+    )
+
+    # Meant to be overwritten by subclasses
+    associated_activity = None
+
+    partial_response = models.BooleanField(default=True)
+
+    time_spent = models.PositiveIntegerField(default=0)
+
+    attempts_left = models.PositiveIntegerField(default=0)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "partial_response": self.partial_response,
+            "time_spent": self.time_spent,
+            "attempts_left": self.attempts_left,
+            "associated_activity": self.associated_activity.id,
+        }
+
+
+class WritingResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        Writing,
+        on_delete=models.CASCADE,
+        related_name='associated_writing',
+        help_text='The writing that was answered'
+    )
+
+    response = models.CharField(default="", max_length=10000)
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "response": self.response
+        }
+
+
+class TextContentResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        TextContent,
+        on_delete=models.CASCADE,
+        related_name='associated_textcontent',
+        help_text='The text content associated with this response'
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
+
+
+class PollQuestionResponse(BaseResponse):
+    response_data = models.JSONField(
+        help_text="The user's response data in JSON format"
+    )
+
+    associated_activity = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        related_name='associated_poll_for_question',
+        help_text="The poll associated with this question"
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "response_data": self.response_data
+        }
+
+
+class IdentificationResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        Identification,
+        on_delete=models.CASCADE,
+        related_name='associated_identification',
+        help_text='The identification activity associated with this response'
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
+
+
+class PollResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        related_name='associated_poll',
+        help_text='The poll associated with this response'
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
+
+
+class ActivityManager():
+    """A centralized management class meant to streamline the process of creating and using a
+    activities within the backend.
+    """
+    # Enforce a singleton object pattern
+    _instance = None
+    _initialized = False
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    registered_activities: dict[str, tuple[BaseActivity, BaseResponse,
+                                           dict[str, tuple[str, any]], bool]] = {}
+    registered_services: dict[str, dict[BaseActivity, callable]] = {"response": {}}
+    
+    def registerActivity(self,
+                         ActivityClass: BaseActivity,
+                         ResponseClass: BaseResponse,
+                         nonstandard_resp_fields: dict[str, tuple[str, any]] = {}, child_class: bool = False):
+        """Registers an an activity and associated response class to a globally accessable
+        ActivityManager class instance for the purpose of centralizing the activity API to one file.
+        This is used in the response views, as well as the services module.
+
+        Args:
+            ActivityClass (BaseActivity): The primary activity type. The key for an entry in the\
+            `registered_activities` dictionary is based off of the stringified, lowered name of this class.
+
+            ResponseClass (BaseResponse): The associated response type with the aforementioned activity,\
+            because we are tracking time for pretty much everything, this should never need to be None.
+
+            nonstandard_resp_fields (dict[str, tuple[str, any]], optional): Possibly a TODO item, this field\
+            is used to define fields of a response that are not defined on the BaseResponse type this comes\
+            as a dict that is keyed by the field name, and paired with a tuple describing the name expected from\
+            the client payload, and the default value if that does not exist. Defaults to {}.
+
+            child_class (bool, optional): Designates if the registering class is specifically a child of another\
+            class. This is used in the lesson_service to ensure the activity is not repeated. Defaults to False.
+        """
+        self.registered_activities[ActivityClass.__name__.lower()] = (
+            ActivityClass, ResponseClass, nonstandard_resp_fields, child_class, {})
+    
+    def registerService(self, service_type: str, ActivityClass: BaseActivity, service: callable):
+        """Registers a service to an activity. This is used to allow for custom services to be registered
+        to an activity, such as a custom quiz service. Used for legacy/complex activities to provide more
+        behavior than possible with unified API's services.
+
+        Args:
+            ActivityClass (BaseActivity): The activity class to register the service to.
+            service_name (str): The name of the service.
+            service (callable): The service to register.
+        """
+        if service_type not in self.registered_services:
+            raise ValueError(
+                f"{service_type} is an invalid service type.")
+        self.registered_activities[service_type][ActivityClass.__name__.lower()] = service
+
+    def __init__(self):
+        if self._initialized:
+            return
+        self._initialized = True
+        self.registerActivity(TextContent, TextContentResponse)
+        self.registerActivity(Identification, IdentificationResponse)
+        self.registerActivity(Writing, WritingResponse, {
+                              "response": ["response"]})
+        self.registerActivity(Poll, PollResponse)
+        self.registerActivity(
+            PollQuestion, PollQuestionResponse, child_class=True)
+        self.registerActivity(Quiz, UserQuizResponse)
+        self.registerActivity(Question, UserQuestionResponse, child_class=True)
+
+
+# Register on launch
+ActivityManager()

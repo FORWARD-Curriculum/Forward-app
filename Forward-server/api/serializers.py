@@ -2,12 +2,14 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-from core.models import User, UserQuizResponse, UserQuestionResponse, Quiz, Question
+from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager
+from django.core.exceptions import ImproperlyConfigured
+
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
     Serializer for handling user registration in the API.
-    
+
     This serializer validates and processes user registration data, ensuring:
     - Password meets Django's validation requirements
     - Password confirmation matches
@@ -15,15 +17,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     - User creation follows service layer pattern
     """
     password = serializers.CharField(
-        write_only = True,
-        required = True,
-        validators = [validate_password], # Uses Django's built-in password validation
-        style = {'input_type': 'password'} # Renders as password field in browsable API
+        write_only=True,
+        required=True,
+        # Uses Django's built-in password validation
+        validators=[validate_password],
+        # Renders as password field in browsable API
+        style={'input_type': 'password'}
     )
     password_confirm = serializers.CharField(
-        write_only = True,
-        required = True,
-        style = {'input_type': 'password'}
+        write_only=True,
+        required=True,
+        style={'input_type': 'password'}
     )
 
     class Meta:
@@ -44,13 +48,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         """
         Perform cross-field validation.
-        
+
         Args:
             attrs (dict): Dictionary of field values to validate
-            
+
         Returns:
             dict: Validated data
-            
+
         Raises:
             serializers.ValidationError: If passwords don't match
         """
@@ -60,18 +64,18 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
                 "password": "Password fields didn't match."
             })
         return attrs
-    
+
     def create(self, validated_data: dict):
         """
         Create a new user instance.
-        
+
         This method:
         1. Removes the password_confirm field as it's not needed for user creation
         2. Delegates user creation to the UserService layer
-        
+
         Args:
             validated_data (dict): Validated data from the serializer
-            
+
         Returns:
             User: Newly created user instance
         """
@@ -81,7 +85,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         # Delegate user creation to the service layer
         from core.services import UserService
         return UserService.create_user(validated_data)
-    
+
+
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(
@@ -105,22 +110,23 @@ class UserLoginSerializer(serializers.Serializer):
             username=username,
             password=password
         )
-        
+
         if not user:
             raise AuthenticationFailed('Invalid credentials')
 
         attrs['user'] = user
         return attrs
-    
+
+
 class UserUpdateSerializer(serializers.Serializer):
     display_name = serializers.CharField(required=False)
     profile_picture = serializers.CharField(required=False, allow_null=True)
     consent = serializers.BooleanField(required=False)
-    theme= serializers.CharField(required=False)
+    theme = serializers.CharField(required=False)
     text_size = serializers.CharField(required=False)
     speech_uri_index = serializers.IntegerField(required=False)
     speech_speed = serializers.FloatField(required=False)
-    
+
     def validate(self, attrs: dict):
         theme = attrs.get('theme')
         text_size = attrs.get('text_size')
@@ -137,37 +143,43 @@ class UserUpdateSerializer(serializers.Serializer):
                     'Text size is not a valid option.',
                     code='validation'
                 )
-                
+
         return attrs
-    
+
     def update(self, instance, validated_data):
         """
         Updates a User instance with new data.
-        
+
         This method:
         1. Validates thhe user data follows spec
         2. Replaces any old user info if new info is passed on
-        
+
         Args:
             validated_data (dict): Validated data from the serializer
-            
+
         Returns:
             instance: an updated user instance
         """
         # Update the instance with validated data
-        instance.display_name = validated_data.get('display_name', instance.display_name)
-        instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)
+        instance.display_name = validated_data.get(
+            'display_name', instance.display_name)
+        instance.profile_picture = validated_data.get(
+            'profile_picture', instance.profile_picture)
         instance.consent = validated_data.get('consent', instance.consent)
         instance.theme = validated_data.get('theme', instance.theme)
-        instance.text_size = validated_data.get('text_size', instance.text_size)
-        instance.speech_uri_index = validated_data.get('speech_uri_index', instance.speech_uri_index)
-        instance.speech_speed = validated_data.get('speech_speed', instance.speech_speed)
-        
+        instance.text_size = validated_data.get(
+            'text_size', instance.text_size)
+        instance.speech_uri_index = validated_data.get(
+            'speech_uri_index', instance.speech_uri_index)
+        instance.speech_speed = validated_data.get(
+            'speech_speed', instance.speech_speed)
+
         # Save the instance
         instance.save()
-        
+
         return instance
-    
+
+
 class UserQuestionResponseSerializer(serializers.Serializer):
     """
     Serializer for individual question responses within a quiz submission
@@ -180,12 +192,14 @@ class UserQuestionResponseSerializer(serializers.Serializer):
         quiz_id = self.context.get('quiz_id')
         if not quiz_id:
             raise serializers.ValidationError("Quiz ID is required in context")
-        
+
         try:
             question = Question.objects.get(id=value, quiz_id=quiz_id)
             return value
         except Question.DoesNotExist:
-            raise serializers.ValidationError(f"Question with ID {value} does not exist in this quiz")
+            raise serializers.ValidationError(
+                f"Question with ID {value} does not exist in this quiz")
+
 
 class QuizSubmissionSerializer(serializers.Serializer):
     """
@@ -201,8 +215,9 @@ class QuizSubmissionSerializer(serializers.Serializer):
             Quiz.objects.get(id=value)
             return value
         except Quiz.DoesNotExist:
-            raise serializers.ValidationError(f"Quiz with ID {value} does not exist")
-        
+            raise serializers.ValidationError(
+                f"Quiz with ID {value} does not exist")
+
     def to_internal_value(self, data):
         """
         Override to set quiz_id in context before validation occurs on nested serializers
@@ -212,7 +227,7 @@ class QuizSubmissionSerializer(serializers.Serializer):
         if quiz_id:
             # Update the context for all nested serializers
             self.context['quiz_id'] = quiz_id
-            
+
         # Continue with normal validation process
         return super().to_internal_value(data)
 
@@ -223,11 +238,13 @@ class QuizSubmissionSerializer(serializers.Serializer):
 
         # Get all questions for this quiz
         quiz = Quiz.objects.get(id=quiz_id)
-        required_questions = Question.objects.filter(quiz=quiz, is_required=True)
+        required_questions = Question.objects.filter(
+            quiz=quiz, is_required=True)
 
         # Check if all required questions have responses
         if data.get('is_complete', True):
-            responded_question_ids = [resp['question_id'] for resp in question_responses]
+            responded_question_ids = [resp['question_id']
+                                      for resp in question_responses]
             missing_questions = []
 
             for question in required_questions:
@@ -238,27 +255,98 @@ class QuizSubmissionSerializer(serializers.Serializer):
                 raise serializers.ValidationError({
                     'question_responses': f"Missing responses for required questions: {missing_questions}"
                 })
-            
+
         # Add quiz_id to context for question validation
         # for question_response in question_responses:
         #     self.context['quiz_id'] = quiz_id
 
         return data
-    
+
+
 class UserQuizResponseDetailSerializer(serializers.ModelSerializer):
     """Serializer for retrieving a user's quiz response with details"""
     question_responses = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = UserQuizResponse
         fields = [
-            'id', 'quiz', 'score', 'is_complete', 
+            'id', 'quiz', 'score', 'is_complete',
             'started_at', 'completed_at', 'question_responses'
         ]
-    
+
     def get_question_responses(self, obj):
         """
         Get all question responses for this quiz response.
         """
         question_responses = obj.question_responses.all()
         return [qr.to_dict() for qr in question_responses]
+
+
+class DynamicActivityPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    """
+    Gets queryset dynamically based on 'ActivityModel' in context.
+    """
+
+    def get_queryset(self):
+        ActivityModel = self.context.get('activity_config')[0]
+        # Check if ActivityModel is provided
+        if not ActivityModel:
+            raise ImproperlyConfigured(
+                "DynamicActivityPrimaryKeyRelatedField requires a valid 'ActivityModel' "
+                "class in the serializer context."
+            )
+        return ActivityModel.objects.all()
+
+
+class ResponseSerializer(serializers.Serializer):
+    """Handles creation/update for various BaseResponse subclasses."""
+    # --- Common Input Fields ---
+    id = serializers.UUIDField(required=False, allow_null=True)
+    lesson_id = serializers.PrimaryKeyRelatedField(
+        queryset=Lesson.objects.all())
+    associated_activity = DynamicActivityPrimaryKeyRelatedField(
+        write_only=True)
+    partial_response = serializers.BooleanField(default=True, write_only=True)
+    time_spent = serializers.IntegerField(default=0, write_only=True)
+    attempts_left = serializers.IntegerField(default=0)
+
+    def validate(self, attrs):
+        if 'activity_config' not in self.context:
+            raise serializers.ValidationError(
+                "Serializer context is missing required models.")
+        return attrs
+
+    def save(self, **kwargs):
+        """Handles get_or_create/update logic based on context and input."""
+        validated_data = {**self.validated_data, **kwargs}
+        ResponseModel: BaseResponse = self.context['activity_config'][1]
+        ActivityModel = self.context['activity_config'][0]
+
+        if ActivityModel in ActivityManager.registered_services["response"]:
+            return ActivityManager.registered_services["response"][ActivityModel.__name__.lower()](
+            )
+        else:
+            try:
+                response_object, created = ResponseModel.objects.get_or_create(
+                    user=self.context['request'].user,
+                    associated_activity=validated_data.get(
+                        'associated_activity'),
+                    lesson=validated_data.get("lesson_id"),
+                    id=validated_data.get('id', None),
+                )
+                response_object.partial_response = validated_data.get(
+                    "partial_response", True)
+                response_object.time_spent = validated_data.get(
+                    "time_spent", 0)
+                response_object.attempts_left = validated_data.get(
+                    "attempts_left", 0)
+                for key, value in self.context['activity_config'][2].items():
+                    setattr(response_object, key,
+                            self.context['request'].data.get(*value))
+                response_object.save()
+            except:
+                # If ID provided but not found for user, treat as error
+                raise serializers.ValidationError(
+                    {"response_object": f"{ResponseModel.__name__} could not be created or found."})
+
+            return response_object

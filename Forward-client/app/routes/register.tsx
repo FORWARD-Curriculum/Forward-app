@@ -2,10 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
-import { useAuth } from "@/lib/useAuth";
+import { useAuth } from "@/features/account/hooks";
 import { toast } from "sonner";
 import { Link } from "react-router";
-import { apiFetch } from "@/lib/utils";
+import { apiFetch } from "@/utils/utils";
 
 export default function Login() {
   const [error, setError] = useState(null);
