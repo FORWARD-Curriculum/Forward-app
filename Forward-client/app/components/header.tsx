@@ -46,7 +46,7 @@ export default function Header() {
                   !important modifier, this causes an overflow on the right side of the screen.
                   Even with the overflow-x: hidden; applied, or margin-right: 0px !important;
                   the body still has a content shift due to the margin. I have looked into Radix's
-                  documentation, and have found no way to disable the content shift caused by shadcn's 
+                  documentation, and have found no way to disable the content shift caused by shadcn's
                   use of their headless dialog component. It may be a case of having to use a different
                   custom component or looking further into it. For now, I am choosing to keep it.*/}
               {user ? (

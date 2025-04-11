@@ -71,13 +71,13 @@ class User(AbstractUser):
         max_length=8,
         default="txt-base"
     )
-    
+
     speech_uri_index = models.PositiveIntegerField(
         'webSpeech uri',
         null=True,
         blank=True,
     )
-    
+
     speech_speed = models.FloatField(
         'webSpeech speed',
         null=True,
@@ -289,7 +289,7 @@ class BaseActivity(models.Model):
 
     def __str__(self):
         return f"{self.__class__.__name__} - {self.title}"
-    
+
     @property
     def activity_type(self):
         return self.__class__.__name__
@@ -548,15 +548,15 @@ class UserQuizResponse(models.Model):
         unique_together = ['user', 'quiz']
         verbose_name = 'quiz response'
         verbose_name_plural = 'quiz responses'
-    
+
     def __str__(self):
         return f"{self.user.username}'s response to {self.quiz.title}"
-    
+
     def calculate_score(self):
         """Calculate and set the score based on the question responses"""
         if not self.is_complete:
             return None
-        
+
         # Only count questions that have correct answers defined
         gradable_questions = self.question_responses.filter(
             # self note: This is a field lookup feature in Django's ORM.
@@ -569,7 +569,7 @@ class UserQuizResponse(models.Model):
 
         if total_count == 0:
             return None
-        
+
         for response in gradable_questions:
             if response.is_correct:
                 correct_count += 1
@@ -578,7 +578,7 @@ class UserQuizResponse(models.Model):
         self.save()
 
         return self.score
-    
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -590,7 +590,7 @@ class UserQuizResponse(models.Model):
             "time_spent": self.time_spent,
             "questionResponses": [qr.to_dict() for qr in self.question_responses.all()]
         }
-    
+
 class UserQuestionResponse(models.Model):
     """
     Stores a user's response to an individual question within a quiz
@@ -645,14 +645,14 @@ class UserQuestionResponse(models.Model):
 
     def __str__(self):
         return f"Response to question {self.question.order} in {self.quiz_response}"
-    
+
     def evaluate_correctness(self):
         """Determine if the response is correct based on question type and correct answer"""
         if not self.question.has_correct_answer:
             self.is_correct = None
             self.save()
             return None
-        
+
         # Get correct answers from the question
         correct_answers = self.question.choices.get('correct_answers', [])
         selected = self.response_data.get('selected', None)
@@ -667,7 +667,7 @@ class UserQuestionResponse(models.Model):
             self.feedback = feedback_config.get('no_response', default_feedback)
             self.save()
             return False
-        
+
         # Handle different question types
         if self.question.question_type == 'multiple_choice':
             self.is_correct = selected in correct_answers
@@ -690,7 +690,7 @@ class UserQuestionResponse(models.Model):
 
         self.save()
         return self.is_correct
-    
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -700,4 +700,105 @@ class UserQuestionResponse(models.Model):
             "isCorrect": self.is_correct,
             "time_spent": self.time_spent,
             "feedback": self.feedback
+        }
+
+class UserPollResponse(models.Model):
+    '''
+    store a users poll responses
+    '''
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='poll_responses',
+        help_text='The user who submitted this poll response'
+    )
+    poll = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        related_name="original_poll",
+        help_text="The poll this poll question belongs to"
+    )
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='poll_lesson_origin',
+        help_text="The lesson this content belongs to"
+    )
+    response_data = models.JSONField(
+        default=list,
+        help_text="list of responses from the poll"
+    )
+    time_spent = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text='The total time spent on this question'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "userId": self.user_id,
+            "pollId": self.poll_id,
+            "lessonId": self.lesson_id,
+            "time_spent": self.time_spent,
+            "responseData": self.response_data
+        }
+
+
+class UserPollQuestionResponse(models.Model):
+    '''
+    stores a users question repsonses for a poll
+    '''
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='poll_question_responses',
+        help_text='The user who submitted this poll response'
+    )
+    poll = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        related_name="poll_question_origin_poll",
+        help_text="The poll this poll question belongs to"
+    )
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='poll_question_lesson_origin',
+        help_text="The lesson this content belongs to"
+    )
+    response_data = models.JSONField(
+        default=list,
+        help_text="list of responses from the poll"
+    )
+    time_spent = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text='The total time spent on this question'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "userId": self.user_id,
+            "pollId": self.poll_id,
+            "lessonId": self.lesson_id,
+            "time_spent": self.time_spent,
+            "responseData": self.response_data
         }

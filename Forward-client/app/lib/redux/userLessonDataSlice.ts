@@ -100,14 +100,14 @@ export const saveUserResponseThunk = createAsyncThunk(
     const state = thunkAPI.getState() as RootState;
     const lastTime = state.response.timeSpent;
     data.response.timeSpent = Math.floor((Date.now() - lastTime)/1000);
-    
+
     // FIXME: SERVER DOES NOT RECIEVE THE AGGREGATE TIME, MUST ALSO DO THIS IN THE VIEW
     const response = await apiFetch(`/response/${data.type.toLowerCase()}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data.response),
     });
-    
+
     // TODO: Validate OK status, this is only for not having a backend
     //if (response.ok) {
       thunkAPI.dispatch(resetTimeSpent())

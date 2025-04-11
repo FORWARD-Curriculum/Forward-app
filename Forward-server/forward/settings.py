@@ -26,11 +26,11 @@ SECRET_KEY = 'django-insecure-=esmn7v4(rjy@9#cs1gpv3$m^6i!z-5a1l0hbt@elyr!!tpi9)
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'backend', 
+    'backend',
     'backend:8000',
     'localhost',
     '127.0.0.1',
-    'frontend', 
+    'frontend',
     'testserver'
 ]
 
@@ -106,7 +106,7 @@ MIDDLEWARE = [
     # 'accept',
     # 'accept-encoding',
     # 'authorization',
-    # 'content-type', 
+    # 'content-type',
     # 'dnt',
     # 'origin',
     # 'user-agent',

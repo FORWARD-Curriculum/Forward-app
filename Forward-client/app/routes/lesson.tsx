@@ -93,7 +93,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
       window.pageYOffset > 500 ? setShowScrolBtn(true) : setShowScrolBtn(false);
     };
     window.addEventListener("scroll", handleButtonVisibility);
-    
+
     // Deregisters event listener and destroys interval
     return () => {
       window.removeEventListener("scroll", handleButtonVisibility);
@@ -121,7 +121,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
     }
   }, [loaderData]);
 
-  
+
   return (
     <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:flex-row lg:items-start lg:gap-8">
       <div className="flex flex-col lg:h-full">

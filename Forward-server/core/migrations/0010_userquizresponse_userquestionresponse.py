@@ -46,4 +46,14 @@ class Migration(migrations.Migration):
                 'unique_together': {('quiz_response', 'question')},
             },
         ),
+        migrations.AddField(
+            model_name='user',
+            name='speech_speed',
+            field=models.FloatField(blank=True, null=True, verbose_name='webSpeech speed'),
+        ),
+        migrations.AddField(
+            model_name='user',
+            name='speech_uri_index',
+            field=models.PositiveIntegerField(blank=True, null=True, verbose_name='webSpeech uri'),
+        ),
     ]

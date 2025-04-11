@@ -5,6 +5,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 /*import mkcert from 'vite-plugin-mkcert'*/
 import path from "path";
 
+// console.log(process.env)
 export default defineConfig({
   server: {
     host: "0.0.0.0",

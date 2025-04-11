@@ -80,7 +80,7 @@ export interface PollQuestion {
   id: number;
   pollId: number;
   questionText: string;
-  options: 
+  options:
     {
       id: number;
       text: string;
@@ -109,14 +109,14 @@ export interface QuizResponse extends BaseResponse {
   order: number;
   highestQuestionReached: number,
   responses: QuestionResponse[]
-} 
+}
 
 /**
  * @field choices: an array of options by id
  * @extends BaseResponse
  */
 export interface QuestionResponse extends BaseResponse {
-  choices: number[]
+  choices: number[],
 }
 
 export interface QuizResponse {
@@ -130,7 +130,8 @@ export interface QuizResponse {
  * @field choices: an array of options by id
  */
 export interface PollQuestionResponse extends BaseResponse  {
-  choices: number[]
+  answer: string,
+  order: number,
 }
 
 export interface WritingResponse extends BaseResponse  {
