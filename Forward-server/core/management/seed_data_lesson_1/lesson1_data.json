@@ -1,4 +1,32 @@
 {
+  "users": [
+    {
+      "username": "admin",
+      "password": "adminpassword",
+      "display_name": "Admin",
+      "is_staff": true,
+      "is_superuser": true
+    },
+    {
+      "username": "student1",
+      "password": "password1",
+      "display_name": "Student1",
+      "facility_id": "1",
+      "profile_picture": "/pfp.png",
+      "consent": true
+    },
+    {
+      "username": "student2",
+      "password": "password2",
+      "display_name": "Student2"
+    },
+    {
+      "username": "student3",
+      "password": "password3",
+      "display_name": "Student3",
+      "consent": false
+    }
+  ],
   "lesson": {
     "title": "Going to College",
     "description": "This lesson covers the basics of going to college, including types of colleges, degrees, application process, and financing your education.",
@@ -280,7 +308,9 @@
               "Bachelor's degree",
               "Master's degree"
             ],
-            "correct_answers": ["Master's degree"]
+            "correct_answers": [
+              "Master's degree"
+            ]
           },
           "is_required": true,
           "order": 1,
@@ -296,7 +326,9 @@
               "Professional degree",
               "Doctoral degree"
             ],
-            "correct_answers": ["Professional degree"]
+            "correct_answers": [
+              "Professional degree"
+            ]
           },
           "is_required": true,
           "order": 2,
@@ -312,7 +344,9 @@
               "Bachelor's degree",
               "Master's degree"
             ],
-            "correct_answers": ["Bachelor's degree"]
+            "correct_answers": [
+              "Bachelor's degree"
+            ]
           },
           "is_required": true,
           "order": 3,
@@ -328,7 +362,9 @@
               "Professional degree",
               "Doctoral degree"
             ],
-            "correct_answers": ["Professional degree"]
+            "correct_answers": [
+              "Professional degree"
+            ]
           },
           "is_required": true,
           "order": 4,
@@ -344,7 +380,9 @@
               "Professional degrees",
               "Master's degrees"
             ],
-            "correct_answers": ["Master's degrees"]
+            "correct_answers": [
+              "Master's degrees"
+            ]
           },
           "is_required": true,
           "order": 5,
