@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.conf import settings
 
-from core.models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing
+from core.models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, Identification
 
 class Command(BaseCommand):
     help = 'Seeds the database with initial data from JSON files'
@@ -69,6 +69,9 @@ class Command(BaseCommand):
                 
                 poll_question_data = self.load_json_file(seed_path / 'poll_questions.json')
                 self.seed_poll_questions(poll_question_data, polls)
+                
+                identification_question_data = self.load_json_file(seed_path / 'identifications.json')
+                identifications = self.seed_identifications(identification_question_data, lessons)
 
                 self.stdout.write(self.style.SUCCESS('Successfully seeded database'))
         except Exception as e:
@@ -154,6 +157,29 @@ class Command(BaseCommand):
             )
             status = 'Created' if created else 'Updated'
             self.stdout.write(self.style.SUCCESS(f'{status}: {title}'))
+    
+    def seed_identifications(self, identification_data, lessons):
+        for data in identification_data:
+            title = data['title']
+            lesson_title = data['lesson']
+            instructions = data.get('instructions', '')
+            
+            if lesson_title not in lessons:
+                self.stdout.write(self.style.ERROR(f'Lesson not found: {lesson_title}'))
+                continue
+                
+            content, created = Identification.objects.update_or_create(
+                lesson=lessons[lesson_title],
+                title=title,
+                instructions = data.get('instructions', ''),
+                minimum_correct=data.get('minimum_correct', 0),
+                defaults={
+                    'content': data.get('content', ''),
+                    'order': data.get('order', 0),
+                }
+            )
+            status = 'Created' if created else 'Updated'
+            self.stdout.write(self.style.SUCCESS(f'{status}: Identification - {title}'))
     
     def seed_quizzes(self, quiz_data, lessons):
         self.stdout.write('Seeding quizzes...')

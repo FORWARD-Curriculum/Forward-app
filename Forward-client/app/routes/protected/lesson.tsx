@@ -1,24 +1,21 @@
 import {
   type BaseActivity,
   type Lesson,
-  type TextContent as TextContentType,
-  type Poll as PollType,
-  type Quiz as QuizType,
-  type Writing as WritingType,
-  setLesson,
-  nextActivity,
-  setActivity,
-} from "@/lib/redux/lessonSlice";
+  type LessonResponse,
+  type ActivityManager,
+  ActivityTypeDisplayNames,
+} from "@/features/curriculum/types";
 import type { Route } from "./+types/lesson";
-import { apiFetch, useTitle } from "@/lib/utils";
+import { apiFetch } from "@/utils/utils";
 import { useSelector, useDispatch } from "react-redux";
 import store, { type RootState } from "@/store";
 import { useEffect } from "react";
-import TextContent from "@/components/curriculum/textcontent";
-import Poll from "@/components/curriculum/poll";
-import Quiz from "@/components/curriculum/quiz";
-import Writing from "@/components/curriculum/writing";
-import { useClient } from "@/lib/useClient";
+import TextContent from "@/features/curriculum/components/textcontent";
+import Poll from "@/features/curriculum/components/poll";
+import Quiz from "@/features/curriculum/components/quiz";
+import Writing from "@/features/curriculum/components/writing";
+import Identification from "@/features/curriculum/components/identification";
+import { useClient } from "@/hooks/useClient";
 import {
   Accordion,
   AccordionContent,
@@ -27,13 +24,16 @@ import {
 } from "@/components/ui/accordion";
 import { ArrowRightIcon, ArrowUpIcon } from "lucide-react";
 import { useState } from "react";
-import { Link, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import {
   incrementHighestActivity,
-  type LessonResponse,
-  resetTimeSpent,
   setResponse,
-} from "@/lib/redux/userLessonDataSlice";
+} from "@/features/curriculum/slices/userLessonDataSlice";
+import {
+  nextActivity,
+  setActivity,
+  setLesson,
+} from "@/features/curriculum/slices/lessonSlice";
 
 export async function clientLoader({
   params,
@@ -42,8 +42,8 @@ export async function clientLoader({
   response: LessonResponse | null;
 } | void> {
   // If lesson is cached, don't fetch
-  if (store.getState().lesson.lesson?.id !== parseInt(params.lessonId)) {
-    const response = await apiFetch(`/lessons/${params.lessonId}/content`, {
+  if (store.getState().lesson.lesson?.id !== params.lessonId) {
+    const response = await apiFetch(`/lesson/${params.lessonId}/content`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
@@ -59,22 +59,41 @@ export async function clientLoader({
 
 clientLoader.prefetch = true;
 
-export function Activity({
-  activity,
-}: {
-  activity: BaseActivity | TextContentType | undefined;
-}) {
-  switch (activity?.type) {
+export function Activity({ activity }: { activity: BaseActivity }) {
+  /* Generate a unique key based on the activity's identifier
+   * IMPORTANT: The key also makes sure react discards components instead of reusing them on
+   * navigation, which breaks how we handle responses.
+   */
+  const key = activity ? `${activity.type}-${activity.order}` : "invalid";
+
+  switch (activity.type) {
     case "Writing":
-      return <Writing writing={activity as WritingType} />;
+      return (
+        <Writing
+          key={key}
+          writing={activity as ActivityManager["Writing"][0]}
+        />
+      );
     case "Quiz":
-      return <Quiz quiz={activity as QuizType} />;
+      return <Quiz key={key} quiz={activity as ActivityManager["Quiz"][0]} />;
     case "Poll":
-      return <Poll poll={activity as PollType} />;
+      return <Poll key={key} poll={activity as ActivityManager["Poll"][0]} />;
     case "TextContent":
-      return <TextContent textContent={activity} />;
+      return (
+        <TextContent
+          key={key}
+          textContent={activity as ActivityManager["TextContent"][0]}
+        />
+      );
+    case "Identification":
+      return (
+        <Identification
+          key={key}
+          identification={activity as ActivityManager["Identification"][0]}
+        />
+      );
     default:
-      return <p>Invalid</p>;
+      return <p>Out of bounds</p>;
   }
 }
 
@@ -84,7 +103,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   const { hash } = useLocation();
   const lesson = useSelector((state: RootState) => state.lesson);
   const response = useSelector((state: RootState) => state.response);
-  const activity = lesson.lesson?.activities[lesson.currentActivity - 1];
+  const activity = lesson.lesson?.activities[lesson.current_activity - 1];
   const [showsScrolBtn, setShowScrolBtn] = useState(false);
 
   // Mount/Unmount
@@ -100,7 +119,6 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
     };
   }, []);
 
-
   // We only want to update the lesson slice when the data loads, no other time
   useEffect(() => {
     if (loaderData) {
@@ -115,13 +133,19 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                 : 1,
             ),
           );
-          if (loaderData.response) dispatch(setResponse(loaderData.response));
+          if (loaderData.response)
+            dispatch(
+              setResponse({ ...loaderData.response, time_spent: Date.now() }),
+            );
         }
       }
     }
   }, [loaderData]);
 
+<<<<<<< HEAD:Forward-client/app/routes/lesson.tsx
 
+=======
+>>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0:Forward-client/app/routes/protected/lesson.tsx
   return (
     <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:flex-row lg:items-start lg:gap-8">
       <div className="flex flex-col lg:h-full">
@@ -143,16 +167,15 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                 {lesson.lesson?.activities.map((activityIndex) => {
                   return (
                     <button
-                      disabled={activityIndex.order > response.highestActivity}
+                      disabled={activityIndex.order > response.highest_activity}
                       key={activityIndex.order}
-                      className={`${activityIndex.order === lesson.currentActivity ? "bg-accent/40" : ""} disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
+                      className={`${activityIndex.order === lesson.current_activity ? "bg-accent/40" : ""} disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                       onClick={() => {
                         dispatch(setActivity(activityIndex.order));
-                        dispatch(resetTimeSpent());
                         history.replaceState(
                           null,
                           "",
-                          `#${activityIndex.order},`,
+                          `#${activityIndex.order}`,
                         );
                       }}
                     >
@@ -188,34 +211,28 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
       <div className="bg-secondary border-secondary-border text-secondary-foreground flex min-h-min w-full flex-col rounded-3xl border-1 p-4">
         <h1 className="text-2xl font-bold">
           <span className="text-accent">
-            {
-              {
-                Writing: "Writing",
-                Quiz: "Quiz",
-                TextContent: "Info",
-                Poll: "Poll",
-                Default: "Activity",
-              }[activity?.type || "Default"]
-            }
-            :{" "}
+            {ActivityTypeDisplayNames[activity?.type || "Default"]}:{" "}
           </span>
           {activity?.title}
         </h1>
-        <Activity activity={activity} />
+        {activity && <Activity activity={activity} />}
         <div className="mt-auto flex">
-          <Link
-            prefetch="intent"
-            to={"#" + (lesson.currentActivity + 1)}
-            className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2"
+          <button
+            disabled={response.current_response?.partial_response || undefined}
+            className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden"
             onClick={() => {
               dispatch(nextActivity());
               dispatch(incrementHighestActivity());
-              dispatch(resetTimeSpent());
+              history.replaceState(
+                null,
+                "",
+                "#" + (lesson.current_activity + 1),
+              );
             }}
           >
             Save and Continue
             <ArrowRightIcon className="!text-primary-foreground" />
-          </Link>
+          </button>
         </div>
       </div>
     </div>

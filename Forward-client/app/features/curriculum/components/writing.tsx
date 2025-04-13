@@ -1,4 +1,4 @@
-import type { Writing } from "@/lib/redux/lessonSlice";
+import type { Writing } from "@/features/curriculum/types";
 
 export default function Writing({writing}: {writing: Writing}) {
     return (

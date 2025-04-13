@@ -1,6 +1,9 @@
-import { setUser, type User } from "@/lib/redux/userSlice";
+import { setUser } from "@/features/account/slices/userSlice";
 import { useDispatch } from "react-redux";
-import { apiFetch } from "@/lib/utils";
+import { apiFetch } from "@/utils/utils";
+import type { User } from "@/features/account/types";
+import { initialLessonResponseState, resetResponseState, setResponse } from "@/features/curriculum/slices/userLessonDataSlice";
+import { resetInitialLessonState } from "@/features/curriculum/slices/lessonSlice";
 
 // Function to get the CSRF token from cookies
 const getCookie = (name: string) => {
@@ -43,10 +46,14 @@ export const useAuth = () => {
 
       const result = await response.json();
 
+      dispatch(setUser(null));
+      dispatch(resetResponseState());
+      dispatch(resetInitialLessonState());
+      
       if (!response.ok) {
         throw new Error(result.detail);
       }
-      dispatch(setUser(null));
+      
     } catch (error: any) {
       console.error(error.message || "Logout failed. Please try again.");
       throw error; // This propagates the error to the caller

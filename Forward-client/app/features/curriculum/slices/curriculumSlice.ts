@@ -1,5 +1,5 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
-import type { Lesson } from "./lessonSlice";
+import type { Lesson } from "@/features/curriculum/types";
 
 const initialState: {
   lessons: Lesson[] | null;

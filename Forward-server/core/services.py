@@ -4,8 +4,12 @@ from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+<<<<<<< HEAD
 from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, UserQuizResponse, UserQuestionResponse, UserPollResponse, UserPollQuestionResponse
 from typing import Union
+=======
+from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse
+>>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 
 class UserService:
     @staticmethod
@@ -126,9 +130,13 @@ class LessonService:
         Raises:
             Lesson.DoesNotExist: If the lesson doesn't exist
         """
-        lesson = Lesson.objects.get(id=lesson_id)
+        try:
+            lesson = Lesson.objects.get(id=lesson_id)
+        except Lesson.DoesNotExist:
+            raise 
         lesson_dict = lesson.to_dict()
 
+<<<<<<< HEAD
         lesson_dict['activities'] = {}
 
         # Process text content
@@ -158,11 +166,59 @@ class LessonService:
             lesson_dict['activities'][writing.order] = writing_dict
 
         lesson_dict['activities'] = list(lesson_dict['activities'].values())
+=======
+        activity_list = []
+        
+        for value in ActivityManager.registered_activities.values():
+            ActivityModel, child_class = value[0],value[3]
+            if not child_class:
+                activities = list(ActivityModel.objects.filter(lesson=lesson).order_by('order'))
+                for activity in activities:
+                    activity_list.append(activity.to_dict())
+        
+        lesson_dict["activities"] = sorted(activity_list, key=lambda x: x["order"])
+>>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 
         return {
             "lesson": lesson_dict
         }
+<<<<<<< HEAD
 
+=======
+        
+class ResponseService:
+    staticmethod
+    def get_response_data(lesson_id, user):
+        """
+        Retrieve all content associated with a lesson.
+        
+        Args:
+            lesson_id (int): The ID of the lesson
+            
+        Returns:
+            dict: All content associated with the lesson         
+        Raises:
+            Lesson.DoesNotExist: If the lesson doesn't exist
+        """
+        
+        lesson = Lesson.objects.get(id=lesson_id)
+        
+        out_dict = {} 
+        out_dict['lesson_id'] = lesson.id
+        out_dict['response_data'] = {}
+        for value in ActivityManager.registered_activities.values():
+            [Activity, Response] = value[:2]
+            out_dict['response_data'][Activity.__name__] = [a.to_dict() for a in list(Response.objects.filter(lesson=lesson,user=user))]
+        
+        out_dict['highest_activity'] = 1
+        for value in out_dict['response_data'].values():
+            out_dict['highest_activity'] += len(value)
+            
+        return {
+            "response": out_dict
+        }
+        
+>>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 class QuizResponseService:
     @staticmethod
     def __get_feedback_for_score(quiz, score):
@@ -301,6 +357,7 @@ class QuizResponseService:
             UserQuizResponse.DoesNotExist: If the response doesn't exist or belong to the user
         """
         return UserQuizResponse.objects.get(id=response_id, user=user)
+<<<<<<< HEAD
 
 
 class PollResponseService:
@@ -447,3 +504,8 @@ class PollResponseService:
         except (ValueError, TypeError):
              # Handle invalid response_id format
              return None
+=======
+    
+    def __init__(self):
+        ActivityManager.registerService(ActivityManager, "response", Quiz, QuizResponseService)
+>>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0

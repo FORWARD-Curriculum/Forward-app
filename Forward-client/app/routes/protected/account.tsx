@@ -1,4 +1,4 @@
-import type { User } from "@/lib/redux/userSlice";
+import type { User } from "@/features/account/types";
 import React, { useEffect, useRef } from "react";
 import type { RootState } from "@/store";
 import { useSelector } from "react-redux";
@@ -14,8 +14,8 @@ import {
   Square,
   Turtle,
 } from "lucide-react";
-import { apiFetch } from "@/lib/utils";
-import { useAuth } from "@/lib/useAuth";
+import { apiFetch } from "@/utils/utils";
+import { useAuth } from "@/features/account/hooks";
 import { toast } from "sonner";
 import {
   Popover,

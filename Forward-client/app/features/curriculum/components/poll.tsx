@@ -1,12 +1,12 @@
-import type { Poll, PollQuestion, PollQuestionResponse } from "@/lib/redux/lessonSlice";
-import { saveUserResponseThunk } from "@/lib/redux/userLessonDataSlice";
+import type { Poll, PollQuestion, PollQuestionResponse } from "../types/index";
+import { saveUserResponseThunk } from "@/features/curriculum/slices/userLessonDataSlice";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/store";
 
 
 export default function Writing({ poll }: { poll: Poll }) {
   const dispatch = useDispatch<AppDispatch>();
-  const lessonId = useSelector((state: RootState) => state.response.lessonId);
+  const lessonId = useSelector((state: RootState) => state.response.lesson_id);
 
   const handleOptionChange = (
     questionIndex: number,
@@ -18,19 +18,18 @@ export default function Writing({ poll }: { poll: Poll }) {
 
     const response: PollQuestionResponse = {
       id: question.id, // Use question.id
-      associatedId: poll.id,
-      partialResponse: null,
-      attempts: null,
-      answer: optionText,
-      timeSpent: 0,
-      order: poll.order,
+      associated_activity: poll.id,
+      partial_response: false,
+      time_spent: 0,
+      attempts_left: 0,
+      response_data: [],
     };
 
     dispatch(
       saveUserResponseThunk({
         type: "Poll",
         response,
-        order: response.order,
+        trackTime: true,
       }),
     )
   };
@@ -42,7 +41,7 @@ export default function Writing({ poll }: { poll: Poll }) {
         {poll.questions.map((question: PollQuestion, index: number) => {
           return (
             <div key={index}>
-              <li>{question.questionText}</li>
+              <li>{question.question_text}</li>
               <form>
                 {question.options.map((option, optionIndex) => {
                   const optionId = `question-${index}-option-${optionIndex}`;

@@ -20,6 +20,4 @@ python manage.py migrate
 # Seed database with test data
 python manage.py seed_test_data --reset
 
-python manage.py runserver
-
 echo "Development environment is ready"
