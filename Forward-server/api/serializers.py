@@ -2,13 +2,9 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-<<<<<<< HEAD
-from core.models import User, UserQuizResponse, UserQuestionResponse, Quiz, Question, Poll, PollQuestion
-=======
-from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager
+from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager, Poll, PollQuestion, UserQuestionResponse
 from django.core.exceptions import ImproperlyConfigured
 
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
