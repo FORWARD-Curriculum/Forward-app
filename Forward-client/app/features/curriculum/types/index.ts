@@ -43,6 +43,7 @@ export type ActivityManager = {
   ConceptMap: [ConceptMap, ConceptMapResponse, false];
   Question: [Question, QuestionResponse, true];
   PollQuestion: [PollQuestion, PollQuestionResponse, true];
+  Embed: [Embed, EmbedResponse, false];
 };
 
 /**
@@ -58,6 +59,7 @@ export const ActivityTypeDisplayNames: Record<BaseActivity["type"] | "Default", 
   Default: "Activity",
   ConceptMap: "Concept Map",
   Identification: "Identification",
+  Embed: "Embed",
 }
 
 // #region -------------------------- Activities ---------------------------
@@ -156,6 +158,11 @@ export interface Identification extends BaseActivity {
   feedback: string;
 }
 
+export interface Embed extends BaseActivity {
+  has_code: boolean;
+  link: string;
+}
+
 // #endregion -------------------------- Activities ---------------------------
 
 // #region -------------------------- Responses ----------------------------
@@ -226,5 +233,8 @@ export interface TextContentResponse extends BaseResponse {}
 export interface ConceptMapResponse extends BaseResponse {}
 export interface IdentificationResponse extends BaseResponse {}
 export interface PollResponse extends BaseResponse {}
+export interface EmbedResponse extends BaseResponse {
+  inputted_code: string;
+}
 
 // #endregion -------------------------- Responses ----------------------------

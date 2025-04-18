@@ -15,6 +15,7 @@ import Poll from "@/features/curriculum/components/poll";
 import Quiz from "@/features/curriculum/components/quiz";
 import Writing from "@/features/curriculum/components/writing";
 import Identification from "@/features/curriculum/components/identification";
+import Embed from "@/features/curriculum/components/embed";
 import { useClient } from "@/hooks/useClient";
 import {
   Accordion,
@@ -92,6 +93,8 @@ export function Activity({ activity }: { activity: BaseActivity }) {
           identification={activity as ActivityManager["Identification"][0]}
         />
       );
+    case "Embed":
+      return <Embed key={key} embed={activity as ActivityManager["Embed"][0]}/>
     default:
       return <p>Out of bounds</p>;
   }

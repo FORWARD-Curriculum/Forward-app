@@ -494,6 +494,41 @@ class PollQuestion(models.Model):
             "order": self.order,
         }
 
+
+class Embed(BaseActivity):
+    """
+    Model for a simple link to be embedded within an activity
+    """
+    link = models.TextField(
+        help_text="a valid link"
+    )
+
+    code = models.TextField(
+        null=True,
+        blank=True,
+        default=None,
+        help_text="A string of a code to determine if the user may procede"
+    )
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "embed"
+        verbose_name_plural = "embeds"
+
+    def __str__(self):
+        return f"Embed: {self.title}"
+
+    @property
+    def activity_type(self):
+        return self.__class__.__name__
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "link": self.link,
+            "has_code": self.code is not None,
+        }
+
 # TODO: Make quiz and question response inherit from BaseResponse, or make
 # them adhere to the contract enforced by BaseResponse
 
@@ -859,6 +894,23 @@ class PollResponse(BaseResponse):
         }
 
 
+class EmbedResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        Embed,
+        on_delete=models.CASCADE,
+        related_name='associated_embed',
+        help_text='The embed activity associated with this response'
+    )
+
+    inputted_code: str = None
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "inputted_code": self.inputted_code
+        }
+
+
 class ActivityManager():
     """A centralized management class meant to streamline the process of creating and using a
     activities within the backend.
@@ -874,8 +926,9 @@ class ActivityManager():
 
     registered_activities: dict[str, tuple[BaseActivity, BaseResponse,
                                            dict[str, tuple[str, any]], bool]] = {}
-    registered_services: dict[str, dict[BaseActivity, callable]] = {"response": {}}
-    
+    registered_services: dict[str,
+                              dict[BaseActivity, callable]] = {"response": {}}
+
     def registerActivity(self,
                          ActivityClass: BaseActivity,
                          ResponseClass: BaseResponse,
@@ -901,7 +954,7 @@ class ActivityManager():
         """
         self.registered_activities[ActivityClass.__name__.lower()] = (
             ActivityClass, ResponseClass, nonstandard_resp_fields, child_class, {})
-    
+
     def registerService(self, service_type: str, ActivityClass: BaseActivity, service: callable):
         """Registers a service to an activity. This is used to allow for custom services to be registered
         to an activity, such as a custom quiz service. Used for legacy/complex activities to provide more
@@ -915,7 +968,8 @@ class ActivityManager():
         if service_type not in self.registered_services:
             raise ValueError(
                 f"{service_type} is an invalid service type.")
-        self.registered_activities[service_type][ActivityClass.__name__.lower()] = service
+            
+        self.registered_services[service_type][ActivityClass.__name__.lower()] = service
 
     def __init__(self):
         if self._initialized:
@@ -930,6 +984,8 @@ class ActivityManager():
             PollQuestion, PollQuestionResponse, child_class=True)
         self.registerActivity(Quiz, UserQuizResponse)
         self.registerActivity(Question, UserQuestionResponse, child_class=True)
+        self.registerActivity(Embed, EmbedResponse, {
+                              "inputted_code": ["inputted_code", None]})
 
 
 # Register on launch
