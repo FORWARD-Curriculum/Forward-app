@@ -494,6 +494,77 @@ class PollQuestion(models.Model):
             "order": self.order,
         }
 
+class ConceptMap(BaseActivity):
+    """Model for mapping concepts to each other"""
+    content = models.CharField(
+        max_length=50000,
+        default="",
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content,
+            "concepts": [c.to_dict() for c in Concept.objects.filter(concept_map=self).order_by('order')]
+        }
+
+class Concept(BaseActivity):
+    """Model for a concept in the concept map"""
+    # TODO use jsonschema to enforce and validate the schema of the example field
+    
+    """
+    {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"|null
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "logo",
+          "description"
+        ],
+        "additionalProperties": false
+      },
+    }
+    """
+    
+    concept_map = models.ForeignKey(
+        ConceptMap,
+        on_delete=models.CASCADE,
+        related_name="concepts",
+        help_text="The concept map this concept belongs to"
+    )
+    
+    image = models.TextField(blank=True, null=True)
+    
+    description = models.TextField(
+        help_text="A detailed description of the concept"
+    )
+    
+    examples = models.JSONField(
+        default=list,
+        help_text="List of examples for this concept"
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "id": self.id,
+            "image": self.image,
+            "description": self.description,
+            "examples": self.examples,
+        }
+
 # TODO: Make quiz and question response inherit from BaseResponse, or make
 # them adhere to the contract enforced by BaseResponse
 
@@ -858,6 +929,18 @@ class PollResponse(BaseResponse):
             **super().to_dict(),
         }
 
+class ConceptMapResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        ConceptMap,
+        on_delete=models.CASCADE,
+        related_name='associated_conceptmap',
+        help_text='The concept map associated with this response'
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
 
 class ActivityManager():
     """A centralized management class meant to streamline the process of creating and using a
@@ -930,6 +1013,8 @@ class ActivityManager():
             PollQuestion, PollQuestionResponse, child_class=True)
         self.registerActivity(Quiz, UserQuizResponse)
         self.registerActivity(Question, UserQuestionResponse, child_class=True)
+        self.registerActivity(ConceptMap, ConceptMapResponse)
+        self.registerActivity(Concept, None, child_class=True) # None here means no response is expected
 
 
 # Register on launch

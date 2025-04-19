@@ -138,11 +138,16 @@ export interface PollQuestion {
 }
 
 export interface ConceptMap extends BaseActivity {
-  summary: string;
-  items: {
-    term: string;
-    image: string;
-    definition: string;
+  content: string;
+  concepts: {
+    title: string;
+    image?: string;
+    description: string;
+    examples: {
+      name: string;
+      image?: string;
+      description: string;
+    }[];
   }[];
 }
 

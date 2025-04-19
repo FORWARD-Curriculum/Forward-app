@@ -9,12 +9,13 @@ import type { Route } from "./+types/lesson";
 import { apiFetch } from "@/utils/utils";
 import { useSelector, useDispatch } from "react-redux";
 import store, { type RootState } from "@/store";
-import { useEffect } from "react";
+import { act, useEffect } from "react";
 import TextContent from "@/features/curriculum/components/textcontent";
 import Poll from "@/features/curriculum/components/poll";
 import Quiz from "@/features/curriculum/components/quiz";
 import Writing from "@/features/curriculum/components/writing";
 import Identification from "@/features/curriculum/components/identification";
+import ConceptMap from "@/features/curriculum/components/conceptmap";
 import { useClient } from "@/hooks/useClient";
 import {
   Accordion,
@@ -92,6 +93,9 @@ export function Activity({ activity }: { activity: BaseActivity }) {
           identification={activity as ActivityManager["Identification"][0]}
         />
       );
+    case "ConceptMap":
+      return (
+        <ConceptMap key={key} conceptmap={activity as ActivityManager['ConceptMap'][0]}/>);
     default:
       return <p>Out of bounds</p>;
   }
@@ -163,7 +167,8 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                 {lesson.lesson?.activities.map((activityIndex) => {
                   return (
                     <button
-                      disabled={activityIndex.order > response.highest_activity}
+                      // FIXME for now, we are not using the response to disable the button
+                      // disabled={activityIndex.order > response.highest_activity}
                       key={activityIndex.order}
                       className={`${activityIndex.order === lesson.current_activity ? "bg-accent/40" : ""} disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                       onClick={() => {
@@ -214,7 +219,8 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         {activity && <Activity activity={activity} />}
         <div className="mt-auto flex">
           <button
-            disabled={response.current_response?.partial_response || undefined}
+            
+            /*disabled={response.current_response?.partial_response || undefined}*/
             className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden"
             onClick={() => {
               dispatch(nextActivity());
