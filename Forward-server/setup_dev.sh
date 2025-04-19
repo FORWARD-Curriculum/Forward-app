@@ -18,6 +18,7 @@ pip install django djangorestframework django-cors-headers
 python manage.py migrate
 
 # Seed database with test data
-python manage.py seed_test_data --reset
+python manage.py seed_lessons_data --reset lesson_seed_data/lesson1.json
+
 
 echo "Development environment is ready"
