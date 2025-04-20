@@ -1,0 +1,149 @@
+[
+    {
+      "lesson": "Going to College",
+      "title": "Exploring College Types",
+      "instructions": null,
+      "order": 9,
+      "content": "There are many types of colleges and ways to receive <def def='Post-secondary refers to any education or training you pursue after graduating from high school, such as college, university, or trade school.'>post-secondary</def> education. There are also different types of degrees that you can get, providing various levels of <def def='expert skill or knowledge in a particular field.'>expertise</def>. Sometimes you won’t know what a college offers until you ask, so it’s all a matter of finding the perfect fit for you! Let’s explore some different college types here:",
+      "examples": [
+        {
+          "title": "Trade/Technical school",
+          "image": "/dev/trade.png",
+          "description": "Trade and technical schools, sometimes called vocational training schools, are schools that provide education for a specific focus area without requiring general education classes. These schools typically provide certificates or associates degrees, take 1-3 years to complete, and often incorporate lots of hands-on experience.",
+          "examples": [
+            {
+              "name": "Paul Mitchell",
+              "image": "https://dsfee43herbpw.cloudfront.net/uploads/099d1084aa173b12f02419af.png",
+              "description": "A beauty school with multiple locations nationwide. Focus areas include cosmetology, barbering, esthetics, nails, and makeup."
+            },
+            {
+              "name": "EVIT (East Valley Institute of Technology)",
+              "image": "https://cmsv2-assets.apptegy.net/uploads/8209/file/1071239/2aae1777-4797-4162-b016-8811f889abde.png",
+              "description": "Located in Arizona offers career training programs in health services (Examples: nursing and massage therapy), industrial trades (Examples: plumbing and welding), and service industries (aesthetics and cosmetology)."
+            },
+            {
+              "name": "Avalon Institute",
+              "image": "https://media.licdn.com/dms/image/v2/C4D0BAQGDoLY9FzEbCg/company-logo_200_200/company-logo_200_200/0/1630548450872/avalon_school_of_cosmetology_cp_logo?e=2147483647&v=beta&t=V04nRYfWbGLaqsB-LwgBzDSSrdWuJUfWyEQQhQFb1JA",
+              "description": "A beauty school focused on esthetics with locations in Arizona, Nevada, Utah and Colorado."
+            },
+            {
+              "name": "NCTA (Nebraska College of Technical Agriculture)",
+              "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtiGIx7NQDp1QK-pr-Smd_YN72-Zb9jcUKf0_CVGzpkd-PXPFvmHgBnOvNLQwPcGNap58&usqp=CAU",
+              "description": "Located in Nebraska offers career training in a variety of agriculture and veterinary technology programs."
+            },
+            {
+              "name": "Margaret H Rollins School of Nursing at Beebe Healthcare",
+              "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_sEkEyRlzsgH-etjh9FaGUNP-_gzQImMrow&s",
+              "description": "A nursing school located in Delaware and incorporated with Beebe Healthcare to provide clinical experiences."
+            },
+            {
+              "name": "CAMTECH School of Construction",
+              "image": "https://camtechschool.com/media/images/CAM_Logo.png",
+              "description": "Located in Florida, offers career specific training in construction to prepare students to be contractors."
+            }
+          ]
+        },
+        {
+          "title": "Community college",
+          "image": "/dev/community.png",
+          "description": "Community colleges provide education for a variety of subjects, including general education and more career-specific classes. Most community colleges offer 2-year associates degrees and certificates. Some community colleges have begun offering 4-year bachelor’s degrees as well. Community colleges typically have lower <def def='a sum of money charged for teaching or instruction by a school, college, or university.'>tuition</def> than 4-year colleges and universities and may be more flexible in the times of day in which classes are offered.",
+          "examples": [
+            {
+              "name": "Johnson County Community College",
+              "image": "/static/images/logos/jccc.png",
+              "description": "A community college in Kansas offering 45 different program areas"
+            },
+            {
+              "name": "College of Southern Idaho",
+              "image": "/static/images/logos/csi.png",
+              "description": "Home of the Eagles, a community college located in Idaho with more than 60 program areas"
+            },
+            {
+              "name": "Walla Walla Community College",
+              "image": "/static/images/logos/wwcc.png",
+              "description": "A community college located in Washington state that offers primarily associate’s degrees through two different campus locations and online."
+            },
+            {
+              "name": "Santa Monica Community College",
+              "image": "/static/images/logos/smc.png",
+              "description": "Located in California, this college is close to the beach and has more than 50 subject areas."
+            },
+            {
+              "name": "Lake Michigan College",
+              "image": "/static/images/logos/lmc.png",
+              "description": "Home of the Red Hawks, a community college with more than 50 associate degree programs located in Michigan across several campuses."
+            }
+          ]
+        },
+        {
+          "title": "4-year college",
+          "image": "/dev/4year.png",
+          "description": "4-year colleges focus on offering bachelor’s degrees and provide classes in both general studies and specific focus areas, referred to as <def def='A college major is the specific academic subject area you choose to specialize in and focus most of your studies on to earn your degree.'>majors</def>. 4-year can include universities and liberal arts colleges, and are usually private (funded by tuition and other sources, sometimes more expensive or exclusive).",
+          "examples": [
+            {
+              "name": "Lewis & Clark College",
+              "image": "/static/images/logos/lewis_clark.png",
+              "description": "A private 4-year liberal arts college located in Oregon, offering around 30 different majors to about 2,000 <def def=\"An undergraduate is a college student who is working toward earning their first university degree, typically a bachelor's degree.\">undergraduate</def> students. Lewis & Clark offers intercollegiate sports and programs that allow students to learn outside the classroom."
+            },
+            {
+              "name": "Amherst College",
+              "image": "/static/images/logos/amherst.png",
+              "description": "A private 4-year liberal arts college located in Massachusetts, has around 2,000 students with about 50% being students of color. Amherst offers about 40 different majors in arts, sciences, social sciences, and humanities."
+            },
+            {
+              "name": "Brigham Young University of Idaho",
+              "image": "/static/images/logos/byui.png",
+              "description": "A larger private 4-year college located in Idaho with about 20,000 students and more than 100 different majors. BYU-Idaho is a religious university open to students of all backgrounds."
+            },
+            {
+              "name": "Rhodes College",
+              "image": "/static/images/logos/rhodes.png",
+              "description": "A private 4-year college located in Tennessee offering more than 70 majors, minors, and interdisciplinary programs. Rhodes has strong extracurricular offerings for students including intercollegiate sports and Greek life."
+            },
+            {
+              "name": "Knox College",
+              "image": "/static/images/logos/knox.png",
+              "description": "a private 4-year liberal arts college in Illinois with more than 60 majors and around 1,000 students. Knox emphasizes hands-on learning experience through internships and involvement in research."
+            },
+            {
+              "name": "Truman State University",
+              "image": "/static/images/logos/truman.png",
+              "description": "A public 4-year college with about 3,500 students located in Missouri. Truman State offers 55 undergraduate programs and competitive athletics."
+            }
+          ]
+        },
+        {
+          "title": "University",
+          "image": "/dev/unv.png",
+          "description": "Universities are larger schools and offer a wide variety of majors and degrees, including certificates, associate’s bachelors, master’s, and doctoral degrees. They may also include professional training such as medical and law schools. Universities can be public (funded by the government, typically cheaper) or private (funded by tuition and other sources, sometimes more expensive or exclusive).",
+          "examples": [
+            {
+              "name": "Arizona State University (ASU)",
+              "image": "/static/images/logos/asu.png",
+              "description": "a public university in Arizona with high research activity. ASU is one of the largest public universities and has more than 60,000 undergraduate students."
+            },
+            {
+              "name": "University of South Carolina (USC)",
+              "image": "/static/images/logos/usc_sc.png",
+              "description": "A public university in South Carolina with about 45,000 undergraduate students and more than 100 majors. USC is considered a university with high research activity."
+            },
+            {
+              "name": "Florida State University (FSU)",
+              "image": "/static/images/logos/fsu.png",
+              "description": "A high research public university in Florida with about 30,000 undergraduate students. Florida State is well known for competitive athletics, especially football and baseball."
+            },
+            {
+              "name": "Ohio State University (OSU)",
+              "image": "/static/images/logos/osu.png",
+              "description": "A public university in Ohio with high research activity and highly competitive athletic teams. OSU is one of the largest universities by enrollment and has around 50,000 undergraduate students."
+            },
+            {
+              "name": "University of California-Los Angeles (UCLA)",
+              "image": "/static/images/logos/ucla.png",
+              "description": "A public university in California with high research activity. UCLA has more than 140 majors and has around 30,000 undergraduate students enrolled."
+            }
+          ]
+        }
+      ]
+    }
+  ]
