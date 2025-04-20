@@ -5,13 +5,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
-<<<<<<< HEAD
-from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, QuizSubmissionSerializer, UserQuizResponseDetailSerializer, UserPollQuestionResponseSerializer, PollSubmissionSerializer
-from core.services import UserService, LessonService, QuizResponseService, PollResponseService
-=======
 from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, QuizSubmissionSerializer, UserQuizResponseDetailSerializer, ResponseSerializer
 from core.services import UserService, LessonService, QuizResponseService, ResponseService
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 from .utils import json_go_brrr, messages
 from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question
 from rest_framework import serializers
@@ -345,7 +340,7 @@ class PollView(APIView):
 
 class ResponseView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request, *args, **kwargs):
         activity_type: str = kwargs.get("activitytype").lower()
         if not activity_type:
@@ -430,106 +425,6 @@ class QuizResponseView(APIView):
             status=status.HTTP_200_OK
         )
 
-<<<<<<< HEAD
-class PollResponseView(APIView):
-    """
-    API endpoint for submitting and retrieving poll responses.
-
-    POST: Submit a poll response
-    GET: Retrieve a user's poll responses
-    """
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, *args, **kwargs):
-        """Submit a poll response"""
-        # Assume PollSubmissionSerializer validates poll_id and responses structure
-        serializer = PollSubmissionSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                # Assume PollResponseService handles saving the response
-                # It might return just the saved response object, as polls
-                # don't typically have right/wrong answer feedback like quizzes.
-                poll_response = PollResponseService.submit_poll_response(
-                    user=request.user,
-                    data=serializer.validated_data
-                )
-
-                # Check if the service call was successful (it might return None on error)
-                if poll_response:
-                    return json_go_brrr(
-                        message="Poll response submitted successfully",
-                        data={
-                            # Assumes UserPollResponse model has a .to_dict() method
-                            "poll_response": poll_response.to_dict(),
-                        },
-                        status=status.HTTP_201_CREATED
-                    )
-                else:
-                    # Handle cases where the service indicates failure without raising an exception
-                    return json_go_brrr(
-                        message="Failed to submit poll response due to server logic.",
-                        data={},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    )
-            except Exception as e:
-                 # Catch potential exceptions from the service layer
-                 return json_go_brrr(
-                        message=f"An error occurred: {str(e)}",
-                        data={},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                 )
-
-        # If serializer is invalid
-        return json_go_brrr(
-            message="Failed to submit poll response due to invalid data",
-            data=serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    def get(self, request, *args, **kwargs):
-        """Retrieve a user's poll responses, optionally filtered by poll_id"""
-        # Get optional poll_id from query parameters
-        poll_id = request.query_params.get('poll_id')
-
-        try:
-            # Assume PollResponseService retrieves the responses
-            responses = PollResponseService.get_user_poll_responses(request.user, poll_id)
-
-            return json_go_brrr(
-                message="Poll responses retrieved successfully",
-                # Assumes UserPollResponse model has a .to_dict() method
-                data={'poll_responses': [response.to_dict() for response in responses]},
-                status=status.HTTP_200_OK
-            )
-        except Exception as e:
-            # Catch potential exceptions during retrieval
-            return json_go_brrr(
-                message=f"An error occurred while retrieving poll responses: {str(e)}",
-                data={},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-    # def post(self, request, *args, **kwargs):
-        """Submit a quiz response"""
-        # serializer = QuizSubmissionSerializer(data=request.data)
-        # if (serializer.is_valid()):
-        #     result = QuizResponseService.submit_quiz_response(
-        #         user=request.user,
-        #         data=serializer.validated_data
-        #     )
-
-        #     quiz_response = result['quiz_response']
-        #     feedback = result['feedback']
-
-        #     return json_go_brrr(
-        #         message="Quiz response submitted successfully",
-        #         data={
-        #             "quiz_response": quiz_response.to_dict(),
-        #             "feedback": feedback
-        #         },
-        #         status=status.HTTP_201_CREATED
-        #     )
-=======
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 
 class QuizResponseDetailView(APIView):
     """

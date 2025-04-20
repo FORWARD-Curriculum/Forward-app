@@ -597,10 +597,6 @@ class UserQuizResponse(models.Model):
             "question_responses": [qr.to_dict() for qr in self.question_responses.all()]
         }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 class UserQuestionResponse(models.Model):
     """
     Stores a user's response to an individual question within a quiz
@@ -731,12 +727,6 @@ class UserQuestionResponse(models.Model):
             "feedback": self.feedback
         }
 
-<<<<<<< HEAD
-class UserPollResponse(models.Model):
-    '''
-    store a users poll responses
-    '''
-=======
 
 class BaseResponse(models.Model):
     """
@@ -746,44 +736,12 @@ class BaseResponse(models.Model):
     class Meta:
         abstract = True
 
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
         editable=False,
         help_text='the uuid of the database item'
     )
-<<<<<<< HEAD
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='poll_responses',
-        help_text='The user who submitted this poll response'
-    )
-    poll = models.ForeignKey(
-        Poll,
-        on_delete=models.CASCADE,
-        related_name="original_poll",
-        help_text="The poll this poll question belongs to"
-    )
-    lesson = models.ForeignKey(
-        Lesson,
-        on_delete=models.CASCADE,
-        related_name='poll_lesson_origin',
-        help_text="The lesson this content belongs to"
-    )
-    response_data = models.JSONField(
-        default=list,
-        help_text="list of responses from the poll"
-    )
-    time_spent = models.IntegerField(
-        null=True,
-        blank=True,
-        help_text='The total time spent on this question'
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-=======
 
     lesson = models.ForeignKey(
         Lesson,
@@ -811,70 +769,10 @@ class BaseResponse(models.Model):
     time_spent = models.PositiveIntegerField(default=0)
 
     attempts_left = models.PositiveIntegerField(default=0)
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 
     def to_dict(self):
         return {
             "id": self.id,
-<<<<<<< HEAD
-            "userId": self.user_id,
-            "pollId": self.poll_id,
-            "lessonId": self.lesson_id,
-            "time_spent": self.time_spent,
-            "responseData": self.response_data
-        }
-
-
-class UserPollQuestionResponse(models.Model):
-    '''
-    stores a users question repsonses for a poll
-    '''
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        help_text='the uuid of the database item'
-    )
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='poll_question_responses',
-        help_text='The user who submitted this poll response'
-    )
-    poll = models.ForeignKey(
-        Poll,
-        on_delete=models.CASCADE,
-        related_name="poll_question_origin_poll",
-        help_text="The poll this poll question belongs to"
-    )
-    lesson = models.ForeignKey(
-        Lesson,
-        on_delete=models.CASCADE,
-        related_name='poll_question_lesson_origin',
-        help_text="The lesson this content belongs to"
-    )
-    response_data = models.JSONField(
-        default=list,
-        help_text="list of responses from the poll"
-    )
-    time_spent = models.IntegerField(
-        null=True,
-        blank=True,
-        help_text='The total time spent on this question'
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "userId": self.user_id,
-            "pollId": self.poll_id,
-            "lessonId": self.lesson_id,
-            "time_spent": self.time_spent,
-            "responseData": self.response_data
-        }
-=======
             "partial_response": self.partial_response,
             "time_spent": self.time_spent,
             "attempts_left": self.attempts_left,
@@ -976,7 +874,7 @@ class ActivityManager():
     registered_activities: dict[str, tuple[BaseActivity, BaseResponse,
                                            dict[str, tuple[str, any]], bool]] = {}
     registered_services: dict[str, dict[BaseActivity, callable]] = {"response": {}}
-    
+
     def registerActivity(self,
                          ActivityClass: BaseActivity,
                          ResponseClass: BaseResponse,
@@ -1002,7 +900,7 @@ class ActivityManager():
         """
         self.registered_activities[ActivityClass.__name__.lower()] = (
             ActivityClass, ResponseClass, nonstandard_resp_fields, child_class, {})
-    
+
     def registerService(self, service_type: str, ActivityClass: BaseActivity, service: callable):
         """Registers a service to an activity. This is used to allow for custom services to be registered
         to an activity, such as a custom quiz service. Used for legacy/complex activities to provide more
@@ -1035,4 +933,3 @@ class ActivityManager():
 
 # Register on launch
 ActivityManager()
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0

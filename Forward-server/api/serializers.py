@@ -2,13 +2,9 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-<<<<<<< HEAD
-from core.models import User, UserQuizResponse, UserQuestionResponse, Quiz, Question, Poll, PollQuestion
-=======
 from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager
 from django.core.exceptions import ImproperlyConfigured
 
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
@@ -90,10 +86,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         from core.services import UserService
         return UserService.create_user(validated_data)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(
@@ -124,10 +116,6 @@ class UserLoginSerializer(serializers.Serializer):
         attrs['user'] = user
         return attrs
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 class UserUpdateSerializer(serializers.Serializer):
     display_name = serializers.CharField(required=False)
     profile_picture = serializers.CharField(required=False, allow_null=True)
@@ -177,28 +165,18 @@ class UserUpdateSerializer(serializers.Serializer):
             'profile_picture', instance.profile_picture)
         instance.consent = validated_data.get('consent', instance.consent)
         instance.theme = validated_data.get('theme', instance.theme)
-<<<<<<< HEAD
-        instance.text_size = validated_data.get('text_size', instance.text_size)
-        instance.speech_uri_index = validated_data.get('speech_uri_index', instance.speech_uri_index)
-        instance.speech_speed = validated_data.get('speech_speed', instance.speech_speed)
-=======
         instance.text_size = validated_data.get(
             'text_size', instance.text_size)
         instance.speech_uri_index = validated_data.get(
             'speech_uri_index', instance.speech_uri_index)
         instance.speech_speed = validated_data.get(
             'speech_speed', instance.speech_speed)
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 
         # Save the instance
         instance.save()
 
         return instance
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 class UserQuestionResponseSerializer(serializers.Serializer):
     """
     Serializer for individual question responses within a quiz submission
@@ -234,12 +212,8 @@ class QuizSubmissionSerializer(serializers.Serializer):
             Quiz.objects.get(id=value)
             return value
         except Quiz.DoesNotExist:
-<<<<<<< HEAD
-            raise serializers.ValidationError(f"Quiz with ID {value} does not exist")
-=======
             raise serializers.ValidationError(
                 f"Quiz with ID {value} does not exist")
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 
     def to_internal_value(self, data):
         """
@@ -285,10 +259,6 @@ class QuizSubmissionSerializer(serializers.Serializer):
 
         return data
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 class UserQuizResponseDetailSerializer(serializers.ModelSerializer):
     """Serializer for retrieving a user's quiz response with details"""
     question_responses = serializers.SerializerMethodField()
@@ -308,131 +278,6 @@ class UserQuizResponseDetailSerializer(serializers.ModelSerializer):
         return [qr.to_dict() for qr in question_responses]
 
 
-<<<<<<< HEAD
-class UserPollQuestionResponseSerializer(serializers.Serializer):
-    """
-    Serializer for individual poll question responses within a poll submission.
-    Validates the question ID against the poll context.
-    """
-    question_id = serializers.UUIDField(required=True)
-    response_data = serializers.JSONField(required=True)
-
-    def validate_question_id(self, value):
-        """Validate that the poll question exists and belongs to the poll."""
-        poll_id = self.context.get('poll_id')
-        if not poll_id:
-            raise serializers.ValidationError("Poll ID is required in context for question validation.")
-
-        try:
-            # Check if the question exists and is part of the specific poll
-            question = PollQuestion.objects.get(id=value, poll_id=poll_id)
-            return value
-        except PollQuestion.DoesNotExist:
-            raise serializers.ValidationError(f"Poll Question with ID {value} does not exist in poll {poll_id}.")
-        except ValueError:
-             # Handle case where value is not a valid UUID format
-             raise serializers.ValidationError(f"Invalid ID format for Poll Question: {value}.")
-
-
-class PollSubmissionSerializer(serializers.Serializer):
-    """
-    Serializer for submitting a complete poll response.
-    Validates the poll ID and the structure/content of individual question responses.
-    """
-    poll_id = serializers.UUIDField(required=True)
-    is_complete = serializers.BooleanField(default=True)
-    question_responses = UserPollQuestionResponseSerializer(many=True)
-
-    def validate_poll_id(self, value):
-        """Ensure the poll exists."""
-        try:
-            Poll.objects.get(id=value)
-            return value
-        except Poll.DoesNotExist:
-            raise serializers.ValidationError(f"Poll with ID {value} does not exist.")
-        except ValueError:
-             # Handle case where value is not a valid UUID format
-             raise serializers.ValidationError(f"Invalid ID format for Poll: {value}.")
-
-    def to_internal_value(self, data):
-        """
-        Override to set poll_id in context before validation occurs on nested serializers.
-        """
-        poll_id = data.get('poll_id')
-        if poll_id:
-            # Ensure it's added to the context dictionary
-            # Create context if it doesn't exist
-            if self.context is None:
-                 self.context = {}
-            self.context['poll_id'] = poll_id
-
-        # Continue with the normal validation process
-        return super().to_internal_value(data)
-
-    def validate_question_responses(self, responses):
-        """
-        Validate the list of question responses.
-        Checks response format against PollQuestion's allow_multiple setting.
-        """
-        # Retrieve poll_id from context, already validated by to_internal_value/validate_poll_id
-        poll_id = self.context.get('poll_id')
-        if not poll_id:
-             raise serializers.ValidationError("Poll ID context is missing for response validation.") # Should not happen
-
-        submitted_q_ids = set()
-        for index, resp_data in enumerate(responses):
-            question_id = resp_data.get('question_id')
-            response_content = resp_data.get('response_data', {}).get('selected')
-
-            # Check for duplicate question submissions within the same payload
-            if question_id in submitted_q_ids:
-                 raise serializers.ValidationError({
-                     f"question_responses[{index}]": f"Duplicate response submitted for question ID {question_id}."
-                 })
-            submitted_q_ids.add(question_id)
-
-            # Retrieve the question instance added to context by the nested serializer
-            question = self.context.get(f'question_{question_id}')
-            if not question:
-                # This should only happen if validate_question_id failed earlier but somehow validation continued.
-                # Or if context passing failed. Added as a safeguard.
-                 try:
-                     question = PollQuestion.objects.get(id=question_id, poll_id=poll_id)
-                 except PollQuestion.DoesNotExist:
-                     # Error already raised by nested serializer, but double-check
-                     raise serializers.ValidationError({
-                        f"question_responses[{index}]": f"Question ID {question_id} validation failed or context missing."
-                     })
-
-            # Validate response format based on allow_multiple
-            if question.allow_multiple:
-                # Expect a list for 'selected'
-                if not isinstance(response_content, list):
-                    raise serializers.ValidationError({
-                        f"question_responses[{index}]": f"Response for question ID {question_id} should be a list (allow_multiple is True)."
-                    })
-            else:
-                # Expect a single value (string, int, bool depending on options), not a list
-                if isinstance(response_content, list):
-                     raise serializers.ValidationError({
-                         f"question_responses[{index}]": f"Response for question ID {question_id} should not be a list (allow_multiple is False)."
-                     })
-            # Further validation could check if selected options actually exist in question.options
-
-        return responses
-
-    def validate(self, data):
-        """
-        Perform object-level validation after individual fields and nested fields.
-        """
-        # Example: Check if all questions in the poll were answered (if required)
-        # For polls, usually answering is optional unless specified otherwise.
-        # The validation in validate_question_responses covers the format check.
-        # You could add checks here if polls have required questions, similar to the quiz serializer.
-
-        # For now, mainly rely on field and nested field validation.
-        return data
-=======
 class DynamicActivityPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     """
     Gets queryset dynamically based on 'ActivityModel' in context.
@@ -501,4 +346,3 @@ class ResponseSerializer(serializers.Serializer):
                     {"response_object": f"{ResponseModel.__name__} could not be created or found."})
 
             return response_object
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0

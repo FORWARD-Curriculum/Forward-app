@@ -142,10 +142,6 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
     }
   }, [loaderData]);
 
-<<<<<<< HEAD:Forward-client/app/routes/lesson.tsx
-
-=======
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0:Forward-client/app/routes/protected/lesson.tsx
   return (
     <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:flex-row lg:items-start lg:gap-8">
       <div className="flex flex-col lg:h-full">

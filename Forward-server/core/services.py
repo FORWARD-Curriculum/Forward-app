@@ -4,12 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-<<<<<<< HEAD
-from .models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, UserQuizResponse, UserQuestionResponse, UserPollResponse, UserPollQuestionResponse
-from typing import Union
-=======
 from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 
 class UserService:
     @staticmethod
@@ -133,92 +128,56 @@ class LessonService:
         try:
             lesson = Lesson.objects.get(id=lesson_id)
         except Lesson.DoesNotExist:
-            raise 
+            raise
         lesson_dict = lesson.to_dict()
 
-<<<<<<< HEAD
-        lesson_dict['activities'] = {}
-
-        # Process text content
-        text_contents = list(TextContent.objects.filter(lesson_id=lesson_id).order_by('order'))
-        for content in text_contents:
-            activity_dict = content.to_dict()
-            lesson_dict['activities'][content.order] = activity_dict
-
-        # Process quizzes
-        for quiz in Quiz.objects.filter(lesson_id=lesson_id).order_by('order'):
-            questions = Question.objects.filter(quiz_id=quiz.id).order_by('order')
-            quiz_dict = quiz.to_dict()
-            quiz_dict['questions'] = [q.to_dict() for q in questions]
-            lesson_dict['activities'][quiz.order] = quiz_dict
-
-        # Process polls
-        for poll in Poll.objects.filter(lesson_id=lesson_id).order_by('order'):
-            poll_questions = PollQuestion.objects.filter(poll_id=poll.id).order_by('order')
-            poll_dict = poll.to_dict()
-            poll_dict['questions'] = [pq.to_dict() for pq in poll_questions]
-            lesson_dict['activities'][poll.order] = poll_dict
-
-        # Process writing activities
-        writing_activities = list(Writing.objects.filter(lesson_id=lesson_id))
-        for writing in writing_activities:
-            writing_dict = writing.to_dict()
-            lesson_dict['activities'][writing.order] = writing_dict
-
-        lesson_dict['activities'] = list(lesson_dict['activities'].values())
-=======
         activity_list = []
-        
+
         for value in ActivityManager.registered_activities.values():
             ActivityModel, child_class = value[0],value[3]
             if not child_class:
                 activities = list(ActivityModel.objects.filter(lesson=lesson).order_by('order'))
                 for activity in activities:
                     activity_list.append(activity.to_dict())
-        
+
         lesson_dict["activities"] = sorted(activity_list, key=lambda x: x["order"])
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
 
         return {
             "lesson": lesson_dict
         }
-<<<<<<< HEAD
 
-=======
-        
 class ResponseService:
     staticmethod
     def get_response_data(lesson_id, user):
         """
         Retrieve all content associated with a lesson.
-        
+
         Args:
             lesson_id (int): The ID of the lesson
-            
+
         Returns:
-            dict: All content associated with the lesson         
+            dict: All content associated with the lesson
         Raises:
             Lesson.DoesNotExist: If the lesson doesn't exist
         """
-        
+
         lesson = Lesson.objects.get(id=lesson_id)
-        
-        out_dict = {} 
+
+        out_dict = {}
         out_dict['lesson_id'] = lesson.id
         out_dict['response_data'] = {}
         for value in ActivityManager.registered_activities.values():
             [Activity, Response] = value[:2]
             out_dict['response_data'][Activity.__name__] = [a.to_dict() for a in list(Response.objects.filter(lesson=lesson,user=user))]
-        
+
         out_dict['highest_activity'] = 1
         for value in out_dict['response_data'].values():
             out_dict['highest_activity'] += len(value)
-            
+
         return {
             "response": out_dict
         }
-        
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0
+
 class QuizResponseService:
     @staticmethod
     def __get_feedback_for_score(quiz, score):
@@ -357,155 +316,6 @@ class QuizResponseService:
             UserQuizResponse.DoesNotExist: If the response doesn't exist or belong to the user
         """
         return UserQuizResponse.objects.get(id=response_id, user=user)
-<<<<<<< HEAD
 
-
-class PollResponseService:
-    """
-    Service layer containing business logic for handling Poll Responses.
-    """
-
-    @staticmethod
-    @transaction.atomic # Ensures the whole submission process is atomic
-    def submit_poll_response(user: User, data: dict) -> UserPollResponse:
-        """
-        Creates or updates a user's response to a specific poll.
-
-        Args:
-            user: The User instance submitting the response.
-            data: Validated data dictionary from PollSubmissionSerializer, containing:
-                  - poll_id (UUID or int)
-                  - question_responses (list of dicts with question_id and response_data)
-                  - is_complete (boolean, optional)
-
-        Returns:
-            The created or updated UserPollResponse instance.
-
-        Raises:
-            ObjectDoesNotExist: If the specified Poll does not exist (should be caught by serializer first).
-            ValidationError: If data integrity issues arise beyond serializer checks.
-        """
-        poll_id = data.get('poll_id')
-        question_responses_data = data.get('question_responses', [])
-        is_complete = data.get('is_complete', True) # Default based on serializer
-
-        # Retrieve the Poll instance (serializer should have validated existence)
-        try:
-            poll = Poll.objects.get(id=poll_id)
-        except Poll.DoesNotExist:
-            # This ideally shouldn't be hit if serializer validation is correct
-            raise Exception(f"Service Error: Poll with ID {poll_id} not found.")
-        except ValueError:
-             raise ValidationError(f"Service Error: Invalid Poll ID format {poll_id}.")
-
-        # Use update_or_create to handle both initial submissions and re-submissions
-        # It finds a response based on user and poll, or creates a new one.
-        user_poll_response, created = UserPollResponse.objects.update_or_create(
-            user=user,
-            poll=poll,
-            defaults={
-                'is_complete': is_complete,
-                # 'updated_at' updates automatically via auto_now=True
-                # Add other fields from 'defaults' if UserPollResponse has more settable fields
-            }
-        )
-
-        # If updating (re-submitting), clear previous question responses for this attempt
-        if not created:
-            # Assumes related_name='poll_question_responses' on the ForeignKey
-            # in UserPollQuestionResponse model pointing to UserPollResponse
-            user_poll_response.poll_question_responses.all().delete()
-
-        # Create new UserPollQuestionResponse objects for the current submission
-        poll_question_response_objects = []
-        question_ids_processed = set() # Keep track of questions processed in this batch
-
-        for response_item in question_responses_data:
-            question_id = response_item.get('question_id')
-            response_data = response_item.get('response_data')
-
-            # Prevent duplicate processing within this submission batch if serializer didn't catch it
-            if question_id in question_ids_processed:
-                continue # Or raise an error if strictness is required
-            question_ids_processed.add(question_id)
-
-            # Fetch the specific PollQuestion (serializer should have validated existence)
-            # We fetch it again here to be certain within the atomic transaction.
-            try:
-                question = PollQuestion.objects.get(id=question_id, poll=poll)
-            except PollQuestion.DoesNotExist:
-                 raise Exception(f"Service Error: PollQuestion {question_id} not found for Poll {poll_id}.")
-            except ValueError:
-                 raise ValidationError(f"Service Error: Invalid PollQuestion ID format {question_id}.")
-
-
-            poll_question_response_objects.append(
-                UserPollQuestionResponse(
-                    poll_response=user_poll_response,
-                    question=question,
-                    response_data=response_data
-                    # Add other fields if necessary
-                )
-            )
-
-        # Bulk create the question responses for efficiency
-        if poll_question_response_objects:
-            UserPollQuestionResponse.objects.bulk_create(poll_question_response_objects)
-
-        # Return the overall response object
-        return user_poll_response
-
-    @staticmethod
-    def get_user_poll_responses(user: User, poll_id=None):
-        """
-        Retrieves UserPollResponse objects for a given user, optionally filtered by poll.
-
-        Args:
-            user: The User instance whose responses are being fetched.
-            poll_id: Optional ID of the Poll to filter responses for.
-
-        Returns:
-            A QuerySet of UserPollResponse objects.
-        """
-        queryset = UserPollResponse.objects.filter(user=user)
-        if poll_id:
-            queryset = queryset.filter(poll_id=poll_id)
-
-        # Consider adding ordering
-        queryset = queryset.order_by('-created_at')
-
-        return queryset
-
-    @staticmethod
-    def get_poll_response_details(user: User, response_id) -> Union[UserPollResponse,None]:
-        """
-        Retrieves a specific UserPollResponse and its details, ensuring it belongs to the user.
-
-        Args:
-            user: The User instance requesting the details.
-            response_id: The ID of the UserPollResponse to retrieve.
-
-        Returns:
-            The UserPollResponse instance with related data, or None if not found/not owned.
-        """
-        try:
-            response = UserPollResponse.objects.select_related(
-                'poll' # Fetch related Poll in the same query
-            ).prefetch_related(
-                # Fetch related question responses and their linked questions efficiently
-                'poll_question_responses__question'
-            ).get(
-                id=response_id,
-                user=user # Ensure the response belongs to the requesting user
-            )
-            return response
-        except UserPollResponse.DoesNotExist:
-            return None # Or raise a specific "NotFound" or "PermissionDenied" exception
-        except (ValueError, TypeError):
-             # Handle invalid response_id format
-             return None
-=======
-    
     def __init__(self):
         ActivityManager.registerService(ActivityManager, "response", Quiz, QuizResponseService)
->>>>>>> 5bbcbcf3c672f65b5d7f6183d19e50c3377448d0

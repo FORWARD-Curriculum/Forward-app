@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,7 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=esmn7v4(rjy@9#cs1gpv3$m^6i!z-5a1l0hbt@elyr!!tpi9)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = os.environ.get('DEBUG') == 'False'
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'backend',
@@ -31,7 +32,9 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'frontend',
-    'testserver'
+    'testserver',
+    'backend-latest-ma6c.onrender.com',
+    'forward-app-a9ew.onrender.com',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -42,6 +45,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8080",
     "https://localhost:5173",
     "https://127.0.0.1:5173",
+    'https://backend-latest-ma6c.onrender.com',
+    'https://forward-app-a9ew.onrender.com',
 ]
 
 # Application definition
@@ -54,7 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-#   'corsheaders',
+    'corsheaders',
     'api',
     'core',
 ]
@@ -72,7 +77,7 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
-#    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -82,43 +87,47 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-#CORS_ALLOWED_ORIGINS = [
-#    "http://localhost:8080",
-#    "http://127.0.0.1:8080",
-#    "http://localhost:5173",
-#    "http://127.0.0.1:5173",
-#    "https://localhost:5173",
-#    "https://127.0.0.1:5173",
-#]
+# CORS_ALLOWED_ORIGINS_RAW = os.environ.get('CORS_ALLOWED_ORIGINS', '')
+# CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_RAW.split(',')]
+CORS_ALLOWED_ORIGINS = [
+   "http://localhost:8080",
+   "http://127.0.0.1:8080",
+   "http://localhost:5173",
+   "http://127.0.0.1:5173",
+   "https://localhost:5173",
+   "https://127.0.0.1:5173",
+   'https://backend-latest-ma6c.onrender.com',
+   'https://forward-app-a9ew.onrender.com',
+]
 
-# CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True
 
-#CORS_ALLOW_METHODS = [
-#    'DELETE',
-#    'GET',
-#    'OPTIONS',
-#    'PATCH',
-#    'POST',
-#    'PUT',
-#]
+CORS_ALLOW_METHODS = [
+   'DELETE',
+   'GET',
+   'OPTIONS',
+   'PATCH',
+   'POST',
+   'PUT',
+]
 
-#CORS_ALLOW_HEADERS = ['*'
-    # 'accept',
-    # 'accept-encoding',
-    # 'authorization',
-    # 'content-type',
-    # 'dnt',
-    # 'origin',
-    # 'user-agent',
-    # 'X-CSRFToken',
-    # 'x-requested-with',
-#]
+CORS_ALLOW_HEADERS = ['*'
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'X-CSRFToken',
+    'x-requested-with',
+]
 
 # TODO: Change to true when we have https setup
-# SESSION_COOKIE_SECURE = True
-# SESSION_COOKIE_SAMESITE = 'None'
-# CSRF_COOKIE_SECURE = True
-# CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
 
 ROOT_URLCONF = 'forward.urls'
 
