@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager
+from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager, Poll, PollQuestion, UserQuestionResponse
 from django.core.exceptions import ImproperlyConfigured
 
 
