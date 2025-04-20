@@ -175,9 +175,9 @@ class ResponseService:
         out_dict['response_data'] = {}
         for value in ActivityManager.registered_activities.values():
             [Activity, Response] = value[:2]
-            out_dict['response_data'][Activity.__name__] = [
-                a.to_dict() for a in list(Response.objects.filter(lesson=lesson, user=user))]
-
+            if (Response is not None):
+                out_dict['response_data'][Activity.__name__] = [a.to_dict() for a in list(Response.objects.filter(lesson=lesson,user=user))]
+        
         out_dict['highest_activity'] = 1
         for value in out_dict['response_data'].values():
             out_dict['highest_activity'] += len(value)

@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.conf import settings
 
-from core.models import User, Lesson, TextContent, Quiz, Embed, Question, Poll, PollQuestion, Writing, Identification
+from core.models import User, Lesson, TextContent, Quiz, Embed, Question, Poll, PollQuestion, Writing, Identification, Concept, ConceptMap
 
 class Command(BaseCommand):
     help = 'Seeds the database with initial data from JSON files'
@@ -45,6 +45,9 @@ class Command(BaseCommand):
                     Writing.objects.all().delete()
                     TextContent.objects.all().delete()
                     Lesson.objects.all().delete()
+                    Identification.objects.all().delete()
+                    Concept.objects.all().delete()
+                    ConceptMap.objects.all().delete()
                     # Keep superuser accounts if they exist
                     User.objects.filter(is_superuser=False).delete()
                 
@@ -75,6 +78,9 @@ class Command(BaseCommand):
                 
                 embed_question_data = self.load_json_file(seed_path / 'embeds.json')
                 self.seed_embeds(embed_question_data, lessons)
+
+                concept_map_data = self.load_json_file(seed_path / 'concept_maps.json')
+                self.seed_concept_maps(concept_map_data, lessons)
 
                 self.stdout.write(self.style.SUCCESS('Successfully seeded database'))
         except Exception as e:
@@ -160,6 +166,43 @@ class Command(BaseCommand):
             )
             status = 'Created' if created else 'Updated'
             self.stdout.write(self.style.SUCCESS(f'{status}: {title}'))
+    
+    def seed_concept_maps(self, concept_map_data, lessons):
+        for concept_map in concept_map_data:
+            title = concept_map['title']
+            lesson_title = concept_map['lesson']
+            instructions = concept_map.get('instructions', '')
+            if lesson_title not in lessons:
+                self.stdout.write(self.style.ERROR(f'Lesson not found: {lesson_title}'))
+                continue
+            
+            concept_map_obj, created = ConceptMap.objects.update_or_create(
+                lesson=lessons[lesson_title],
+                title=title,
+                defaults={
+                    'instructions': instructions,
+                    'content': concept_map.get('content', ''),
+                    'order': concept_map.get('order', 0),
+                }
+            )
+            status = 'Created' if created else 'Updated'
+            self.stdout.write(self.style.SUCCESS(f'{status}: Concept Map - {title}'))
+            
+            for order, concept in enumerate(concept_map.get('examples', []), start=1):
+                concept_name = concept['title']
+                concept_obj, created = Concept.objects.update_or_create(
+                    concept_map=concept_map_obj,
+                    title=concept_name,
+                    lesson=lessons[lesson_title],
+                    defaults={
+                        'image': concept.get('image', None),
+                        'description': concept.get('description', ''),
+                        'examples': concept.get('examples', []),
+                        'order': order,
+                    }
+                )
+                status = 'Created' if created else 'Updated'
+                self.stdout.write(self.style.SUCCESS(f'     {status}: Concept - {concept_name}'))
     
     def seed_identifications(self, identification_data, lessons):
         for data in identification_data:
