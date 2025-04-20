@@ -15,7 +15,7 @@ import {
 import MarkdownTTS from "@/components/ui/markdown-tts";
 import { useResponse } from "../hooks";
 import { useClient } from "@/hooks/useClient";
-import { Pointer } from "lucide-react";
+import { MousePointerClick, Pointer } from "lucide-react";
 
 export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
   useResponse<ConceptMapResponse, ConceptMap>({
@@ -51,11 +51,12 @@ export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
                       src={concept.image}
                       className="aspect-square w-full rounded-3xl shadow-md"
                     />
-                    {client.isMobile &&
+                    {client.isMobile ?
                     <Pointer
                       className="absolute bottom-3 left-3 text-white drop-shadow-[0px_0px_2px_rgba(0,0,0,1)] filter"
                       color="white"
-                    />}
+                    />:<MousePointerClick className="absolute bottom-3 left-3 text-white drop-shadow-[0px_0px_2px_rgba(0,0,0,1)] filter"
+                    color="white"/>}
                   </div>
                 ) : (
                   <Skeleton className="aspect-square w-full" />

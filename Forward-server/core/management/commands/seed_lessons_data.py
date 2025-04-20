@@ -7,14 +7,15 @@ from django.conf import settings
 # Import all necessary models, including the ActivityManager
 from core.models import (
     User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
-    Identification, Embed, ActivityManager, UserQuizResponse, UserQuestionResponse # Add Identification and Embed
+    Identification, Embed, ActivityManager, UserQuizResponse, UserQuestionResponse,
+    Concept, ConceptMap
 )
 
 # Mapping for deletion order (reverse dependency)
 # Add new models here as needed
 MODEL_DELETE_ORDER = [
     Question, PollQuestion, UserQuizResponse, UserQuestionResponse, # Responses first if they existed
-    Quiz, Poll, Writing, TextContent, Identification, Embed, # Activities
+    Quiz, Poll, Writing, TextContent, Identification, Embed, Concept, ConceptMap, # Activities
     Lesson, # Lesson
     User, # User (excluding superusers)
 ]
@@ -92,7 +93,7 @@ class Command(BaseCommand):
             # Delete activities associated with this lesson using ActivityManager types
             for activity_key, (ModelClass, _, _, _, _) in activity_manager.registered_activities.items():
                  # Skip abstract or child models that don't have direct lesson FK or own table
-                if hasattr(ModelClass._meta, 'abstract') and ModelClass._meta.abstract:
+                if not hasattr(ModelClass, '_meta') or (hasattr(ModelClass._meta, 'abstract') and ModelClass._meta.abstract):
                     continue
                 if activity_key in ["question", "pollquestion"]: # Handled by Quiz/Poll deletion cascade
                      continue
@@ -198,12 +199,15 @@ class Command(BaseCommand):
             # Explicitly pop child data *before* creating the parent defaults
             questions_data = None
             poll_questions_data = None
+            concepts_data = None
             if activity_type_str == 'quiz':
                 # Pop 'questions' from the data intended for the Quiz model defaults
                 questions_data = current_activity_data.pop('questions', None)
             elif activity_type_str == 'poll':
                  # Pop 'questions' from the data intended for the Poll model defaults
                 poll_questions_data = current_activity_data.pop('questions', None)
+            elif activity_type_str == 'conceptmap':
+                concepts_data = current_activity_data.pop('examples', None)
 
             # Base defaults common to most BaseActivity children
             defaults = {
@@ -236,6 +240,8 @@ class Command(BaseCommand):
                      self._create_questions(activity_obj, questions_data)
                 elif activity_type_str == 'poll' and poll_questions_data: # Check if we popped data earlier
                     self._create_poll_questions(activity_obj, poll_questions_data)
+                elif activity_type_str == 'conceptmap' and concepts_data:
+                     self._create_concepts(activity_obj, concepts_data)
 
             except Exception as e:
                 # Include the derived order in the error message
@@ -300,3 +306,35 @@ class Command(BaseCommand):
             except Exception as e:
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update poll question (Order: {order}) for poll '{poll.title}': {e}"))
+
+    def _create_concepts(self, concept_map, concepts_data):
+        """Creates or updates concepts for a given concept map, deriving order from list position."""
+        self.stdout.write(f"  Processing {len(concepts_data)} concepts for concept map: {concept_map.title}") # Debug print
+        # Use enumerate to get the index (order), starting from 1
+        for order, concept_data in enumerate(concepts_data, start=1):
+            # Prepare defaults for the Concept model
+            concept_defaults = {
+                'title': concept_data.get('title', f'Concept {order}'), # Use title from data or default
+                'image': concept_data.get('image'),
+                'description': concept_data.get('description', ''),
+                'examples': concept_data.get('examples', []),
+                # Instructions might be on concept_data or inherit from BaseActivity defaults
+                'instructions': concept_data.get('instructions'),
+            }
+            # Remove None values unless the field explicitly allows null=True
+            model_fields = {f.name: f for f in Concept._meta.get_fields()}
+            concept_defaults = {k: v for k, v in concept_defaults.items() if k in model_fields and (v is not None or getattr(model_fields[k], 'null', False))}
+
+            try:
+                # Use the 'order' from enumerate in update_or_create
+                concept, c_created = Concept.objects.update_or_create(
+                    concept_map=concept_map, # Link to the parent concept map
+                    lesson=concept_map.lesson, # Link to the same lesson as the map
+                    order=order, # Use the order derived from list position
+                    defaults=concept_defaults
+                )
+                c_action = 'Created' if c_created else 'Updated'
+                self.stdout.write(f"    {c_action} concept (Order: {order}): {concept.title[:50]}...")
+            except Exception as e:
+                 # Include the derived order in the error message
+                 self.stdout.write(self.style.ERROR(f"    Failed to create/update concept (Order: {order}) for concept map '{concept_map.title}': {e}"))
