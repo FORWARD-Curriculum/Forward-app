@@ -703,7 +703,6 @@ class UserQuizResponse(models.Model):
             "question_responses": [qr.to_dict() for qr in self.question_responses.all()]
         }
 
-
 class UserQuestionResponse(models.Model):
     """
     Stores a user's response to an individual question within a quiz
@@ -1009,8 +1008,7 @@ class ActivityManager():
 
     registered_activities: dict[str, tuple[BaseActivity, BaseResponse,
                                            dict[str, tuple[str, any]], bool]] = {}
-    registered_services: dict[str,
-                              dict[BaseActivity, callable]] = {"response": {}}
+    registered_services: dict[str, dict[BaseActivity, callable]] = {"response": {}}
 
     def registerActivity(self,
                          ActivityClass: BaseActivity,

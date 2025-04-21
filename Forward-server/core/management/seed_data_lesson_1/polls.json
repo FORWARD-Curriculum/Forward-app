@@ -1,0 +1,12 @@
+[
+  {
+    "lesson":"Going to College",
+    "title": "College Degree Opinions",
+    "instructions": "The next few questions ask about what you THINK. There is no correct answer but you will see how others have responded.",
+    "order": 20,
+    "config": {
+      "show_results": true,
+      "allow_anonymous": true
+    }
+  }
+]

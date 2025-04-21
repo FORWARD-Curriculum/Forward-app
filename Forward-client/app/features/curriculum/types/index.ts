@@ -25,7 +25,7 @@ export interface Lesson {
   *   ActivityName: [ActivityInterface, ActivityResponseInterface, child_class]
   * ```
   *
-  * This structure mirrors the backend implementation in the 
+  * This structure mirrors the backend implementation in the
   * [ActivityManager class]({@link ../../../../../Forward-server/core/models.py}),
   * which centralizes activity management. In the backend, the ActivityManager
   * registers each activity with its corresponding response type and any additional
