@@ -597,7 +597,6 @@ class UserQuizResponse(models.Model):
             "question_responses": [qr.to_dict() for qr in self.question_responses.all()]
         }
 
-
 class UserQuestionResponse(models.Model):
     """
     Stores a user's response to an individual question within a quiz
@@ -875,7 +874,7 @@ class ActivityManager():
     registered_activities: dict[str, tuple[BaseActivity, BaseResponse,
                                            dict[str, tuple[str, any]], bool]] = {}
     registered_services: dict[str, dict[BaseActivity, callable]] = {"response": {}}
-    
+
     def registerActivity(self,
                          ActivityClass: BaseActivity,
                          ResponseClass: BaseResponse,
@@ -901,7 +900,7 @@ class ActivityManager():
         """
         self.registered_activities[ActivityClass.__name__.lower()] = (
             ActivityClass, ResponseClass, nonstandard_resp_fields, child_class, {})
-    
+
     def registerService(self, service_type: str, ActivityClass: BaseActivity, service: callable):
         """Registers a service to an activity. This is used to allow for custom services to be registered
         to an activity, such as a custom quiz service. Used for legacy/complex activities to provide more

@@ -340,7 +340,7 @@ class PollView(APIView):
 
 class ResponseView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request, *args, **kwargs):
         activity_type: str = kwargs.get("activitytype").lower()
         if not activity_type:

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager
+from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager, Poll, PollQuestion, UserQuestionResponse
 from django.core.exceptions import ImproperlyConfigured
 
 
@@ -86,7 +86,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         from core.services import UserService
         return UserService.create_user(validated_data)
 
-
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(
@@ -116,7 +115,6 @@ class UserLoginSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
-
 
 class UserUpdateSerializer(serializers.Serializer):
     display_name = serializers.CharField(required=False)
@@ -178,7 +176,6 @@ class UserUpdateSerializer(serializers.Serializer):
         instance.save()
 
         return instance
-
 
 class UserQuestionResponseSerializer(serializers.Serializer):
     """
@@ -261,7 +258,6 @@ class QuizSubmissionSerializer(serializers.Serializer):
         #     self.context['quiz_id'] = quiz_id
 
         return data
-
 
 class UserQuizResponseDetailSerializer(serializers.ModelSerializer):
     """Serializer for retrieving a user's quiz response with details"""
