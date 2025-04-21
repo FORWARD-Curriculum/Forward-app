@@ -15,12 +15,15 @@ class UserService:
         """
         Create a new user with validated data
 
+
         Args:
             data (dict): Dictionary containing user data including:
                         username, password, email, display_name, facility_id, consent
 
+
         Returns:
             User: Created user instance
+
 
         Raises:
             ValidationError: If password validation fails or required fields are missing
@@ -28,6 +31,7 @@ class UserService:
         try:
             # Validate password
             validate_password(data['password'])
+
 
             # Create user instance but don't save yet
             user = User(
@@ -42,14 +46,17 @@ class UserService:
             if 'consent' in data:
                 user.consent = data['consent']
 
+
             # Set password (this handles the hashing)
             user.set_password(data['password'])
 
             # Validate all fields according to model constraints
             user.full_clean()
 
+
             # Save the user
             user.save()
+
 
             return user
         except ValidationError as e:
@@ -57,14 +64,17 @@ class UserService:
         except KeyError as e:
             raise ValidationError(f'Missing required field: {str(e)}')
 
+
     @staticmethod
     def login_user(request, user: User):
         """
         Log in a user and create a session
 
+
         Args:
             request: The HTTP request object
             user: The authenticated user instance
+
 
         Returns:
             dict: User data including authentication token if used
@@ -95,13 +105,16 @@ class UserService:
         except Exception as e:
             raise ValidationError('login failed. Please try again.')
 
+
     @staticmethod
     def logout_user(request):
         """
         Log out a user and destroy the session
 
+
         Args:
             request: The HTTP request object
+
 
         Returns:
             dict: User data including authentication token if used
@@ -119,11 +132,14 @@ class LessonService:
         """
         Retrieve all content associated with a lesson.
 
+
         Args:
             lesson_id (int): The ID of the lesson
 
+
         Returns:
             dict: All content associated with the lesson
+
 
         Raises:
             Lesson.DoesNotExist: If the lesson doesn't exist
@@ -132,9 +148,11 @@ class LessonService:
             lesson = Lesson.objects.get(id=lesson_id)
         except Lesson.DoesNotExist:
             raise
+            raise
         lesson_dict = lesson.to_dict()
 
         activity_list = []
+
 
         for value in ActivityManager.registered_activities.values():
             ActivityModel, child_class = value[0], value[3]
@@ -159,16 +177,21 @@ class ResponseService:
         """
         Retrieve all content associated with a lesson.
 
+
         Args:
             lesson_id (int): The ID of the lesson
 
+
         Returns:
-            dict: All content associated with the lesson         
+            dict: All content associated with the lesson
         Raises:
             Lesson.DoesNotExist: If the lesson doesn't exist
         """
 
+
         lesson = Lesson.objects.get(id=lesson_id)
+
+        out_dict = {}
 
         out_dict = {}
         out_dict['lesson_id'] = lesson.id
@@ -182,6 +205,7 @@ class ResponseService:
         for value in out_dict['response_data'].values():
             out_dict['highest_activity'] += len(value)
 
+
         return {
             "response": out_dict
         }
@@ -194,9 +218,11 @@ class QuizResponseService:
         (Private method)
         Get the appropriate feedback based on the quiz score
 
+
         Args:
             quiz: The Quiz object
             score: The user's score
+
 
         Returns:
             str: The feedback message
@@ -204,15 +230,19 @@ class QuizResponseService:
         if not quiz.feedback_config or 'ranges' not in quiz.feedback_config:
             return quiz.feedback_config.get('default', '')
 
+
         ranges = quiz.feedback_config.get('ranges', [])
         default_feedback = quiz.feedback_config.get('default', '')
+
 
         for range_config in ranges:
             min_score = range_config.get('min', 0)
             max_score = range_config.get('max', 0)
 
+
             if min_score <= score <= max_score:
                 return range_config.get('feedback', default_feedback)
+
 
         return default_feedback
 
@@ -276,6 +306,7 @@ class QuizResponseService:
         else:
             feedback = ''
 
+
             # Calculate completion percentage based on answered questions
             total_quiz_questions = Question.objects.filter(
                 quiz_id=quiz_id).count()
@@ -290,12 +321,14 @@ class QuizResponseService:
         # Save the quiz response with updated completion percentage
         quiz_response.save()
 
+
         # Return both the quiz response and feedback
         # Feedback is separate from the model because it will likely only be displayed once upon submission
         return {
             'quiz_response': quiz_response,
             'feedback': feedback
         }
+
 
     @staticmethod
     def get_user_quiz_responses(user, quiz_id=None):
@@ -313,17 +346,21 @@ class QuizResponseService:
             return UserQuizResponse.objects.filter(user=user, quiz_id=quiz_id)
         return UserQuizResponse.objects.filter(user=user)
 
+
     @staticmethod
     def get_quiz_response_details(user, response_id):
         """
         Get detailed information about a quiz response.
 
+
         Args:
             user: The user who submitted the response
             response_id: ID of the quiz response
 
+
         Returns:
             UserQuizResponse: The quiz response with question responses
+
 
         Raises:
             UserQuizResponse.DoesNotExist: If the response doesn't exist or belong to the user
