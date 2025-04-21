@@ -42,7 +42,7 @@ export async function apiFetch(
     "X-CSRFToken": getCookie("csrftoken") || "",
   };
 
-  return fetch(`${import.meta.env.VITE_BACKEND_URL}` + '/api' + url , { ...options, headers, credentials: "include" });
+  return fetch((import.meta.env.DEV ? "": import.meta.env.VITE_BACKEND_URL) + '/api' + url , { ...options, headers, credentials: "include" });
 }
 
 /**
