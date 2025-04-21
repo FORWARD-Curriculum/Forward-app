@@ -18,7 +18,6 @@ export default function TextContent({
   );
   return (
     <div className="markdown">
-      <p>{textContent.id}</p>
       <MarkdownTTS
         controlsClassName="flex gap-2"
         controlsOrientation="vertical"

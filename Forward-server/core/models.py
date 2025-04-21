@@ -494,6 +494,112 @@ class PollQuestion(models.Model):
             "order": self.order,
         }
 
+
+class Embed(BaseActivity):
+    """
+    Model for a simple link to be embedded within an activity
+    """
+    link = models.TextField(
+        help_text="a valid link"
+    )
+
+    code = models.TextField(
+        null=True,
+        blank=True,
+        default=None,
+        help_text="A string of a code to determine if the user may procede"
+    )
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "embed"
+        verbose_name_plural = "embeds"
+
+    def __str__(self):
+        return f"Embed: {self.title}"
+
+    @property
+    def activity_type(self):
+        return self.__class__.__name__
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "link": self.link,
+            "has_code": self.code is not None,
+        }
+
+class ConceptMap(BaseActivity):
+    """Model for mapping concepts to each other"""
+    content = models.CharField(
+        max_length=50000,
+        default="",
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content,
+            "concepts": [c.to_dict() for c in Concept.objects.filter(concept_map=self).order_by('order')]
+        }
+
+class Concept(BaseActivity):
+    """Model for a concept in the concept map"""
+    # TODO use jsonschema to enforce and validate the schema of the example field
+    
+    """
+    {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"|null
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "logo",
+          "description"
+        ],
+        "additionalProperties": false
+      },
+    }
+    """
+    
+    concept_map = models.ForeignKey(
+        ConceptMap,
+        on_delete=models.CASCADE,
+        related_name="concepts",
+        help_text="The concept map this concept belongs to"
+    )
+    
+    image = models.TextField(blank=True, null=True)
+    
+    description = models.TextField(
+        help_text="A detailed description of the concept"
+    )
+    
+    examples = models.JSONField(
+        default=list,
+        help_text="List of examples for this concept"
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "id": self.id,
+            "image": self.image,
+            "description": self.description,
+            "examples": self.examples,
+        }
+
 # TODO: Make quiz and question response inherit from BaseResponse, or make
 # them adhere to the contract enforced by BaseResponse
 
@@ -858,6 +964,35 @@ class PollResponse(BaseResponse):
         }
 
 
+class EmbedResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        Embed,
+        on_delete=models.CASCADE,
+        related_name='associated_embed',
+        help_text='The embed activity associated with this response'
+    )
+
+    inputted_code: str = None
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "inputted_code": self.inputted_code
+        }
+
+class ConceptMapResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        ConceptMap,
+        on_delete=models.CASCADE,
+        related_name='associated_conceptmap',
+        help_text='The concept map associated with this response'
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
+
 class ActivityManager():
     """A centralized management class meant to streamline the process of creating and using a
     activities within the backend.
@@ -914,7 +1049,8 @@ class ActivityManager():
         if service_type not in self.registered_services:
             raise ValueError(
                 f"{service_type} is an invalid service type.")
-        self.registered_activities[service_type][ActivityClass.__name__.lower()] = service
+            
+        self.registered_services[service_type][ActivityClass.__name__.lower()] = service
 
     def __init__(self):
         if self._initialized:
@@ -929,6 +1065,10 @@ class ActivityManager():
             PollQuestion, PollQuestionResponse, child_class=True)
         self.registerActivity(Quiz, UserQuizResponse)
         self.registerActivity(Question, UserQuestionResponse, child_class=True)
+        self.registerActivity(Embed, EmbedResponse, {
+                              "inputted_code": ["inputted_code", None]})
+        self.registerActivity(ConceptMap, ConceptMapResponse)
+        self.registerActivity(Concept, None, child_class=True) # None here means no response is expected
 
 
 # Register on launch

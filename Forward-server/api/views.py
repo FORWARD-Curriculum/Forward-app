@@ -9,7 +9,7 @@ from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUp
 from core.services import UserService, LessonService, QuizResponseService, ResponseService
 from .utils import json_go_brrr, messages
 from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question
-from rest_framework import serializers
+from rest_framework import serializers, request
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -349,8 +349,6 @@ class ResponseView(APIView):
         activity_config = ActivityManager.registered_activities.get(activity_type.lower())
         if not activity_config:
             return Response({"detail": f"Invalid activity type: {activity_type}"}, status=status.HTTP_400_BAD_REQUEST)
-
-        print(request.data.get("lesson_id"))
 
         serializer = ResponseSerializer(
             data=request.data,

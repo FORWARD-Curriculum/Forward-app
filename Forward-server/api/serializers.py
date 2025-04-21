@@ -318,9 +318,8 @@ class ResponseSerializer(serializers.Serializer):
         ResponseModel: BaseResponse = self.context['activity_config'][1]
         ActivityModel = self.context['activity_config'][0]
 
-        if ActivityModel in ActivityManager.registered_services["response"]:
-            return ActivityManager.registered_services["response"][ActivityModel.__name__.lower()](
-            )
+        if ActivityModel.__name__.lower() in ActivityManager.registered_services["response"]:
+            return ActivityManager.registered_services["response"][ActivityModel.__name__.lower()](validated_data, self.context["request"])
         else:
             try:
                 response_object, created = ResponseModel.objects.get_or_create(
