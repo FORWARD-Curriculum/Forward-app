@@ -186,14 +186,7 @@ class QuizView(APIView):
                 "questions": [q.to_dict() for q in questions]}},
             status=status.HTTP_200_OK
         )
-
-    def post(self, req, *args, **kwargs):
-        '''
-        submits a quiz by creating a new userdata row in db
-        '''
-
-        # need to make user data table to save to. TBD
-
+    
 
 class GetLessonIds(APIView):
     permission_classess = [IsAuthenticated]
@@ -350,21 +343,36 @@ class ResponseView(APIView):
         if not activity_config:
             return Response({"detail": f"Invalid activity type: {activity_type}"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Prepare context for serializer
+        context = {
+            'request': request,
+            'activity_config': activity_config
+        }
+
         serializer = ResponseSerializer(
             data=request.data,
-            context={
-                'request': request,
-                'activity_config': activity_config
-            }
+            context=context
         )
 
         try:
             serializer.is_valid(raise_exception=True)
             response_object = serializer.save()
+            
+            # Handle different response object types
+            try:
+                response_data = response_object.to_dict()
+            except (AttributeError, TypeError) as e:
+                print(f"Error calling to_dict(): {e}")
+                # Fallback for objects without to_dict
+                if hasattr(response_object, '__dict__'):
+                    response_data = response_object.__dict__
+                else:
+                    response_data = {"id": getattr(response_object, "id", None)}
+            
             return Response(
                 {"detail": "Successfully saved " + activity_type,
-                    "data": response_object.to_dict()},
-                status=status.HTTP_201_CREATED
+                    "data": response_data},
+                status=status.HTTP_200_OK
             )
         except serializers.ValidationError as e:
             # Handles validation errors from serializer or explicit raises
@@ -479,7 +487,7 @@ class QuizResponseStatusView(APIView):
                     message="Retrieved quiz completion status",
                     data={
                         'quiz_id': quiz_id,
-                        'is_complete': quiz_response.is_complete,
+                        'is_complete': quiz_response.partial_response,
                         'completion_percentage': quiz_response.completion_percentage,
                         'score': quiz_response.score,
                     },

@@ -305,6 +305,7 @@ class ResponseSerializer(serializers.Serializer):
     partial_response = serializers.BooleanField(default=True, write_only=True)
     time_spent = serializers.IntegerField(default=0, write_only=True)
     attempts_left = serializers.IntegerField(default=0)
+    quiz_id = serializers.UUIDField(required=False)
 
     def validate(self, attrs):
         if 'activity_config' not in self.context:
@@ -315,11 +316,15 @@ class ResponseSerializer(serializers.Serializer):
     def save(self, **kwargs):
         """Handles get_or_create/update logic based on context and input."""
         validated_data = {**self.validated_data, **kwargs}
+
         ResponseModel: BaseResponse = self.context['activity_config'][1]
         ActivityModel = self.context['activity_config'][0]
 
-        if ActivityModel.__name__.lower() in ActivityManager.registered_services["response"]:
-            return ActivityManager.registered_services["response"][ActivityModel.__name__.lower()](validated_data, self.context["request"])
+        activity_type = ActivityModel.__name__.lower()
+    
+        if activity_type in ActivityManager.registered_services.get("response", {}):
+            service_func = ActivityManager.registered_services["response"][activity_type]
+            return service_func(validated_data, self.context["request"])
         else:
             try:
                 response_object, created = ResponseModel.objects.get_or_create(
@@ -336,8 +341,9 @@ class ResponseSerializer(serializers.Serializer):
                 response_object.attempts_left = validated_data.get(
                     "attempts_left", 0)
                 for key, value in self.context['activity_config'][2].items():
+                    field_name, default = value
                     setattr(response_object, key,
-                            self.context['request'].data.get(*value))
+                            self.context['request'].data.get(field_name, default))
                 response_object.save()
             except:
                 # If ID provided but not found for user, treat as error
