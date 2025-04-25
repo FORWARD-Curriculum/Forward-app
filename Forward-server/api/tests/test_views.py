@@ -926,7 +926,7 @@ class QuizResponseAPITests(TestCase):
         
         # Verify database was updated
         new_response = UserQuizResponse.objects.exclude(id=self.quiz_response.id).first()
-        self.assertFalse(new_response.is_complete)
+        self.assertFalse(new_response.partial_response)
         self.assertIsNone(new_response.score)
 
     def test_submit_invalid_quiz_response(self):
@@ -1065,7 +1065,7 @@ class QuizResponseAPITests(TestCase):
         # Most recent response should be complete with score of 1
         new_response_id = response.data['data']['quiz_response']['id']
         new_response = UserQuizResponse.objects.get(id=new_response_id)
-        self.assertTrue(new_response.is_complete)
+        self.assertTrue(new_response.partial_response)
         self.assertEqual(new_response.score, 1)
         self.assertEqual(new_response.question_responses.count(), 1) # Should still be 1 since updated
         
