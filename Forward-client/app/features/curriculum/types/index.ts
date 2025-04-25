@@ -209,6 +209,7 @@ export interface BaseResponse {
 export interface QuizResponse extends BaseResponse {
   score: number | null;
   highest_question_reached: number;
+  completion_percentage: number;
 }
 
 /**
