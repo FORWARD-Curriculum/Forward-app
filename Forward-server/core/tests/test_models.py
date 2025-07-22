@@ -498,8 +498,8 @@ class QuizResponseModelTests(TestCase):
         )
         
         self.assertEqual(quiz_response.user, self.user)
-        self.assertEqual(quiz_response.quiz, self.quiz)
-        self.assertFalse(quiz_response.is_complete)
+        self.assertEqual(quiz_response.associated_activity, self.quiz)
+        self.assertFalse(quiz_response.partial_response)
         self.assertIsNone(quiz_response.score)
         self.assertIsNotNone(quiz_response.updated_at)
         self.assertIsNotNone(quiz_response.created_at)

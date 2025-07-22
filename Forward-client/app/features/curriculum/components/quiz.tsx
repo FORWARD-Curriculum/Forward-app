@@ -18,7 +18,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
     type: "Quiz",
     activity: quiz,
     trackTime: false,
-    initialFields: { highest_question_reached: 1, score: 0 },
+    initialFields: { highest_question_reached: 1, score: 0, completion_percentage: 0 },
   });
 
   const [done,setDone] = useState(false);

@@ -624,7 +624,7 @@ class UserQuizResponse(models.Model):
         help_text='The lesson related to this quiz response'
     )
 
-    quiz = models.ForeignKey(
+    associated_activity = models.ForeignKey(
         Quiz,
         on_delete=models.CASCADE,
         related_name='user_responses',
@@ -637,7 +637,7 @@ class UserQuizResponse(models.Model):
         help_text="The user's score on this quiz"
     )
 
-    is_complete = models.BooleanField(
+    partial_response = models.BooleanField(
         default=False,
         help_text='Whether the quiz has been completed and submitted'
     )
@@ -657,16 +657,16 @@ class UserQuizResponse(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['user', 'quiz']
+        unique_together = ['user', 'associated_activity'] # TODO
         verbose_name = 'quiz response'
         verbose_name_plural = 'quiz responses'
 
     def __str__(self):
-        return f"{self.user.username}'s response to {self.quiz.title}"
+        return f"{self.user.username}'s response to {self.associated_activity.title}"
 
     def calculate_score(self):
         """Calculate and set the score based on the question responses"""
-        if not self.is_complete:
+        if not self.partial_response:
             return None
 
         # Only count questions that have correct answers defined
@@ -695,9 +695,9 @@ class UserQuizResponse(models.Model):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "quiz_id": self.quiz_id,
+            "associated_activity_id": self.associated_activity_id,
             "score": self.score,
-            "is_complete": self.is_complete,
+            "partial_response": self.partial_response,
             "completion_percentage": self.completion_percentage,
             "time_spent": self.time_spent,
             "question_responses": [qr.to_dict() for qr in self.question_responses.all()]

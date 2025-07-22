@@ -24,6 +24,7 @@ export const initialLessonResponseState: LessonResponse = {
     ConceptMap: [],
     Identification: [],
     Poll: [],
+    Embed: [],
   },
 };
 

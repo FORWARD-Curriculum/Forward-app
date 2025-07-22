@@ -5,7 +5,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, Embed, EmbedResponse
-from rest_framework import request
+from rest_framework.request import Request as DRFRequest
 
 
 class UserService:
@@ -248,86 +248,99 @@ class QuizResponseService:
 
     @staticmethod
     @transaction.atomic
-    def submit_quiz_response(user: User, data: dict):
+    def submit_quiz_response(validated_data, request):
         """
-        Process a user's quiz submission
-
+        Process a user's quiz submission from the unified API
+        
         Args:
-            user: The user submitting the quiz
-            data: Dictionary containing quiz submission data (validated by serializer)
-
+            validated_data: The validated data from the serializer
+            request: The request object containing the user
+            
         Returns:
-            UserQuizResponse: The created/updated quiz response object
+            An object with to_dict method containing the response data
         """
-        quiz_id = data.get('quiz_id')
-        # TODO: idk about the default value here
-        is_complete = data.get('is_complete', True)
-        question_responses_data = data.get('question_responses', [])
-
-        # Get the quiz object
-        quiz = Quiz.objects.get(id=quiz_id)
-
-        # Get or create a quiz response object
-        quiz_response, created = UserQuizResponse.objects.get_or_create(
-            user=user,
-            quiz_id=quiz_id,
-            defaults={'is_complete': False}
-        )
-
-        # If quiz is being completed, update completion status and time
-        if is_complete and not quiz_response.is_complete:
-            quiz_response.is_complete = True
-            quiz_response.updated_at = timezone.now()
-
-        # If the quiz response is new it needs an ID, so save it now
-        quiz_response.save()
-
-        # Process each question response
-        for response_data in question_responses_data:
-            question_id = response_data.get('question_id')
-            response_content = response_data.get('response_data')
-
-            # Create or update the question response
-            question_response, _ = UserQuestionResponse.objects.update_or_create(
-                quiz_response=quiz_response,
-                question_id=question_id,
-                defaults={'response_data': response_content}
-            )
-
-            # Check correctness
-            question_response.evaluate_correctness()
-
-        # Calculate score if complete
-        if quiz_response.is_complete:
-            quiz_response.calculate_score()
-            feedback = QuizResponseService.__get_feedback_for_score(
-                quiz, quiz_response.score)
-            quiz_response.completion_percentage = 100.0  # Set 100% complete
-        else:
-            feedback = ''
-
-
-            # Calculate completion percentage based on answered questions
-            total_quiz_questions = Question.objects.filter(
-                quiz_id=quiz_id).count()
-            answered_questions = quiz_response.question_responses.count()
-
-            if total_quiz_questions > 0:
-                quiz_response.completion_percentage = (
-                    answered_questions / total_quiz_questions) * 100
+        try:
+            user = request.user
+            
+            # Extract the quiz ID from the associated_activity
+            quiz_obj = validated_data.get('associated_activity')
+            if hasattr(quiz_obj, 'id'):
+                quiz_id = quiz_obj.id
             else:
-                quiz_response.completion_percentage = 0.0
+                quiz_id = quiz_obj
+                
+            lesson_id = validated_data.get('lesson_id')
+            partial_response = validated_data.get('partial_response', True)
+            
+            # Get the quiz object
+            quiz = Quiz.objects.get(id=quiz_id)
+            
+            # If we have a lesson ID, get the lesson object
+            if lesson_id:
+                if isinstance(lesson_id, Lesson):
+                    lesson = lesson_id
+                else:
+                    try:
+                        lesson = Lesson.objects.get(id=lesson_id)
+                    except Lesson.DoesNotExist:
+                        # Try to get lesson from quiz
+                        lesson = quiz.lesson
+            else:
+                # Try to get lesson from quiz
+                lesson = quiz.lesson
+                
+            # Create or get quiz response
+            quiz_response, created = UserQuizResponse.objects.get_or_create(
+                user=user,
+                associated_activity=quiz,
+                defaults={
+                    'lesson': lesson,
+                    'partial_response': partial_response
+                }
+            )
+            
+            # Update if not newly created
+            if not created:
+                quiz_response.partial_response = partial_response
+                quiz_response.save()
+                
+            # Calculate score and feedback
+            if not partial_response:
+                quiz_response.calculate_score()
+                feedback = QuizResponseService.__get_feedback_for_score(
+                    quiz, quiz_response.score)
+                quiz_response.completion_percentage = 100.0
+            else:
+                feedback = ''
+                # Calculate completion percentage based on answered questions
+                total_quiz_questions = Question.objects.filter(
+                    quiz_id=quiz_id).count()
+                answered_questions = quiz_response.question_responses.count()
 
-        # Save the quiz response with updated completion percentage
-        quiz_response.save()
-
-
-        # Return both the quiz response and feedback
-        # Feedback is separate from the model because it will likely only be displayed once upon submission
-        return {
-            'quiz_response': quiz_response,
-            'feedback': feedback
-        }
+                if total_quiz_questions > 0:
+                    quiz_response.completion_percentage = (
+                        answered_questions / total_quiz_questions) * 100
+                else:
+                    quiz_response.completion_percentage = 0.0
+                
+            quiz_response.save()
+            
+            # Return the response with feedback
+            class QuizResponseWrapper:
+                def __init__(self, quiz_response, feedback):
+                    self.quiz_response = quiz_response
+                    self.feedback = feedback
+                    
+                def to_dict(self):
+                    response_dict = self.quiz_response.to_dict()
+                    response_dict['feedback'] = self.feedback
+                    return response_dict
+            
+            return QuizResponseWrapper(quiz_response, feedback)
+            
+        except Exception as e:
+            print(f"Error in submit_quiz_response: {e}")
+            raise
 
 
     @staticmethod
@@ -367,10 +380,79 @@ class QuizResponseService:
         """
         return UserQuizResponse.objects.get(id=response_id, user=user)
 
+class QuestionResponseService:
+    @staticmethod
+    @transaction.atomic
+    def submit_question_response(validated_data, request):
+        """
+        Process a user's response to an individual question.
+        
+        Args:
+            validated_data: The validated data from the serializer
+            request: The request object containing the user
+            
+        Returns:
+            UserQuestionResponse: The created/updated question response
+        """
+        try:
+            user = request.user
+            
+            # Extract the question object from validated_data
+            question = validated_data.get('associated_activity')
+            quiz_id = validated_data.get('quiz_id')
+            lesson_id = validated_data.get('lesson_id')
+            response_data = validated_data.get('response_data', {})
+            time_spent = validated_data.get('time_spent', 0)
+            
+            # Get or create the parent quiz response
+            quiz_response, created = UserQuizResponse.objects.get_or_create(
+                user=user,
+                associated_activity_id=quiz_id,
+                defaults={
+                    'lesson_id': lesson_id,
+                    'partial_response': True,  # It's partial until explicitly completed
+                    'completion_percentage': 0.0
+                }
+            )
+            
+            # Get or create the question response
+            question_response, created = UserQuestionResponse.objects.update_or_create(
+                user=user,
+                quiz_response=quiz_response,
+                question=question,
+                defaults={
+                    'lesson_id': lesson_id,
+                    'response_data': response_data,
+                    'time_spent': time_spent
+                }
+            )
+            
+            # Evaluate the correctness of the response
+            question_response.evaluate_correctness()
+            
+            # Update quiz completion percentage
+            total_quiz_questions = Question.objects.filter(quiz_id=quiz_id).count()
+            answered_questions = quiz_response.question_responses.count()
+            
+            if total_quiz_questions > 0:
+                quiz_response.completion_percentage = (answered_questions / total_quiz_questions) * 100
+            else:
+                quiz_response.completion_percentage = 0.0
+                
+            quiz_response.save()
+            
+            return question_response
+            
+        except Exception as e:
+            print(f"Error in submit_question_response: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
+
 
 class EmbedResponseService:
     @staticmethod
-    def update_embed_completion_status(validated_data: dict, request: request):
+    def update_embed_completion_status(validated_data: dict, request: DRFRequest):
         """
         Update the completion status of an embed response.
 
@@ -388,17 +470,24 @@ class EmbedResponseService:
             id=validated_data.get('id', None),
         )
 
-        response_object.partial_response = validated_data.get('associated_activity').code is not None and (request.data.get('inputted_code', None) != validated_data.get('associated_activity').code)
+        # Fix: Access request data safely
+        inputted_code = None
+        if hasattr(request, 'data'):
+            inputted_code = request.data.get('inputted_code', None)
+        
+        response_object.partial_response = validated_data.get('associated_activity').code is not None and (inputted_code != validated_data.get('associated_activity').code)
         response_object.time_spent = validated_data.get("time_spent", 0)
         response_object.attempts_left = validated_data.get("attempts_left", 0)
-        response_object.inputted_code = request.data.get('inputted_code', "")
+        
+        # Fix: Access request data safely
+        if hasattr(request, 'data'):
+            response_object.inputted_code = request.data.get('inputted_code', "")
         
         
         response_object.save()
         return response_object
 
+ActivityManager().registerService("response", Quiz, QuizResponseService.submit_quiz_response)
+ActivityManager().registerService("response", Question, QuestionResponseService.submit_question_response)
 
-ActivityManager.registerService(
-    ActivityManager, "response", Quiz, QuizResponseService.submit_quiz_response)
-ActivityManager.registerService(
-    ActivityManager, "response", Embed, EmbedResponseService.update_embed_completion_status)
+ActivityManager().registerService("response", Embed, EmbedResponseService.update_embed_completion_status)

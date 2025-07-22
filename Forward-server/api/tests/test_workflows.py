@@ -154,7 +154,7 @@ class QuizResponseWorkflowTests(TestCase):
         
         # Verify it was saved as incomplete
         saved_response = UserQuizResponse.objects.get(id=quiz_response_id)
-        self.assertFalse(saved_response.is_complete)
+        self.assertFalse(saved_response.partial_response)
         self.assertIsNone(saved_response.score)
         
         # Step 3: Save the second question (autosave)
@@ -185,7 +185,7 @@ class QuizResponseWorkflowTests(TestCase):
         # Verify we now have two question responses but still incomplete
         saved_response = UserQuizResponse.objects.get(id=quiz_response_id)
         self.assertEqual(saved_response.question_responses.count(), 2)
-        self.assertFalse(saved_response.is_complete)
+        self.assertFalse(saved_response.partial_response)
         
         # Step 4: Final submission with all questions
         final_data = {
@@ -222,7 +222,7 @@ class QuizResponseWorkflowTests(TestCase):
         
         # Verify completion and score
         saved_response = UserQuizResponse.objects.get(id=quiz_response_id)
-        self.assertTrue(saved_response.is_complete)
+        self.assertTrue(saved_response.partial_response)
         self.assertEqual(saved_response.score, 2)  # 2 correct out of 3 graded questions
         self.assertEqual(saved_response.question_responses.count(), 4)
         
