@@ -1,103 +1,42 @@
-# Forward-app Backend Notes
+# Forward App
+### Useful Links
+- [Client/Frontend Notes](Forward-client/README.md)
+- [API Documentation](Forward-server/README.md)
+- [Database Documentation](Forward-server/database-diagram.md)
 
-Django backend for the Forward application.
+## Testing
+### Docker
+If you have Docker installed on your system, a system agnostic testing environment is available by running `docker compose up`
 
-## Endpoints
-### POST `/api/users`: New user registration
-#### Request format
-```json
-{
-    "username": "your_username",
-    "password": "your_password",
-    "password_confirm": "your_confirmed_password",
-    "first_name": "Your",
-    "last_name": "Name"
-}
-```
-#### Response format
-```json
-{
-    "message": "User registered successfully",
-    "user": {
-        "id": 1,
-        "username": "your_username",
-        "first_name": "Your",
-        "last_name": "Name"
-    }
-}
-```
+This docker container will automatically run a development build of the full-scale app that will live update with changes. `^C` (Ctrl-C) to exit the container.
 
-### POST `/api/sessions`: User login
-#### Request format
-```json
-{
-    "username": "your_username",
-    "password": "your_password"
-}
-```
-#### Response format
-```json
-{
-    "message": "Login successful",
-    "user": {
-        "id": 1,
-        "username": "your_username",
-        "first_name": "Your",
-        "last_name": "Name"
-    }
-}
-```
+> [!IMPORTANT]  
+> Any data action taken within the context of the container, such as user registration / lesson progress, *will* reflect in your host system, this is due to the fact the folders are being mounted to the container for hot-reloading.
 
-### POST `/api/logout`: User logout
-#### Request format
-```json
-{}
-```
-#### Response format
-```json
-{
-    "message":"Logout successful"
-}
-```
+---
 
-## Project Structure
-```
-Forward-app/
-├── api/               # API endpoints and serializers
-│   ├── urls.py       
-│   ├── views.py      
-│   └── serializers.py
-│
-├── core/              # Business logic and models
-│   ├── models.py    
-│   └── services.py
-│
-├── forward/           # Project root
-│   ├── settings.py    
-│   └── urls.py
-```
+### Frontend
+`npm run dev`
+This will start the Frontend dev server, making it available at http://localhost:5173/
 
-## Setup
-
-1. Create and activate a virtual environment:
+---
+### Backend
+1. Setup development environment. This will:
+    1. Create and activate a virtual environment
+    2. Intall dependencies (via pip)
+    3. Run database migrations
+    4. Seed the database with test data
 ```bash
-python -m venv .venv
-
-# Windows
-venv\Scripts\activate
-
-# Mac/Linux
-source venv/bin/activate
+cd Forward-server
+./setup_dev.sh
 ```
-
-2. Install requirements
+*Note: This only works for windows machines. If you are running MacOS or Linux you replace must this line in setup_dev.sh:*
 ```bash
-pip install django djangorestframework
+./.venv/Scripts/activate # For windows only
 ```
-
-3. Run migrations
+*with:*
 ```bash
-python manage.py migrate
+source .venv/bin/activate
 ```
 
 4. Run the development server

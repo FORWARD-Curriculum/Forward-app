@@ -1,0 +1,19 @@
+services:
+  backend:
+    image: FORWARD/django
+    build: ./Forward-server
+    volumes:
+      - ./Forward-server:/app/server
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  frontend:
+    image: FORWARD/frontend
+    build: ./Forward-client
+    volumes:
+      - ./Forward-client:/app/server
+      - /app/server/node_modules
+    ports:
+      - "127.0.0.1:5173:5173"
+    links:
+      - backend

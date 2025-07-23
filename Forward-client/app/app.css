@@ -1,13 +1,244 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+@theme inline {
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --animate-slide-in-to-right: slide-in-from-right 0.4s ease-in-out;
+  --animate-slide-out-to-right: slide-out-to-right 0.4s ease-in-out;
+  --animate-in: fade-in 0.4s ease-in-out;
+  --animate-out: fade-out 0.4s ease-in-out;
+  --animate-slide-up: slideUp 0.3s ease-in;
+  --animate-slide-down: slideDown 0.3s ease-out;
+  --animate-slide-left: slideLeft 0.115s ease-out 75ms;
+  --animate-slide-right: slideRight 0.115s ease-in;
+
+  /* Dynamic theming */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-error: var(--error);
+  /* Used in accessable color schemes to differentiate elements without
+  affecting non-primarily accessable. Use around elements with the same name */
+  --color-foreground-border: var(--foreground-border);
+  --color-primary-border: var(--primary-border);
+  --color-error-border: var(--error-border);
+  --color-secondary-border: var(--secondary-border);
+
+  /* Dynamic Text Sizes */
+  --text-xs: var(--txt-xs);
+  --text-sm: var(--txt-sm);
+  --text-base: var(--txt-base);
+  --text-lg: var(--txt-lg);
+  --text-xl: var(--txt-xl);
+  --text-2xl: var(--txt-2xl);
+  --text-3xl: var(--txt-3xl);
+  --text-4xl: var(--txt-4xl);
+  --text-5xl: var(--txt-5xl);
+  --text-6xl: var(--txt-6xl);
+  --text-7xl: var(--txt-7xl);
+  --text-8xl: var(--txt-8xl);
+  --text-9xl: var(--txt-9xl);
+
+  @keyframes slide-out-to-right {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  @keyframes slideRight {
+    from {
+      max-width: 0px;
+      max-height: 0px;
+    }
+    to {
+      max-width: var(--radix-accordion-content-width);
+      max-height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes slideLeft {
+    from {
+      max-width: var(--radix-accordion-content-width);
+      max-height: var(--radix-accordion-content-height);
+    }
+    to {
+      max-width: 0px;
+      max-height: 0px;
+    }
+  }
+
+  @keyframes slide-in-from-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes enter {
+    from {
+      opacity: var(--tw-enter-opacity, 1);
+      transform: translate3d(
+          var(--tw-enter-translate-x, 0),
+          var(--tw-enter-translate-y, 0),
+          0
+        )
+        scale3d(
+          var(--tw-enter-scale, 1),
+          var(--tw-enter-scale, 1),
+          var(--tw-enter-scale, 1)
+        )
+        rotate(var(--tw-enter-rotate, 0));
+    }
+  }
+
+  @keyframes exit {
+    to {
+      opacity: var(--tw-exit-opacity, 1);
+      transform: translate3d(
+          var(--tw-exit-translate-x, 0),
+          var(--tw-exit-translate-y, 0),
+          0
+        )
+        scale3d(
+          var(--tw-exit-scale, 1),
+          var(--tw-exit-scale, 1),
+          var(--tw-exit-scale, 1)
+        )
+        rotate(var(--tw-exit-rotate, 0));
+    }
+  }
+
+  @keyframes slide-in-from-left {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-out-to-left {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes slide-in-from-top {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-out-to-top {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-100%);
+    }
+  }
+
+  @keyframes slide-in-from-bottom {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-out-to-bottom {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(100%);
+    }
+  }
+}
+
+.markdown>*ul {
+  list-style-type: disc !important; 
+  list-style-position: inside !important; 
+}
+
+.markdown>*ol {
+  list-style-type: decimal !important; 
+  list-style-position: inside !important; 
+}
+
+.markdown>*ul ul, ol ul {
+  list-style-type: circle !important; 
+   list-style-position: inside !important; 
+   margin-left: 15px !important; 
+}
+
+.markdown>*ol ol, ul ol {
+  list-style-type: lower-latin !important; 
+   list-style-position: inside !important; 
+   margin-left: 15px !important; 
 }
 
 html,
 body {
-  @apply bg-gray-100;
+  overflow-x: hidden;
+  margin-right: 0px !important;
+  @apply bg-background;
   color: black;
 
   @media (prefers-color-scheme: dark) {
@@ -15,67 +246,786 @@ body {
   }
 }
 
-a {
-  @apply text-blue-500;
-  text-decoration: underline;
+.lucide {
+  color: var(--secondary-foreground);
 }
 
 button {
   cursor: pointer;
 }
 
+
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --background: var(--color-gray-100);
+    --foreground: var(--color-white);
+    --foreground-border: var(--color-white);
+
+    --primary: var(--color-cyan-500);
+    --primary-foreground: var(--color-white);
+    --primary-border: var(--primary);
+
+    --secondary: var(--color-white);
+    --secondary-foreground: var(--color-black);
+    --secondary-border: var(--color-white);
+
+    --accent: var(--color-amber-500);
+
+    --muted: var(--color-gray-200);
+    --muted-foreground: var(--color-gray-400);
+
+    --error: var(--color-red-600);
+    --error-border: var(--color-red-600);
   }
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: var(--color-gray-800);
+    --foreground: var(--color-gray-700);
+    --foreground-border: var(--color-gray-700);
+
+    --primary: var(--color-cyan-700);
+    --primary-foreground: var(--color-white);
+    --primary-border: var(--primary);
+
+    --secondary: var(--color-gray-700);
+    --secondary-foreground: var(--color-gray-200);
+    --secondary-border: var(--color-gray-700);
+
+    --accent: var(--color-amber-500);
+
+    --muted: var(--color-gray-900);
+    --muted-foreground: var(--color-gray-400);
+
+    --error: var(--color-red-700);
+    --error-border: var(--color-red-700);
   }
+
+  .high-contrast {
+    --background: var(--color-black);
+    --foreground: var(--color-black);
+    --foreground-border: var(--color-white);
+
+    --primary: var(--color-black);
+    --primary-foreground: var(--color-yellow-300);
+    --primary-border: var(--color-yellow-300);
+
+    --secondary: var(--color-black);
+    --secondary-foreground: var(--color-white);
+    --secondary-border: var(--color-white);
+
+    --accent: var(--color-amber-500);
+
+    --muted: var(--color-black);
+    --muted-foreground: var(--color-yellow-300);
+
+    --error: var(--color-black);
+    --error-border: var(--color-fuchsia-500);
+  }
+
+  .txt-sm {
+    --txt-xs: 0.625rem;
+    --txt-sm: 0.75rem;
+    --txt-base: 0.875rem;
+    --txt-lg: 1rem;
+    --txt-xl: 1.125rem;
+    --txt-2xl: 1.25rem;
+    --txt-3xl: 1.5rem;
+    --txt-4xl: 1.875rem;
+    --txt-5xl: 2.25rem;
+    --txt-6xl: 3rem;
+    --txt-7xl: 3.75rem;
+    --txt-8xl: 4.5rem;
+    --txt-9xl: 6rem;
+  }
+
+  .txt-base {
+    --txt-xs: 0.75rem;
+    --txt-sm: 0.875rem;
+    --txt-base: 1rem;
+    --txt-lg: 1.125rem;
+    --txt-xl: 1.25rem;
+    --txt-2xl: 1.5rem;
+    --txt-3xl: 1.875rem;
+    --txt-4xl: 2.25rem;
+    --txt-5xl: 3rem;
+    --txt-6xl: 3.75rem;
+    --txt-7xl: 4.5rem;
+    --txt-8xl: 6rem;
+    --txt-9xl: 8rem;
+  }
+
+  .txt-lg {
+    --txt-xs: 0.875rem;
+    --txt-sm: 1rem;
+    --txt-base: 1.125rem;
+    --txt-lg: 1.25rem;
+    --txt-xl: 1.5rem;
+    --txt-2xl: 1.875rem;
+    --txt-3xl: 2.25rem;
+    --txt-4xl: 3rem;
+    --txt-5xl: 3.75rem;
+    --txt-6xl: 4.5rem;
+    --txt-7xl: 6rem;
+    --txt-8xl: 8rem;
+    --txt-9xl: 10rem;
+  }
+
+  .txt-xl {
+    --txt-xs: 1rem;
+    --txt-sm: 1.125rem;
+    --txt-base: 1.25rem;
+    --txt-lg: 1.5rem;
+    --txt-xl: 1.875rem;
+    --txt-2xl: 2.25rem;
+    --txt-3xl: 3rem;
+    --txt-4xl: 3.75rem;
+    --txt-5xl: 4.5rem;
+    --txt-6xl: 6rem;
+    --txt-7xl: 8rem;
+    --txt-8xl: 10rem;
+    --txt-9xl: 12rem;
+  }
+}
+
+.markdown ul, ol { 
+  display: block;
+  list-style: disc outside none;
+  margin: 1em 0;
+  padding: 0 0 0 40px;
+}
+.markdown ol { 
+  list-style-type: decimal;
+}
+
+.markdown ul ul, ol ul {
+  list-style-type: circle; 
+   list-style-position: inside; 
+   margin-left: 15px; 
+}
+
+.markdown ol ol, ul ol {
+  list-style-type: lower-latin; 
+   list-style-position: inside; 
+   margin-left: 15px; 
+}
+
+.markdown li {
+  display: list-item;
+}
+
+.markdown h1 {
+  font-size: var(--text-2xl);
+  font-weight: bold;
+}
+.markdown h2 {
+  font-size: var(--text-xl);
+  font-weight: bold;
+}
+.markdown h3 {
+  font-size: var(--text-lg);
+  font-weight: bold;
+}
+.markdown h4 {
+  font-size: var(--text-base);
+  font-weight: bold;
+}
+.markdown h5 {
+  font-size: var(--text-sm);
+  font-weight: bold;
+}
+
+.animate-in {
+  animation-duration: 150ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  --tw-enter-opacity: initial;
+  --tw-enter-scale: initial;
+  --tw-enter-rotate: initial;
+  --tw-enter-translate-x: initial;
+  --tw-enter-translate-y: initial;
+}
+
+.animate-out {
+  animation-duration: 150ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  --tw-exit-opacity: initial;
+  --tw-exit-scale: initial;
+  --tw-exit-rotate: initial;
+  --tw-exit-translate-x: initial;
+  --tw-exit-translate-y: initial;
+
+  
+}
+
+/* https://kaba.hilvi.org/remark-1.7.8/Remark/remark_files/remark_default.css.htm */
+/*
+Description: Styling for Remark
+Documentation: style.txt
+*/
+
+/* The 'remark-all'-div contains the 'remark'-div and the 'remark-footer'-div */
+.remark
+{
+    /* Fonts from the sans-serif generic family are easier to read
+    on the screen. Sans-serif means 'without wiggles'. */
+    font-family: 'Times New Roman', Times, serif, Sans-serif;
+    color: var(--secondary-foreground) !important;
+
+    /* Limit the width of the content. This makes it easier to read. */
+
+    /* Center the content. */
+    margin: auto;
+
+    /* Add padding for the case when the browser is made small. */
+    padding: 0.5em;
+}
+
+/* Remark-generated content is contained in the 'remark'-div. */
+.remark
+{
+    /* Using more space between lines of text makes it easier to read. */
+    line-height: 1.3em;
+    color: var(--color-secondary-foreground);
+}
+
+/* Verbatim content */
+.remark pre
+{
+    /* Border with a dotted, one-pixel wide rectangle. */
+    /*
+    border-style: dotted;
+    border-width: 1px;
+    border-color: rgb(85, 85, 85);
+    */
+
+    /* Use a monospaced font. */
+    /* The Consolas font is Microsoft's proprietary font which was designed to work well with ClearType; it looks great. If Consolas is not available, we fall back to Inconsolata; another nice coding font. */
+    font-family: 'Consolas', 'Inconsolata', monospace;
+
+    /* Use light blue as a background color. */
+    background-color: var(--color-muted);
+
+    /* Give the content margins. */
+    margin-top: 1em;
+    margin-bottom: 1em;
+    margin-left: 0em;
+    margin-right: 0em;
+
+    /* Pre-formatted text should not introduce new-lines. If the content does not fit, provide scrolling. */
+    overflow: auto;
+
+    /* The content should not be near the border. */
+    padding: 0.5em;
+}
+
+/* Paragraph */
+.remark p
+{
+    margin-left: 0em;
+    margin-right: 0em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+/* Emphasized text */
+.remark em
+{
+    font-style: italic;
+}
+
+/* Emphasized text (alternative) */
+.remark strong
+{
+    font-style: bold;
+}
+
+/* Code */
+.remark code
+{
+    color: var(--color-muted-foreground);
+}
+
+/* Level 1 headings */
+.remark h1
+{
+   text-align: center;
+    clear: left;
+    font-size: var(--txt-3xl);
+    margin: 0;
+    margin-bottom: 1em;
+
+    /* Make some space between the heading and the line under it.*/ 
+    padding-bottom: 0.2em;
+
+    /*letter-spacing: 0.7em;*/
+    line-height: 1.5em;
+}
+
+/* Level 2 headings */
+.remark h2 
+{
+    clear: left;
+    font-size: var(--txt-2xl);
+    margin: 1.5em 0em 1em 0em;
+
+    /* Draw a dotted line under the heading. */
+
+    /* Make some space between the heading and the line under it.*/ 
+    padding-bottom: 0.3em;
+}
+
+/* Level 3 headings */
+.remark h3 
+{
+    clear: left;
+    margin: 1.5em 0em 1em 0em;
+    font-size: 1.2em;
+}
+
+/* Level 4 headings */
+.remark h4 
+{
+    clear: left;
+    font-size: 1.0em;
+    margin: 1.5em 0em 1em 0em;
+}
+
+/* Unordered lists */
+.remark ul 
+{
+    list-style-type: disc;
+    /* Be careful if you decide to make this inside;
+    in particular, paragraphs <p> have block-display,
+    and so out-of-the-box display under the bullet.*/
+    list-style-position: outside;
+    padding-left: 2.5em !important;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 0em;
+}
+
+/* Indent nested lists. */
+.remark ul ul
+{
+    margin-top: 0em;
+    margin-bottom: 0em;
+    padding-left: 2em;
+}
+
+.remark ol ul
+{
+    margin-top: 0em;
+    margin-bottom: 0em;
+    padding-left: 2em;
+}
+
+.remark ul ol
+{
+    margin-top: 0em;
+    margin-bottom: 0em;
+    padding-left: 2em;
+}
+
+.remark ol ol
+{
+    margin-top: 0em;
+    margin-bottom: 0em;
+    padding-left: 2em;
+}
+
+/* Ordered lists */
+.remark ol
+{
+    list-style-type: decimal;
+    list-style-position: inside;
+
+    padding-left: 2.5em !important;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 0em;
+}
+
+/* A list item */
+.remark li
+{
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+}
+
+/* Links */
+.remark a 
+{ 
+    text-decoration: none; 
+}
+
+/* Link with a mouse hovering over it. */
+.remark a:hover 
+{ 
+    text-decoration: underline;
+}
+
+/* Tables */
+.remark table
+{
+    border-collapse: collapse;
+    margin-left: 0;
+
+    /* Make tables to cover the whole content in width. */
+    width: 100%;
+}
+
+/* Tables: Cells */
+.remark td, th
+{
+    /* Give some empty space around the content of a cell. */
+    padding-left: 0.5em;
+    padding-bottom: 0.5em;
+    padding-top: 0.5em;
+    background-color: hsl(220, 100%, 97%);
+    border: 1px solid white;
+}
+
+/* Table: Cells: Headers */
+.remark th
+{
+    text-align: left;
+    color: #356535;
+    background-color: hsl(220, 100%, 92%);
+    font-weight: normal;
+}
+
+/* Table: Cells: Data */
+.remark td
+{
+}
+
+/* Definition lists */
+.remark dl
+{
+}
+
+/* Definition lists: The thing to define. */
+.remark dt
+{
+    /* Make the font of the defined thing larger. */
+    font-size: 1.1em;
+    padding-bottom: 0em;
+}
+
+/* Definition lists: The definition of the thing. */
+.remark dd
+{
+    margin-left: 2em;
+}
+
+.remark dl dd
+{
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.remark .ascii-math,
+.remark .latex-math,
+.remark .display-latex-math
+{
+    /*
+    color: red;
+    font-size: 2em;
+    */
+}
+
+/* ParentList */
+/* ---------- */
+
+/* Styling for ParentList lists. */
+.remark .ParentList ol
+{
+    /* Use display: none; to remove ParentList from flow.*/
+    display: flex;
+    flex-wrap: wrap;
+
+    /* Get rid of default-indentation for lists. */
+    margin: 0em;
+    padding: 0em;
+
+    /* Get rid of default-dots for the list items. */
+    list-style-type: none;
+}
+
+/* Styling for ParentList list-items. */
+.remark .ParentList li
+{
+}
+
+/* Styling for Links in ParentList. */
+.remark .ParentList li a
+{ 
+    display: block;
+    padding-bottom: 0em;
+}
+
+/* Add a '/' between subsequent ParentList list-items. */
+.remark .ParentList li + li ::before
+{
+    content: "/";
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+/* DocumentTree */
+/* ------------ */
+
+/* Syling for DocumentTree lists. */
+.remark .DocumentTree ol
+{
+    /*
+    display: flex;
+    flex-direction: column;
+    */
+
+    /* Get rid of default-indentation for lists. */
+    margin: 0;
+    padding: 0;
+
+    /* Get rid of default-dots for the list items. */
+    list-style-type: none;
+}
+
+.remark .DocumentTree ol ol
+{
+    /* Give some indendation to nested lists. */
+    padding-left: 2em;
+}
+
+/* Styling for DocumentTree list-items. */ 
+.remark .DocumentTree li a
+{
+    display: block;
+
+    /* Convert margin (from being first and last) to padding. */
+    margin: 0em;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+}
+
+/* DocChildren */
+/* ----------- */
+
+/* Styling for DocChildren lists. */
+.remark .DocChildren ol
+{
+    /* The items are placed side-by-side, until the
+    right-edge and they wrap to the next row. */
+    display: flex;
+    flex-wrap: wrap;
+
+    /* Get rid of default-indentation for lists. */
+    margin: 0em;
+    padding: 0em;
+
+    /* Get rid of default-dots for the list items. */
+    list-style-type: none;
+}
+
+/* Styling for links in DocChildren. */
+.remark .DocChildren li
+{
+    display: block;
+
+    /* Use two columns.*/
+    min-width: 50%;
+    max-width: 50%;
+}
+
+/* Styling for links in DocChildren. */
+.remark .DocChildren li a
+{ 
+    /* The links are block-based, for increased area. */
+    display: block;
+
+    /* Convert margin (from being first and last) to padding. */
+    margin: 0em;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+}
+
+/* SourceChildren */
+/* -------------- */
+
+/* Styling for SourceChildren lists. */
+.remark .SourceChildren ul
+{
+    /* List the links vertically. */
+    display: block;
+
+    /* Get rid of default-indentation for lists. */
+    margin: 0em;
+    padding: 0em;
+
+    /* Get rid of default-dots for the list items. */
+    list-style-type: none;
+}
+
+/* Styling for links in SourceChildren. */
+.remark .SourceChildren li a
+{ 
+    /* The links are block-based, for increased area. */
+    display: block;
+
+    /* Convert margin (from being first and last) to padding. */
+    margin: 0em;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+}
+
+/* Index */
+/* ----- */
+
+/* Styling for Index lists. */
+.remark .Index ol
+{
+    /* The items are placed side-by-side, until the
+    right-edge and they wrap to the next row. */
+    display: flex;
+    flex-wrap: wrap;
+
+    /* Get rid of default-indentation for lists. */
+    margin: 0;
+    padding: 0;
+
+    /* Get rid of default-dots for the list items. */
+    list-style-type: none;
+}
+
+/* Styling for Index list-items. */ 
+.remark .Index li
+{
+    /* At most 2 columns. */
+    min-width: 50%;
+}
+
+.remark .Index li a
+{
+    /* The links are block-based, for increased area. */
+    display: block;
+
+    /* Add some spacing. */
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+}
+
+/* Remark generates the time-date and the link to itself 
+in the 'remark-footer' div. */
+
+.remark-footer 
+{
+    /* Use this to hide the footer. */ 
+    /* display: none; */
+
+    /* Separate the footer from the content with a line. */
+    border-top: 1px dotted #aca899;
+    /* Add some space for the footer. */
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+
+    margin-top: 1.5em;
+    margin-bottom: 0em;
+    margin-left: 0em;
+    margin-right: 0em;
+}
+
+.remark-footer p 
+{
+    margin: 0em;
+    /* Make the footer small. */
+    font-size: 0.7em;
+    /* Make the footer neutrally colored. */
+}
+
+.remark-footer a 
+{ 
+    /* Make links in the footer look neutral. */
+    text-decoration: none; 
+    color: #716f64;
+}
+
+.remark-footer a:hover 
+{ 
+    /* Reveals links in the footer by hovering. */
+    text-decoration: underline; 
+    color: #600; 
+}
+
+/* EquationSet */
+
+.remark .EquationSet ol
+{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.remark .EquationSet li
+{
+    list-style-type: none;
+}
+
+/* Equation */
+
+.remark .Equation
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.remark .Equation-Body
+{
+    padding-left: 4em;
+}
+
+.remark .Equation-Number
+{
+    /* Remove the equation-number. */
+    display: none;
+    padding: 0;
+    margin: 0;
+    font-size: 1.25em;
+}
+
+.remark span.Equation-Number:after
+{
+    content: ")";
+}
+
+.remark span.Equation-Number:before
+{
+    content: "(";
+}
+
+/* Example */
+
+.remark .Example
+{
+    padding: 0.75em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    border: 0.25em solid #8A8;
+    overflow: auto;
+}
+
+/* 
+The Example-box already contains padding. 
+Zero margin-top from the first child to avoid heavy margins. 
+*/
+.remark .Example > *:first-child,
+.remark .Example > div:first-child > *:first-child
+{
+    margin-top: 0em;
+}
+
+/* The same for the margin-bottom of the last child. */
+.remark .Example > *:last-child,
+.remark .Example > div:last-child > *:last-child
+{
+    margin-bottom: 0em;
 }

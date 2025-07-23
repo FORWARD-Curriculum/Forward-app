@@ -1,0 +1,47 @@
+[
+    {
+      "poll": "College Degree Opinions",
+      "question_text": "Which degree do you think would be the hardest to get?",
+      "options": [
+        { "id": 1, "text": "High school diploma" },
+        { "id": 2, "text": "GED" },
+        { "id": 3, "text": "Associate degree" },
+        { "id": 4, "text": "Bachelor's degree" },
+        { "id": 5, "text": "Master's degree" },
+        { "id": 6, "text": "Professional degree" },
+        { "id": 7, "text": "Doctoral degree" }
+      ],
+      "allow_multiple": false,
+      "order": 1
+    },
+    {
+      "poll": "College Degree Opinions",
+      "question_text": "Which degree would you like to have?",
+      "options": [
+        { "id": 1, "text": "High school diploma" },
+        { "id": 2, "text": "GED" },
+        { "id": 3, "text": "Associate degree" },
+        { "id": 4, "text": "Bachelor's degree" },
+        { "id": 5, "text": "Master's degree" },
+        { "id": 6, "text": "Professional degree" },
+        { "id": 7, "text": "Doctoral degree" }
+      ],
+      "allow_multiple": false,
+      "order": 2
+    },
+    {
+      "poll": "College Degree Opinions",
+      "question_text": "Which degree sounds like the most fun to complete?",
+      "options": [
+        { "id": 1, "text": "High school diploma" },
+        { "id": 2, "text": "GED" },
+        { "id": 3, "text": "Associate degree" },
+        { "id": 4, "text": "Bachelor's degree" },
+        { "id": 5, "text": "Master's degree" },
+        { "id": 6, "text": "Professional degree" },
+        { "id": 7, "text": "Doctoral degree" }
+      ],
+      "allow_multiple": false,
+      "order": 3
+    }
+]
