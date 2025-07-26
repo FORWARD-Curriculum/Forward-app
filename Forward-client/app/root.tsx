@@ -49,9 +49,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  store.subscribe(() => {
-    localStorage.setItem("reduxState", JSON.stringify(store.getState()));
-  });
+  // store.subscribe(() => {
+  //   localStorage.setItem("reduxState", JSON.stringify(store.getState()));
+  // });
   return (
     <Provider store={store}>
       <Outlet />
