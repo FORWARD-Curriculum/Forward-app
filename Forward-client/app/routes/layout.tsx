@@ -14,9 +14,9 @@ export default function Layout() {
   return (
     <>
       <div
-        className={`bg-background relative flex min-h-[100vh] flex-col content-evenly text-base ${
+        className={`bg-background relative flex min-h-[100vh] flex-col content-evenly ${
           user?.preferences?.theme || ""
-        } ${user?.preferences?.text_size || ""}`}
+        } ${user?.preferences?.text_size || "txt-base"}`}
       >
         <Header />
         <div className="flex flex-grow">
