@@ -4,7 +4,10 @@ from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, Embed, EmbedResponse
+from .models import ( 
+    ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse,
+    Embed, EmbedResponse, Poll, PollResponse, PollQuestion, PollQuestionResponse
+) 
 from rest_framework.request import Request as DRFRequest
 
 
@@ -171,7 +174,7 @@ class LessonService:
 
 
 class ResponseService:
-    staticmethod
+    @staticmethod
 
     def get_response_data(lesson_id, user):
         """
@@ -196,8 +199,10 @@ class ResponseService:
         out_dict = {}
         out_dict['lesson_id'] = lesson.id
         out_dict['response_data'] = {}
+
+        # Loop through all registered activities and fetch user responses for each type.
         for value in ActivityManager.registered_activities.values():
-            [Activity, Response] = value[:2]
+            [Activity, Response] = value[:2] # Get Activity and Response classes
             if (Response is not None):
                 out_dict['response_data'][Activity.__name__] = [a.to_dict() for a in list(Response.objects.filter(lesson=lesson,user=user))]
         
@@ -209,7 +214,52 @@ class ResponseService:
         return {
             "response": out_dict
         }
+    
+class PollResponseService:
+    @staticmethod
+    @transaction.atomic
+    def submit_poll_response(validated_data, request):
+        """Handle poll submission"""
+        user = request.user
+        poll = validated_data.get('associated_activity')
+        lesson = validated_data.get('lesson_id')
 
+        # Create/update poll response
+        poll_response, created = PollResponse.objects.get_or_create(
+            user=user,
+            associated_activity=poll,
+            lesson=lesson,
+            defaults={'partial_response': False}
+        )
+
+        return poll_response
+
+class PollQuestionResponseService:
+    @staticmethod
+    @transaction.atomic
+    def submit_poll_question_response(validated_data, request):
+        """Handle individual poll question submission"""
+        user = request.user
+        poll_question = validated_data.get('associated_activity')
+        lesson = validated_data.get('lesson_id')
+        response_data = validated_data.get('response_data', {})
+
+        # Create/update poll question response
+        response, created = PollQuestionResponse.objects.get_or_create(
+            user=user,
+            associated_activity=poll_question,
+            lesson=lesson,
+            defaults={
+                'partial_response': False,
+                'response_data': response_data
+            }
+        )
+
+        if not created:
+            response.response_data = response_data
+            response.save()
+
+        return response
 
 class QuizResponseService:
     @staticmethod
@@ -489,5 +539,7 @@ class EmbedResponseService:
 
 ActivityManager().registerService("response", Quiz, QuizResponseService.submit_quiz_response)
 ActivityManager().registerService("response", Question, QuestionResponseService.submit_question_response)
+ActivityManager().registerService("response", Poll, PollResponseService.submit_poll_response)
+ActivityManager().registerService("response", PollQuestion, PollQuestionResponseService.submit_poll_question_response)
 
 ActivityManager().registerService("response", Embed, EmbedResponseService.update_embed_completion_status)
