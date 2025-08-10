@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.hashers import make_password
 from django.db import transaction, IntegrityError
 from django.conf import settings
+from django.core.files.storage import default_storage
 # Import all necessary models, including the ActivityManager
 from core.models import (
     User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
@@ -312,10 +313,13 @@ class Command(BaseCommand):
         self.stdout.write(f"  Processing {len(concepts_data)} concepts for concept map: {concept_map.title}") # Debug print
         # Use enumerate to get the index (order), starting from 1
         for order, concept_data in enumerate(concepts_data, start=1):
+
+            image_url = self.bucket_url_call()
+            print(f"DEBUG: About to save image: {image_url}")
             # Prepare defaults for the Concept model
             concept_defaults = {
                 'title': concept_data.get('title', f'Concept {order}'), # Use title from data or default
-                'image': concept_data.get('image'),
+                'image': image_url,
                 'description': concept_data.get('description', ''),
                 'examples': concept_data.get('examples', []),
                 # Instructions might be on concept_data or inherit from BaseActivity defaults
@@ -338,3 +342,25 @@ class Command(BaseCommand):
             except Exception as e:
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update concept (Order: {order}) for concept map '{concept_map.title}': {e}"))
+
+
+    def bucket_url_call(self):
+        # Counter as class attribute to persist between calls
+        if not hasattr(self, '_image_counter'):
+            self._image_counter = 0
+        
+        images = ['test3.png', 'test.jpg', 'images.png']
+        bucket_name = 'media-bucket'
+        
+        file_path = images[self._image_counter]
+        # url = f'http://minio:9000/{bucket_name}/{current_image}'
+
+        url = default_storage.url(file_path)
+        
+        # Cycle: 0→1→2→0→1→2...
+        self._image_counter = (self._image_counter + 1) % 3
+        
+        print(f"DEBUG: Returning URL: {url}")
+        print(f"DEBUG: URL type: {type(url)}")
+    
+        return url
