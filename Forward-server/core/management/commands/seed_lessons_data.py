@@ -5,6 +5,8 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction, IntegrityError
 from django.conf import settings
 from django.core.files.storage import default_storage
+from botocore.exceptions import ClientError # pyright: ignore[reportMissingImports]
+import boto3 # pyright: ignore[reportMissingImports]
 # Import all necessary models, including the ActivityManager
 from core.models import (
     User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
@@ -308,13 +310,18 @@ class Command(BaseCommand):
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update poll question (Order: {order}) for poll '{poll.title}': {e}"))
 
+
+    # Will be used to construct minio asset folder path, if an image needs to be uploaded to minio
+    seed_minIO_folder = Path(settings.BASE_DIR) / 'core' / 'management' / 'minIO_asset_seed' 
+
     def _create_concepts(self, concept_map, concepts_data):
         """Creates or updates concepts for a given concept map, deriving order from list position."""
         self.stdout.write(f"  Processing {len(concepts_data)} concepts for concept map: {concept_map.title}") # Debug print
         # Use enumerate to get the index (order), starting from 1
         for order, concept_data in enumerate(concepts_data, start=1):
 
-            image_url = self.bucket_url_call()
+            image_filename = concept_data.get('image')
+            image_url = self.bucket_url_call(image_filename)
             print(f"DEBUG: About to save image: {image_url}")
             # Prepare defaults for the Concept model
             concept_defaults = {
@@ -344,23 +351,52 @@ class Command(BaseCommand):
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update concept (Order: {order}) for concept map '{concept_map.title}': {e}"))
 
 
-    def bucket_url_call(self):
-        # Counter as class attribute to persist between calls
-        if not hasattr(self, '_image_counter'):
-            self._image_counter = 0
-        
-        images = ['test3.png', 'test.jpg', 'images.png']
-        bucket_name = 'media-bucket'
-        
-        file_path = images[self._image_counter]
-        # url = f'http://minio:9000/{bucket_name}/{current_image}'
+    def _upload_image_to_bucket(self, image_filename):
+        """Helper method to upload an image file to the bucket"""
+        final_path = self.seed_minIO_folder / image_filename
+        with open(final_path, 'rb') as f:
+            saved_path = default_storage.save(image_filename, f)
+            self.stdout.write(self.style.SUCCESS(f'Image uploaded, url: {saved_path}'))
+            return default_storage.url(saved_path)
 
-        url = default_storage.url(file_path)
-        
-        # Cycle: 0→1→2→0→1→2...
-        self._image_counter = (self._image_counter + 1) % 3
-        
-        print(f"DEBUG: Returning URL: {url}")
-        print(f"DEBUG: URL type: {type(url)}")
-    
-        return url
+    def bucket_url_call(self, image_filename):
+        try:
+            if default_storage.exists(image_filename):
+                return default_storage.url(image_filename)
+            else:
+                # File doesn't exist, upload it
+                return self._upload_image_to_bucket(image_filename)
+                
+        except:
+            self.stdout.write(self.style.ERROR('No bucket found.'))
+            self.stdout.write(self.style.ERROR('Creating bucket'))
+            # Creates client and creates bucket
+            s3_client = boto3.client(
+                's3',
+                endpoint_url='http://minio:9000',  
+                aws_access_key_id='minioadmin',   
+                aws_secret_access_key='minioadmin'  
+            )
+            bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
+            s3_client.create_bucket(Bucket=bucket_name)
+            self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
+            # Set bucket policy to public read
+            public_read_policy = {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": "s3:GetObject",
+                        "Resource": f"arn:aws:s3:::{bucket_name}/*"
+                    }
+                ]
+            }
+            s3_client.put_bucket_policy(
+                Bucket=bucket_name,
+                Policy=json.dumps(public_read_policy)
+            )
+            self.stdout.write(self.style.SUCCESS(f'Bucket policy set to public read'))
+            
+            # Now upload the image after creating the bucket
+            return self._upload_image_to_bucket(image_filename)
