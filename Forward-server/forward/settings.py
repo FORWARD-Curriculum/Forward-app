@@ -214,6 +214,10 @@ STORAGES = {
             "access_key": "minioadmin",
             "secret_key": "minioadmin",
             "endpoint_url": "http://minio:9000",
+            "custom_domain": "localhost:9000/media-bucket",
+            "url_protocol": "http:",
+            "default_acl": "public-read",
+            "querystring_auth": False, 
             "use_ssl": False # set to false for local development
         }
     },
