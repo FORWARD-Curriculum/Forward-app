@@ -19,7 +19,6 @@ pip install -r requirements.txt
 # Run migrations
 python manage.py migrate
 
-python manage.py seed_minIO_data
 
 # Seed database with test data
 python manage.py seed_lessons_data --reset lesson_seed_data/lesson1.json
