@@ -36,6 +36,7 @@ import {
   setActivity,
   setLesson,
 } from "@/features/curriculum/slices/lessonSlice";
+import LikertScale from "@/features/curriculum/components/likertscale";
 
 export async function clientLoader({
   params,
@@ -96,9 +97,22 @@ export function Activity({ activity }: { activity: BaseActivity }) {
       );
     case "ConceptMap":
       return (
-        <ConceptMap key={key} conceptmap={activity as ActivityManager['ConceptMap'][0]}/>);
+        <ConceptMap
+          key={key}
+          conceptmap={activity as ActivityManager["ConceptMap"][0]}
+        />
+      );
     case "Embed":
-      return <Embed key={key} embed={activity as ActivityManager["Embed"][0]}/>
+      return (
+        <Embed key={key} embed={activity as ActivityManager["Embed"][0]} />
+      );
+    case "LikertScale":
+      return (
+        <LikertScale
+          key={key}
+          likertScale={activity as ActivityManager["LikertScale"][0]}
+        />
+      );
     default:
       return <p>Out of bounds</p>;
   }
@@ -222,7 +236,6 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         {activity && <Activity activity={activity} />}
         <div className="mt-auto flex">
           <button
-            
             /*disabled={response.current_response?.partial_response || undefined}*/
             className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden"
             onClick={() => {
