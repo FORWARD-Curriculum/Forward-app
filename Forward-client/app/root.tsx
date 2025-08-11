@@ -49,9 +49,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  // store.subscribe(() => {
-  //   localStorage.setItem("reduxState", JSON.stringify(store.getState()));
-  // });
+  // We need to change this to just the user eventually
+   store.subscribe(() => {
+     localStorage.setItem("reduxState", JSON.stringify(store.getState()));
+   });
   return (
     <Provider store={store}>
       <Outlet />

@@ -44,6 +44,7 @@ export type ActivityManager = {
   Question: [Question, QuestionResponse, true];
   PollQuestion: [PollQuestion, PollQuestionResponse, true];
   Embed: [Embed, EmbedResponse, false];
+  LikertScale: [LikertScale, LikertScaleResponse, false];
 };
 
 /**
@@ -60,6 +61,7 @@ export const ActivityTypeDisplayNames: Record<BaseActivity["type"] | "Default", 
   ConceptMap: "Concept Map",
   Identification: "Identification",
   Embed: "Embed",
+  LikertScale: "Likert Scale",
 }
 
 // #region -------------------------- Activities ---------------------------
@@ -168,6 +170,14 @@ export interface Embed extends BaseActivity {
   link: string;
 }
 
+export interface LikertScale extends BaseActivity {
+  content: {
+    explain: boolean,
+    statement: string,
+    scale: (number | string)[]
+  }[];
+}
+
 // #endregion -------------------------- Activities ---------------------------
 
 // #region -------------------------- Responses ----------------------------
@@ -241,6 +251,9 @@ export interface IdentificationResponse extends BaseResponse {}
 export interface PollResponse extends BaseResponse {}
 export interface EmbedResponse extends BaseResponse {
   inputted_code: string;
+}
+export interface LikertScaleResponse extends BaseResponse {
+  content: {selection: number,explaination: string}[];
 }
 
 // #endregion -------------------------- Responses ----------------------------
