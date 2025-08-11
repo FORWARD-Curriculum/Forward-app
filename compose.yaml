@@ -2,6 +2,8 @@ services:
   backend:
     image: FORWARD/django
     build: ./Forward-server
+    depends_on:
+      - database
     volumes:
       - ./Forward-server:/app/server
     ports:
@@ -17,3 +19,14 @@ services:
       - "127.0.0.1:5173:5173"
     links:
       - backend
+
+  database:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: forward_db
+    volumes:
+      - .postgres_data:/var/lib/postgresql/data
+    #ports:
+    #  - "5432:5432"
