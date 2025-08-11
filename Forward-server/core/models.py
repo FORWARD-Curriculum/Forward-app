@@ -643,6 +643,52 @@ class Concept(BaseActivity):
             "examples": self.examples,
         }
 
+class LikertScale(BaseActivity):
+    """"
+    "type": "array",
+    "items": {
+    "type": "object",
+    "properties": {
+      "explain": {
+        "type": "boolean",
+        "description": "Indicates whether an explanation is required for the statement."
+      },
+      "statement": {
+        "type": "string",
+        "description": "The statement or question being presented."
+      },
+      "map": {
+        "type": "array",
+        "description": "Possible answer options or numeric scale values.",
+        "items": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "description": "Numeric scale value (e.g., 0–5)."
+            },
+            {
+              "type": "string",
+              "description": "Textual option (e.g., Likert scale labels)."
+            }
+          ]
+        }
+      }
+    },
+    """
+    content = models.JSONField(
+        
+    )
+    
+    class Meta:
+        verbose_name = "likert scale"
+        verbose_name_plural = "likert scales"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content
+        }
+
 # TODO: Make quiz and question response inherit from BaseResponse, or make
 # them adhere to the contract enforced by BaseResponse
 
@@ -1082,6 +1128,24 @@ class ConceptMapResponse(BaseResponse):
         return {
             **super().to_dict(),
         }
+        
+class LikertScaleResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        LikertScale,
+        on_delete=models.CASCADE,
+        related_name='associated_likertscale',
+        help_text='The likert scale associated with this response'
+    )
+
+    content = models.JSONField(
+        help_text="The user's responses to the likert scale"
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content
+    }
 
 
 class ActivityManager():
@@ -1165,6 +1229,8 @@ class ActivityManager():
         self.registerActivity(Concept, None, child_class=True)
         self.registerActivity(DndMatch, DndMatchResponse, {
                               "submission": ["submission", []]})
+        self.registerActivity(LikertScale, LikertScaleResponse, {
+                              "content": ["content", {}]})
 
 
 # Register on launch

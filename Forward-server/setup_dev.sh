@@ -14,6 +14,8 @@ source .venv/bin/activate # Uncomment for Mac/Linux
 # Install dependencies
 pip install -r requirements.txt
 
+# python manage.py makemigrations
+
 # Run migrations
 python manage.py makemigrations
 

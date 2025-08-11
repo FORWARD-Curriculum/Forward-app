@@ -45,6 +45,7 @@ export type ActivityManager = {
   PollQuestion: [PollQuestion, PollQuestionResponse, true];
   Embed: [Embed, EmbedResponse, false];
   DndMatch: [DndMatch, DndMatchResponse, false];
+  LikertScale: [LikertScale, LikertScaleResponse, false];
 };
 
 /**
@@ -62,6 +63,7 @@ export const ActivityTypeDisplayNames: Record<BaseActivity["type"] | "Default", 
   Identification: "Identification",
   Embed: "Embed",
   DndMatch: "Drag and Drop Match",
+  LikertScale: "Likert Scale",
 }
 
 // #region -------------------------- Activities ---------------------------
@@ -174,6 +176,14 @@ export interface Embed extends BaseActivity {
   link: string;
 }
 
+export interface LikertScale extends BaseActivity {
+  content: {
+    explain: boolean,
+    statement: string,
+    scale: (number | string)[]
+  }[];
+}
+
 // #endregion -------------------------- Activities ---------------------------
 
 // #region -------------------------- Responses ----------------------------
@@ -250,6 +260,9 @@ export interface EmbedResponse extends BaseResponse {
 }
 export interface DndMatchResponse extends BaseResponse {
   submission: number[][][];
+}
+export interface LikertScaleResponse extends BaseResponse {
+  content: {selection: number,explaination: string}[];
 }
 
 // #endregion -------------------------- Responses ----------------------------
