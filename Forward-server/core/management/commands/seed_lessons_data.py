@@ -350,36 +350,40 @@ class Command(BaseCommand):
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update concept (Order: {order}) for concept map '{concept_map.title}': {e}"))
 
-
+    #Helper method to upload an image file to the bucket
     def _upload_image_to_bucket(self, image_filename):
-        """Helper method to upload an image file to the bucket"""
+        
+        # Url path is constructed over here, 
         final_path = self.seed_minIO_folder / image_filename
         with open(final_path, 'rb') as f:
-            saved_path = default_storage.save(image_filename, f)
+            saved_path = default_storage.save(image_filename, f) # the default storage is teh s3/minio configured in djanago settings, its uses boto under the hood
             self.stdout.write(self.style.SUCCESS(f'Image uploaded, url: {saved_path}'))
             return default_storage.url(saved_path)
 
     def bucket_url_call(self, image_filename):
         try:
-            if default_storage.exists(image_filename):
-                return default_storage.url(image_filename)
+            if default_storage.exists(image_filename): # if exists just return its url 
+                return default_storage.url(image_filename) 
             else:
                 # File doesn't exist, upload it
                 return self._upload_image_to_bucket(image_filename)
-                
+
+        # this error would be thrown if no existing bucket      
         except:
             self.stdout.write(self.style.ERROR('No bucket found.'))
             self.stdout.write(self.style.ERROR('Creating bucket'))
+            
             # Creates client and creates bucket
             s3_client = boto3.client(
                 's3',
-                endpoint_url='http://minio:9000',  
+                endpoint_url='http://minio:9000',  # maybe need to change these to os.getenv 
                 aws_access_key_id='minioadmin',   
                 aws_secret_access_key='minioadmin'  
             )
             bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
             s3_client.create_bucket(Bucket=bucket_name)
             self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
+            
             # Set bucket policy to public read
             public_read_policy = {
                 "Version": "2012-10-17",
