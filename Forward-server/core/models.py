@@ -529,6 +529,21 @@ class Embed(BaseActivity):
             "has_code": self.code is not None,
         }
 
+class DndMatch(BaseActivity):
+    """Model for drag-and-drop matching activities"""
+    content = models.JSONField(
+        default=list,
+        help_text="Formatted array of tuples, first is the drop, second is drag."
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content,
+        }
+
+
+
 class ConceptMap(BaseActivity):
     """Model for mapping concepts to each other"""
     content = models.CharField(
@@ -885,6 +900,28 @@ class BaseResponse(models.Model):
             "associated_activity": self.associated_activity.id,
         }
 
+class DndMatchResponse(BaseResponse):
+    """
+    Response model for DndMatch activities.
+    Stores the user's drag-and-drop matches.
+    """
+    associated_activity = models.ForeignKey(
+        DndMatch,
+        on_delete=models.CASCADE,
+        related_name='associated_dndmatch',
+        help_text='The DnD match activity associated with this response'
+    )
+
+    submission = models.JSONField(
+        default=list,
+        help_text="List of matches made by the user in the format [[drop, drag], ...]"
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "submission": self.submission
+        }
 
 class WritingResponse(BaseResponse):
     associated_activity = models.ForeignKey(
