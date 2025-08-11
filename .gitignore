@@ -2,3 +2,4 @@
 .vscode/
 .env*
 .postgres_data/
+minio_data/
