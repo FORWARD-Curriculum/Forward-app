@@ -350,20 +350,48 @@ class Command(BaseCommand):
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update concept (Order: {order}) for concept map '{concept_map.title}': {e}"))
 
+
+    # Helper method to generate presigned urls
+    def create_presigned_urls(self, minio_path):
+        
+        s3_client = boto3.client(
+            's3',
+            endpoint_url = 'http://localhost:9000', # browser access endpoint
+            aws_access_key_id='minioadmin', # these should probably be changed to getenv calls, or maybe a default storage call
+            aws_secret_access_key='minioadmin'  
+        )
+
+        bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
+        try:
+            response = s3_client.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': bucket_name, 'Key': minio_path},
+                ExpiresIn= 10800, # 3 hour expiration time at the moment
+            )
+        except ClientError as e:
+            self.stdout.write(self.style.ERROR(e))
+            return None
+        
+        self.stdout.write(self.style.SUCCESS(response))
+        return response
+
     #Helper method to upload an image file to the bucket
     def _upload_image_to_bucket(self, image_filename):
         
         # Url path is constructed over here, 
         final_path = self.seed_minIO_folder / image_filename
         with open(final_path, 'rb') as f:
-            saved_path = default_storage.save(image_filename, f) # the default storage is teh s3/minio configured in djanago settings, its uses boto under the hood
+            saved_path = default_storage.save(image_filename, f) # the default storage is the s3/minio configured in djanago settings, its uses boto under the hood
             self.stdout.write(self.style.SUCCESS(f'Image uploaded, url: {saved_path}'))
-            return default_storage.url(saved_path)
+            # return default_storage.url(saved_path)
+            return self.create_presigned_urls(saved_path)
+
 
     def bucket_url_call(self, image_filename):
         try:
             if default_storage.exists(image_filename): # if exists just return its url 
-                return default_storage.url(image_filename) 
+                # return default_storage.url(image_filename) 
+                return self.create_presigned_urls(image_filename)
             else:
                 # File doesn't exist, upload it
                 return self._upload_image_to_bucket(image_filename)
@@ -376,31 +404,31 @@ class Command(BaseCommand):
             # Creates client and creates bucket
             s3_client = boto3.client(
                 's3',
-                endpoint_url='http://minio:9000',  # maybe need to change these to os.getenv 
-                aws_access_key_id='minioadmin',   
+                endpoint_url='http://minio:9000',   # upload enpoint
+                aws_access_key_id='minioadmin',   # maybe need to change these to os.getenv
                 aws_secret_access_key='minioadmin'  
             )
             bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
             s3_client.create_bucket(Bucket=bucket_name)
             self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
             
-            # Set bucket policy to public read
-            public_read_policy = {
-                "Version": "2012-10-17",
-                "Statement": [
-                    {
-                        "Effect": "Allow",
-                        "Principal": "*",
-                        "Action": "s3:GetObject",
-                        "Resource": f"arn:aws:s3:::{bucket_name}/*"
-                    }
-                ]
-            }
-            s3_client.put_bucket_policy(
-                Bucket=bucket_name,
-                Policy=json.dumps(public_read_policy)
-            )
-            self.stdout.write(self.style.SUCCESS(f'Bucket policy set to public read'))
+            # This can be used if you ever wish to set the bucket policy to public
+            # public_read_policy = {
+            #     "Version": "2012-10-17",
+            #     "Statement": [
+            #         {
+            #             "Effect": "Allow",
+            #             "Principal": "*",
+            #             "Action": "s3:GetObject",
+            #             "Resource": f"arn:aws:s3:::{bucket_name}/*"
+            #         }
+            #     ]
+            # }
+            # s3_client.put_bucket_policy(
+            #     Bucket=bucket_name,
+            #     Policy=json.dumps(public_read_policy)
+            # )
+            # self.stdout.write(self.style.SUCCESS(f'Bucket policy set to public read'))
             
             # Now upload the image after creating the bucket
             return self._upload_image_to_bucket(image_filename)
