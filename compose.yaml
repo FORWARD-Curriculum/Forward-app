@@ -24,7 +24,7 @@ services:
   minio:
     image: minio/minio
     volumes:
-      - minio_data:/data #docker managed instead of project folder
+      - ./minio_data:/data #local volume mount
     ports:
       - "127.0.0.1:9000:9000"
       - "127.0.0.1:9001:9001" # web console port
@@ -33,5 +33,4 @@ services:
       MINIO_ROOT_PASSWORD: minioadmin
     command: server /data --console-address ":9001"
 
-volumes:
-  minio_data:
+
