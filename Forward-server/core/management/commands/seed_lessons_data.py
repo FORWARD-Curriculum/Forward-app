@@ -5,8 +5,8 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction, IntegrityError
 from django.conf import settings
 from django.core.files.storage import default_storage
-from botocore.exceptions import ClientError # pyright: ignore[reportMissingImports]
 import boto3 # pyright: ignore[reportMissingImports]
+
 # Import all necessary models, including the ActivityManager
 from core.models import (
     User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
@@ -351,30 +351,6 @@ class Command(BaseCommand):
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update concept (Order: {order}) for concept map '{concept_map.title}': {e}"))
 
 
-    # Helper method to generate presigned urls
-    def create_presigned_urls(self, minio_path):
-        
-        s3_client = boto3.client(
-            's3',
-            endpoint_url = 'http://localhost:9000', # browser access endpoint
-            aws_access_key_id='minioadmin', # these should probably be changed to getenv calls, or maybe a default storage call
-            aws_secret_access_key='minioadmin'  
-        )
-
-        bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
-        try:
-            response = s3_client.generate_presigned_url(
-                'get_object',
-                Params={'Bucket': bucket_name, 'Key': minio_path},
-                ExpiresIn= 10800, # 3 hour expiration time at the moment
-            )
-        except ClientError as e:
-            self.stdout.write(self.style.ERROR(e))
-            return None
-        
-        self.stdout.write(self.style.SUCCESS(response))
-        return response
-
     #Helper method to upload an image file to the bucket
     def _upload_image_to_bucket(self, image_filename):
         
@@ -384,14 +360,14 @@ class Command(BaseCommand):
             saved_path = default_storage.save(image_filename, f) # the default storage is the s3/minio configured in djanago settings, its uses boto under the hood
             self.stdout.write(self.style.SUCCESS(f'Image uploaded, url: {saved_path}'))
             # return default_storage.url(saved_path)
-            return self.create_presigned_urls(saved_path)
+            return saved_path
 
 
     def bucket_url_call(self, image_filename):
         try:
             if default_storage.exists(image_filename): # if exists just return its url 
                 # return default_storage.url(image_filename) 
-                return self.create_presigned_urls(image_filename)
+                return image_filename
             else:
                 # File doesn't exist, upload it
                 return self._upload_image_to_bucket(image_filename)
