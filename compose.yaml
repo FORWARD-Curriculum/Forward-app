@@ -15,8 +15,6 @@ services:
       - /app/server/node_modules
     ports:
       - "127.0.0.1:5173:5173"
-    environment:
-      - VITE_BACKEND_URL=http://backend:8000 # note to self, ask lead and remove
     links:
       - backend
 
