@@ -4,6 +4,9 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.hashers import make_password
 from django.db import transaction, IntegrityError
 from django.conf import settings
+from django.core.files.storage import default_storage
+import boto3 # pyright: ignore[reportMissingImports]
+
 # Import all necessary models, including the ActivityManager
 from core.models import (
     User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
@@ -307,15 +310,23 @@ class Command(BaseCommand):
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update poll question (Order: {order}) for poll '{poll.title}': {e}"))
 
+
+    # Will be used to construct minio asset folder path, if an image needs to be uploaded to minio
+    seed_minIO_folder = Path(settings.BASE_DIR) / 'core' / 'management' / 'minIO_asset_seed' 
+
     def _create_concepts(self, concept_map, concepts_data):
         """Creates or updates concepts for a given concept map, deriving order from list position."""
         self.stdout.write(f"  Processing {len(concepts_data)} concepts for concept map: {concept_map.title}") # Debug print
         # Use enumerate to get the index (order), starting from 1
         for order, concept_data in enumerate(concepts_data, start=1):
+
+            image_filename = concept_data.get('image')
+            image_url = self.bucket_url_call(image_filename)
+            print(f"DEBUG: About to save image: {image_url}")
             # Prepare defaults for the Concept model
             concept_defaults = {
                 'title': concept_data.get('title', f'Concept {order}'), # Use title from data or default
-                'image': concept_data.get('image'),
+                'image': image_url,
                 'description': concept_data.get('description', ''),
                 'examples': concept_data.get('examples', []),
                 # Instructions might be on concept_data or inherit from BaseActivity defaults
@@ -338,3 +349,62 @@ class Command(BaseCommand):
             except Exception as e:
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update concept (Order: {order}) for concept map '{concept_map.title}': {e}"))
+
+
+    #Helper method to upload an image file to the bucket
+    def _upload_image_to_bucket(self, image_filename):
+        
+        # Url path is constructed over here, 
+        final_path = self.seed_minIO_folder / image_filename
+        with open(final_path, 'rb') as f:
+            saved_path = default_storage.save(image_filename, f) # the default storage is the s3/minio configured in djanago settings, its uses boto under the hood
+            self.stdout.write(self.style.SUCCESS(f'Image uploaded, url: {saved_path}'))
+            # return default_storage.url(saved_path)
+            return saved_path
+
+
+    def bucket_url_call(self, image_filename):
+        try:
+            if default_storage.exists(image_filename): # if exists just return its url 
+                # return default_storage.url(image_filename) 
+                return image_filename
+            else:
+                # File doesn't exist, upload it
+                return self._upload_image_to_bucket(image_filename)
+
+        # this error would be thrown if no existing bucket      
+        except:
+            self.stdout.write(self.style.ERROR('No bucket found.'))
+            self.stdout.write(self.style.ERROR('Creating bucket'))
+            
+            # Creates client and creates bucket
+            s3_client = boto3.client(
+                's3',
+                endpoint_url='http://minio:9000',   # upload enpoint
+                aws_access_key_id='minioadmin',   # maybe need to change these to os.getenv
+                aws_secret_access_key='minioadmin'  
+            )
+            bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
+            s3_client.create_bucket(Bucket=bucket_name)
+            self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
+            
+            # This can be used if you ever wish to set the bucket policy to public
+            # public_read_policy = {
+            #     "Version": "2012-10-17",
+            #     "Statement": [
+            #         {
+            #             "Effect": "Allow",
+            #             "Principal": "*",
+            #             "Action": "s3:GetObject",
+            #             "Resource": f"arn:aws:s3:::{bucket_name}/*"
+            #         }
+            #     ]
+            # }
+            # s3_client.put_bucket_policy(
+            #     Bucket=bucket_name,
+            #     Policy=json.dumps(public_read_policy)
+            # )
+            # self.stdout.write(self.style.SUCCESS(f'Bucket policy set to public read'))
+            
+            # Now upload the image after creating the bucket
+            return self._upload_image_to_bucket(image_filename)
