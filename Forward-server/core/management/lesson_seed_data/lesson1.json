@@ -62,7 +62,7 @@
       "examples": [
         {
           "title": "Trade/Technical school",
-          "image": "/dev/trade.png",
+          "image": "trade.png",
           "description": "Trade and technical schools, sometimes called vocational training schools, are schools that provide education for a specific focus area without requiring general education classes. These schools typically provide certificates or associates degrees, take 1-3 years to complete, and often incorporate lots of hands-on experience.",
           "examples": [
             {
@@ -99,7 +99,7 @@
         },
         {
           "title": "Community college",
-          "image": "/dev/community.png",
+          "image": "community.png",
           "description": "Community colleges provide education for a variety of subjects, including general education and more career-specific classes. Most community colleges offer 2-year associates degrees and certificates. Some community colleges have begun offering 4-year bachelor’s degrees as well. Community colleges typically have lower <def def='a sum of money charged for teaching or instruction by a school, college, or university.'>tuition</def> than 4-year colleges and universities and may be more flexible in the times of day in which classes are offered.",
           "examples": [
             {
@@ -131,7 +131,7 @@
         },
         {
           "title": "4-year college",
-          "image": "/dev/4year.png",
+          "image": "4year.png",
           "description": "4-year colleges focus on offering bachelor’s degrees and provide classes in both general studies and specific focus areas, referred to as <def def='A college major is the specific academic subject area you choose to specialize in and focus most of your studies on to earn your degree.'>majors</def>. 4-year can include universities and liberal arts colleges, and are usually private (funded by tuition and other sources, sometimes more expensive or exclusive).",
           "examples": [
             {
@@ -168,7 +168,7 @@
         },
         {
           "title": "University",
-          "image": "/dev/unv.png",
+          "image": "unv.png",
           "description": "Universities are larger schools and offer a wide variety of majors and degrees, including certificates, associate’s bachelors, master’s, and doctoral degrees. They may also include professional training such as medical and law schools. Universities can be public (funded by the government, typically cheaper) or private (funded by tuition and other sources, sometimes more expensive or exclusive).",
           "examples": [
             {

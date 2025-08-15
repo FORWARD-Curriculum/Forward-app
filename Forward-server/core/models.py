@@ -3,7 +3,10 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
 from django.urls import reverse
 import uuid
-
+import boto3 # pyright: ignore[reportMissingImports]
+from django.conf import settings
+from botocore.exceptions import ClientError # pyright: ignore[reportMissingImports]
+import logging
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
 # while allowing us to add our own custom fields and methods
@@ -591,11 +594,46 @@ class Concept(BaseActivity):
         help_text="List of examples for this concept"
     )
 
+    # Helper method to generate presigned urls
+    def create_presigned_urls(self, minio_path):
+        
+        logger = logging.getLogger(__name__)
+        s3_client = boto3.client(
+            's3',
+            endpoint_url = 'http://localhost:9000', # browser access endpoint
+            aws_access_key_id='minioadmin', # these should probably be changed to getenv calls, or maybe a default storage call
+            aws_secret_access_key='minioadmin'  
+        )
+
+        bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
+        try:
+            response = s3_client.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': bucket_name, 'Key': minio_path},
+                ExpiresIn= 3600, # 3 hour expiration time at the moment
+            )
+        except ClientError as e:
+            logger.error(f"Failed to generate presigned URL: {e}")
+            return None
+        
+        logger.info(f"Generated presigned URL: {response}")
+        return response
+
     def to_dict(self):
+
+        logger = logging.getLogger(__name__)
+
+        try:
+            image_url = self.create_presigned_urls(self.image) if self.image else None
+        except Exception as e:
+            logger.error(f"Error generating presigned URL: {e}")  # Debug print
+            image_url = None
+        
         return {
             **super().to_dict(),
             "id": self.id,
-            "image": self.image,
+            # "image": self.create_presigned_urls(self.image) if self.image else None,
+            "image": image_url,
             "description": self.description,
             "examples": self.examples,
         }
