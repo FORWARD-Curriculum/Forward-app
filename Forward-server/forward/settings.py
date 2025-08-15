@@ -20,37 +20,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=esmn7v4(rjy@9#cs1gpv3$m^6i!z-5a1l0hbt@elyr!!tpi9)'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = os.environ.get('DEBUG') == 'False'
-DEBUG = False
+DEBUG = os.environ.get('DEBUG') == 'True'
 
-ALLOWED_HOSTS = [
-    'backend',
-    'backend:8000',
-    'localhost',
-    '127.0.0.1',
-    'frontend',
-    'testserver',
-    'backend-latest-ma6c.onrender.com',
-    'forward-app-a9ew.onrender.com',
-]
+ALLOWED_HOSTS_RAW = os.environ.get('ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_RAW.split(',') if host.strip()]
 
-CSRF_TRUSTED_ORIGINS = [
-    'http://backend:8000',
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:8000',
-    "http://localhost:8080",
-    "https://localhost:5173",
-    "https://127.0.0.1:5173",
-    'https://backend-latest-ma6c.onrender.com',
-    'https://forward-app-a9ew.onrender.com',
-]
+CSRF_TRUSTED_ORIGINS_RAW = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in CSRF_TRUSTED_ORIGINS_RAW.split(',') if origin.strip()]
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -87,18 +68,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# CORS_ALLOWED_ORIGINS_RAW = os.environ.get('CORS_ALLOWED_ORIGINS', '')
-# CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_RAW.split(',')]
-CORS_ALLOWED_ORIGINS = [
-   "http://localhost:8080",
-   "http://127.0.0.1:8080",
-   "http://localhost:5173",
-   "http://127.0.0.1:5173",
-   "https://localhost:5173",
-   "https://127.0.0.1:5173",
-   'https://backend-latest-ma6c.onrender.com',
-   'https://forward-app-a9ew.onrender.com',
-]
+CORS_ALLOWED_ORIGINS_RAW = os.environ.get('CORS_ALLOWED_ORIGINS', '')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_RAW.split(',')]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -124,6 +95,7 @@ CORS_ALLOW_HEADERS = ['*'
 ]
 
 # TODO: Change to true when we have https setup
+
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = True

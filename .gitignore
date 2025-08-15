@@ -1,3 +1,5 @@
 .venv/
 .vscode/
 minio_data/
+.env*
+

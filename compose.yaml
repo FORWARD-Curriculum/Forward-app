@@ -6,7 +6,6 @@ services:
       - ./Forward-server:/app/server
     ports:
       - "127.0.0.1:8000:8000"
-
   frontend:
     image: FORWARD/frontend
     build: ./Forward-client
@@ -17,8 +16,6 @@ services:
       - "127.0.0.1:5173:5173"
     links:
       - backend
-
-
   minio:
     image: minio/minio
     volumes:
@@ -30,5 +27,3 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     command: server /data --console-address ":9001"
-
-
