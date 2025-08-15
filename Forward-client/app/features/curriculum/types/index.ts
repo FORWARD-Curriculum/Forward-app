@@ -44,6 +44,7 @@ export type ActivityManager = {
   Question: [Question, QuestionResponse, true];
   PollQuestion: [PollQuestion, PollQuestionResponse, true];
   Embed: [Embed, EmbedResponse, false];
+  DndMatch: [DndMatch, DndMatchResponse, false];
 };
 
 /**
@@ -60,6 +61,7 @@ export const ActivityTypeDisplayNames: Record<BaseActivity["type"] | "Default", 
   ConceptMap: "Concept Map",
   Identification: "Identification",
   Embed: "Embed",
+  DndMatch: "Drag and Drop Match",
 }
 
 // #region -------------------------- Activities ---------------------------
@@ -137,6 +139,10 @@ export interface PollQuestion {
   }[];
   allow_multiple: boolean;
   order: number;
+}
+
+export interface DndMatch extends BaseActivity {
+  content: string[][];
 }
 
 export interface ConceptMap extends BaseActivity {
@@ -241,6 +247,9 @@ export interface IdentificationResponse extends BaseResponse {}
 export interface PollResponse extends BaseResponse {}
 export interface EmbedResponse extends BaseResponse {
   inputted_code: string;
+}
+export interface DndMatchResponse extends BaseResponse {
+  submission: number[][][];
 }
 
 // #endregion -------------------------- Responses ----------------------------

@@ -15,6 +15,9 @@ source .venv/bin/activate # Uncomment for Mac/Linux
 pip install -r requirements.txt
 
 # Run migrations
+python manage.py makemigrations
+
+# Run migrations
 python manage.py migrate
 
 # Seed database with test data
