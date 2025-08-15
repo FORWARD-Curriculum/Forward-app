@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
 from django.urls import reverse
+from django.contrib.postgres.fields import ArrayField
 import uuid
 import boto3 # pyright: ignore[reportMissingImports]
 from django.conf import settings
@@ -532,19 +533,45 @@ class Embed(BaseActivity):
             "has_code": self.code is not None,
         }
 
+
 class DndMatch(BaseActivity):
     """Model for drag-and-drop matching activities"""
+
+    """
+        Stored as an Array of Arrays, in which the first element is the drop target
+        and the second and onwards are the drag items. Null values are allowed, and
+        correspond to items that have no counterpart associated with them.
+        
+        Any item may be prefixed with "image:" to indicate that it is an image URL.
+        These will be stored in the S3 bucket, and served as presigned URLs on request,
+        inlined with the data. They will also be prefixed with "image:" in the payload to
+        the frontend to indicate that they are images.
+        
+        Example:
+        [
+            ["Trade School", "image:welder.png", "image:electrician.png"],
+            ["University", "programmer", "ecologist"],
+            ["Typically offers associate level programs for 2 years of study.", "Community College"],
+            [null,"red herring drag"],
+            ["red herring drop", null]
+        ]
+    """
+
     content = models.JSONField(
-        default=list,
-        help_text="Formatted array of tuples, first is the drop, second is drag."
+        help_text="List of arrays to match in the format [[drop, drag], ...]"
     )
+
+    def incorrect_matches(self):
+        """Returns a list of the top 3 consistently incorrect matches made by users"""
+        responses = DndMatchResponse.objects.filter(
+            associated_activity=self
+        )
 
     def to_dict(self):
         return {
             **super().to_dict(),
             "content": self.content,
         }
-
 
 
 class ConceptMap(BaseActivity):
@@ -561,10 +588,11 @@ class ConceptMap(BaseActivity):
             "concepts": [c.to_dict() for c in Concept.objects.filter(concept_map=self).order_by('order')]
         }
 
+
 class Concept(BaseActivity):
     """Model for a concept in the concept map"""
     # TODO use jsonschema to enforce and validate the schema of the example field
-    
+
     """
     {
       "type": "array",
@@ -590,20 +618,20 @@ class Concept(BaseActivity):
       },
     }
     """
-    
+
     concept_map = models.ForeignKey(
         ConceptMap,
         on_delete=models.CASCADE,
         related_name="concepts",
         help_text="The concept map this concept belongs to"
     )
-    
+
     image = models.TextField(blank=True, null=True)
-    
+
     description = models.TextField(
         help_text="A detailed description of the concept"
     )
-    
+
     examples = models.JSONField(
         default=list,
         help_text="List of examples for this concept"
@@ -756,7 +784,7 @@ class UserQuizResponse(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['user', 'associated_activity'] # TODO
+        unique_together = ['user', 'associated_activity']  # TODO
         verbose_name = 'quiz response'
         verbose_name_plural = 'quiz responses'
 
@@ -801,6 +829,7 @@ class UserQuizResponse(models.Model):
             "time_spent": self.time_spent,
             "question_responses": [qr.to_dict() for qr in self.question_responses.all()]
         }
+
 
 class UserQuestionResponse(models.Model):
     """
@@ -984,10 +1013,10 @@ class BaseResponse(models.Model):
             "associated_activity": self.associated_activity.id,
         }
 
+
 class DndMatchResponse(BaseResponse):
     """
     Response model for DndMatch activities.
-    Stores the user's drag-and-drop matches.
     """
     associated_activity = models.ForeignKey(
         DndMatch,
@@ -996,16 +1025,39 @@ class DndMatchResponse(BaseResponse):
         help_text='The DnD match activity associated with this response'
     )
 
-    submission = models.JSONField(
-        default=list,
-        help_text="List of matches made by the user in the format [[drop, drag], ...]"
-    )
+    """
+    The submission field is a list of list of typles where each inner list contains a tuple of indices into the
+    origial content array of the DnDMatch activity. 
+    
+    Take for example the following content:
+    [
+            ["Trade School", "image:welder.png", "image:electrician.png"],
+            ["University", "programmer", "ecologist"],
+            ["Typically offers associate level programs for 2 years of study.", "Community College"],
+            [null,"red herring drag"],
+            ["red herring drop", null]
+    ]
+    
+    an example of a partial submission with no incorrect answers would be:
+    [
+        [[0, 1], [0, 2]],
+        [[1, 2], [1, 1]],
+    ]
+    
+    an example of a full submission with one incorrect answer would be:
+    [
+        [[0, 1], [3, 1]],
+    ]
+    
+    """
+    submission = models.JSONField()
 
     def to_dict(self):
         return {
             **super().to_dict(),
             "submission": self.submission
         }
+
 
 class WritingResponse(BaseResponse):
     associated_activity = models.ForeignKey(
@@ -1101,6 +1153,7 @@ class EmbedResponse(BaseResponse):
             "inputted_code": self.inputted_code
         }
 
+
 class ConceptMapResponse(BaseResponse):
     associated_activity = models.ForeignKey(
         ConceptMap,
@@ -1132,6 +1185,8 @@ class LikertScaleResponse(BaseResponse):
             "content": self.content
     }
 
+
+
 class ActivityManager():
     """A centralized management class meant to streamline the process of creating and using a
     activities within the backend.
@@ -1147,7 +1202,8 @@ class ActivityManager():
 
     registered_activities: dict[str, tuple[BaseActivity, BaseResponse,
                                            dict[str, tuple[str, any]], bool]] = {}
-    registered_services: dict[str, dict[BaseActivity, callable]] = {"response": {}}
+    registered_services: dict[str,
+                              dict[BaseActivity, callable]] = {"response": {}}
 
     def registerActivity(self,
                          ActivityClass: BaseActivity,
@@ -1188,8 +1244,9 @@ class ActivityManager():
         if service_type not in self.registered_services:
             raise ValueError(
                 f"{service_type} is an invalid service type.")
-            
-        self.registered_services[service_type][ActivityClass.__name__.lower()] = service
+
+        self.registered_services[service_type][ActivityClass.__name__.lower(
+        )] = service
 
     def __init__(self):
         if self._initialized:
@@ -1207,7 +1264,10 @@ class ActivityManager():
         self.registerActivity(Embed, EmbedResponse, {
                               "inputted_code": ["inputted_code", None]})
         self.registerActivity(ConceptMap, ConceptMapResponse)
-        self.registerActivity(Concept, None, child_class=True) # None here means no response is expected
+        # None here means no response is expected
+        self.registerActivity(Concept, None, child_class=True)
+        self.registerActivity(DndMatch, DndMatchResponse, {
+                              "submission": ["submission", []]})
         self.registerActivity(LikertScale, LikertScaleResponse, {
                               "content": ["content", {}]})
 

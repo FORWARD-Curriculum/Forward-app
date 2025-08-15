@@ -17,6 +17,7 @@ import Writing from "@/features/curriculum/components/writing";
 import Identification from "@/features/curriculum/components/identification";
 import Embed from "@/features/curriculum/components/embed";
 import ConceptMap from "@/features/curriculum/components/conceptmap";
+import DndMatch from "@/features/curriculum/components/dndmatch";
 import { useClient } from "@/hooks/useClient";
 import {
   Accordion,
@@ -113,6 +114,9 @@ export function Activity({ activity }: { activity: BaseActivity }) {
           likertScale={activity as ActivityManager["LikertScale"][0]}
         />
       );
+    case "DndMatch":
+      return <DndMatch key={key} dndmatch={activity as ActivityManager["DndMatch"][0]}/>
+    // No default case needed, as all types are handled
     default:
       return <p>Out of bounds</p>;
   }

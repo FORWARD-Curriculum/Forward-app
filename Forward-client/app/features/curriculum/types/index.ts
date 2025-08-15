@@ -44,6 +44,7 @@ export type ActivityManager = {
   Question: [Question, QuestionResponse, true];
   PollQuestion: [PollQuestion, PollQuestionResponse, true];
   Embed: [Embed, EmbedResponse, false];
+  DndMatch: [DndMatch, DndMatchResponse, false];
   LikertScale: [LikertScale, LikertScaleResponse, false];
 };
 
@@ -64,6 +65,7 @@ export const ActivityTypeDisplayNames: Record<
   ConceptMap: "Concept Map",
   Identification: "Identification",
   Embed: "Embed",
+  DndMatch: "Drag and Drop Match",
   LikertScale: "Likert Scale",
 };
 
@@ -142,6 +144,10 @@ export interface PollQuestion {
   }[];
   allow_multiple: boolean;
   order: number;
+}
+
+export interface DndMatch extends BaseActivity {
+  content: string[][];
 }
 
 export interface ConceptMap extends BaseActivity {
@@ -254,6 +260,9 @@ export interface IdentificationResponse extends BaseResponse {}
 export interface PollResponse extends BaseResponse {}
 export interface EmbedResponse extends BaseResponse {
   inputted_code: string;
+}
+export interface DndMatchResponse extends BaseResponse {
+  submission: number[][][];
 }
 export interface LikertScaleResponse extends BaseResponse {
   content: {

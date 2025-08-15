@@ -53,6 +53,7 @@
       "title": "DnD Match Test",
       "instructions": "Match items from the <source> to the correct (category/description/definition)",
       "attempts": 3,
+      "_comment": "This is a test activity for the DnD Match type.",
       "content": [
         ["Trade School", "image:welder.png", "image:electrician.png"],
         ["University", "programmer", "ecologist"],
@@ -60,7 +61,8 @@
           "Typically offers associate level programs for 2 years of study.",
           "Community College"
         ],
-        "red herring"
+        [null,"red herring drag"],
+        ["red herring drop", null]
       ]
     },
     {

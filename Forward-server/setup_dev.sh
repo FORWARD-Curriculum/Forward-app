@@ -19,6 +19,9 @@ pip install -r requirements.txt -q
 python manage.py makemigrations
 
 # Run migrations
+python manage.py makemigrations
+
+# Run migrations
 python manage.py migrate
 
 # Seed database with test data
