@@ -41,6 +41,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         json_file_path = Path(settings.BASE_DIR) / 'core' / 'management' / options['json_file']
         activity_manager = ActivityManager() # Get the singleton instance
+        self.seed_minIO_folder = json_file_path.parent
 
         # Read the JSON file
         try:
@@ -312,7 +313,6 @@ class Command(BaseCommand):
 
 
     # Will be used to construct minio asset folder path, if an image needs to be uploaded to minio
-    seed_minIO_folder = Path(settings.BASE_DIR) / 'core' / 'management' / 'minIO_asset_seed' 
 
     def _create_concepts(self, concept_map, concepts_data):
         """Creates or updates concepts for a given concept map, deriving order from list position."""
