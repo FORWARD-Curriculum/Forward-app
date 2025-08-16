@@ -10,30 +10,30 @@ export interface Lesson {
   image: string | undefined;
   activities: BaseActivity[];
 }
- /**
-  * A mapping between activity names and their corresponding interface types.
-  *
-  * Each entry in the mapping uses a key-value structure where:
-  * - **Key**: A string representing the activity name (in PascalCase).
-  * - **Value**: An array tuple containing:
-  *    1. The Activity Interface.
-  *    2. The Activity Response Interface.
-  *    3. A boolean flag indicating whether the activity is a child class.
-  *
-  * The KV format is:
-  * ```javascript
-  *   ActivityName: [ActivityInterface, ActivityResponseInterface, child_class]
-  * ```
-  *
-  * This structure mirrors the backend implementation in the
-  * [ActivityManager class]({@link ../../../../../Forward-server/core/models.py}),
-  * which centralizes activity management. In the backend, the ActivityManager
-  * registers each activity with its corresponding response type and any additional
-  * non-standard response fields via a method signature similar to:
-  * ```js
-  *   registerActivity(ActivityClass, ResponseClass, nonstandard_resp_fields, child_class)
-  * ```
-  */
+/**
+ * A mapping between activity names and their corresponding interface types.
+ *
+ * Each entry in the mapping uses a key-value structure where:
+ * - **Key**: A string representing the activity name (in PascalCase).
+ * - **Value**: An array tuple containing:
+ *    1. The Activity Interface.
+ *    2. The Activity Response Interface.
+ *    3. A boolean flag indicating whether the activity is a child class.
+ *
+ * The KV format is:
+ * ```javascript
+ *   ActivityName: [ActivityInterface, ActivityResponseInterface, child_class]
+ * ```
+ *
+ * This structure mirrors the backend implementation in the
+ * [ActivityManager class]({@link ../../../../../Forward-server/core/models.py}),
+ * which centralizes activity management. In the backend, the ActivityManager
+ * registers each activity with its corresponding response type and any additional
+ * non-standard response fields via a method signature similar to:
+ * ```js
+ *   registerActivity(ActivityClass, ResponseClass, nonstandard_resp_fields, child_class)
+ * ```
+ */
 export type ActivityManager = {
   Identification: [Identification, IdentificationResponse, false];
   TextContent: [TextContent, TextContentResponse, false];
@@ -52,7 +52,10 @@ export type ActivityManager = {
  * this must be seperate from the ActivityManager interface because TypeScript does not exist
  * at runtime.
  */
-export const ActivityTypeDisplayNames: Record<BaseActivity["type"] | "Default", string> = {
+export const ActivityTypeDisplayNames: Record<
+  BaseActivity["type"] | "Default",
+  string
+> = {
   Writing: "Writing",
   Quiz: "Quiz",
   TextContent: "Info",
@@ -62,7 +65,7 @@ export const ActivityTypeDisplayNames: Record<BaseActivity["type"] | "Default", 
   Identification: "Identification",
   Embed: "Embed",
   LikertScale: "Likert Scale",
-}
+};
 
 // #region -------------------------- Activities ---------------------------
 
@@ -172,9 +175,9 @@ export interface Embed extends BaseActivity {
 
 export interface LikertScale extends BaseActivity {
   content: {
-    explain: boolean,
-    statement: string,
-    scale: (number | string)[]
+    statement: string;
+    scale: (number | string)[];
+    continuous: boolean;
   }[];
 }
 
@@ -253,7 +256,10 @@ export interface EmbedResponse extends BaseResponse {
   inputted_code: string;
 }
 export interface LikertScaleResponse extends BaseResponse {
-  content: {selection: number,explaination: string}[];
+  content: {
+    selection: number[];
+    explanation: string | null;
+  };
 }
 
 // #endregion -------------------------- Responses ----------------------------

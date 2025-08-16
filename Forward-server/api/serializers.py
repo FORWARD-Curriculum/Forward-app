@@ -327,24 +327,33 @@ class ResponseSerializer(serializers.Serializer):
             return service_func(validated_data, self.context["request"])
         else:
             try:
+                extra_fields = {}
+                for key, value in self.context['activity_config'][2].items():
+                    field_name, default = value
+                    extra_fields[key] = self.context['request'].data.get(field_name, default)
+                
                 response_object, created = ResponseModel.objects.get_or_create(
                     user=self.context['request'].user,
                     associated_activity=validated_data.get(
                         'associated_activity'),
                     lesson=validated_data.get("lesson_id"),
                     id=validated_data.get('id', None),
+                    defaults=extra_fields
                 )
+                
+                # update case, as opposed to defaults in creation case
+                if not created:
+                    for key, value in extra_fields.items():
+                        setattr(response_object, key, value)
+                        
                 response_object.partial_response = validated_data.get(
                     "partial_response", True)
                 response_object.time_spent = validated_data.get(
                     "time_spent", 0)
                 response_object.attempts_left = validated_data.get(
                     "attempts_left", 0)
-                for key, value in self.context['activity_config'][2].items():
-                    field_name, default = value
-                    setattr(response_object, key,
-                            self.context['request'].data.get(field_name, default))
                 response_object.save()
+                   
             except:
                 # If ID provided but not found for user, treat as error
                 raise serializers.ValidationError(
