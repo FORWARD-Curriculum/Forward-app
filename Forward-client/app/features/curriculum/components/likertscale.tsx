@@ -1,4 +1,5 @@
 import type React from "react";
+import { useRef, useCallback } from "react";
 import type { LikertScale, LikertScaleResponse } from "../types";
 import { useResponse } from "../hooks";
 
@@ -7,12 +8,74 @@ export default function LikertScale({
 }: {
   likertScale: LikertScale;
 }) {
-  // State intentionally omitted per instructions
-  const [response, setResponse] = useResponse<LikertScaleResponse,LikertScale>({
-    type: "LikertScale",
-    activity: likertScale,
-    initialFields: {content: new Array(likertScale.content.length).fill({})},
-  });
+  // A ref to store timeout IDs for each slider, persisting across re-renders
+  const debounceTimers = useRef<{ [key: number]: NodeJS.Timeout }>({});
+
+  const [response, setResponse] = useResponse<LikertScaleResponse, LikertScale>(
+    {
+      type: "LikertScale",
+      activity: likertScale,
+      initialFields: {
+        content: {
+          selection: new Array(likertScale.content.length),
+          explanation: null,
+        },
+      },
+    },
+  );
+
+  const handleExplainChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setResponse((old) => ({
+      ...old,
+      content: {
+        ...old.content,
+        explanation: e.target.value,
+      },
+    }));
+  };
+
+  // Memoize the handler to prevent it from being recreated on every render
+  const handleRangeInput = useCallback(
+    (e: React.FormEvent<HTMLInputElement>, index: number): void => {
+      const el = e.currentTarget;
+      const minVal = Number(el.min) || 0;
+      const maxVal = Number(el.max) || 1;
+      const val = Number(el.value);
+      const isContinuous = el.step === "any";
+
+      // 1. Provide immediate visual feedback for a smooth user experience
+      const pct = ((val - minVal) / (maxVal - minVal)) * 100;
+      el.style.setProperty("--progress", `${pct}%`);
+
+      // 2. Define the state update logic
+      const updateState = () => {
+        setResponse((old) => {
+          const newSelection = [...old.content.selection];
+          newSelection[index] = val;
+          return {
+            ...old,
+            content: {
+              ...old.content,
+              selection: newSelection,
+            },
+          };
+        });
+      };
+
+      // 3. Conditionally debounce the state update
+      if (isContinuous) {
+        if (debounceTimers.current[index]) {
+          clearTimeout(debounceTimers.current[index]);
+        }
+        // Set a new timer. The state will only update after 250ms of inactivity.
+        debounceTimers.current[index] = setTimeout(updateState, 250);
+      } else {
+        // If the slider is not continuous, update the state immediately
+        updateState();
+      }
+    },
+    [setResponse], // Dependency for useCallback
+  );
 
   return (
     <div className="likert-scale mb-6">
@@ -24,51 +87,14 @@ export default function LikertScale({
           const n = scale.length;
           const min = 0;
           const max = Math.max(0, n - 1);
-          const step = 1;
-          const defaultValue = Math.round((min + max) / 2);
+          const step = likertScale.content[index].continuous ? "any" : 1;
+          const defaultValue = response.content.selection[index] ?? 0;
           const initialPercent =
             max > min ? ((defaultValue - min) / (max - min)) * 100 : 0;
 
           const progressStyle = {
             ["--progress" as any]: `${initialPercent}%`,
           } as React.CSSProperties;
-
-          const handleRangeInput = (
-            e: React.FormEvent<HTMLInputElement>, index: number
-          ): void => {
-            const el = e.currentTarget;
-            const minVal = Number(el.min) || 0;
-            const maxVal = Number(el.max) || 1;
-            const val = Number(el.value);
-            const pct = ((val - minVal) / (maxVal - minVal)) * 100;
-            el.style.setProperty("--progress", `${pct}%`);
-
-            setResponse((old)=>{
-                const newResp = [...old.content];
-                newResp[index] = {
-                    ...newResp[index],
-                    selection: val,
-                };
-                return {
-                    ...old,
-                    content: newResp,
-                };
-            })
-          };
-
-          const handleExplainChange = (e: React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
-            setResponse((old)=>{
-                const newResp = [...old.content];
-                newResp[index] = {
-                    ...newResp[index],
-                    explaination: e.target.value,
-                };
-                return {
-                    ...old,
-                    content: newResp,
-                };
-            })
-          };
 
           const rangeId = `likert-scale-${likertScale.id}-${index}`;
 
@@ -99,12 +125,12 @@ export default function LikertScale({
                   max={max}
                   step={step}
                   defaultValue={defaultValue}
-                  onInput={(e)=>handleRangeInput(e,index)}
+                  onInput={(e) => handleRangeInput(e, index)}
                   className="likert-range mx-1 w-[calc(100%-0.5rem)] cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20"
                   style={{
                     ...progressStyle,
-                    ["--track-h" as any]: "0.75rem", // track thickness (8px)
-                    ["--thumb" as any]: "1.75rem", // thumb size (20px)
+                    ["--track-h" as any]: "0.75rem",
+                    ["--thumb" as any]: "1.75rem",
                   }}
                   aria-valuemin={min}
                   aria-valuemax={max}
@@ -115,11 +141,11 @@ export default function LikertScale({
                   {/* Labels container */}
                   <div className="pointer-events-none absolute top-2 right-1 left-1">
                     {scale.map((option, i) => {
-                      const pct = n > 1 ? ((i / (n - 1)) * 98) + 0.95 : 0;
+                      const pct = n > 1 ? (i / (n - 1)) * 98 + 0.95 : 0;
                       return (
                         <span
                           key={i}
-                          className="1w absolute lg:max-w-15 max-w-2 -translate-x-1/2 text-center lg:text-xs text-xs/5"
+                          className="1w absolute max-w-2 -translate-x-1/2 text-center text-xs/5 lg:max-w-15 lg:text-xs"
                           style={{ left: `${pct}%` }}
                         >
                           {option}
@@ -136,19 +162,15 @@ export default function LikertScale({
                   </datalist>
                 </div>
               </div>
-
-              {item.explain && (
-                <textarea
-                  placeholder="Explain your choice"
-                  className="bg-background/70 text-fg mt-2 w-full resize-y rounded-xl border border-gray-200 p-3 text-sm shadow-sm transition-colors placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-                    value={response.content[index]?.explaination || ""}
-                    onChange={(e) => handleExplainChange(e, index)}
-
-                />
-              )}
             </div>
           );
         })}
+        <textarea
+          placeholder="Explain your choice"
+          className="bg-background/70 text-fg mt-2 w-full resize-y rounded-xl border border-gray-200 p-3 text-sm shadow-sm transition-colors placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+          value={response.content.explanation || ""}
+          onChange={handleExplainChange}
+        />
       </div>
     </div>
   );

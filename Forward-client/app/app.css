@@ -270,7 +270,7 @@ button {
     @apply rounded-full bg-primary-foreground;
     background: linear-gradient(
       to right,
-      color-mix(in oklch, theme(--color-accent), black 10%) 0%,
+      color-mix(in oklch, theme(--color-accent), black 5%) 0%,
       theme(--color-accent) var(--progress, 50%),
       theme(--color-muted) var(--progress, 50%),
       theme(--color-muted) 100%
