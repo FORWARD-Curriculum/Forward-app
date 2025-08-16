@@ -54,22 +54,19 @@
       "instructions": "Use the slider to indicate how much you agree with the following statements.",
       "content": [
         {
-          "explain": false,
           "statement": "I know what type of college I want to attend.",
           "scale": [0,1,2,3,4,5]
         },
         {
-          "explain": true,
           "statement": "I know what type of degree I want to pursue.",
           "scale": [0,1,2,3,4,5]
         },
         {
-          "explain": false,
-          "statement": "I know how to apply for college.",
-          "scale": [0,1,2,3,4,5]
+          "continuous": true,
+          "statement": "I amconfident in my ability to apply for college.",
+          "scale": ["0%", "100%"]
         },
         {
-          "explain": false,
           "statement": "I am likely to apply for financial aid for college.",
           "scale": ["Not at all likely", "Slightly likely", "Somewhat likely", "Moderately likely", "Very likely", "Extremely likely"]
         }
