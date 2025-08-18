@@ -640,6 +640,31 @@ class Concept(BaseActivity):
         help_text="List of examples for this concept"
     )
 
+    # Helper method to generate presigned urls
+    def create_presigned_urls(self, minio_path):
+        
+        logger = logging.getLogger(__name__)
+        s3_client = boto3.client(
+            's3',
+            endpoint_url = 'http://localhost:9000', # browser access endpoint
+            aws_access_key_id='minioadmin', # these should probably be changed to getenv calls, or maybe a default storage call
+            aws_secret_access_key='minioadmin'  
+        )
+
+        bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
+        try:
+            response = s3_client.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': bucket_name, 'Key': minio_path},
+                ExpiresIn= 3600, # 3 hour expiration time at the moment
+            )
+        except ClientError as e:
+            logger.error(f"Failed to generate presigned URL: {e}")
+            return None
+        
+        logger.info(f"Generated presigned URL: {response}")
+        return response
+
     def to_dict(self):
 
         logger = logging.getLogger(__name__)

@@ -399,6 +399,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
             
             # This can be used if you ever wish to set the bucket policy to public
+
             public_read_policy = {
                 "Version": "2012-10-17",
                 "Statement": [

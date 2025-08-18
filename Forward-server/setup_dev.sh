@@ -24,6 +24,7 @@ python manage.py makemigrations
 # Run migrations
 python manage.py migrate
 
+
 # Seed database with test data
 python manage.py seed_lessons_data --reset lesson_seed_data/lesson1.json
 
