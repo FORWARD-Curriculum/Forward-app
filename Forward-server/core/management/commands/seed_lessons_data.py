@@ -41,6 +41,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         json_file_path = Path(settings.BASE_DIR) / 'core' / 'management' / options['json_file']
+        self.folder_path = json_file_path.parent
         activity_manager = ActivityManager() # Get the singleton instance
 
         # Read the JSON file
@@ -231,7 +232,9 @@ class Command(BaseCommand):
             try:
                 if activity_type_str == 'dndmatch': # intermediate parsing
                     self.parse_dndmatch_images(defaults.get('content', ''))
-                    
+                if activity_type_str == 'textcontent' and 'image' in defaults:
+                    self.bucket_url_call(defaults.get('image'), key_prefix="text_content_image/")
+                    defaults['image'] = f"public/text_content_image/{defaults['image']}"                    
                       
                 # Use the 'order' from enumerate in update_or_create
                 activity_obj, created = ActivityModel.objects.update_or_create(
@@ -319,10 +322,6 @@ class Command(BaseCommand):
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update poll question (Order: {order}) for poll '{poll.title}': {e}"))
 
-
-    # Will be used to construct minio asset folder path, if an image needs to be uploaded to minio
-    seed_minIO_folder = Path(settings.BASE_DIR) / 'core' / 'management' / 'minIO_asset_seed'
-
     def _create_concepts(self, concept_map, concepts_data):
         """Creates or updates concepts for a given concept map, deriving order from list position."""
         self.stdout.write(f"  Processing {len(concepts_data)} concepts for concept map: {concept_map.title}") # Debug print
@@ -360,11 +359,13 @@ class Command(BaseCommand):
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update concept (Order: {order}) for concept map '{concept_map.title}': {e}"))
 
 
+    # TODO: Change everything to be stored as a KEY not URL, so it is not hardcoded to some bucket
+
     #Helper method to upload an image file to the bucket
     def _upload_image_to_bucket(self, image_filename, key_prefix=''):
         
         # Url path is constructed over here, 
-        final_path = self.seed_minIO_folder / image_filename
+        final_path = self.folder_path / image_filename
         with open(final_path, 'rb') as f:
             saved_path = default_storage.save(f"public/{key_prefix}{image_filename}", f) # the default storage is the s3/minio configured in djanago settings, its uses boto under the hood
             url = default_storage.url(saved_path)

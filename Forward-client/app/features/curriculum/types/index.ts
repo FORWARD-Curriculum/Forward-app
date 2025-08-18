@@ -86,7 +86,8 @@ export interface BaseActivity {
 }
 
 export interface TextContent extends BaseActivity {
-  content: string;
+  content?: string;
+  image?: string; // Optional image URL to accompany the text content
 }
 
 export interface Writing extends BaseActivity {

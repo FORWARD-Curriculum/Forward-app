@@ -168,7 +168,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   }, [loaderData]);
 
   return (
-    <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:flex-row lg:items-start lg:gap-8">
+    <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:mt-14 lg:flex-row lg:items-start lg:gap-8">
       <div className="flex flex-col lg:h-full">
         <Accordion
           type="single"

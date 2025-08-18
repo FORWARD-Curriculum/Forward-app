@@ -262,8 +262,12 @@ class TextContent(BaseActivity):
     """
     # User's generated uuid
     content = models.TextField(
+        null=True, blank=True,
         help_text="The main content text, can include HTML/markdown formatting"
+        
     )
+    
+    image = models.TextField(null=True, blank=True, help_text="Optional image to accompany the text content")
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -281,6 +285,7 @@ class TextContent(BaseActivity):
         return {
             **super().to_dict(),
             "content": self.content,
+            "image": create_presigned_url(self.image) if self.image else None,
         }
 
 
