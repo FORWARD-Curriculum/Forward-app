@@ -6,6 +6,7 @@ from django.db import transaction, IntegrityError
 from django.conf import settings
 from django.core.files.storage import default_storage
 import boto3 # pyright: ignore[reportMissingImports]
+import re
 
 # Import all necessary models, including the ActivityManager
 from core.models import (
@@ -228,6 +229,10 @@ class Command(BaseCommand):
             }
 
             try:
+                if activity_type_str == 'dndmatch': # intermediate parsing
+                    self.parse_dndmatch_images(defaults.get('content', ''))
+                    
+                      
                 # Use the 'order' from enumerate in update_or_create
                 activity_obj, created = ActivityModel.objects.update_or_create(
                     lesson=lesson,
@@ -253,7 +258,11 @@ class Command(BaseCommand):
                 traceback.print_exc() # Print full traceback for debugging
                 # Depending on desired behavior. For seeding, maybe log and continue.
                 # raise # Uncomment to stop on first error
-
+                
+    def parse_dndmatch_images(self, content):
+        images = re.findall(r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))", json.dumps(content))
+        [self.bucket_url_call(f"{m[0]}",key_prefix="dndmatch/") for m in images]
+        
     def _create_questions(self, quiz, questions_data):
         """Creates or updates questions for a given quiz, deriving order from list position."""
         self.stdout.write(f"  Processing {len(questions_data)} questions for quiz: {quiz.title}") # Debug print
@@ -312,7 +321,7 @@ class Command(BaseCommand):
 
 
     # Will be used to construct minio asset folder path, if an image needs to be uploaded to minio
-    seed_minIO_folder = Path(settings.BASE_DIR) / 'core' / 'management' / 'minIO_asset_seed' 
+    seed_minIO_folder = Path(settings.BASE_DIR) / 'core' / 'management' / 'minIO_asset_seed'
 
     def _create_concepts(self, concept_map, concepts_data):
         """Creates or updates concepts for a given concept map, deriving order from list position."""
@@ -326,7 +335,7 @@ class Command(BaseCommand):
             # Prepare defaults for the Concept model
             concept_defaults = {
                 'title': concept_data.get('title', f'Concept {order}'), # Use title from data or default
-                'image': image_url,
+                'image': f"public/{image_filename}",
                 'description': concept_data.get('description', ''),
                 'examples': concept_data.get('examples', []),
                 # Instructions might be on concept_data or inherit from BaseActivity defaults
@@ -352,25 +361,26 @@ class Command(BaseCommand):
 
 
     #Helper method to upload an image file to the bucket
-    def _upload_image_to_bucket(self, image_filename):
+    def _upload_image_to_bucket(self, image_filename, key_prefix=''):
         
         # Url path is constructed over here, 
         final_path = self.seed_minIO_folder / image_filename
         with open(final_path, 'rb') as f:
-            saved_path = default_storage.save(image_filename, f) # the default storage is the s3/minio configured in djanago settings, its uses boto under the hood
+            saved_path = default_storage.save(f"public/{key_prefix}{image_filename}", f) # the default storage is the s3/minio configured in djanago settings, its uses boto under the hood
+            url = default_storage.url(saved_path)
             self.stdout.write(self.style.SUCCESS(f'Image uploaded, url: {saved_path}'))
             # return default_storage.url(saved_path)
-            return saved_path
+            return url
 
 
-    def bucket_url_call(self, image_filename):
+    def bucket_url_call(self, image_filename, key_prefix=''):
         try:
-            if default_storage.exists(image_filename): # if exists just return its url 
+            if default_storage.exists(f"public/{key_prefix}{image_filename}"): # if exists just return its url 
                 # return default_storage.url(image_filename) 
-                return image_filename
+                return default_storage.url(key_prefix+image_filename)
             else:
                 # File doesn't exist, upload it
-                return self._upload_image_to_bucket(image_filename)
+                return self._upload_image_to_bucket(image_filename, key_prefix)
 
         # this error would be thrown if no existing bucket      
         except:
@@ -389,22 +399,22 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
             
             # This can be used if you ever wish to set the bucket policy to public
-            # public_read_policy = {
-            #     "Version": "2012-10-17",
-            #     "Statement": [
-            #         {
-            #             "Effect": "Allow",
-            #             "Principal": "*",
-            #             "Action": "s3:GetObject",
-            #             "Resource": f"arn:aws:s3:::{bucket_name}/*"
-            #         }
-            #     ]
-            # }
-            # s3_client.put_bucket_policy(
-            #     Bucket=bucket_name,
-            #     Policy=json.dumps(public_read_policy)
-            # )
-            # self.stdout.write(self.style.SUCCESS(f'Bucket policy set to public read'))
+            public_read_policy = {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": "s3:GetObject",
+                        "Resource": f"arn:aws:s3:::{bucket_name}/public/*"
+                    }
+                ]
+            }
+            s3_client.put_bucket_policy(
+                Bucket=bucket_name,
+                Policy=json.dumps(public_read_policy)
+            )
+            self.stdout.write(self.style.SUCCESS(f'Bucket policy set to public read'))
             
             # Now upload the image after creating the bucket
             return self._upload_image_to_bucket(image_filename)
