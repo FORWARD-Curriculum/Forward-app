@@ -431,10 +431,11 @@
       "content": "College Costs Include: Tuition and Fees, Room and Board, Meal plans, Books and Supplies, Health insurance, Transportation, and Personal Expenses."
     },
     {
-      "type": "textcontent",
+      "type": "video",
       "title": "FAFSA",
-      "instructions": null,
-      "content": "The FASFA, or Free Application for Federal Student Aid, is a form available online that identifies financial aid sources you are eligible for with colleges you consider attending. Watch the video to learn more about the FAFSA."
+      "instructions": "The FASFA, or Free Application for Federal Student Aid, is a form available online that identifies financial aid sources you are eligible for with colleges you consider attending. Watch the video to learn more about the FAFSA.",
+      "video": "financial_aid_for_college.mp4",
+      "scrubbable": false
     },
     {
       "type": "textcontent",

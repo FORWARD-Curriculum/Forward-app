@@ -1,5 +1,7 @@
 // Fields should always be snake_case, and class names should always be ProperCase
 
+import exp from "constants";
+
 export interface Lesson {
   id: string;
   title: string;
@@ -46,6 +48,7 @@ export type ActivityManager = {
   Embed: [Embed, EmbedResponse, false];
   DndMatch: [DndMatch, DndMatchResponse, false];
   LikertScale: [LikertScale, LikertScaleResponse, false];
+  Video: [Video, VideoResponse, false];
 };
 
 /**
@@ -67,6 +70,7 @@ export const ActivityTypeDisplayNames: Record<
   Embed: "Embed",
   DndMatch: "Drag and Drop Match",
   LikertScale: "Likert Scale",
+  Video: "Video",
 };
 
 // #region -------------------------- Activities ---------------------------
@@ -88,6 +92,11 @@ export interface BaseActivity {
 export interface TextContent extends BaseActivity {
   content?: string;
   image?: string; // Optional image URL to accompany the text content
+}
+
+export interface Video extends BaseActivity {
+  video: string;
+  scrubbable: boolean;
 }
 
 export interface Writing extends BaseActivity {
@@ -272,4 +281,7 @@ export interface LikertScaleResponse extends BaseResponse {
   };
 }
 
+export interface VideoResponse extends BaseResponse {
+  watched_percentage: number; 
+}
 // #endregion -------------------------- Responses ----------------------------

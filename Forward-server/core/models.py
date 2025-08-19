@@ -288,6 +288,33 @@ class TextContent(BaseActivity):
             "image": create_presigned_url(self.image) if self.image else None,
         }
 
+class Video(BaseActivity):
+    """
+    Model for video content within a lesson.
+    Can be used to embed videos from external sources or local files.
+    """
+    video = models.TextField(
+        help_text="URL of the video to be embedded"
+    )
+    
+    scrubbable = models.BooleanField(
+        default=False,
+        help_text="Whether the video can be scrubbed by the user"
+    )
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "video content"
+        verbose_name_plural = "video contents"
+
+    def __str__(self):
+        return f"Video Content: {self.title}"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "video": create_presigned_url(self.video),
+        }
 
 class Writing(BaseActivity):
     """Model for writing activities where students provide written responses."""
@@ -1024,6 +1051,27 @@ class BaseResponse(models.Model):
             "associated_activity": self.associated_activity.id,
         }
 
+class VideoResponse(BaseResponse):
+    """
+    Response model for Video activities.
+    """
+    associated_activity = models.ForeignKey(
+        Video,
+        on_delete=models.CASCADE,
+        related_name='associated_video',
+        help_text='The video activity associated with this response'
+    )
+
+    watched_percentage = models.FloatField(
+        default=0.0,
+        help_text="Percentage of the video that has been watched"
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "watched_percentage": self.watched_percentage
+        }
 
 class DndMatchResponse(BaseResponse):
     """
@@ -1282,6 +1330,9 @@ class ActivityManager():
                               "submission": ["submission", []]})
         self.registerActivity(LikertScale, LikertScaleResponse, {
                               "content": ["content", {}]})
+        self.registerActivity(Video, VideoResponse, {
+                              "watched_percentage": ["watched_percentage", 0.0]
+                          })
 
 
 # Register on launch

@@ -9,7 +9,6 @@ import {
   type DragEndEvent,
   type DragStartEvent,
   closestCenter,
-  // --- CHANGE 1: Import necessary hooks and types ---
   useDroppable,
   type CollisionDetection,
   rectIntersection,
@@ -36,6 +35,105 @@ function shuffle<T>(array: T[]): T[] {
   return newArray;
 }
 
+// --- CHANGE 1: Define DraggableItem component outside of DndMatch ---
+// It now receives all the data it needs via props.
+interface DraggableItemProps {
+  id: string;
+  label: string;
+  isDraggable: boolean;
+}
+
+const DraggableItem: FC<DraggableItemProps> = ({ id, label, isDraggable }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id, disabled: !isDraggable });
+
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    cursor: "grab",
+    opacity: isDragging ? 0 : 1,
+  };
+
+  const isImage = label.startsWith("image:");
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`touch-none rounded-md bg-foreground shadow-sm ${
+        !isDraggable ? "!cursor-default" : ""
+      } ${isImage ? "overflow-clip" : "px-4 py-2"}`}
+    >
+      {isImage ? (
+        <img src={label.replace("image:", "")} alt={label} />
+      ) : (
+        label
+      )}
+    </div>
+  );
+};
+
+// --- CHANGE 2: Define DropZone component outside of DndMatch ---
+// It also receives data via props, including the data needed by DraggableItem.
+interface DropZoneProps {
+  id: string;
+  label: string;
+  itemIds: string[];
+  allItemsById: Record<string, { id: string; label: string }>;
+  isDraggable: boolean;
+  validationStatus?: "correct" | "incorrect";
+}
+
+const DropZone: FC<DropZoneProps> = ({
+  id,
+  label,
+  itemIds,
+  allItemsById,
+  isDraggable,
+  validationStatus,
+}) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  const stateClasses =
+    validationStatus === "correct"
+      ? "border-green-500 bg-green-500/10"
+      : validationStatus === "incorrect"
+        ? "border-error bg-error/10"
+        : isOver
+          ? "border-primary bg-primary/10"
+          : "border-muted bg-background";
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <h3 className="max-w-56 text-center font-semibold text-secondary-foreground bright">
+        {label}
+      </h3>
+      <SortableContext items={itemIds}>
+        <div
+          ref={setNodeRef}
+          className={`flex h-full min-h-32 w-56 flex-col gap-2 rounded-lg border-2 border-dashed p-4 transition-colors ${stateClasses}`}
+        >
+          {itemIds.map((itemId) => (
+            <DraggableItem
+              key={itemId}
+              id={itemId}
+              label={allItemsById[itemId]?.label ?? "Unknown"}
+              isDraggable={isDraggable}
+            />
+          ))}
+        </div>
+      </SortableContext>
+    </div>
+  );
+};
+
 export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
   // --- State Management ---
   const [response, setResponse] = useResponse<DndMatchResponse, DndMatch>({
@@ -44,6 +142,9 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
     initialFields: {
       submission: Array.from({ length: dndmatch.content.length }, () => []),
       attempts_left: 3,
+      // --- CHANGE 3: Initialize partial_response to true ---
+      // This allows dragging from the start.
+      partial_response: true,
     },
   });
 
@@ -106,77 +207,6 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
     }),
   );
 
-  // --- Co-located Components for Simplicity ---
-  const Draggable: FC<{ id: string }> = ({ id }) => {
-    const {
-      attributes,
-      listeners,
-      setNodeRef,
-      transform,
-      transition,
-      isDragging,
-    } = useSortable({ id, disabled: !response.partial_response });
-    const style: CSSProperties = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-      cursor: "grab",
-      opacity: isDragging ? 0 : 1,
-    };
-    const label = allItemsById[id]?.label ?? "Unknown";
-    const isImage = label.startsWith("image:");
-
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
-        className={`touch-none rounded-md  bg-foreground shadow-sm ${
-          !response.partial_response ? "!cursor-default" : ""
-        } ${isImage ? "overflow-clip" : "px-4 py-2"}`}
-      >
-        {isImage ? <img src={label.replace("image:", "")} /> : label}
-      </div>
-    );
-  };
-
-  const DropZone: FC<{
-    id: string;
-    label: string;
-    itemIds: string[];
-    validationStatus?: "correct" | "incorrect";
-  }> = ({ id, label, itemIds, validationStatus }) => {
-    // --- CHANGE 2: Use `useDroppable` instead of `useSortable` ---
-    const { setNodeRef, isOver } = useDroppable({ id });
-    const stateClasses =
-      validationStatus === "correct"
-        ? "border-green-500 bg-green-500/10"
-        : validationStatus === "incorrect"
-          ? "border-error bg-error/10"
-          : isOver
-            ? "border-primary bg-primary/10"
-            : "border-muted bg-background";
-
-    return (
-      <div className="flex flex-col items-center gap-2">
-        <h3 className="max-w-56 text-center font-semibold text-secondary-foreground bright">
-          {label}
-        </h3>
-        {/* The SortableContext remains to manage the items *inside* the drop zone */}
-        <SortableContext items={itemIds}>
-          <div
-            ref={setNodeRef}
-            className={`flex h-full min-h-32 w-56 flex-col gap-2 rounded-lg border-2 border-dashed p-4 transition-colors ${stateClasses}`}
-          >
-            {itemIds.map((itemId) => (
-              <Draggable key={itemId} id={itemId} />
-            ))}
-          </div>
-        </SortableContext>
-      </div>
-    );
-  };
-
   // --- Event Handlers ---
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
@@ -194,11 +224,9 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
         itemsByContainer[key].includes(id),
       );
 
-    // If `over.id` is a DropZone, `overContainer` will be undefined.
-    // The destination is the DropZone itself.
     const activeContainer = findContainer(active.id as string);
-    let overContainer = findContainer(over.id as string);
-    let destinationContainer = overContainer ?? (over.id as string);
+    const overContainer = findContainer(over.id as string);
+    const destinationContainer = overContainer ?? (over.id as string);
 
     if (
       !activeContainer ||
@@ -224,11 +252,10 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
       newItems[activeContainer] = itemsByContainer[activeContainer].filter(
         (id) => id !== activeId,
       );
-      // If dragging into a new container, check if we're over an existing item or the container itself
       const isOverItem = overContainer !== undefined;
       const overIndex = isOverItem
         ? itemsByContainer[destinationContainer].indexOf(overId)
-        : itemsByContainer[destinationContainer].length; // If over container, add to end
+        : itemsByContainer[destinationContainer].length;
 
       newItems[destinationContainer] = [
         ...itemsByContainer[destinationContainer].slice(0, overIndex),
@@ -293,9 +320,6 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
 
   const activeItem = activeId ? allItemsById[activeId] : null;
 
-  // --- CHANGE 3: (RECOMMENDED) A better collision detection strategy ---
-  // This strategy first checks for rectangle intersection (great for dropping into empty containers)
-  // and falls back to closest center (great for re-ordering items within a container).
   const customCollisionDetection: CollisionDetection = (args) => {
     const rectIntersectionCollisions = rectIntersection(args);
     if (rectIntersectionCollisions.length > 0) {
@@ -312,7 +336,6 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={() => setActiveId(null)}
-        // --- CHANGE 4: Use the new collision strategy ---
         collisionDetection={customCollisionDetection}
       >
         <div className="space-y-8">
@@ -322,22 +345,28 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
               const label = item[0];
               return (
                 label && (
+                  // --- CHANGE 4: Use the new DropZone and pass props ---
                   <DropZone
                     key={targetId}
                     id={targetId}
                     label={label}
                     itemIds={itemsByContainer[targetId] ?? []}
                     validationStatus={validationResults[targetId]}
+                    allItemsById={allItemsById}
+                    isDraggable={!!response.partial_response}
                   />
                 )
               );
             })}
           </div>
 
+          {/* --- CHANGE 5: Use the new DropZone for the item bank too --- */}
           <DropZone
             id={ITEM_POOL_ID}
             label="Item Bank"
             itemIds={itemsByContainer[ITEM_POOL_ID] ?? []}
+            allItemsById={allItemsById}
+            isDraggable={!!response.partial_response}
           />
 
           <div className="mt-8 flex justify-center gap-4">
@@ -359,7 +388,14 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
         </div>
 
         <DragOverlay>
-          {activeItem ? <Draggable id={activeItem.id} /> : null}
+          {/* --- CHANGE 6: Use the new DraggableItem in the overlay --- */}
+          {activeItem ? (
+            <DraggableItem
+              id={activeItem.id}
+              label={activeItem.label}
+              isDraggable={true}
+            />
+          ) : null}
         </DragOverlay>
         {/* {JSON.stringify(response)} */}
       </DndContext>

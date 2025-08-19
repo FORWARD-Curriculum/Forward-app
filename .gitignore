@@ -3,5 +3,4 @@
 .postgres_data/
 minio_data/
 .env*
-.mp4
-Forward-server/core/management/lesson_seed_data/lesson1/Financial Aid for College.mp4
+*.mp4

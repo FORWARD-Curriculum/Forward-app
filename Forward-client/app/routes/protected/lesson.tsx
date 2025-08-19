@@ -38,6 +38,7 @@ import {
   setLesson,
 } from "@/features/curriculum/slices/lessonSlice";
 import LikertScale from "@/features/curriculum/components/likertscale";
+import Video from "@/features/curriculum/components/video";
 
 export async function clientLoader({
   params,
@@ -116,6 +117,8 @@ export function Activity({ activity }: { activity: BaseActivity }) {
       );
     case "DndMatch":
       return <DndMatch key={key} dndmatch={activity as ActivityManager["DndMatch"][0]}/>
+    case "Video":
+      return <Video key={key} video={activity as ActivityManager["Video"][0]} />;
     // No default case needed, as all types are handled
     default:
       return <p>Out of bounds</p>;

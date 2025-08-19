@@ -234,7 +234,10 @@ class Command(BaseCommand):
                     self.parse_dndmatch_images(defaults.get('content', ''))
                 if activity_type_str == 'textcontent' and 'image' in defaults:
                     self.bucket_url_call(defaults.get('image'), key_prefix="text_content_image/")
-                    defaults['image'] = f"public/text_content_image/{defaults['image']}"                    
+                    defaults['image'] = f"public/text_content_image/{defaults['image']}"        
+                if activity_type_str == 'video':
+                    self.bucket_url_call(defaults.get('video'), key_prefix="video/")
+                    defaults['video'] = f"public/video/{defaults['video']}"
                       
                 # Use the 'order' from enumerate in update_or_create
                 activity_obj, created = ActivityModel.objects.update_or_create(
