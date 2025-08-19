@@ -178,25 +178,43 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Sets up the django-storages s3 configuration with minio container
 
-
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS":{
-            "bucket_name": "media-bucket",
-            "access_key": "minioadmin",
-            "secret_key": "minioadmin",
-            "endpoint_url": "http://minio:9000",
-            "custom_domain": "localhost:9000/media-bucket",
-            "url_protocol": "http:",
-            "default_acl": "public-read",
-            "querystring_auth": False, 
-            "use_ssl": False # set to false for local development
+if DEBUG: # uses Minio for development
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS":{
+                "bucket_name": "media-bucket",
+                "access_key": "minioadmin",
+                "secret_key": "minioadmin",
+                "endpoint_url": "http://minio:9000",
+                "custom_domain": "localhost:9000/media-bucket",
+                "url_protocol": "http:",
+                "default_acl": "public-read",
+                "querystring_auth": False, 
+                "use_ssl": False # set to false for local development
+            }
+        },
+        # Required to satisfy django storages but we do not use static files i believe
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         }
-    },
-    # Required to satisfy django storages but we do not use static files i believe
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     }
-}
+else: # Production with s3 bucket configuration
+    STORAGES= {
+        "default": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS":{
+                "bucket_name": os.getenv("AWS_MEDIA_BUCKET_NAME"),
+                "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
+                "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+                "default_acl": "private",
+                "querystring_auth": True, 
+                "use_ssl": True
+            }
+        },
+        # Required to satisfy django storages but we do not use static files i believe
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        }
+    }
 
