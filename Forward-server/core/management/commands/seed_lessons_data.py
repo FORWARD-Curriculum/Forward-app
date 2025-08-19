@@ -41,6 +41,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         json_file_path = Path(settings.BASE_DIR) / 'core' / 'management' / options['json_file']
         activity_manager = ActivityManager() # Get the singleton instance
+        seed_minIO_folder = json_file_path.parent # Will be used to construct minio asset folder path, if an image needs to be uploaded to minio
 
         # Read the JSON file
         try:
@@ -310,9 +311,6 @@ class Command(BaseCommand):
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update poll question (Order: {order}) for poll '{poll.title}': {e}"))
 
-
-    # Will be used to construct minio asset folder path, if an image needs to be uploaded to minio
-    seed_minIO_folder = Path(settings.BASE_DIR) / 'core' / 'management' / 'minIO_asset_seed' 
 
     def _create_concepts(self, concept_map, concepts_data):
         """Creates or updates concepts for a given concept map, deriving order from list position."""
