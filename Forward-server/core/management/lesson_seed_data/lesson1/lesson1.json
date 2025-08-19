@@ -606,6 +606,10 @@
           }
         }
       ]
+    },
+    {
+      "type": "twine",
+      "file": "choosing_a_major.html"
     }
   ]
 }

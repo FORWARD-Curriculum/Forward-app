@@ -49,6 +49,7 @@ export type ActivityManager = {
   DndMatch: [DndMatch, DndMatchResponse, false];
   LikertScale: [LikertScale, LikertScaleResponse, false];
   Video: [Video, VideoResponse, false];
+  Twine: [Twine, TwineResponse, false];
 };
 
 /**
@@ -71,6 +72,7 @@ export const ActivityTypeDisplayNames: Record<
   DndMatch: "Drag and Drop Match",
   LikertScale: "Likert Scale",
   Video: "Video",
+  Twine: "Twine",
 };
 
 // #region -------------------------- Activities ---------------------------
@@ -197,6 +199,10 @@ export interface LikertScale extends BaseActivity {
   }[];
 }
 
+export interface Twine extends BaseActivity {
+  file: string; 
+  }
+
 // #endregion -------------------------- Activities ---------------------------
 
 // #region -------------------------- Responses ----------------------------
@@ -284,4 +290,5 @@ export interface LikertScaleResponse extends BaseResponse {
 export interface VideoResponse extends BaseResponse {
   watched_percentage: number; 
 }
+export interface TwineResponse extends BaseResponse {}
 // #endregion -------------------------- Responses ----------------------------

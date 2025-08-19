@@ -13,6 +13,7 @@ import { act, useEffect } from "react";
 import TextContent from "@/features/curriculum/components/textcontent";
 import Poll from "@/features/curriculum/components/poll";
 import Quiz from "@/features/curriculum/components/quiz";
+import Twine from "@/features/curriculum/components/twine";
 import Writing from "@/features/curriculum/components/writing";
 import Identification from "@/features/curriculum/components/identification";
 import Embed from "@/features/curriculum/components/embed";
@@ -119,6 +120,8 @@ export function Activity({ activity }: { activity: BaseActivity }) {
       return <DndMatch key={key} dndmatch={activity as ActivityManager["DndMatch"][0]}/>
     case "Video":
       return <Video key={key} video={activity as ActivityManager["Video"][0]} />;
+    case "Twine":
+      return <Twine key={key} twine={activity as ActivityManager["Twine"][0]} />;
     // No default case needed, as all types are handled
     default:
       return <p>Out of bounds</p>;

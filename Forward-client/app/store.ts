@@ -24,10 +24,11 @@ const reducer = {
 export type RootState = StateFromReducersMapObject<typeof reducer>;
 
 // Only run if code is on client
- const preloadedState: RootState | undefined =
-  typeof window === "undefined"
-    ? undefined
-    : JSON.parse(localStorage.getItem("reduxState") || "null") || undefined;
+ const preloadedState: RootState | undefined = undefined;
+ 
+  // typeof window === "undefined"
+  //   ? undefined
+  //   : JSON.parse(localStorage.getItem("reduxState") || "null") || undefined;
 
 const store = configureStore({
   reducer,

@@ -264,10 +264,11 @@ class TextContent(BaseActivity):
     content = models.TextField(
         null=True, blank=True,
         help_text="The main content text, can include HTML/markdown formatting"
-        
+
     )
-    
-    image = models.TextField(null=True, blank=True, help_text="Optional image to accompany the text content")
+
+    image = models.TextField(
+        null=True, blank=True, help_text="Optional image to accompany the text content")
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -288,6 +289,7 @@ class TextContent(BaseActivity):
             "image": create_presigned_url(self.image) if self.image else None,
         }
 
+
 class Video(BaseActivity):
     """
     Model for video content within a lesson.
@@ -296,7 +298,7 @@ class Video(BaseActivity):
     video = models.TextField(
         help_text="URL of the video to be embedded"
     )
-    
+
     scrubbable = models.BooleanField(
         default=False,
         help_text="Whether the video can be scrubbed by the user"
@@ -315,6 +317,7 @@ class Video(BaseActivity):
             **super().to_dict(),
             "video": create_presigned_url(self.video),
         }
+
 
 class Writing(BaseActivity):
     """Model for writing activities where students provide written responses."""
@@ -379,6 +382,23 @@ class Quiz(BaseActivity):
             "passing_score": self.passing_score,
             "feedback_config": self.feedback_config,
             "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')]
+        }
+
+
+class Twine(BaseActivity):
+    """Model for Twine activities, which are interactive stories or games."""
+    file = models.TextField(
+        help_text="The Twine story as a built HTML file in string format"
+    )
+
+    class Meta(BaseActivity.Meta):
+        verbose_name = "twine activity"
+        verbose_name_plural = "twine activities"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "file": regex_image_sub(self.file, key_prefix="twine/", isJson=False),
         }
 
 
@@ -605,7 +625,7 @@ class DndMatch(BaseActivity):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "content": json.loads(re.sub(r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))", lambda m: f"image:{create_presigned_url(f"public/dndmatch/{m.group(1)}")}", json.dumps(self.content))),
+            "content": regex_image_sub(self.content, key_prefix="dndmatch/"),
         }
 
 
@@ -718,6 +738,22 @@ def create_presigned_url(s3_key):
     logger.info(f"Generated presigned URL: {response}")
     return response
 
+def regex_image_sub(tosub: any, key_prefix="", isJson: bool = True):
+    """Substitutes image URLs in the input string with presigned URLs.
+        Args:
+        tosub (str): The input string containing image URLs.
+        key_prefix (str): The prefix to add to the S3 key for the image.
+        isJson (bool): Whether the input is a JSON string or a regular string.
+    Returns:
+        str: The modified string with image URLs replaced by presigned URLs.
+    """
+    result = re.sub(
+        r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))", 
+        lambda m: f"image:{create_presigned_url(f'public/{key_prefix}{m.group(1)}')}",
+        isJson and json.dumps(tosub) or str(tosub)
+    )
+    return isJson and json.loads(result) or result
+    
 
 class LikertScale(BaseActivity):
     """"
@@ -1051,6 +1087,7 @@ class BaseResponse(models.Model):
             "associated_activity": self.associated_activity.id,
         }
 
+
 class VideoResponse(BaseResponse):
     """
     Response model for Video activities.
@@ -1072,6 +1109,7 @@ class VideoResponse(BaseResponse):
             **super().to_dict(),
             "watched_percentage": self.watched_percentage
         }
+
 
 class DndMatchResponse(BaseResponse):
     """
@@ -1140,6 +1178,22 @@ class TextContentResponse(BaseResponse):
         TextContent,
         on_delete=models.CASCADE,
         related_name='associated_textcontent',
+        help_text='The text content associated with this response'
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
+
+
+class TwineResponse(BaseResponse):
+    """Response model for Twine activities.
+    It's really just a boolean field to indicate if the user has completed the Twine activity."""
+    associated_activity = models.ForeignKey(
+        Twine,
+        on_delete=models.CASCADE,
+        related_name='associated_twine',
         help_text='The text content associated with this response'
     )
 
@@ -1246,7 +1300,6 @@ class LikertScaleResponse(BaseResponse):
         }
 
 
-
 class ActivityManager():
     """A centralized management class meant to streamline the process of creating and using a
     activities within the backend.
@@ -1332,7 +1385,8 @@ class ActivityManager():
                               "content": ["content", {}]})
         self.registerActivity(Video, VideoResponse, {
                               "watched_percentage": ["watched_percentage", 0.0]
-                          })
+                              })
+        self.registerActivity(Twine, TwineResponse)
 
 
 # Register on launch
