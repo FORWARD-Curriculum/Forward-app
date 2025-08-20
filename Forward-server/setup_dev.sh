@@ -14,7 +14,7 @@ python manage.py makemigrations
 # Run migrations
 python manage.py migrate
 
-#python manage.py collectstatic --noinput
+python manage.py collectstatic --noinput
 
 # Seed database with test data
 
