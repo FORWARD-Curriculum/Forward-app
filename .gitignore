@@ -4,3 +4,4 @@
 minio_data/
 .env*
 *.mp4
+Forward-server/staticfiles/*

@@ -244,6 +244,7 @@ class BaseActivity(models.Model):
 
     instructions = models.TextField(
         null=True,
+        blank=True,
         help_text="Instructions for completing the activity"
     )
 
@@ -1106,6 +1107,9 @@ class BaseResponse(models.Model):
     time_spent = models.PositiveIntegerField(default=0)
 
     attempts_left = models.PositiveIntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def to_dict(self):
         return {

@@ -22,6 +22,8 @@ python manage.py makemigrations
 # Run migrations
 python manage.py migrate
 
+python manage.py collectstatic --noinput
+
 # Seed database with test data
 
 python manage.py seed_defaults --reset defaults.json
