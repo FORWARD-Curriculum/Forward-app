@@ -4,38 +4,50 @@ import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/sonner";
 import { useClient } from "@/hooks/useClient";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store";
+import type { Route } from "./+types/layout";
+import { apiFetch } from "@/utils/utils";
+import type { User } from "@/features/account/types";
+import { setAuthLoading, setUser } from "@/features/account/slices/userSlice";
 
-export default function Layout() {
+// This runs only on browser reloads or initial page loads, as it its the highest level layout
+// it fetches the current user's data
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
+  const res = await apiFetch("/users/me");
+  const resp = await res.json();
+  const user =
+    (resp as { detail?: string; data?: { user: User } })?.data?.user ?? null;
+    console.log("clientLoader user", user);
+  return user;
+}
+
+export default function Layout({ loaderData }: Route.ComponentProps) {
   const { windowDimensions } = useClient();
-  const user = useSelector((state: RootState) => state.user.user);
+  const fetchUser = loaderData as User;
+  const { user, status } = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch();
 
-  // Get theme and text size, but they can be undefined if not set
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(setUser(fetchUser));
+    }
+  }, [fetchUser, user, status, dispatch]);
+
   const theme = user?.preferences?.theme;
   const textSize = user?.preferences?.text_size;
 
+  // Apply theme and text size classes to the root element, this fixes dialog and modal issues
   useEffect(() => {
-    const root = document.documentElement; // <html> tag
-
-    // Define all possible classes this effect can manage
+    const root = document.documentElement;
     const themeClasses = ["dark", "high-contrast"]; // Add any other theme classes
     const textSizeClasses = ["txt-sm", "txt-base", "txt-lg", "txt-xl"];
-
-    // 1. Start with a clean slate by removing all managed classes
     root.classList.remove(...themeClasses, ...textSizeClasses);
-
-    // 2. Create an array of the *valid* classes to add
-    const newClasses = [theme, textSize].filter(Boolean) as string[]; // filter(Boolean) removes any empty, null, or undefined values
-
-    // 3. Add the new classes if there are any
+    const newClasses = [theme, textSize].filter(Boolean) as string[];
     if (newClasses.length > 0) {
       root.classList.add(...newClasses);
     }
-
-    // The cleanup is now implicitly handled by the removal at the start of the effect.
-    // This is a more robust pattern than trying to remove the "previous" classes.
-  }, [theme, textSize]); // Rerun when theme or textSize changes
+  }, [theme, textSize]);
 
   return (
     <>

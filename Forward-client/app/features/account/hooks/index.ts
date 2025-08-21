@@ -44,15 +44,17 @@ export const useAuth = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      const result = await response.json();
+      if (!response.ok) {
+        // If the backend fails, we don't log the user out on the client.
+        const result = await response.json();
+        throw new Error(result.detail || "Server logout failed.");
+      }
 
-      dispatch(setUser(null));
+      //eagerly log out
       dispatch(resetResponseState());
       dispatch(resetInitialLessonState());
       
-      if (!response.ok) {
-        throw new Error(result.detail);
-      }
+      window.location.reload();
       
     } catch (error: any) {
       console.error(error.message || "Logout failed. Please try again.");
