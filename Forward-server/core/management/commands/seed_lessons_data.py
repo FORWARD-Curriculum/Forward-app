@@ -41,7 +41,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         json_file_path = Path(settings.BASE_DIR) / 'core' / 'management' / options['json_file']
         activity_manager = ActivityManager() # Get the singleton instance
-        seed_minIO_folder = json_file_path.parent # Will be used to construct minio asset folder path, if an image needs to be uploaded to minio
+        self.seed_minIO_folder = json_file_path.parent # Will be used to construct minio asset folder path, if an image needs to be uploaded to minio
 
         # Read the JSON file
         try:
@@ -378,7 +378,7 @@ class Command(BaseCommand):
             # Creates client and creates bucket
             s3_client = boto3.client(
                 's3',
-                endpoint_url='http://minio:9000',   # upload enpoint
+                endpoint_url='http://minio:9000',   # upload endpoint
                 aws_access_key_id='minioadmin',   # maybe need to change these to os.getenv
                 aws_secret_access_key='minioadmin'  
             )

@@ -179,6 +179,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Sets up the django-storages s3 configuration with minio container
 
 if DEBUG: # uses Minio for development
+    print("Development mode active")
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3.S3Storage",
@@ -190,7 +191,7 @@ if DEBUG: # uses Minio for development
                 "custom_domain": "localhost:9000/media-bucket",
                 "url_protocol": "http:",
                 "default_acl": "public-read",
-                "querystring_auth": False, 
+                "querystring_auth": False,
                 "use_ssl": False # set to false for local development
             }
         },
@@ -200,15 +201,15 @@ if DEBUG: # uses Minio for development
         }
     }
 else: # Production with s3 bucket configuration
+    print("Production mode active")
     STORAGES= {
         "default": {
             "BACKEND": "storages.backends.s3.S3Storage",
             "OPTIONS":{
-                "bucket_name": os.getenv("AWS_MEDIA_BUCKET_NAME"),
-                "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
-                "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
-                "default_acl": "private",
-                "querystring_auth": True, 
+                "bucket_name": os.getenv("PROD_AWS_MEDIA_BUCKET_NAME"),
+                "access_key": os.getenv("PROD_AWS_ACCESS_KEY_ID"),
+                "secret_key": os.getenv("PROD_AWS_SECRET_ACCESS_KEY"), 
+                "region_name": os.getenv("PROD_AWS_REGION"),
                 "use_ssl": True
             }
         },

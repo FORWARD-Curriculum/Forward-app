@@ -7,6 +7,7 @@ import boto3 # pyright: ignore[reportMissingImports]
 from django.conf import settings
 from botocore.exceptions import ClientError # pyright: ignore[reportMissingImports]
 import logging
+
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
 # while allowing us to add our own custom fields and methods
@@ -598,14 +599,19 @@ class Concept(BaseActivity):
     def create_presigned_urls(self, minio_path):
         
         logger = logging.getLogger(__name__)
+        
+        # Get settings from your STORAGES configuration
+        storage_options = settings.STORAGES['default']['OPTIONS']
         s3_client = boto3.client(
             's3',
-            endpoint_url = 'http://localhost:9000', # browser access endpoint
-            aws_access_key_id='minioadmin', # these should probably be changed to getenv calls, or maybe a default storage call
-            aws_secret_access_key='minioadmin'  
+            endpoint_url=storage_options.get('endpoint_url'),  # None for AWS S3
+            aws_access_key_id=storage_options.get('access_key'),
+            aws_secret_access_key=storage_options.get('secret_key'),
+            region_name=storage_options.get('region_name'),
+            use_ssl=storage_options.get('use_ssl', True)
         )
 
-        bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
+        bucket_name = storage_options['bucket_name']
         try:
             response = s3_client.generate_presigned_url(
                 'get_object',
