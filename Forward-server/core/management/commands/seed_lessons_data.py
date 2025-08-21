@@ -371,38 +371,43 @@ class Command(BaseCommand):
                 return self._upload_image_to_bucket(image_filename)
 
         # this error would be thrown if no existing bucket      
-        except:
-            self.stdout.write(self.style.ERROR('No bucket found.'))
-            self.stdout.write(self.style.ERROR('Creating bucket'))
+        except Exception as e:
             
-            # Creates client and creates bucket
-            s3_client = boto3.client(
-                's3',
-                endpoint_url='http://minio:9000',   # upload endpoint
-                aws_access_key_id='minioadmin',   # maybe need to change these to os.getenv
-                aws_secret_access_key='minioadmin'  
-            )
-            bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
-            s3_client.create_bucket(Bucket=bucket_name)
-            self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
+            # Want to log the specific error
+            self.stdout.write(self.style.ERROR(f'Storage error: {str(e)}'))
+
+            #Create a minio bucket if this is development mode
+            if settings.DEBUG:
+
+                self.stdout.write(self.style.WARNING('Development mode: Creating MinIO bucket'))
             
-            # This can be used if you ever wish to set the bucket policy to public
-            # public_read_policy = {
-            #     "Version": "2012-10-17",
-            #     "Statement": [
-            #         {
-            #             "Effect": "Allow",
-            #             "Principal": "*",
-            #             "Action": "s3:GetObject",
-            #             "Resource": f"arn:aws:s3:::{bucket_name}/*"
-            #         }
-            #     ]
-            # }
-            # s3_client.put_bucket_policy(
-            #     Bucket=bucket_name,
-            #     Policy=json.dumps(public_read_policy)
-            # )
-            # self.stdout.write(self.style.SUCCESS(f'Bucket policy set to public read'))
+                self.create_minio_bucket()
+                
+                # Now upload the image after creating the bucket
+                return self._upload_image_to_bucket(image_filename)
+            else:
+
+                # Production mode, don't try to create buckets. This should be done in AWS first and the 
+                # Correct bucket name given to PROD_AWS_MEDIA_BUCKET_NAME in .env variables
+                self.stdout.write(self.style.ERROR(
+                    f'Production error: Bucket or file access failed for {image_filename}. '
+                    'Skipping this image. Please ensure S3 bucket exists and permissions are correct.'
+                ))
+                return None  
             
-            # Now upload the image after creating the bucket
-            return self._upload_image_to_bucket(image_filename)
+    # Creates bucket in development if none has been created yet
+    def create_minio_bucket(self):
+                
+        s3_client = boto3.client(
+            's3',
+            endpoint_url='http://minio:9000',   # upload endpoint
+            aws_access_key_id='minioadmin',   # maybe need to change these to os.getenv
+            aws_secret_access_key='minioadmin'  
+        )
+        bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
+        s3_client.create_bucket(Bucket=bucket_name)
+        self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
+        self.stdout.write(self.style.SUCCESS(f'MinIO bucket created: {bucket_name}'))
+
+                
+

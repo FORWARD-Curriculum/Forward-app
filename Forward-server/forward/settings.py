@@ -188,7 +188,7 @@ if DEBUG: # uses Minio for development
                 "access_key": "minioadmin",
                 "secret_key": "minioadmin",
                 "endpoint_url": "http://minio:9000",
-                "custom_domain": "localhost:9000/media-bucket",
+                "custom_domain": "http://localhost:9000", # test
                 "url_protocol": "http:",
                 "default_acl": "public-read",
                 "querystring_auth": False,
