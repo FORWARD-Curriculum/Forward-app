@@ -8,7 +8,6 @@ export default function LikertScale({
 }: {
   likertScale: LikertScale;
 }) {
-  // A ref to store timeout IDs for each slider, persisting across re-renders
   const debounceTimers = useRef<{ [key: number]: NodeJS.Timeout }>({});
 
   const [response, setResponse] = useResponse<LikertScaleResponse, LikertScale>(
@@ -34,7 +33,6 @@ export default function LikertScale({
     }));
   };
 
-  // Memoize the handler to prevent it from being recreated on every render
   const handleRangeInput = useCallback(
     (e: React.FormEvent<HTMLInputElement>, index: number): void => {
       const el = e.currentTarget;
@@ -43,11 +41,9 @@ export default function LikertScale({
       const val = Number(el.value);
       const isContinuous = el.step === "any";
 
-      // 1. Provide immediate visual feedback for a smooth user experience
       const pct = ((val - minVal) / (maxVal - minVal)) * 100;
       el.style.setProperty("--progress", `${pct}%`);
 
-      // 2. Define the state update logic
       const updateState = () => {
         setResponse((old) => {
           const newSelection = [...old.content.selection];
@@ -60,21 +56,22 @@ export default function LikertScale({
             },
           };
         });
+        setResponse((old) => ({
+          ...old,
+          partial_response: old.content.selection.every((v) => v !== null),
+        }));
       };
 
-      // 3. Conditionally debounce the state update
       if (isContinuous) {
         if (debounceTimers.current[index]) {
           clearTimeout(debounceTimers.current[index]);
         }
-        // Set a new timer. The state will only update after 250ms of inactivity.
         debounceTimers.current[index] = setTimeout(updateState, 250);
       } else {
-        // If the slider is not continuous, update the state immediately
         updateState();
       }
     },
-    [setResponse], // Dependency for useCallback
+    [setResponse],
   );
 
   return (
@@ -115,7 +112,6 @@ export default function LikertScale({
                 {item.statement}
               </span>
 
-              {/* Slider */}
               <div className="mt-2 px-1 md:px-2">
                 <input
                   id={rangeId}
@@ -138,7 +134,6 @@ export default function LikertScale({
                 />
 
                 <div className="relative pt-8">
-                  {/* Labels container */}
                   <div className="pointer-events-none absolute top-2 right-1 left-1">
                     {scale.map((option, i) => {
                       const pct = n > 1 ? (i / (n - 1)) * 98 + 0.95 : 0;
@@ -154,7 +149,6 @@ export default function LikertScale({
                     })}
                   </div>
 
-                  {/* Datalist (native ticks where supported) */}
                   <datalist id={rangeId}>
                     {scale.map((_, i) => (
                       <option key={i} value={i} />

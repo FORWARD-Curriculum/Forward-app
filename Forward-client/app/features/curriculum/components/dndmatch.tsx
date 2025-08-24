@@ -25,7 +25,7 @@ import { useResponse } from "../hooks";
 
 const ITEM_POOL_ID = "item-pool";
 
-// Utility function to shuffle an array
+// shuffle an array
 function shuffle<T>(array: T[]): T[] {
   const newArray = [...array];
   for (let i = newArray.length - 1; i > 0; i--) {
@@ -35,8 +35,6 @@ function shuffle<T>(array: T[]): T[] {
   return newArray;
 }
 
-// --- CHANGE 1: Define DraggableItem component outside of DndMatch ---
-// It now receives all the data it needs via props.
 interface DraggableItemProps {
   id: string;
   label: string;
@@ -81,8 +79,6 @@ const DraggableItem: FC<DraggableItemProps> = ({ id, label, isDraggable }) => {
   );
 };
 
-// --- CHANGE 2: Define DropZone component outside of DndMatch ---
-// It also receives data via props, including the data needed by DraggableItem.
 interface DropZoneProps {
   id: string;
   label: string;
@@ -135,15 +131,12 @@ const DropZone: FC<DropZoneProps> = ({
 };
 
 export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
-  // --- State Management ---
   const [response, setResponse] = useResponse<DndMatchResponse, DndMatch>({
     type: "DndMatch",
     activity: dndmatch,
     initialFields: {
       submission: Array.from({ length: dndmatch.content.length }, () => []),
       attempts_left: 3,
-      // --- CHANGE 3: Initialize partial_response to true ---
-      // This allows dragging from the start.
       partial_response: true,
     },
   });
@@ -153,7 +146,6 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
     Record<string, "correct" | "incorrect">
   >({});
 
-  // --- Derived Data & Memoization ---
   const { targetIds, allItemsById, correctAnswers, allItemIds } =
     useMemo(() => {
       const targets = dndmatch.content;
@@ -207,7 +199,6 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
     }),
   );
 
-  // --- Event Handlers ---
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
     setValidationResults({});
@@ -345,7 +336,6 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
               const label = item[0];
               return (
                 label && (
-                  // --- CHANGE 4: Use the new DropZone and pass props ---
                   <DropZone
                     key={targetId}
                     id={targetId}
@@ -359,8 +349,7 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
               );
             })}
           </div>
-
-          {/* --- CHANGE 5: Use the new DropZone for the item bank too --- */}
+          
           <DropZone
             id={ITEM_POOL_ID}
             label="Item Bank"
@@ -388,7 +377,6 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
         </div>
 
         <DragOverlay>
-          {/* --- CHANGE 6: Use the new DraggableItem in the overlay --- */}
           {activeItem ? (
             <DraggableItem
               id={activeItem.id}
@@ -397,7 +385,6 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
             />
           ) : null}
         </DragOverlay>
-        {/* {JSON.stringify(response)} */}
       </DndContext>
     </>
   );

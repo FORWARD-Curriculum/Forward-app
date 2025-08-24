@@ -278,8 +278,6 @@ class Command(BaseCommand):
                 
     def regex_image_upload(self, content, key_prefix="", subfolder=""):
         images = re.findall(r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))", str(content))
-        print(f"DEBUG: Found {len(images)} images to upload in content.")
-        print(f"DEBUG: Key prefix for images: {[str(m) +"\n" for m in images]}")
         [self.bucket_url_call(f"{subfolder}{m[0]}",key_prefix) for m in images]
         
     def _create_questions(self, quiz, questions_data):
@@ -345,8 +343,7 @@ class Command(BaseCommand):
         for order, concept_data in enumerate(concepts_data, start=1):
 
             image_filename = concept_data.get('image')
-            image_url = self.bucket_url_call(image_filename)
-            print(f"DEBUG: About to save image: {image_url}")
+            self.bucket_url_call(image_filename)
             # Prepare defaults for the Concept model
             concept_defaults = {
                 'title': concept_data.get('title', f'Concept {order}'), # Use title from data or default
@@ -385,18 +382,19 @@ class Command(BaseCommand):
         with open(final_path, 'rb') as f:
             saved_path = default_storage.save(f"public/{key_prefix}{Path(image_filename).name}", f) # the default storage is the s3/minio configured in djanago settings, its uses boto under the hood
             url = default_storage.url(saved_path)
-            self.stdout.write(self.style.SUCCESS(f'Image uploaded, url: {saved_path}'))
-            # return default_storage.url(saved_path)
+            self.stdout.write(".UPLOADED")
             return url
 
 
     def bucket_url_call(self, image_filename, key_prefix=''):
+        self.stdout.write(f"{f"  UPLOADING: '{image_filename}' INTO 'public/{key_prefix}'":.<77}",ending="")
         final_s3_key = f"public/{key_prefix}{Path(image_filename).name}"
 
         try:
             # Use the consistently generated key for the check
             if default_storage.exists(final_s3_key):
                 # And use it to generate the URL
+                self.stdout.write("CACHE HIT")
                 return default_storage.url(final_s3_key)
             else:
                 # File doesn't exist, upload it.

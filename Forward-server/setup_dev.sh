@@ -4,7 +4,7 @@
 set -e
 
 # Print commands
-# set -x
+set -x
 
 echo "Setting up Django development environment..."
 
@@ -15,8 +15,6 @@ source .venv/bin/activate # Uncomment for Mac/Linux
 
 # Install dependencies
 pip install -r requirements.txt -q
-
-python manage.py makemigrations
 
 # Run migrations
 python manage.py makemigrations
