@@ -415,7 +415,7 @@ class Question(models.Model):
             "quiz_id": self.quiz_id,
             "question_text": self.question_text,
             "question_type": self.question_type,
-            "has_orrect_answer": self.has_correct_answer,
+            "has_correct_answer": self.has_correct_answer,
             "choices": self.choices,
             "is_required": self.is_required,
             "order": self.order,
