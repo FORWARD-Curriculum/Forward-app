@@ -254,7 +254,67 @@ button {
   cursor: pointer;
 }
 
+@layer components {
+  /* Base range styling */
+  .likert-range {
+    /* Tweak these per-input if you want */
+    --track-h: 0.75rem; /* 8px track */
+    --thumb: 1.75rem; /* 20px thumb */
 
+    @apply appearance-none w-full bg-transparent;
+  }
+
+  /* WebKit (Chrome, Safari, Edge) */
+  .likert-range::-webkit-slider-runnable-track {
+    height: var(--track-h);
+    @apply rounded-full bg-primary-foreground;
+    background: linear-gradient(
+      to right,
+      color-mix(in oklch, theme(--color-accent), black 5%) 0%,
+      theme(--color-accent) var(--progress, 50%),
+      theme(--color-muted) var(--progress, 50%),
+      theme(--color-muted) 100%
+    );
+  }
+
+  .likert-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: var(--thumb);
+    height: var(--thumb);
+    margin-top: calc((var(--track-h) - var(--thumb)) / 2);
+    @apply rounded-full bg-primary-foreground border-2 border-accent shadow
+      transition ring-4 ring-accent/0 hover:ring-accent/20
+      active:ring-accent/30;
+  }
+
+  /* Firefox */
+  .likert-range::-moz-range-track {
+    height: var(--track-h);
+    @apply rounded-full bg-muted;
+  }
+
+  .likert-range::-moz-range-progress {
+    height: var(--track-h);
+    @apply rounded-full bg-accent;
+  }
+
+  .likert-range::-moz-range-thumb {
+    width: var(--thumb);
+    height: var(--thumb);
+    @apply rounded-full bg-primary-foreground border-2 border-accent shadow
+      transition ring-4 ring-accent/0 hover:ring-accent/20
+      active:ring-accent/30;
+  }
+
+  .likert-range:focus-visible {
+    @apply outline-none ring-4 ring-accent/20;
+  }
+
+  .likert-range:disabled {
+    @apply opacity-60 cursor-not-allowed;
+  }
+}
 
 @layer base {
   :root {

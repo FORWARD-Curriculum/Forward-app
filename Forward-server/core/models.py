@@ -2,11 +2,15 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
 from django.urls import reverse
+from django.contrib.postgres.fields import ArrayField
 import uuid
-import boto3 # pyright: ignore[reportMissingImports]
+import boto3  # pyright: ignore[reportMissingImports]
 from django.conf import settings
-from botocore.exceptions import ClientError # pyright: ignore[reportMissingImports]
+# pyright: ignore[reportMissingImports]
+from botocore.exceptions import ClientError
 import logging
+import re
+import json
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
 # while allowing us to add our own custom fields and methods
@@ -258,8 +262,13 @@ class TextContent(BaseActivity):
     """
     # User's generated uuid
     content = models.TextField(
+        null=True, blank=True,
         help_text="The main content text, can include HTML/markdown formatting"
+
     )
+
+    image = models.TextField(
+        null=True, blank=True, help_text="Optional image to accompany the text content")
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -277,6 +286,36 @@ class TextContent(BaseActivity):
         return {
             **super().to_dict(),
             "content": self.content,
+            "image": create_presigned_url(self.image) if self.image else None,
+        }
+
+
+class Video(BaseActivity):
+    """
+    Model for video content within a lesson.
+    Can be used to embed videos from external sources or local files.
+    """
+    video = models.TextField(
+        help_text="URL of the video to be embedded"
+    )
+
+    scrubbable = models.BooleanField(
+        default=False,
+        help_text="Whether the video can be scrubbed by the user"
+    )
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "video content"
+        verbose_name_plural = "video contents"
+
+    def __str__(self):
+        return f"Video Content: {self.title}"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "video": create_presigned_url(self.video),
         }
 
 
@@ -343,6 +382,23 @@ class Quiz(BaseActivity):
             "passing_score": self.passing_score,
             "feedback_config": self.feedback_config,
             "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')]
+        }
+
+
+class Twine(BaseActivity):
+    """Model for Twine activities, which are interactive stories or games."""
+    file = models.TextField(
+        help_text="The Twine story as a built HTML file in string format"
+    )
+
+    class Meta(BaseActivity.Meta):
+        verbose_name = "twine activity"
+        verbose_name_plural = "twine activities"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "file": regex_image_sub(self.file, key_prefix="twine/", isJson=False),
         }
 
 
@@ -532,6 +588,47 @@ class Embed(BaseActivity):
             "has_code": self.code is not None,
         }
 
+
+class DndMatch(BaseActivity):
+    """Model for drag-and-drop matching activities"""
+
+    """
+        Stored as an Array of Arrays, in which the first element is the drop target
+        and the second and onwards are the drag items. Null values are allowed, and
+        correspond to items that have no counterpart associated with them.
+        
+        Any item may be prefixed with "image:" to indicate that it is an image URL.
+        These will be stored in the S3 bucket, and served as presigned URLs on request,
+        inlined with the data. They will also be prefixed with "image:" in the payload to
+        the frontend to indicate that they are images.
+        
+        Example:
+        [
+            ["Trade School", "image:welder.png", "image:electrician.png"],
+            ["University", "programmer", "ecologist"],
+            ["Typically offers associate level programs for 2 years of study.", "Community College"],
+            [null,"red herring drag"],
+            ["red herring drop", null]
+        ]
+    """
+
+    content = models.JSONField(
+        help_text="List of arrays to match in the format [[drop, drag], ...]"
+    )
+
+    def incorrect_matches(self):
+        """Returns a list of the top 3 consistently incorrect matches made by users"""
+        responses = DndMatchResponse.objects.filter(
+            associated_activity=self
+        )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": regex_image_sub(self.content, key_prefix="dndmatch/"),
+        }
+
+
 class ConceptMap(BaseActivity):
     """Model for mapping concepts to each other"""
     content = models.CharField(
@@ -546,10 +643,11 @@ class ConceptMap(BaseActivity):
             "concepts": [c.to_dict() for c in Concept.objects.filter(concept_map=self).order_by('order')]
         }
 
+
 class Concept(BaseActivity):
     """Model for a concept in the concept map"""
     # TODO use jsonschema to enforce and validate the schema of the example field
-    
+
     """
     {
       "type": "array",
@@ -575,60 +673,36 @@ class Concept(BaseActivity):
       },
     }
     """
-    
+
     concept_map = models.ForeignKey(
         ConceptMap,
         on_delete=models.CASCADE,
         related_name="concepts",
         help_text="The concept map this concept belongs to"
     )
-    
+
     image = models.TextField(blank=True, null=True)
-    
+
     description = models.TextField(
         help_text="A detailed description of the concept"
     )
-    
+
     examples = models.JSONField(
         default=list,
         help_text="List of examples for this concept"
     )
-
-    # Helper method to generate presigned urls
-    def create_presigned_urls(self, minio_path):
-        
-        logger = logging.getLogger(__name__)
-        s3_client = boto3.client(
-            's3',
-            endpoint_url = 'http://localhost:9000', # browser access endpoint
-            aws_access_key_id='minioadmin', # these should probably be changed to getenv calls, or maybe a default storage call
-            aws_secret_access_key='minioadmin'  
-        )
-
-        bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
-        try:
-            response = s3_client.generate_presigned_url(
-                'get_object',
-                Params={'Bucket': bucket_name, 'Key': minio_path},
-                ExpiresIn= 3600, # 3 hour expiration time at the moment
-            )
-        except ClientError as e:
-            logger.error(f"Failed to generate presigned URL: {e}")
-            return None
-        
-        logger.info(f"Generated presigned URL: {response}")
-        return response
 
     def to_dict(self):
 
         logger = logging.getLogger(__name__)
 
         try:
-            image_url = self.create_presigned_urls(self.image) if self.image else None
+            image_url = create_presigned_url(
+                self.image) if self.image else None
         except Exception as e:
             logger.error(f"Error generating presigned URL: {e}")  # Debug print
             image_url = None
-        
+
         return {
             **super().to_dict(),
             "id": self.id,
@@ -636,6 +710,95 @@ class Concept(BaseActivity):
             "image": image_url,
             "description": self.description,
             "examples": self.examples,
+        }
+
+# Helper method to generate presigned urls
+
+
+def create_presigned_url(s3_key):
+    logger = logging.getLogger(__name__)
+    s3_client = boto3.client(
+        's3',
+        endpoint_url='http://localhost:9000',  # browser access endpoint
+        # these should probably be changed to getenv calls, or maybe a default storage call
+        aws_access_key_id='minioadmin',
+        aws_secret_access_key='minioadmin'
+    )
+    bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
+    try:
+        response = s3_client.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': bucket_name, 'Key': s3_key},
+            ExpiresIn=3600,  # 3 hour expiration time at the moment
+        )
+    except ClientError as e:
+        logger.error(f"Failed to generate presigned URL: {e}")
+        return None
+
+    logger.info(f"Generated presigned URL: {response}")
+    return response
+
+def regex_image_sub(tosub: any, key_prefix="", isJson: bool = True):
+    """Substitutes image URLs in the input string with presigned URLs.
+        Args:
+        tosub (str): The input string containing image URLs.
+        key_prefix (str): The prefix to add to the S3 key for the image.
+        isJson (bool): Whether the input is a JSON string or a regular string.
+    Returns:
+        str: The modified string with image URLs replaced by presigned URLs.
+    """
+    result = re.sub(
+        r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))", 
+        lambda m: f"image:{create_presigned_url(f'public/{key_prefix}{m.group(1)}')}",
+        isJson and json.dumps(tosub) or str(tosub)
+    )
+    return isJson and json.loads(result) or result
+    
+
+class LikertScale(BaseActivity):
+    """"
+    "type": "array",
+    "items": {
+    "type": "object",
+    "properties": {
+      "explain": {
+        "type": "boolean",
+        "description": "Indicates whether an explanation is required for the statement."
+      },
+      "statement": {
+        "type": "string",
+        "description": "The statement or question being presented."
+      },
+      "map": {
+        "type": "array",
+        "description": "Possible answer options or numeric scale values.",
+        "items": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "description": "Numeric scale value (e.g., 0–5)."
+            },
+            {
+              "type": "string",
+              "description": "Textual option (e.g., Likert scale labels)."
+            }
+          ]
+        }
+      }
+    },
+    """
+    content = models.JSONField(
+
+    )
+
+    class Meta:
+        verbose_name = "likert scale"
+        verbose_name_plural = "likert scales"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content
         }
 
 # TODO: Make quiz and question response inherit from BaseResponse, or make
@@ -695,7 +858,7 @@ class UserQuizResponse(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['user', 'associated_activity'] # TODO
+        unique_together = ['user', 'associated_activity']  # TODO
         verbose_name = 'quiz response'
         verbose_name_plural = 'quiz responses'
 
@@ -740,6 +903,7 @@ class UserQuizResponse(models.Model):
             "time_spent": self.time_spent,
             "question_responses": [qr.to_dict() for qr in self.question_responses.all()]
         }
+
 
 class UserQuestionResponse(models.Model):
     """
@@ -924,6 +1088,74 @@ class BaseResponse(models.Model):
         }
 
 
+class VideoResponse(BaseResponse):
+    """
+    Response model for Video activities.
+    """
+    associated_activity = models.ForeignKey(
+        Video,
+        on_delete=models.CASCADE,
+        related_name='associated_video',
+        help_text='The video activity associated with this response'
+    )
+
+    watched_percentage = models.FloatField(
+        default=0.0,
+        help_text="Percentage of the video that has been watched"
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "watched_percentage": self.watched_percentage
+        }
+
+
+class DndMatchResponse(BaseResponse):
+    """
+    Response model for DndMatch activities.
+    """
+    associated_activity = models.ForeignKey(
+        DndMatch,
+        on_delete=models.CASCADE,
+        related_name='associated_dndmatch',
+        help_text='The DnD match activity associated with this response'
+    )
+
+    """
+    The submission field is a list of list of typles where each inner list contains a tuple of indices into the
+    origial content array of the DnDMatch activity. 
+    
+    Take for example the following content:
+    [
+            ["Trade School", "image:welder.png", "image:electrician.png"],
+            ["University", "programmer", "ecologist"],
+            ["Typically offers associate level programs for 2 years of study.", "Community College"],
+            [null,"red herring drag"],
+            ["red herring drop", null]
+    ]
+    
+    an example of a partial submission with no incorrect answers would be:
+    [
+        [[0, 1], [0, 2]],
+        [[1, 2], [1, 1]],
+    ]
+    
+    an example of a full submission with one incorrect answer would be:
+    [
+        [[0, 1], [3, 1]],
+    ]
+    
+    """
+    submission = models.JSONField()
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "submission": self.submission
+        }
+
+
 class WritingResponse(BaseResponse):
     associated_activity = models.ForeignKey(
         Writing,
@@ -946,6 +1178,22 @@ class TextContentResponse(BaseResponse):
         TextContent,
         on_delete=models.CASCADE,
         related_name='associated_textcontent',
+        help_text='The text content associated with this response'
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
+
+
+class TwineResponse(BaseResponse):
+    """Response model for Twine activities.
+    It's really just a boolean field to indicate if the user has completed the Twine activity."""
+    associated_activity = models.ForeignKey(
+        Twine,
+        on_delete=models.CASCADE,
+        related_name='associated_twine',
         help_text='The text content associated with this response'
     )
 
@@ -1018,6 +1266,7 @@ class EmbedResponse(BaseResponse):
             "inputted_code": self.inputted_code
         }
 
+
 class ConceptMapResponse(BaseResponse):
     associated_activity = models.ForeignKey(
         ConceptMap,
@@ -1030,6 +1279,26 @@ class ConceptMapResponse(BaseResponse):
         return {
             **super().to_dict(),
         }
+
+
+class LikertScaleResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        LikertScale,
+        on_delete=models.CASCADE,
+        related_name='associated_likertscale',
+        help_text='The likert scale associated with this response'
+    )
+
+    content = models.JSONField(
+        help_text="The user's responses to the likert scale"
+    )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content
+        }
+
 
 class ActivityManager():
     """A centralized management class meant to streamline the process of creating and using a
@@ -1046,7 +1315,8 @@ class ActivityManager():
 
     registered_activities: dict[str, tuple[BaseActivity, BaseResponse,
                                            dict[str, tuple[str, any]], bool]] = {}
-    registered_services: dict[str, dict[BaseActivity, callable]] = {"response": {}}
+    registered_services: dict[str,
+                              dict[BaseActivity, callable]] = {"response": {}}
 
     def registerActivity(self,
                          ActivityClass: BaseActivity,
@@ -1087,8 +1357,9 @@ class ActivityManager():
         if service_type not in self.registered_services:
             raise ValueError(
                 f"{service_type} is an invalid service type.")
-            
-        self.registered_services[service_type][ActivityClass.__name__.lower()] = service
+
+        self.registered_services[service_type][ActivityClass.__name__.lower(
+        )] = service
 
     def __init__(self):
         if self._initialized:
@@ -1106,7 +1377,16 @@ class ActivityManager():
         self.registerActivity(Embed, EmbedResponse, {
                               "inputted_code": ["inputted_code", None]})
         self.registerActivity(ConceptMap, ConceptMapResponse)
-        self.registerActivity(Concept, None, child_class=True) # None here means no response is expected
+        # None here means no response is expected
+        self.registerActivity(Concept, None, child_class=True)
+        self.registerActivity(DndMatch, DndMatchResponse, {
+                              "submission": ["submission", []]})
+        self.registerActivity(LikertScale, LikertScaleResponse, {
+                              "content": ["content", {}]})
+        self.registerActivity(Video, VideoResponse, {
+                              "watched_percentage": ["watched_percentage", 0.0]
+                              })
+        self.registerActivity(Twine, TwineResponse)
 
 
 # Register on launch

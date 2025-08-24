@@ -82,7 +82,7 @@ CORS_ALLOW_METHODS = [
    'PUT',
 ]
 
-CORS_ALLOW_HEADERS = ['*'
+CORS_ALLOW_HEADERS = ['*',
     'accept',
     'accept-encoding',
     'authorization',
@@ -100,6 +100,8 @@ SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = 'None'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 ROOT_URLCONF = 'forward.urls'
 
@@ -127,8 +129,12 @@ WSGI_APPLICATION = 'forward.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        "NAME": os.environ.get("DB_NAME", "forward_db"),
+        "USER": os.environ.get("DB_USER", "forward_user"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", "forward_password"),
+        "HOST": os.environ.get("DB_HOST", "localhost"),
+        "PORT": os.environ.get("DB_PORT", "5432"),
     }
 }
 
