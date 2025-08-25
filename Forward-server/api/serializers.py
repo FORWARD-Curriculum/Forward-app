@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager, Poll, PollQuestion, UserQuestionResponse
+from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager, Facility
 from django.core.exceptions import ImproperlyConfigured
 
 
@@ -16,6 +16,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     - Required fields are provided
     - User creation follows service layer pattern
     """
+    
+    facility = serializers.SlugRelatedField(
+        slug_field='code', 
+        queryset=Facility.objects.all(), 
+    )
+    
     password = serializers.CharField(
         write_only=True,
         required=True,
@@ -29,6 +35,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         required=True,
         style={'input_type': 'password'}
     )
+    
+    def validate_facility(self, value):
+        return Facility.objects.filter(code__iexact=value.code).first() or value
 
     class Meta:
         model = User
@@ -37,10 +46,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'password',
             'password_confirm',
             'display_name',
-            'facility_id',
+            'facility',
             'consent'
         ]
-        # Override default optional fields to make them required
         extra_kwargs = {
             'display_name': {'required': True},
         }
@@ -48,21 +56,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         """
         Perform cross-field validation.
-
-        Args:
-            attrs (dict): Dictionary of field values to validate
-
-        Returns:
-            dict: Validated data
-
-        Raises:
-            serializers.ValidationError: If passwords don't match
         """
-        # Check if passwords match
         if attrs['password'] != attrs['password_confirm']:
             raise serializers.ValidationError({
                 "password": "Password fields didn't match."
             })
+        
         return attrs
 
     def create(self, validated_data: dict):

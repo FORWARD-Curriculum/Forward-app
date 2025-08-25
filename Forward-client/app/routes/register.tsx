@@ -15,17 +15,21 @@ export default function Login() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
+    
+
     const formData = new FormData(e.target);
+    const bm = (formData.get("birth_month")??"00") as string;
+    const by = (formData.get("birth_year")?.slice(2,5)??"XX") as string;
     const username = (formData.get("first_name")?.toString().toLowerCase().slice(0,2)??"")
                     +(formData.get("last_name")?.toString().toLowerCase().slice(0,2)??"")
-                    +(formData.get("birth_month")??"00")
-                    +(formData.get("birth_year")?.slice(2,5)??"XX");
+                    +bm[0] + by[0] + bm[1] + by[1];
     const data = {
 
       username,
       display_name: username,
       password: formData.get("password"),
       password_confirm: formData.get("password2"),
+      facility: (formData.get("facility") as string).toLowerCase()
 
     };
 
@@ -176,12 +180,12 @@ export default function Login() {
             />
           </div>
           <div>
-            <label htmlFor="institution">Institution ID</label>
+            <label htmlFor="facility">Facility ID</label>
             <Input
               type="text"
-              name="institution"
-              id="institution"
-              placeholder="Institution ID"
+              name="facility"
+              id="facility"
+              placeholder="Facility ID"
               className="input min-w-[25vw]"
             />
           </div>

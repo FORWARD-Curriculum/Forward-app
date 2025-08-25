@@ -16,6 +16,18 @@ import json
 # while allowing us to add our own custom fields and methods
 
 
+class Facility(models.Model):
+    """
+    Represents an facility that users can be associated with.
+    """
+    name = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=50, unique=True,
+                            help_text="Unique code for the facility, used for user association on signup")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class User(AbstractUser):
     class Meta:
         verbose_name = 'user'
@@ -37,20 +49,19 @@ class User(AbstractUser):
         help_text='the uuid of the database item'
     )
 
+    facility = models.ForeignKey(
+        Facility,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        help_text="The facility this user is associated with, if any"
+    )
+
     # User's first name - minimum 2 characters required
     display_name = models.CharField(
         'display name',
         max_length=50,
         validators=[MinLengthValidator(2)],
-    )
-
-    # Facility Id - Still need to decide how we are implementing
-    facility_id = models.CharField(
-        'facility id',
-        null=True,
-        max_length=50,
-        validators=[MinLengthValidator(2)],
-        blank=True
     )
 
     # Optional
@@ -110,9 +121,18 @@ class User(AbstractUser):
 
     def to_dict(self):
         return {
-            "id": self.id,
-            "username": self.username,
-            "display_name": self.display_name,
+            'id': self.id,
+            'username': self.username,
+            'display_name': self.display_name,
+            'facility': self.facility.name if self.facility else None,
+            'profile_picture': self.profile_picture,
+            'consent': self.consent,
+            'preferences': {
+                'theme': self.theme,
+                'text_size': self.text_size,
+                'speech_uri_index': self.speech_uri_index,
+                'speech_speed': self.speech_speed
+            }
         }
 
 
@@ -738,6 +758,7 @@ def create_presigned_url(s3_key):
     logger.info(f"Generated presigned URL: {response}")
     return response
 
+
 def regex_image_sub(tosub: any, key_prefix="", isJson: bool = True):
     """Substitutes image URLs in the input string with presigned URLs.
         Args:
@@ -748,12 +769,12 @@ def regex_image_sub(tosub: any, key_prefix="", isJson: bool = True):
         str: The modified string with image URLs replaced by presigned URLs.
     """
     result = re.sub(
-        r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))", 
+        r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))",
         lambda m: f"image:{create_presigned_url(f'public/{key_prefix}{m.group(1)}')}",
         isJson and json.dumps(tosub) or str(tosub)
     )
     return isJson and json.loads(result) or result
-    
+
 
 class LikertScale(BaseActivity):
     """"

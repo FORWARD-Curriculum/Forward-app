@@ -10,7 +10,7 @@ import re
 
 # Import all necessary models, including the ActivityManager
 from core.models import (
-    User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
+    Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
     Identification, Embed, ActivityManager, UserQuizResponse, UserQuestionResponse,
     Concept, ConceptMap
 )
@@ -21,7 +21,6 @@ MODEL_DELETE_ORDER = [
     Question, PollQuestion, UserQuizResponse, UserQuestionResponse, # Responses first if they existed
     Quiz, Poll, Writing, TextContent, Identification, Embed, Concept, ConceptMap, # Activities
     Lesson, # Lesson
-    User, # User (excluding superusers)
 ]
 
 class Command(BaseCommand):
@@ -36,11 +35,11 @@ class Command(BaseCommand):
         parser.add_argument(
             '--reset',
             action='store_true',
-            help='Delete existing data (matching lesson title and non-superusers) before seeding'
+            help='Delete existing data (matching lesson title) before seeding'
         )
 
     def handle(self, *args, **options):
-        json_file_path = Path(settings.BASE_DIR) / 'core' / 'management' / options['json_file']
+        json_file_path = Path(settings.BASE_DIR) / 'core' / 'management' / 'seed_data' / 'lesson_data' / options['json_file']
         self.folder_path = json_file_path.parent
         activity_manager = ActivityManager() # Get the singleton instance
 
@@ -64,12 +63,8 @@ class Command(BaseCommand):
         try:
             with transaction.atomic():
                 if options['reset']:
-                    self.stdout.write(self.style.WARNING('Resetting data for this lesson and non-superusers...'))
+                    self.stdout.write(self.style.WARNING('Resetting data for this lesson...'))
                     self._delete_existing_data(lesson_title, activity_manager)
-
-                # Process users
-                user_data = data.get('users', [])
-                self._create_users(user_data)
 
                 # Process lesson data
                 lesson = self._create_lesson(lesson_data)
@@ -89,7 +84,7 @@ class Command(BaseCommand):
             raise
 
     def _delete_existing_data(self, lesson_title, activity_manager):
-        """Deletes data related to the specific lesson title and non-superuser users."""
+        """Deletes data related to the specific lesson title."""
         # Find the lesson to delete (if it exists)
         lesson_to_delete = Lesson.objects.filter(title=lesson_title).first()
 
@@ -119,48 +114,6 @@ class Command(BaseCommand):
             self.stdout.write(f"Deleted lesson: {lesson_title}")
         else:
             self.stdout.write(f"Lesson '{lesson_title}' not found, skipping lesson/activity deletion.")
-
-        # Delete non-superuser users (be careful with this in production)
-        deleted_users, _ = User.objects.filter(is_superuser=False).delete()
-        if deleted_users:
-            self.stdout.write(f"Deleted {deleted_users} non-superuser User objects.")
-
-    def _create_users(self, user_data):
-        """Creates or updates users from the provided data."""
-        for data in user_data:
-            username = data.get('username')
-            if not username:
-                self.stdout.write(self.style.WARNING("Skipping user entry with no username."))
-                continue
-
-            password = data.get('password', 'password') # Default password if not provided
-            # Hash the password if it's plain text
-            if not password.startswith(('pbkdf2_sha256$', 'bcrypt$', 'argon2$')):
-                password = make_password(password)
-
-            defaults = {
-                'password': password,
-                'display_name': data.get('display_name', username), # Default display name to username
-                'facility_id': data.get('facility_id'), # Use get for optional fields
-                'consent': data.get('consent', False),
-                'profile_picture': data.get('profile_picture'),
-                'theme': data.get('theme', 'light'),
-                'text_size': data.get('text_size', 'txt-base'),
-                'speech_uri_index': data.get('speech_uri_index'),
-                'speech_speed': data.get('speech_speed'),
-                'is_staff': data.get('is_staff', False),
-                'is_superuser': data.get('is_superuser', False),
-                'email': data.get('email') # Add email if present in JSON
-            }
-            # Remove None values from defaults to avoid overriding existing DB defaults unnecessarily
-            defaults = {k: v for k, v in defaults.items() if v is not None}
-
-            user, created = User.objects.update_or_create(
-                username=username,
-                defaults=defaults
-            )
-            action = 'Created' if created else 'Updated'
-            self.stdout.write(f"{action} user: {user.username}")
 
     def _create_lesson(self, lesson_data):
         """Creates or updates a lesson."""
