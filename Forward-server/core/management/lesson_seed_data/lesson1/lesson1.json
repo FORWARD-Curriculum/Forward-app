@@ -49,6 +49,46 @@
   },
   "activities": [
     {
+      "type": "dndmatch",
+      "title": "DnD Match Test",
+      "instructions": "Match items from the <source> to the correct (category/description/definition)",
+      "_comment": "This is a test activity for the DnD Match type.",
+      "content": [
+        ["Trade School", "image:welder.webp", "image:electrician.jpeg"],
+        ["University", "programmer", "ecologist"],
+        [
+          "Typically offers associate level programs for 2 years of study.",
+          "Community College"
+        ],
+        [null,"red herring drag"],
+        ["red herring drop", null]
+      ]
+    },
+    {
+      "type": "likertscale",
+      "title": "Test version",
+      "instructions": "Use the slider to indicate how much you agree with the following statements.",
+      "content": [
+        {
+          "statement": "I know what type of college I want to attend.",
+          "scale": [0,1,2,3,4,5]
+        },
+        {
+          "statement": "I know what type of degree I want to pursue.",
+          "scale": [0,1,2,3,4,5]
+        },
+        {
+          "continuous": true,
+          "statement": "I amconfident in my ability to apply for college.",
+          "scale": ["0%", "100%"]
+        },
+        {
+          "statement": "I am likely to apply for financial aid for college.",
+          "scale": ["Not at all likely", "Slightly likely", "Somewhat likely", "Moderately likely", "Very likely", "Extremely likely"]
+        }
+      ]
+    },
+    {
       "type": "textcontent",
       "title": "Introduction to Going to College",
       "instructions": null,
@@ -231,7 +271,8 @@
       "type": "textcontent",
       "title": "Types of Degrees",
       "instructions": null,
-      "content": "When looking for a job in the future, it’s important to see what level of education the company is seeking so that you know whether to apply. While you may be able to apply for some positions above your skill level, for the most part you should apply for jobs for which you meet the qualifications.\n\n\n For this next activity, read through the infographic to learn about the different types of degrees. Then answer some questions about what you have learned — and what you think!\n\n:::center\n <img src=\"/dev/types_of_degrees.png\"/>\n:::"
+      "image": "types_of_degrees.png",
+      "content": "When looking for a job in the future, it’s important to see what level of education the company is seeking so that you know whether to apply. While you may be able to apply for some positions above your skill level, for the most part you should apply for jobs for which you meet the qualifications.\n\n\n For this next activity, read through the infographic to learn about the different types of degrees. Then answer some questions about what you have learned — and what you think!"
     },
 
     {
@@ -390,40 +431,46 @@
       "content": "College Costs Include: Tuition and Fees, Room and Board, Meal plans, Books and Supplies, Health insurance, Transportation, and Personal Expenses."
     },
     {
-      "type": "textcontent",
+      "type": "video",
       "title": "FAFSA",
-      "instructions": null,
-      "content": "The FASFA, or Free Application for Federal Student Aid, is a form available online that identifies financial aid sources you are eligible for with colleges you consider attending. Watch the video to learn more about the FAFSA."
+      "instructions": "The FASFA, or Free Application for Federal Student Aid, is a form available online that identifies financial aid sources you are eligible for with colleges you consider attending. Watch the video to learn more about the FAFSA.",
+      "video": "financial_aid_for_college.mp4",
+      "scrubbable": false
     },
     {
       "type": "textcontent",
       "title": "Grants",
       "instructions": null,
       "content": "One type of financial support the FAFSA can offer you is grants. Grants are financial support that does not typically have to be repaid. These funds will be either given to you directly or applied to your school financial account. When either happens, the grant should be applied first to your tuition and other academic fees, and secondly to your housing. Additional oney can go toward other school fees and costs such as textbooks and health insurance. "
+      ,"image": "piggy_bank.jpg"
     },
     {
       "type": "textcontent",
       "title": "Loans",
       "instructions": null,
       "content": "FAFSA can also offer you loans, which you will be required to pay back after your degree. Depending on the type of loan, these may begin collecting interest during or after your degree. If you take a loan and don't finish your degree, you still have to pay for the money you have borrowed!  Loans are applied like grants to tuition and fees, then housing and other costs."
+      ,"image": "loan_application.jpg"
     },
     {
       "type": "textcontent",
       "title": "Work-Study",
       "instructions": null,
       "content": "Work-study is a form of financial aid that allows you to earn money by working part-time while attending school. The jobs are often on-campus or related to your field of study, making it easier to balance work and academics. Work-study earnings can help cover expenses like books, transportation, and personal costs. This aid is need-based and awarded through FAFSA, so if you’re interested, make sure to indicate your preference for work-study when completing your application."
+    ,"image": "work_study.jpg"
     },
     {
       "type": "textcontent",
       "title": "Western Undergraduate Exchange",
       "instructions": null,
       "content": "The Western Undergraduate Exchange (WUE) is a program offered by the Western Interstate Commission for Higher Education (WICHE) that helps students save on tuition costs by allowing them to pay reduced out-of-state tuition at participating schools. save on tuition costs by allowing them to pay reduced out-of-state tuition at participating schools. Through WUE, students pay no more than 150% of in-state tuition, which can significantly lower the cost of attending college outside their home state. The program includes students from the following 16 western states and territories: Alaska, Arizona, California, Colorado, Hawaii, Idaho, Montana, Nevada, New Mexico, North Dakota, Oregon, South Dakota, Utah, Washington, Wyoming, and the Commonwealth of the Northern Mariana Islands. To take advantage of WUE, check your eligibility and apply early as some schools have limited spots for WUE students or require separate applications."
+    ,"image": "wiche.jpg"
     },
     {
       "type": "textcontent",
       "title": "Scholarships",
       "instructions": null,
       "content": "Scholarships are another form of financial support that can help you pay for your education. Unlike loans, scholarships do not need to be repaid. They are often awarded based on academic achievements, extracurricular activities, or financial need, and some are specifically for students in certain fields or with unique qualifications. Scholarships do not come from the FAFSA may come from your school, private organizations, or community groups and can be applied to tuition, housing, or other academic expenses. There are many ways to find scholarships online and your college may have a specific page for available scholarships. Some scholarships may require you to submit a resume, an essay, or other work to be considered."
+      ,"image": "scholarships.jpg"
     },
     {
       "type": "textcontent",
@@ -559,6 +606,10 @@
           }
         }
       ]
+    },
+    {
+      "type": "twine",
+      "file": "choosing_a_major.html"
     }
   ]
 }

@@ -1,5 +1,6 @@
 .venv/
 .vscode/
+.postgres_data/
 minio_data/
 .env*
-
+*.mp4

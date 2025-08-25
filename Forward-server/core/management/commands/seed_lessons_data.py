@@ -6,6 +6,7 @@ from django.db import transaction, IntegrityError
 from django.conf import settings
 from django.core.files.storage import default_storage
 import boto3 # pyright: ignore[reportMissingImports]
+import re
 
 # Import all necessary models, including the ActivityManager
 from core.models import (
@@ -40,8 +41,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         json_file_path = Path(settings.BASE_DIR) / 'core' / 'management' / options['json_file']
+        self.folder_path = json_file_path.parent
         activity_manager = ActivityManager() # Get the singleton instance
-        self.seed_minIO_folder = json_file_path.parent # Will be used to construct minio asset folder path, if an image needs to be uploaded to minio
+
 
         # Read the JSON file
         try:
@@ -229,6 +231,26 @@ class Command(BaseCommand):
             }
 
             try:
+                if activity_type_str == 'dndmatch':  # intermediate parsing
+                    self.regex_image_upload(defaults.get(
+                        'content', ''), key_prefix="dndmatch/")
+                    
+                if activity_type_str == 'textcontent' and 'image' in defaults:
+                    self.bucket_url_call(defaults.get(
+                        'image'), key_prefix="text_content_image/")
+                    defaults['image'] = f"public/text_content_image/{defaults['image']}"
+                    
+                if activity_type_str == 'video':
+                    self.bucket_url_call(defaults.get(
+                        'video'), key_prefix="video/")
+                    defaults['video'] = f"public/video/{defaults['video']}"
+                    
+                if activity_type_str == 'twine':
+                    print(f"DEBUG: Processing Twine activity with file: {defaults.get('file', '')}")
+                    raw_html = open(self.folder_path / defaults.get('file', ''), 'r', encoding='utf-8').read()
+                    defaults['file'] = raw_html
+                    self.regex_image_upload(raw_html, key_prefix="twine/", subfolder="twine/")
+                      
                 # Use the 'order' from enumerate in update_or_create
                 activity_obj, created = ActivityModel.objects.update_or_create(
                     lesson=lesson,
@@ -254,7 +276,11 @@ class Command(BaseCommand):
                 traceback.print_exc() # Print full traceback for debugging
                 # Depending on desired behavior. For seeding, maybe log and continue.
                 # raise # Uncomment to stop on first error
-
+                
+    def regex_image_upload(self, content, key_prefix="", subfolder=""):
+        images = re.findall(r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))", str(content))
+        [self.bucket_url_call(f"{subfolder}{m[0]}",key_prefix) for m in images]
+        
     def _create_questions(self, quiz, questions_data):
         """Creates or updates questions for a given quiz, deriving order from list position."""
         self.stdout.write(f"  Processing {len(questions_data)} questions for quiz: {quiz.title}") # Debug print
@@ -319,12 +345,11 @@ class Command(BaseCommand):
         for order, concept_data in enumerate(concepts_data, start=1):
 
             image_filename = concept_data.get('image')
-            image_url = self.bucket_url_call(image_filename)
-            print(f"DEBUG: About to save image: {image_url}")
+            self.bucket_url_call(image_filename)
             # Prepare defaults for the Concept model
             concept_defaults = {
                 'title': concept_data.get('title', f'Concept {order}'), # Use title from data or default
-                'image': image_url,
+                'image': f"public/{image_filename}",
                 'description': concept_data.get('description', ''),
                 'examples': concept_data.get('examples', []),
                 # Instructions might be on concept_data or inherit from BaseActivity defaults
@@ -349,42 +374,49 @@ class Command(BaseCommand):
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update concept (Order: {order}) for concept map '{concept_map.title}': {e}"))
 
 
+    # TODO: Change everything to be stored as a KEY not URL, so it is not hardcoded to some bucket
+
     #Helper method to upload an image file to the bucket
-    def _upload_image_to_bucket(self, image_filename):
+    def _upload_image_to_bucket(self, image_filename, key_prefix=''):
         
         # Url path is constructed over here, 
-        final_path = self.seed_minIO_folder / image_filename
+        final_path = self.folder_path / image_filename
         with open(final_path, 'rb') as f:
-            saved_path = default_storage.save(image_filename, f) # the default storage is the s3/minio configured in djanago settings, its uses boto under the hood
-            self.stdout.write(self.style.SUCCESS(f'Image uploaded, url: {saved_path}'))
-            # return default_storage.url(saved_path)
-            return saved_path
+            saved_path = default_storage.save(f"public/{key_prefix}{Path(image_filename).name}", f) # the default storage is the s3/minio configured in djanago settings, its uses boto under the hood
+            url = default_storage.url(saved_path)
+            self.stdout.write(".UPLOADED")
+            return url
 
 
-    def bucket_url_call(self, image_filename):
+    def bucket_url_call(self, image_filename, key_prefix=''):
+        self.stdout.write(f"{f"  UPLOADING: '{image_filename}' INTO 'public/{key_prefix}'":.<77}",ending="")
+        final_s3_key = f"public/{key_prefix}{Path(image_filename).name}"
+
         try:
-            if default_storage.exists(image_filename): # if exists just return its url 
-                # return default_storage.url(image_filename) 
-                return image_filename
+            # Use the consistently generated key for the check
+            if default_storage.exists(final_s3_key):
+                # And use it to generate the URL
+                self.stdout.write("CACHE HIT")
+                return default_storage.url(final_s3_key)
             else:
-                # File doesn't exist, upload it
-                return self._upload_image_to_bucket(image_filename)
+                # File doesn't exist, upload it.
+                # _upload_image_to_bucket already uses the correct logic.
+                return self._upload_image_to_bucket(image_filename, key_prefix)
 
-        # this error would be thrown if no existing bucket      
-        except Exception as e:
-            
-            # Want to log the specific error
-            self.stdout.write(self.style.ERROR(f'Storage error: {str(e)}'))
+        # This error would be thrown if no existing bucket.
+        # It's better to be more specific with the exception if possible,
+        # but for now, this will work with the key fix.
+        except Exception:
+            self.stdout.write(self.style.ERROR('No bucket found or connection error.'))
+            self.stdout.write(self.style.ERROR('Attempting to create bucket...'))
 
             #Create a minio bucket if this is development mode
             if settings.DEBUG:
 
                 self.stdout.write(self.style.WARNING('Development mode: Creating MinIO bucket'))
-            
                 self.create_minio_bucket()
-                
                 # Now upload the image after creating the bucket
-                return self._upload_image_to_bucket(image_filename)
+                return self._upload_image_to_bucket(image_filename, key_prefix)
             else:
 
                 # Production mode, don't try to create buckets. This should be done in AWS first and the 
@@ -405,9 +437,13 @@ class Command(BaseCommand):
             aws_secret_access_key='minioadmin'  
         )
         bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
-        s3_client.create_bucket(Bucket=bucket_name)
-        self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
-        self.stdout.write(self.style.SUCCESS(f'MinIO bucket created: {bucket_name}'))
-
-                
-
+        
+        
+        try:
+            s3_client.create_bucket(Bucket=bucket_name)
+            self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
+        except s3_client.exceptions.BucketAlreadyOwnedByYou:
+            self.stdout.write(self.style.WARNING(f'Bucket "{bucket_name}" already exists. Continuing.'))
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f'Failed to create or configure bucket: {e}'))
+            raise
