@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Expand, FileVolume } from "lucide-react";
-import Pie from "@/components/ui/progress";
+import Pie from "@/components/ui/cprogress";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import type { User } from "@/features/account/types";
