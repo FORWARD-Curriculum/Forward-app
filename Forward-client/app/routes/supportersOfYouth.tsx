@@ -2,10 +2,12 @@
 
 export default function supportersOfYouth(){
     return (
-        <div>
-            <h4>For supporters of youth</h4>
+
+
+        <div className="max-w-6xl mx-auto">
+            <h4 className="text-accent text-right">For supporters of youth</h4>
             <div>
-                <h1 >About Forward</h1>
+                <h1 className="text-4xl font-black" >About Forward</h1>
 
                 <br/>
 
@@ -24,7 +26,7 @@ export default function supportersOfYouth(){
             {/* paragraph two */}
 
             <div>
-                <h3> Why FORWARD?</h3>
+                <h3 className="text-2xl font-black"> Why FORWARD?</h3>
 
                 <br/>
 
@@ -56,16 +58,16 @@ export default function supportersOfYouth(){
 
             <div>
 
-                <h3>What Does FORWARD Teach?</h3>
+                <h3 className="text-2xl font-black">What Does FORWARD Teach?</h3>
                 <br/>
 
                 <p>FORWARD helps youth develop practical knowledge and skills across three key areas of transition:</p>
 
                 <div className="markdown">
                     <ul>
-                        <li>Academic Readiness – Preparing for postsecondary education, including college, trade school, or GED programs</li>
-                        <li>Workforce Readiness – Building job-seeking and workplace communication skills</li>
-                        <li>Independent Living Readiness – Managing responsibilities like budgeting, housing, and transportation</li>
+                        <li>Academic Readiness - Preparing for postsecondary education, including college, trade school, or GED programs</li>
+                        <li>Workforce Readiness - Building job-seeking and workplace communication skills</li>
+                        <li>Independent Living Readiness - Managing responsibilities like budgeting, housing, and transportation</li>
                     </ul>
                 </div>
 
@@ -73,15 +75,70 @@ export default function supportersOfYouth(){
 
                 <div className="markdown">
                     <ol>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
+                        <li><b>Going to College</b></li>
+                        <li><b>Disclosure and Appropriate Communication</b></li>
+                        <li><b>Personal Finance Management</b></li>
+                        <li><b>Self-Advocacy</b></li>
+                        <li><b>Soft Skills Development</b></li>
                     </ol>
                 </div>
 
+                <br/>
+
+                <p>
+                    Each lesson includes written content, videos, and interactive activities such as quizzes, 
+                    choose-your-path scenarios, simulations, and open-ended reflection. Lessons typically take 
+                    45–60 minutes to complete, though students are encouraged to move at their own pace and explore 
+                    deeply where they are most interested.Each lesson includes written content, videos, and interactive 
+                    activities such as quizzes, choose-your-path scenarios, simulations, and open-ended reflection. Lessons 
+                    typically take 45–60 minutes to complete, though students are encouraged to move at their own pace and 
+                    explore deeply where they are most interested.
+                </p>
+
             </div>
+
+            <div>
+                <br/>
+                <h3 className="text-2xl font-black">Designed for Flexibility and Choice</h3>
+                <br/>
+
+                <p>
+                    Many transition programs follow a set order of instruction, which can limit access to high-priority content 
+                    when youth are facing unpredictable timelines. FORWARD intentionally removes the requirement to move through 
+                    lessons sequentially. Youth can choose the topics that matter most to them and explore the rest as time allows. 
+                    This design increases relevance, reduces frustration, and centers youth autonomy — all while preserving the benefits 
+                    of identity development and self-reflection by embedding these themes across all lessons.
+                </p>
+            </div>
+
+            <div>
+                <br/>
+                <h3 className="text-2xl font-black">Who Is It For?</h3>
+                <br/>
+
+                <p>
+                    FORWARD was created for youth ages 14–21 with disabilities in juvenile justice or other alternative settings. However, 
+                    the content may also benefit any young person preparing for transition, particularly those with low literacy levels or limited access to consistent instruction.
+                    We encourage adults who support youth — including parents, foster parents, teachers, case managers, mentors, parole officers, and others — to explore the site, 
+                    become familiar with the lessons, and engage in conversations about what youth are learning. Your support and encouragement play a powerful role in helping young 
+                    people apply what they’ve learned to real-life decisions and opportunities.
+                </p>
+
+            </div>
+
+            <div>
+
+                <br/>
+                <h3>How can I help?</h3>
+                <br/>
+
+                <p>
+                    In addition to becoming familiar with the lessons and site, you can review the facilitator guides that accompany each lesson. 
+                    These are designed with your support in mind, offering specific activities, conversation starters, and other ideas for engaging 
+                    youth and making connections that will enhance their learning. Facilitator guides can be accessed here. 
+                </p>
+            </div>
+
         </div>
     )
 }
