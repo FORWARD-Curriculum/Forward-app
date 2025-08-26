@@ -11,6 +11,7 @@ from botocore.exceptions import ClientError
 import logging
 import re
 import json
+
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
 # while allowing us to add our own custom fields and methods
@@ -470,7 +471,7 @@ class Question(models.Model):
             "quiz_id": self.quiz_id,
             "question_text": self.question_text,
             "question_type": self.question_type,
-            "has_orrect_answer": self.has_correct_answer,
+            "has_correct_answer": self.has_correct_answer,
             "choices": self.choices,
             "is_required": self.is_required,
             "order": self.order,
@@ -691,52 +692,59 @@ class Concept(BaseActivity):
         default=list,
         help_text="List of examples for this concept"
     )
-
     def to_dict(self):
-
-        logger = logging.getLogger(__name__)
-
+        print(f"DEBUG: to_dict() method called for concept ID: {self.id}")
+        
         try:
-            image_url = create_presigned_url(
-                self.image) if self.image else None
+            image_url = create_presigned_url(self.image) if self.image else None
+            print(f"DEBUG: Image URL generated: {image_url}")
         except Exception as e:
-            logger.error(f"Error generating presigned URL: {e}")  # Debug print
+            print(f"ERROR: Error generating presigned URL: {e}")
             image_url = None
-
+        
         return {
             **super().to_dict(),
             "id": self.id,
-            # "image": self.create_presigned_urls(self.image) if self.image else None,
             "image": image_url,
             "description": self.description,
             "examples": self.examples,
         }
-
 # Helper method to generate presigned urls
-
-
+"""
+There might be a better way to do this useing django storages settings setting it to presigned url without creating a client here
+Lesser priority but will look into later
+"""
 def create_presigned_url(s3_key):
-    logger = logging.getLogger(__name__)
+    
+    print(f"DEBUG: Starting presigned URL generation for path: {s3_key}")
+    
+    # Get settings from your STORAGES configuration
+    storage_options = settings.STORAGES['default']['OPTIONS']
     s3_client = boto3.client(
         's3',
-        endpoint_url='http://localhost:9000',  # browser access endpoint
-        # these should probably be changed to getenv calls, or maybe a default storage call
-        aws_access_key_id='minioadmin',
-        aws_secret_access_key='minioadmin'
+        endpoint_url=storage_options.get('custom_domain'),  # None for AWS S3
+        aws_access_key_id=storage_options.get('access_key'),
+        aws_secret_access_key=storage_options.get('secret_key'),
+        region_name=storage_options.get('region_name'),
+        use_ssl=storage_options.get('use_ssl', True)
     )
-    bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
+    bucket_name = storage_options['bucket_name']
+    print(f"DEBUG: Using bucket: {bucket_name}")
+    
     try:
         response = s3_client.generate_presigned_url(
             'get_object',
             Params={'Bucket': bucket_name, 'Key': s3_key},
-            ExpiresIn=3600,  # 3 hour expiration time at the moment
+            ExpiresIn= 3600, # 3 hour expiration time at the moment
         )
     except ClientError as e:
-        logger.error(f"Failed to generate presigned URL: {e}")
+        print(f"ERROR: Failed to generate presigned URL: {e}")
         return None
-
-    logger.info(f"Generated presigned URL: {response}")
+    
+    print(f"SUCCESS: Generated presigned URL: {response}")
     return response
+    
+
 
 def regex_image_sub(tosub: any, key_prefix="", isJson: bool = True):
     """Substitutes image URLs in the input string with presigned URLs.

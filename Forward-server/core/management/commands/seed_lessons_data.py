@@ -44,6 +44,7 @@ class Command(BaseCommand):
         self.folder_path = json_file_path.parent
         activity_manager = ActivityManager() # Get the singleton instance
 
+
         # Read the JSON file
         try:
             with open(json_file_path, 'r', encoding='utf-8') as file:
@@ -336,6 +337,7 @@ class Command(BaseCommand):
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update poll question (Order: {order}) for poll '{poll.title}': {e}"))
 
+
     def _create_concepts(self, concept_map, concepts_data):
         """Creates or updates concepts for a given concept map, deriving order from list position."""
         self.stdout.write(f"  Processing {len(concepts_data)} concepts for concept map: {concept_map.title}") # Debug print
@@ -408,45 +410,40 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR('No bucket found or connection error.'))
             self.stdout.write(self.style.ERROR('Attempting to create bucket...'))
 
-            # Creates client and creates bucket
-            s3_client = boto3.client(
-                's3',
-                endpoint_url='http://minio:9000',
-                aws_access_key_id='minioadmin',
-                aws_secret_access_key='minioadmin'
-            )
-            bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
+            #Create a minio bucket if this is development mode
+            if settings.DEBUG:
 
-            try:
-                s3_client.create_bucket(Bucket=bucket_name)
-                self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
+                self.stdout.write(self.style.WARNING('Development mode: Creating MinIO bucket'))
+                self.create_minio_bucket()
+                # Now upload the image after creating the bucket
+                return self._upload_image_to_bucket(image_filename, key_prefix)
+            else:
 
-                # Set public read policy
-                public_read_policy = {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": "*",
-                            "Action": "s3:GetObject",
-                            "Resource": f"arn:aws:s3:::{bucket_name}/public/*"
-                        }
-                    ]
-                }
-                s3_client.put_bucket_policy(
-                    Bucket=bucket_name,
-                    Policy=json.dumps(public_read_policy)
-                )
-                self.stdout.write(self.style.SUCCESS(f'Bucket policy set to public read'))
-
-            except s3_client.exceptions.BucketAlreadyOwnedByYou:
-                # This can happen in a race condition or if the initial error was not a missing bucket.
-                # It's safe to ignore and proceed.
-                self.stdout.write(self.style.WARNING(f'Bucket "{bucket_name}" already exists. Continuing.'))
-            except Exception as e:
-                # Catch other potential errors during bucket creation
-                self.stdout.write(self.style.ERROR(f'Failed to create or configure bucket: {e}'))
-                raise # Re-raise the error to stop the script
-
-            # Now upload the image after creating/verifying the bucket
-            return self._upload_image_to_bucket(image_filename, key_prefix)
+                # Production mode, don't try to create buckets. This should be done in AWS first and the 
+                # Correct bucket name given to PROD_AWS_MEDIA_BUCKET_NAME in .env variables
+                self.stdout.write(self.style.ERROR(
+                    f'Production error: Bucket or file access failed for {image_filename}. '
+                    'Skipping this image. Please ensure S3 bucket exists and permissions are correct.'
+                ))
+                return None  
+            
+    # Creates bucket in development if none has been created yet
+    def create_minio_bucket(self):
+                
+        s3_client = boto3.client(
+            's3',
+            endpoint_url='http://minio:9000',   # upload endpoint
+            aws_access_key_id='minioadmin',   # maybe need to change these to os.getenv
+            aws_secret_access_key='minioadmin'  
+        )
+        bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
+        
+        
+        try:
+            s3_client.create_bucket(Bucket=bucket_name)
+            self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
+        except s3_client.exceptions.BucketAlreadyOwnedByYou:
+            self.stdout.write(self.style.WARNING(f'Bucket "{bucket_name}" already exists. Continuing.'))
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f'Failed to create or configure bucket: {e}'))
+            raise
