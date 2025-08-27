@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+
 export default function youth(){
     return (
         <div className="max-w-6xl mx-auto px-6 py-5">
@@ -81,6 +83,12 @@ export default function youth(){
                     Everything on this site is made to work for different learning styles, reading levels, and support needs. Whether you have a disability, 
                     are still figuring things out, or just want to be ready — FORWARD is for you.
                 </p>
+            </div>
+
+            <div className="text-right mt-8">
+                <Link to={"/supportersOfYouth"} className="bg-primary hover:brightness-90 text-primary-foreground px-4 py-2 rounded">
+                    Supporters of Youth
+                </Link>
             </div>
         </div>
     )

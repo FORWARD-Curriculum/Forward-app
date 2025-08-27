@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+
 export default function supportersOfYouth(){
     return (
         <div className="max-w-6xl mx-auto px-6 py-5">
@@ -108,6 +110,12 @@ export default function supportersOfYouth(){
                     youth and making connections that will enhance their learning. Facilitator guides can be accessed here. 
                 </p>
             </div>
+
+        <div className="text-right mt-8">
+            <Link to={"/youth"} className="bg-primary hover:brightness-90 text-primary-foreground px-4 py-2 rounded">
+                Youth
+            </Link>
+        </div>
         </div>
     )
 }
