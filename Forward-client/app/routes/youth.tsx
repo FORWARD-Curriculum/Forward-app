@@ -14,7 +14,11 @@ export default function youth(){
                     Just know that FORWARD is here to help you move forward in life with confidence and new skills.
                 </p>
                 
-                <img src="" alt="Image placeholder: blah blah blah"></img>
+                <img 
+                    src="/about_page/chilling.jpg" 
+                    alt="Young Adults chilling by a buildings curb" 
+                    className="w-full max-w-2xl mx-auto rounded-lg my-6"
+                />
             </div>
 
             {/* paragraph two */}
@@ -43,7 +47,11 @@ export default function youth(){
                     You can start there. You're in charge of your learning.
                 </p>
                 
-                <img src="" alt="Image placeholder: blah blah blah"></img>
+                <img 
+                    src="/about_page/happy_students.jpg" 
+                    alt="Young Adults huddled, staring down happy" 
+                    className="w-full max-w-2xl mx-auto rounded-lg my-6"
+                />
             </div>
 
             {/* section 3 */}
@@ -67,7 +75,11 @@ export default function youth(){
                     You'll get to explore topics your way and at your pace.
                 </p>
                 
-                <img src="" alt="Image placeholder: blah blah blah"></img>
+                <img 
+                    src="/about_page/thumbs_up.jpg" 
+                    alt="People smiling giving a thumbs up" 
+                    className="w-full max-w-2xl mx-auto rounded-lg my-6"
+                />
             </div>
 
             <div className="mt-8">

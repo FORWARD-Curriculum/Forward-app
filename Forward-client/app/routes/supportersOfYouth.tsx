@@ -13,6 +13,12 @@ export default function supportersOfYouth(){
                     Whether you're a parent, caregiver, educator, mental health provider, probation officer, mentor, or other another type of youth supporter, your role in supporting young people during key transitions 
                     is essential — and FORWARD was developed with that in mind.
                 </p>
+
+                <img 
+                    src="/about_page/student_staring_off.jpg" 
+                    alt="Student looking thoughtfully into the distance" 
+                    className="w-full max-w-2xl mx-auto rounded-lg my-6"
+                />
             </div>
 
             {/* paragraph two */}
@@ -36,8 +42,11 @@ export default function supportersOfYouth(){
                     </ul>
                 </div>
                 
-                {/* ask about how image in the frontend pages will be */}
-                <img src="" alt="Image placeholder: blah blah blah"></img>
+                <img 
+                    src="/about_page/kids_huddled_up.jpg" 
+                    alt="Students huddled up" 
+                    className="w-full max-w-2xl mx-auto rounded-lg my-6"
+                />
             </div>
 
             {/* section 3 */}
