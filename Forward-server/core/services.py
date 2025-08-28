@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, Embed, EmbedResponse
+from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, Embed, EmbedResponse, Facility
 from rest_framework.request import Request as DRFRequest
 
 
@@ -18,7 +18,7 @@ class UserService:
 
         Args:
             data (dict): Dictionary containing user data including:
-                        username, password, email, display_name, facility_id, consent
+                        username, password, email, display_name, facility, consent
 
 
         Returns:
@@ -40,8 +40,8 @@ class UserService:
             )
 
             # Set additional fields
-            if 'facility_id' in data:
-                user.facility_id = data['facility_id']
+            if 'facility' in data:
+                user.facility = data['facility']
 
             if 'consent' in data:
                 user.consent = data['consent']
@@ -87,20 +87,7 @@ class UserService:
             login(request, user)
 
             return {
-                'user': {
-                    'id': user.id,
-                    'username': user.username,
-                    'display_name': user.display_name,
-                    'facility_id': user.facility_id,
-                    'profile_picture': user.profile_picture,
-                    'consent': user.consent,
-                    'preferences': {
-                        'theme': user.theme,
-                        'text_size': user.text_size,
-                        'speech_uri_index': user.speech_uri_index,
-                        'speech_speed': user.speech_speed
-                    }
-                }
+                'user': user.to_dict()
             }
         except Exception as e:
             raise ValidationError('login failed. Please try again.')

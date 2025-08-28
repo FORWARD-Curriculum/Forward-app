@@ -1,51 +1,11 @@
 {
-  "users": [
-    {
-      "username": "admin",
-      "password": "adminpassword",
-      "display_name": "Admin",
-      "is_staff": true,
-      "is_superuser": true,
-      "facility_id": null,
-      "profile_picture": null,
-      "consent": false
-    },
-    {
-      "username": "student1",
-      "password": "password1",
-      "display_name": "Student1",
-      "facility_id": "1",
-      "profile_picture": "/pfp.png",
-      "consent": true
-    },
-    {
-      "username": "student2",
-      "password": "password2",
-      "display_name": "Student2",
-      "facility_id": null,
-      "profile_picture": null,
-      "consent": false
-    },
-    {
-      "username": "student3",
-      "password": "password3",
-      "display_name": "Student3",
-      "facility_id": null,
-      "profile_picture": null,
-      "consent": false
-    }
-  ],
   "lesson": {
-    "title": "Going to College",
-    "description": "This lesson covers the basics of going to college, including types of colleges, degrees, application process, and financing your education.",
+    "title": "",
+    "description": "",
     "objectives": [
-      "Know the different types of higher education and degree types",
-      "Apply for college",
-      "Identify multiple strategies for financing college",
-      "Understand basic vocabulary and terms around college and independent living"
     ],
-    "order": 1,
-    "tags": ["college", "education", "future planning"]
+    "order": 2,
+    "tags": []
   },
   "activities": [
     {

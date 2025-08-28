@@ -16,7 +16,7 @@ class UserAdmin(BaseUserAdmin):
     # Define fieldsets for user admin detail view
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        (_('Personal info'), {'fields': ('display_name', 'facility_id', 'profile_picture')}),
+        (_('Personal info'), {'fields': ('display_name', 'facility', 'profile_picture')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'consent',
                                        'groups', 'user_permissions')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),

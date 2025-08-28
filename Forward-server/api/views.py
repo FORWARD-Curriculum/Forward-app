@@ -8,7 +8,7 @@ from rest_framework import status
 from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, QuizSubmissionSerializer, UserQuizResponseDetailSerializer, ResponseSerializer
 from core.services import UserService, LessonService, QuizResponseService, ResponseService
 from .utils import json_go_brrr, messages
-from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question
+from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, User
 from rest_framework import serializers, request
 
 
@@ -105,23 +105,10 @@ class CurrentUserView(APIView):
         Return the current user's information.
         Only accessible to authenticated users.
         """
-        user = request.user
+        user: User = request.user
         return json_go_brrr(
             data={
-                'user': {
-                    'id': user.id,
-                    'username': user.username,
-                    'display_name': user.display_name,
-                    'facility_id': user.facility_id,
-                    'profile_picture': user.profile_picture,
-                    'consent': user.consent,
-                    'preferences': {
-                        'theme': user.theme,
-                        'text_size': user.text_size,
-                        'speech_uri_index': user.speech_uri_index,
-                        'speech_speed': user.speech_speed
-                    }
-                }
+                'user': user.to_dict()
             },
             status=status.HTTP_200_OK
         )
@@ -131,7 +118,7 @@ class CurrentUserView(APIView):
         Update the current user's information.
         Only accessible to authenticated users.
         """
-        user = request.user
+        user: User = request.user
         serializer = UserUpdateSerializer(
             user, data=request.data, partial=True)
         if serializer.is_valid():
@@ -139,20 +126,7 @@ class CurrentUserView(APIView):
             return json_go_brrr(
                 message="User information updated successfully",
                 data={
-                    'user': {
-                        'id': user.id,
-                        'username': user.username,
-                        'display_name': user.display_name,
-                        'facility_id': user.facility_id,
-                        'profile_picture': user.profile_picture,
-                        'consent': user.consent,
-                        'preferences': {
-                            'theme': user.theme,
-                            'text_size': user.text_size,
-                            'speech_uri_index': user.speech_uri_index,
-                            'speech_speed': user.speech_speed
-                        }
-                    }
+                    'user': user.to_dict()
                 },
                 status=status.HTTP_200_OK
             )
