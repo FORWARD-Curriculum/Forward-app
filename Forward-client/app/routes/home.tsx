@@ -37,9 +37,12 @@ export default function Home() {
             Start Here
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
-          <button className="bg-secondary/80 backdrop-blur-sm text-secondary-foreground px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 border border-secondary-border hover:border-muted-foreground shadow-sm hover:shadow-md">
+          <Link 
+            prefetch="intent"
+            to={"/supportersOfYouth"}
+            className="bg-secondary/80 backdrop-blur-sm text-secondary-foreground px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 border border-secondary-border hover:border-muted-foreground shadow-sm hover:shadow-md">
             Learn More
-          </button>
+          </Link>
         </div>
         
         <div className="flex gap-6 max-w-2xl mx-auto justify-center">
