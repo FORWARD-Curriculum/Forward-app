@@ -9,16 +9,17 @@ import type { RootState } from "../store";
 import type { Route } from "./+types/layout";
 import { apiFetch } from "@/utils/utils";
 import type { User } from "@/features/account/types";
-import { setAuthLoading, setUser } from "@/features/account/slices/userSlice";
+import { setUser } from "@/features/account/slices/userSlice";
+import Fetch from "@/components/layout/fetch";
 
 // This runs only on browser reloads or initial page loads, as it its the highest level layout
 // it fetches the current user's data
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  const res = await apiFetch("/users/me");
+  const res = await apiFetch("/users/me",{},true);
   const resp = await res.json();
   const user =
     (resp as { detail?: string; data?: { user: User } })?.data?.user ?? null;
-    console.log("clientLoader user", user);
+  console.log("clientLoader user", user);
   return user;
 }
 
@@ -57,6 +58,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
         } ${user?.preferences?.text_size || "txt-base"}`}
       >
         <Header />
+        <Fetch/>
         <div className="flex flex-grow">
           <Outlet />
         </div>
