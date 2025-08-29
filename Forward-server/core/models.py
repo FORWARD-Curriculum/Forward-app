@@ -649,7 +649,40 @@ class DndMatch(BaseActivity):
             "content": regex_image_sub(self.content, key_prefix="dndmatch/"),
         }
 
+class FillInTheBlank(BaseActivity):
+    """
+    It receives a comma seperated array, dividing each fill
+    in the blank activity type from each other.
 
+    There are three types, mainly 
+    
+    * Any words accepted
+    * Keyword recognition?
+    * Drop-down menu for selecting from given options
+
+    """
+
+    content = models.JSONField(
+        help_text= "Array of sentences with <options> markup for blanks"
+    )
+
+    def incorrect_fills(self):
+        # responses = FillInTheBlankResponse.objects.filter(
+            
+        # )
+        pass
+
+
+    # delete this later comment later, just for me --> but remakes it into a json to give to frontend
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content,
+        }
+
+
+    
+    
 class ConceptMap(BaseActivity):
     """Model for mapping concepts to each other"""
     content = models.CharField(
@@ -1115,6 +1148,9 @@ class BaseResponse(models.Model):
             "attempts_left": self.attempts_left,
             "associated_activity": self.associated_activity.id,
         }
+
+class FillInTheBlankResponse(BaseResponse):
+    pass
 
 
 class VideoResponse(BaseResponse):
