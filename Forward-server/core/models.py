@@ -667,10 +667,11 @@ class FillInTheBlank(BaseActivity):
     )
 
     def incorrect_fills(self):
-        # responses = FillInTheBlankResponse.objects.filter(
-            
-        # )
-        pass
+        # imitating DND, guess this is for analytics
+        responses = FillInTheBlankResponse.objects.filter( # come back to this
+            associated_activity=self
+        )
+
 
 
     # delete this later comment later, just for me --> but remakes it into a json to give to frontend
@@ -1149,10 +1150,6 @@ class BaseResponse(models.Model):
             "associated_activity": self.associated_activity.id,
         }
 
-class FillInTheBlankResponse(BaseResponse):
-    pass
-
-
 class VideoResponse(BaseResponse):
     """
     Response model for Video activities.
@@ -1220,6 +1217,26 @@ class DndMatchResponse(BaseResponse):
             "submission": self.submission
         }
 
+class FillInTheBlankResponse(BaseResponse):
+    
+    associated_activity = models.ForeignKey(
+        FillInTheBlank,
+        on_delete=models.CASCADE,
+        related_name="associated_fillintheblank",
+        help_text="The fill in the blank activity associated with this response"
+    )
+
+    submission = models.JSONField(
+        help_text="Array of user's answers for each blank"
+    )
+
+    def to_dict(self):
+        return{
+            **super().to_dict(),
+            "submission": self.submission
+        }
+    
+    pass
 
 class WritingResponse(BaseResponse):
     associated_activity = models.ForeignKey(
@@ -1446,6 +1463,8 @@ class ActivityManager():
         self.registerActivity(Concept, None, child_class=True)
         self.registerActivity(DndMatch, DndMatchResponse, {
                               "submission": ["submission", []]})
+        self.registerActivity(FillInTheBlank, FillInTheBlankResponse, {
+                              "submission": ["submission", []]}) # a little unsure about this part
         self.registerActivity(LikertScale, LikertScaleResponse, {
                               "content": ["content", {}]})
         self.registerActivity(Video, VideoResponse, {
