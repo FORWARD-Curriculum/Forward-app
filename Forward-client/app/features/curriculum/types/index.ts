@@ -50,6 +50,7 @@ export type ActivityManager = {
   LikertScale: [LikertScale, LikertScaleResponse, false];
   Video: [Video, VideoResponse, false];
   Twine: [Twine, TwineResponse, false];
+  FillInTheBlank: [FillInTheBlank, FillInTheBlankResponse, false]
 };
 
 /**
@@ -73,6 +74,7 @@ export const ActivityTypeDisplayNames: Record<
   LikertScale: "Likert Scale",
   Video: "Video",
   Twine: "Twine",
+  FillInTheBlank: "Fill In The Blank"
 };
 
 // #region -------------------------- Activities ---------------------------
@@ -160,6 +162,10 @@ export interface PollQuestion {
 
 export interface DndMatch extends BaseActivity {
   content: string[][];
+}
+
+export interface FillInTheBlank extends BaseActivity {
+  content: string[];
 }
 
 export interface ConceptMap extends BaseActivity {
@@ -280,10 +286,11 @@ export interface EmbedResponse extends BaseResponse {
 export interface DndMatchResponse extends BaseResponse {
   submission: number[][][];
 }
+
 export interface LikertScaleResponse extends BaseResponse {
   content: {
     selection: number[];
-    explanation: string | null;
+    explanation: string | null
   };
 }
 
@@ -291,4 +298,8 @@ export interface VideoResponse extends BaseResponse {
   watched_percentage: number; 
 }
 export interface TwineResponse extends BaseResponse {}
+
+export interface FillInTheBlankResponse extends BaseResponse {
+  submission: string[][];
+}
 // #endregion -------------------------- Responses ----------------------------

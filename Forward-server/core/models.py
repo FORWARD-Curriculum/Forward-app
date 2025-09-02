@@ -1235,8 +1235,7 @@ class FillInTheBlankResponse(BaseResponse):
             **super().to_dict(),
             "submission": self.submission
         }
-    
-    pass
+
 
 class WritingResponse(BaseResponse):
     associated_activity = models.ForeignKey(
