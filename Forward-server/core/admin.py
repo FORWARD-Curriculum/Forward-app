@@ -6,9 +6,9 @@ from django.conf import settings
 from django import forms
 from django.core.files.storage import default_storage
 from pathlib import Path
-from django.db.models import JSONField
+from django.db.models import JSONField, TextField, CharField
 from django_json_widget.widgets import JSONEditorWidget
-from django_summernote.admin import SummernoteModelAdmin, SummernoteInlineModelAdmin
+from martor.widgets import AdminMartorWidget
 
 # Import all models from your existing models.py
 from .models import (
@@ -122,8 +122,8 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('username',)
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        (_('Personal info'), {'fields': ('display_name', 'facility', 'profile_picture')}),
-        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'consent',
+        (('Personal info'), {'fields': ('display_name', 'facility', 'profile_picture')}),
+        (('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'consent',
                                        'groups', 'user_permissions')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined', 'surveyed_at')}),
     )
@@ -158,13 +158,14 @@ class PollQuestionInline(admin.TabularInline):
     ordering = ('order',)
     fields = ('order', 'question_text', 'options', 'allow_multiple')
 
-class ConceptInline(SummernoteInlineModelAdmin, admin.StackedInline):
+class ConceptInline(admin.StackedInline):
     model = Concept
-    summernote_fields = ('description',)
+    # summernote_fields = ('description',)
     extra = 1
     ordering = ('order',)
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget},
+        TextField: {'widget': AdminMartorWidget},
     }
     fields = ('order', 'title', 'description', 'image', 'examples')
 
@@ -186,9 +187,12 @@ class PollAdmin(BaseActivityAdmin):
     inlines = [PollQuestionInline]
 
 @admin.register(ConceptMap)
-class ConceptMapAdmin(SummernoteModelAdmin, BaseActivityAdmin):
-    summernote_fields = ('content')
+class ConceptMapAdmin(BaseActivityAdmin):
+    # summernote_fields = ('content')
     inlines = [ConceptInline]
+    formfield_overrides = {
+        TextField: {'widget': AdminMartorWidget},   
+    }
 
 def get_public_media_url(s3_key):
     if not s3_key:
@@ -266,8 +270,12 @@ class LikertScaleAdmin(BaseActivityAdmin, JsonAdminMixin):
         JSONField: {'widget': JSONEditorWidget},
     }
 
-class IdenificationAdmin(SummernoteModelAdmin):
-    summernote_fields = ('content')
+class IdenificationAdmin(admin.ModelAdmin):
+    # summernote_fields = ('content')
+    formfield_overrides = {
+        TextField: {'widget': AdminMartorWidget},  
+                CharField: {'widget': AdminMartorWidget},
+    }
 
 admin.site.register(Identification, IdenificationAdmin)
 

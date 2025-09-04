@@ -9,3 +9,4 @@ django-storages[s3]==1.14.2
 boto3==1.40.0
 botocore==1.40.0
 django-json-widget==2.0.3
+martor
