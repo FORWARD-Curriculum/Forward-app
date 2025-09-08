@@ -8,7 +8,6 @@ interface FillInTheBlankProps {
 
 export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
     console.log('Component rendering, fillInTheBlank:', fillInTheBlank);
-
     const { parsedSentences, optionsData } = useMemo(() => {
         const optionsRegex = /<options([^>]*?)>(.*?)<\/options>/g;
         const options: string[][] = []; // options are stored then given back when retriveing the correct jsx
@@ -29,14 +28,10 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
                   "My favorite color is <options></options> and I like to eat <options></options> for breakfast."
                 ]
                     parsing it and giving it an html structure associated since replace can only replace stuff with strings
-
                     storing the options
-
                     then in return doing another if else check and returning jsx depending on the html string found
-
                     maybe not the best solution
-                 * */ 
-
+                 */
                 
                 if (attributes.includes('keyword="true"')) {
                     return '<input type="text" class="keyword-input" />';
@@ -57,35 +52,57 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
     }, [fillInTheBlank.content]);
    
     return (
-        <div>
-            <h2>{fillInTheBlank.title}</h2>
-            {parsedSentences.map((renderedSentence, index) => {
-                const splitParts = renderedSentence.split(/(<input[^>]*\/>|<select[^>]*>.*?<\/select>)/); // splits rendered sentence into parts, got gpt to make this, so we can loop through it
-               
-                return (
-                    <div key={index}>
-                        {splitParts.map((part, partIndex) => {
-                            if (part.includes('<input')) {
-                                return <input key={partIndex} type="text" className="keyword-input" />;
-                            }
-                            else if (part.includes('<select')) {
-                                const indexMatch = part.match(/data-index="(\d+)"/);
-                                const index = parseInt(indexMatch?.[1] || '0');
-                                const options = optionsData[index] || []; // holds the current options drop down for this fill in the blank if it has a select string so drop down
-                           
-                                return (
-                                    <select key={partIndex} className="dropdown-input">
-                                        {options.map((opt: any) => <option key={opt} value={opt}>{opt}</option>)}
-                                    </select>
-                                );
-                            }
-                            else {
-                                return <span key={partIndex}>{part}</span>;
-                            }
-                        })}
-                    </div>
-                );
-            })}
+        <div className="max-w-4xl mx-auto p-6">
+            <h2 className="text-2xl font-bold text-center mb-8">{fillInTheBlank.title}</h2>
+            
+            <div className="space-y-6">
+                {parsedSentences.map((renderedSentence, index) => {
+                    const splitParts = renderedSentence.split(/(<input[^>]*\/>|<select[^>]*>.*?<\/select>)/); // splits rendered sentence into parts, got gpt to make this, so we can loop through it
+                   
+                    return (
+                        <div key={index} className="text-lg leading-relaxed text-center">
+                            {splitParts.map((part, partIndex) => {
+                                if (part.includes('<input')) {
+                                    return (
+                                        <input 
+                                            key={partIndex} 
+                                            type="text" 
+                                            className="inline-block mx-1 px-3 py-2 border-2 border-muted rounded-lg focus:border-primary focus:outline-none bg-background min-w-[120px] text-center" 
+                                        />
+                                    );
+                                }
+                                else if (part.includes('<select')) {
+                                    const indexMatch = part.match(/data-index="(\d+)"/);
+                                    const index = parseInt(indexMatch?.[1] || '0');
+                                    const options = optionsData[index] || []; // holds the current options drop down for this fill in the blank if it has a select string so drop down
+                               
+                                    return (
+                                        <select 
+                                            key={partIndex} 
+                                            className="inline-block mx-1 px-3 py-2 border-2 border-muted rounded-lg focus:border-primary focus:outline-none bg-background min-w-[120px] text-center"
+                                        >
+                                            <option value="">Choose...</option>
+                                            {options.map((opt: any) => <option key={opt} value={opt}>{opt}</option>)}
+                                        </select>
+                                    );
+                                }
+                                else {
+                                    return <span key={partIndex}>{part}</span>;
+                                }
+                            })}
+                        </div>
+                    );
+                })}
+            </div>
+            
+            <div className="mt-12 flex justify-center gap-4">
+                <button className="bg-accent text-secondary-foreground hover:bg-muted rounded-lg px-8 py-3 font-semibold shadow-sm border border-muted transition-colors">
+                    Reset
+                </button>
+                <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-8 py-3 font-semibold shadow-sm transition-colors">
+                    Check Answers
+                </button>
+            </div>
         </div>
     );
 }
