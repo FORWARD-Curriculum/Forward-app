@@ -6,48 +6,86 @@ interface FillInTheBlankProps {
     fillInTheBlank: FillInTheBlank;
 }
 
-
 export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
+    console.log('Component rendering, fillInTheBlank:', fillInTheBlank);
 
-    const parsedStuff = useMemo(() => {
+    const { parsedSentences, optionsData } = useMemo(() => {
         const optionsRegex = /<options([^>]*?)>(.*?)<\/options>/g;
-
-        return fillInTheBlank.content.map(sentence =>{
+        const options: string[][] = []; // options are stored then given back when retriveing the correct jsx
+        let optionCounter = 0;
+       
+        const sentences = fillInTheBlank.content.map(sentence => {
             let rendered = sentence;
-
             rendered = rendered.replace(optionsRegex, (match, attributes, content) => {
-                const options = content.split(',').map((s: string) => s.trim()).filter((s: string) => s);
+                const opts = content.split(',').map((s: string) => s.trim()).filter((s: string) => s);
+                
+                /** 
+                 * this is a weird solution but basically I'm grabbing the data structure here
+                 * 
+                 * 
+                 * "content": [  
+                  "Cats are <options>an animal, a bird, a fish</options> that often are found in <options>homes, outdoor spaces</options>!", 
+                  "The sky is <options keyword=\"true\">blue, clear, bright</options>",
+                  "My favorite color is <options></options> and I like to eat <options></options> for breakfast."
+                ]
+                    parsing it and giving it an html structure associated since replace can only replace stuff with strings
 
+                    storing the options
+
+                    then in return doing another if else check and returning jsx depending on the html string found
+
+                    maybe not the best solution
+                 * */ 
+
+                
                 if (attributes.includes('keyword="true"')) {
-                return '<input type="text" class="keyword-input" />'; 
-                } else if (options.length > 0) {
-                return '<select class="dropdown-input">...</select>'; 
+                    return '<input type="text" class="keyword-input" />';
+                } else if (opts.length > 0) {
+                    options.push(opts);
+                    return `<select class="dropdown-input" data-index="${optionCounter++}">...</select>`;
                 } else {
-                return '<input type="text" class="freetext-input" />'; 
+                    return '<input type="text" class="freetext-input" />';
                 }
-            })
-
-            return rendered
-        })
+            });
+            return rendered;
+        });
+       
+        return {
+            parsedSentences: sentences,
+            optionsData: options
+        };
     }, [fillInTheBlank.content]);
-
-
-return (
-    <div>
-        <h2>{fillInTheBlank.title}</h2>
-        {parsedStuff.map((renderedSentence, index) => (
-            <div key={index}>
-                {renderedSentence.split(/(<input[^>]*\/>|<select[^>]*>.*?<\/select>)/).map((part, partIndex) => {
-                    if (part.includes('<input')) {
-                        return <input key={partIndex} type="text" className="keyword-input" />;
-                    } else if (part.includes('<select')) {
-                        return <select key={partIndex} className="dropdown-input">...</select>;
-                    } else {
-                        return <span key={partIndex}>{part}</span>;
-                    }
-                })}
-            </div>
-        ))}
-    </div>
-)
+   
+    return (
+        <div>
+            <h2>{fillInTheBlank.title}</h2>
+            {parsedSentences.map((renderedSentence, index) => {
+                const splitParts = renderedSentence.split(/(<input[^>]*\/>|<select[^>]*>.*?<\/select>)/); // splits rendered sentence into parts, got gpt to make this, so we can loop through it
+               
+                return (
+                    <div key={index}>
+                        {splitParts.map((part, partIndex) => {
+                            if (part.includes('<input')) {
+                                return <input key={partIndex} type="text" className="keyword-input" />;
+                            }
+                            else if (part.includes('<select')) {
+                                const indexMatch = part.match(/data-index="(\d+)"/);
+                                const index = parseInt(indexMatch?.[1] || '0');
+                                const options = optionsData[index] || []; // holds the current options drop down for this fill in the blank if it has a select string so drop down
+                           
+                                return (
+                                    <select key={partIndex} className="dropdown-input">
+                                        {options.map((opt: any) => <option key={opt} value={opt}>{opt}</option>)}
+                                    </select>
+                                );
+                            }
+                            else {
+                                return <span key={partIndex}>{part}</span>;
+                            }
+                        })}
+                    </div>
+                );
+            })}
+        </div>
+    );
 }
