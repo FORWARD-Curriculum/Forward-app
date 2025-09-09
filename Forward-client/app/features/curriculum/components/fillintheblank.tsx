@@ -1,4 +1,4 @@
-import type { FillInTheBlank, FillInTheBlankResponse } from "../types";
+import type { FillInTheBlank, FillInTheBlank, FillInTheBlankResponse } from "../types";
 import { useResponse } from "../hooks";
 import { useMemo } from "react";
 
@@ -7,7 +7,31 @@ interface FillInTheBlankProps {
 }
 
 export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
-    console.log('Component rendering, fillInTheBlank:', fillInTheBlank);
+
+    // tracks amounts of options or blank inputs
+    const totalBlanks = useMemo(() => {
+        let count = 0;
+        fillInTheBlank.content.forEach(sentence => {
+            const matches = sentence.match(/options[^>]*?>.*?<\/options>/g);
+            if (matches) count += matches.length;
+        });
+        return count;
+    }, [fillInTheBlank.content]);
+
+    //use response hoook, we cerate an array the size of the empty responses we have
+    const[response, setResponse] = useResponse<FillInTheBlankResponse, FillInTheBlank>({
+        type: "FillInTheBlank",
+        activity: fillInTheBlank,
+        initialFields: {
+            submission: Array.from({ length: totalBlanks }, () => []),
+            attempts_left: 3,
+            partial_response: true,
+        }
+    });
+
+
+    //variables to do with state management
+
     const { parsedSentences, optionsData } = useMemo(() => {
         const optionsRegex = /<options([^>]*?)>(.*?)<\/options>/g;
         const options: string[][] = []; // options are stored then given back when retriveing the correct jsx
@@ -50,6 +74,7 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
             optionsData: options
         };
     }, [fillInTheBlank.content]);
+
    
     return (
         <div className="max-w-4xl mx-auto p-6">
