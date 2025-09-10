@@ -342,7 +342,8 @@ class Command(BaseCommand):
 
 
     def bucket_url_call(self, image_filename, key_prefix=''):
-        self.stdout.write(f"{f"  UPLOADING: '{image_filename}' INTO 'public/{key_prefix}'":.<77}",ending="")
+        upload_message = f"  UPLOADING: '{image_filename}' INTO 'public/{key_prefix}'"
+        self.stdout.write(f"{upload_message:.<77}", ending="")
         final_s3_key = f"public/{key_prefix}{Path(image_filename).name}"
 
         try:

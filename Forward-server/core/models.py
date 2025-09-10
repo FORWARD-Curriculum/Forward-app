@@ -107,6 +107,7 @@ class User(AbstractUser):
     # Automatically set when the user is created and updated
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    onboarded_at = models.DateTimeField(null=True)
 
     # This is not data we collect, its ugly but the other option is to inherit
     # from AbstractBaseUser and all the stuff that comes with that
@@ -128,6 +129,7 @@ class User(AbstractUser):
             'facility': self.facility.name if self.facility else None,
             'profile_picture': self.profile_picture,
             'consent': self.consent,
+            'onboard_time': self.onboarded_at,
             'preferences': {
                 'theme': self.theme,
                 'text_size': self.text_size,
@@ -244,6 +246,7 @@ class BaseActivity(models.Model):
 
     instructions = models.TextField(
         null=True,
+        blank=True,
         help_text="Instructions for completing the activity"
     )
 
@@ -1106,6 +1109,9 @@ class BaseResponse(models.Model):
     time_spent = models.PositiveIntegerField(default=0)
 
     attempts_left = models.PositiveIntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def to_dict(self):
         return {
