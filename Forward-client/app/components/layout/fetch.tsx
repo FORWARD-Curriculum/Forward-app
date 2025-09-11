@@ -10,7 +10,6 @@ export default function Fetch(){
     
       useEffect(() => {
         const handleProgressUpdate = () => {
-          console.log(window.apiProgress)
           setApiLoading({...window.apiProgress});
         };
     

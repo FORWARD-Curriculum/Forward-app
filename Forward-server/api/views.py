@@ -485,3 +485,26 @@ class QuizResponseStatusView(APIView):
                 message="Quiz not found",
                 status=status.HTTP_404_NOT_FOUND
             )
+            
+class OnboardView(APIView):
+    def get(self, request):
+        user: User = request.user
+        if user:
+            if(user.consent and not user.onboarded_at):
+                return json_go_brrr(
+                    message="Nessecary onboarding info:",
+                    data={
+                        "survey": "https://asu.co1.qualtrics.com/jfe/form/SV_9BtOetx46YdBQW2"
+                    },
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return json_go_brrr(
+                    message="You have already onboarded.",
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        else:
+            return json_go_brrr(
+                message="Must be logged in to onboard.",
+                status=status.HTTP_404_NOT_FOUND
+            )

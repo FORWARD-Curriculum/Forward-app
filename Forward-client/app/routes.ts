@@ -12,6 +12,7 @@ export default [
     route("register", "routes/register.tsx"),
     route("youth", "routes/youth.tsx"),
     route("supportersOfYouth", "routes/supportersOfYouth.tsx"),
+    route("onboard","routes/onboard.tsx"),
     layout("routes/protected/protected.tsx", [
       route("dashboard", "routes/protected/dashboard.tsx"),
       route("account", "routes/protected/account.tsx"),

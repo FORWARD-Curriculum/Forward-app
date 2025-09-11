@@ -10,6 +10,7 @@ export interface User {
     facility: string | null;
     profile_picture?: string;
     consent: boolean;
+    onboarded_at: string | null;
     preferences: {
       theme: "light" | "dark" | "high-contrast";
       text_size: "txt-sm" | "txt-base" | "txt-lg" | "txt-xl";

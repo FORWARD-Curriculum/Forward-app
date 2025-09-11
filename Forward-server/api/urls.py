@@ -3,7 +3,7 @@ from .views import (
     QuizResponseStatusView, UserRegistrationView, SessionView, CurrentUserView, QuizView,
     LessonView, LessonContentView, TextContentView, WritingView,
     PollView, QuizResponseView, QuizResponseDetailView, GetLessonIds,
-    CurriculumView, ResponseView
+    CurriculumView, ResponseView, OnboardView
 )
 
 urlpatterns = [
@@ -24,5 +24,7 @@ urlpatterns = [
     path('writing/<uuid:id>', WritingView.as_view(), name='writings'),
     path('poll/<uuid:id>', PollView.as_view(), name='polls'),
 
-    path('responses/<str:activitytype>', ResponseView.as_view(), name='general-response')
+    path('responses/<str:activitytype>', ResponseView.as_view(), name='general-response'),
+    
+    path('onboard', OnboardView.as_view(), name='onboarding')
 ]

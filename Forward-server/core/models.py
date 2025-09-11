@@ -129,7 +129,7 @@ class User(AbstractUser):
             'facility': self.facility.name if self.facility else None,
             'profile_picture': self.profile_picture,
             'consent': self.consent,
-            'onboard_time': self.onboarded_at,
+            'onboarded_at': self.onboarded_at,
             'preferences': {
                 'theme': self.theme,
                 'text_size': self.text_size,
