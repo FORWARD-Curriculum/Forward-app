@@ -107,7 +107,7 @@ class User(AbstractUser):
     # Automatically set when the user is created and updated
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    onboarded_at = models.DateTimeField(null=True)
+    surveyed_at = models.DateTimeField(null=True)
 
     # This is not data we collect, its ugly but the other option is to inherit
     # from AbstractBaseUser and all the stuff that comes with that
@@ -129,7 +129,7 @@ class User(AbstractUser):
             'facility': self.facility.name if self.facility else None,
             'profile_picture': self.profile_picture,
             'consent': self.consent,
-            'onboarded_at': self.onboarded_at,
+            'surveyed_at': self.surveyed_at,
             'preferences': {
                 'theme': self.theme,
                 'text_size': self.text_size,

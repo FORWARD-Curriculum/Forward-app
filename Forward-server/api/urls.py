@@ -26,5 +26,5 @@ urlpatterns = [
 
     path('responses/<str:activitytype>', ResponseView.as_view(), name='general-response'),
     
-    path('onboard', OnboardView.as_view(), name='onboarding')
+    path('survey', OnboardView.as_view(), name='surveying')
 ]

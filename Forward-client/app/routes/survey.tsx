@@ -1,5 +1,5 @@
 import { apiFetch } from "@/utils/utils";
-import type { Route } from "./+types/onboard";
+import type { Route } from "./+types/survey";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/features/account/hooks";
@@ -9,7 +9,7 @@ import type { RootState } from "@/store";
 import { useLocation, useNavigate } from "react-router";
 
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  const res = await apiFetch("/onboard", {}, false);
+  const res = await apiFetch("/survey", {}, false);
 
   const resp = (await res.json()) as {
     detail?: string;
@@ -36,7 +36,7 @@ export default function Onboard({ loaderData }: Route.ComponentProps) {
           apiFetch("/users/me", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ set_onboarded_now: true }),
+            body: JSON.stringify({ set_surveyed_now: true }),
           }).then((response) => {
             response.json().then((result) => {
               if (!response.ok) {
@@ -46,7 +46,7 @@ export default function Onboard({ loaderData }: Route.ComponentProps) {
                 ...result.data.user,
               });
               navigate(from, { replace: true });
-              toast.success("Successfully completed onboarding!");
+              toast.success("Successfully completed surveying!");
             });
           });
         } catch (err: any) {

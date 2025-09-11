@@ -490,9 +490,9 @@ class OnboardView(APIView):
     def get(self, request):
         user: User = request.user
         if user:
-            if(user.consent and not user.onboarded_at):
+            if(user.consent):
                 return json_go_brrr(
-                    message="Nessecary onboarding info:",
+                    message="Nessecary surveying info:",
                     data={
                         "survey": "https://asu.co1.qualtrics.com/jfe/form/SV_9BtOetx46YdBQW2"
                     },
@@ -500,11 +500,11 @@ class OnboardView(APIView):
                 )
             else:
                 return json_go_brrr(
-                    message="You have already onboarded.",
+                    message="You have not agreed to participate in the FORWARD research program.",
                     status=status.HTTP_404_NOT_FOUND
                 )
         else:
             return json_go_brrr(
-                message="Must be logged in to onboard.",
+                message="Must be logged in to take the survey.",
                 status=status.HTTP_404_NOT_FOUND
             )

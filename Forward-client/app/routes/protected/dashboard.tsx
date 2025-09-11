@@ -4,20 +4,19 @@ import Pie from "@/components/ui/cprogress";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import type { User } from "@/features/account/types";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import type { Route } from "./+types/dashboard";
 import { apiFetch } from "@/utils/utils";
 import type { Lesson } from "@/features/curriculum/types";
 import MarkdownTTS from "@/components/ui/markdown-tts";
+import { setUser } from "@/features/account/slices/userSlice";
+import { Button } from "@/components/ui/button";
 
 export async function clientLoader({}: Route.ClientLoaderArgs) {
-  const response = await apiFetch(
-    "/lessons",
-    {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    }
-  );
+  const response = await apiFetch("/lessons", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
   if (response.ok) {
     const json = await response.json();
     return json.data as Array<any>;
@@ -32,9 +31,10 @@ function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
           src={props.lesson?.image || "grad_cap.png"}
           className="h-full max-w-20"
         ></img>
-        <MarkdownTTS className="" controlsClassName='flex flex-row-reverse'>
+        <MarkdownTTS className="" controlsClassName="flex flex-row-reverse">
           <div className="flex flex-col text-left">
-            <Link prefetch="intent"
+            <Link
+              prefetch="intent"
               to={"/lesson/" + props.lesson?.id}
               className="text-accent text-xl"
             >
@@ -91,6 +91,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
 
   const lessons = useSelector((state: RootState) => state.curriculum.lessons);
   const user = useSelector((state: RootState) => state.user.user) as User;
+  const navigate = useNavigate();
 
   /* TODO: grab from api instead of hardcoding*/
 
@@ -159,7 +160,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
               )}
             </div>
           </div>
-          <div className="col-span-4 flex flex-col">
+          <div className="col-span-4 flex flex-col gap-4">
             <div className="bg-foreground outline-foreground-border flex h-fit w-full items-center gap-3 rounded-3xl p-4 outline-1">
               <div
                 className={`flex h-16 w-16 items-center justify-center overflow-hidden rounded-full ${
@@ -184,25 +185,38 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                   {user?.username}
                 </p>
               </div>
-              <Link prefetch="intent" className="text-secondary-foreground ml-auto" to="/account">
+              <Link
+                prefetch="intent"
+                className="text-secondary-foreground ml-auto"
+                to="/account"
+              >
                 Edit
               </Link>
             </div>
-            <div className="text-secondary-foreground">
+            <div className="text-secondary-foreground bg-foreground outline-foreground-border col-start-2 col-end-2 rounded-3xl p-4 outline-1">
               <p className="text-left font-medium">Your Progress</p>
-              <div className="bg-foreground outline-foreground-border col-start-2 col-end-2 rounded-3xl p-4 outline-1">
-                {!lessons ? (
-                  <p>Loading...</p>
-                ) : (
-                  lessons.map((e) => (
-                    <div className="flex items-center">
-                      <Pie size={120} percentage={20} color="" />
-                      <h2 className="text-base">{e.title}</h2>
-                    </div>
-                  ))
-                )}
-              </div>
+              {!lessons ? (
+                <p>Loading...</p>
+              ) : (
+                lessons.map((e) => (
+                  <div className="flex items-center" key={e.id}>
+                    <Pie size={120} percentage={20} color="" />
+                    <h2 className="text-base">{e.title}</h2>
+                  </div>
+                ))
+              )}
             </div>
+            {user?.consent && (
+              <div className="text-secondary-foreground bg-foreground outline-foreground-border col-start-2 col-end-2 rounded-3xl p-4 outline-1">
+                <p className="text-left font-medium mb-2">FORWARD Readiness Survey</p>
+                <Link
+                  to="/survey"
+                  className="bg-primary text-primary-foreground outline-primary-border ml-auto flex justify-center rounded-xl p-2 w-full outline-1"
+                >
+                  Re-Take
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -124,7 +124,7 @@ class UserUpdateSerializer(serializers.Serializer):
     speech_uri_index = serializers.IntegerField(required=False)
     speech_speed = serializers.FloatField(required=False)
 
-    set_onboarded_now = serializers.BooleanField(required=False)
+    set_surveyed_now = serializers.BooleanField(required=False)
 
     def validate(self, attrs: dict):
         theme = attrs.get('theme')
@@ -159,8 +159,8 @@ class UserUpdateSerializer(serializers.Serializer):
         Returns:
             instance: an updated user instance
         """
-        if validated_data.pop("set_onboarded_now", False):
-            instance.onboarded_at = timezone.now()
+        if validated_data.pop("set_surveyed_now", False):
+            instance.surveyed_at = timezone.now()
         # Update the instance with validated data
         instance.display_name = validated_data.get(
             'display_name', instance.display_name)

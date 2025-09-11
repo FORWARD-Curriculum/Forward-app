@@ -42,7 +42,8 @@
       "display_name": "Student3",
       "facility": null,
       "profile_picture": null,
-      "consent": false
+      "consent": true,
+      "surveyed_at": "2025-09-11T12:05:00.123"
     }
   ]
 }

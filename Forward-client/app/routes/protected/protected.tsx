@@ -44,6 +44,23 @@ export default function Layout() {
   const navigate = useNavigate();
   const { user, status } = useSelector((state: RootState) => state.user);
 
+  useEffect(() => {
+    if (
+      user &&
+      user.consent &&
+      !user.surveyed_at &&
+      !location.pathname.startsWith("/account")
+    ) {
+      navigate("/survey", { replace: true, state: { from: location } });
+    }
+  }, [
+    user?.consent,
+    user?.surveyed_at,
+    location.pathname,
+    navigate,
+    location,
+  ]);
+
   if (status === "loading" || status === "idle") {
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -51,23 +68,6 @@ export default function Layout() {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (
-      user &&
-      user.consent &&
-      !user.onboarded_at &&
-      !location.pathname.startsWith("/account")
-    ) {
-      navigate("/onboard", { replace: true, state: { from: location } });
-    }
-  }, [
-    user?.consent,
-    user?.onboarded_at,
-    location.pathname,
-    navigate,
-    location,
-  ]);
 
   return (
     <>
