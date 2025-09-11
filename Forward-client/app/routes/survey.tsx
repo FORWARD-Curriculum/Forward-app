@@ -46,7 +46,7 @@ export default function Onboard({ loaderData }: Route.ComponentProps) {
                 ...result.data.user,
               });
               navigate(from, { replace: true });
-              toast.success("Successfully completed surveying!");
+              toast.success("Successfully completed survey!");
             });
           });
         } catch (err: any) {

@@ -128,7 +128,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             Progress
           </button>
         </div>
-        <div className="flex flex-col gap-8 lg:grid lg:grid-cols-12 lg:gap-0">
+        <div className="flex flex-col-reverse gap-8 lg:grid lg:grid-cols-12 lg:gap-0">
           <div className="col-span-8">
             <div className="bg-foreground outline-foreground-border flex flex-col gap-2 rounded-3xl p-4 outline-1 lg:mr-4">
               <h1 className="text-secondary-foreground text-left text-3xl font-medium">
