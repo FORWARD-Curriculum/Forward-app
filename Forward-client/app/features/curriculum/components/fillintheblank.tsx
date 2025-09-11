@@ -1,6 +1,6 @@
 import type { FillInTheBlank, FillInTheBlank, FillInTheBlankResponse } from "../types";
 import { useResponse } from "../hooks";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 interface FillInTheBlankProps {
     fillInTheBlank: FillInTheBlank;
@@ -17,6 +17,10 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
         });
         return count;
     }, [fillInTheBlank.content]);
+
+    const [userInputs, setUserInputs] = (new Array(totalBlanks).fill("")); // Array size of blank user inputs
+    const [validationResults, setValidationResults] = useState<("correct" | "incorrect" | null)[]>(new Array(totalBlanks).fill(null));
+    const [lockedInputs, setLockedInputs] = useState<boolean[]>(new Array(totalBlanks).fill(false)); // Wish to lock messing with inputs when attempts run out
 
     //use response hoook, we cerate an array the size of the empty responses we have
     const[response, setResponse] = useResponse<FillInTheBlankResponse, FillInTheBlank>({
@@ -81,13 +85,16 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
             <h2 className="text-2xl font-bold text-center mb-8">{fillInTheBlank.title}</h2>
             
             <div className="space-y-6">
+                
                 {parsedSentences.map((renderedSentence, index) => {
+                    let inputIndex = 0
                     const splitParts = renderedSentence.split(/(<input[^>]*\/>|<select[^>]*>.*?<\/select>)/); // splits rendered sentence into parts, got gpt to make this, so we can loop through it
                    
                     return (
                         <div key={index} className="text-lg leading-relaxed text-center">
                             {splitParts.map((part, partIndex) => {
                                 if (part.includes('<input')) {
+                                    const currentIndex = inputIndex ++;
                                     return (
                                         <input 
                                             key={partIndex} 
