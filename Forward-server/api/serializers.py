@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager, Facility
 from django.core.exceptions import ImproperlyConfigured
-
+from django.utils import timezone
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
@@ -124,6 +124,8 @@ class UserUpdateSerializer(serializers.Serializer):
     speech_uri_index = serializers.IntegerField(required=False)
     speech_speed = serializers.FloatField(required=False)
 
+    set_onboarded_now = serializers.BooleanField(required=False)
+
     def validate(self, attrs: dict):
         theme = attrs.get('theme')
         text_size = attrs.get('text_size')
@@ -157,6 +159,8 @@ class UserUpdateSerializer(serializers.Serializer):
         Returns:
             instance: an updated user instance
         """
+        if validated_data.pop("set_onboarded_now", False):
+            instance.onboarded_at = timezone.now()
         # Update the instance with validated data
         instance.display_name = validated_data.get(
             'display_name', instance.display_name)
