@@ -26,7 +26,8 @@
       "display_name": "Student1",
       "facility": "rop-dla",
       "profile_picture": "/pfp.png",
-      "consent": true
+      "consent": true,
+      "surveyed_at": "2025-09-12T00:38:40Z"
     },
     {
       "username": "student2",
@@ -42,8 +43,7 @@
       "display_name": "Student3",
       "facility": null,
       "profile_picture": null,
-      "consent": true,
-      "surveyed_at": "2025-09-11T12:05:00.123"
+      "consent": true
     }
   ]
 }

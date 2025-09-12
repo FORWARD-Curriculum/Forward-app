@@ -29,7 +29,7 @@ services:
           action: rebuild
 
   database:
-    image: postgres:latest
+    image: postgres:alpine
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
