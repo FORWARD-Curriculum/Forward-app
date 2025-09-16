@@ -290,7 +290,7 @@ export interface DndMatchResponse extends BaseResponse {
 export interface LikertScaleResponse extends BaseResponse {
   content: {
     selection: number[];
-    explanation: string | null
+    explanation: string | null;
   };
 }
 

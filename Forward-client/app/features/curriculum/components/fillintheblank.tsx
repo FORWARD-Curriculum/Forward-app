@@ -67,7 +67,7 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
                  * 
                  * 
                  * "content": [  
-                  "Cats are <options>an animal, a bird, a fish</options> that often are found in <options>homes, outdoor spaces</options>!", 
+                  "Cats are <options>*an animal, a bird, a fish</options> that often are found in <options>*homes, outdoor spaces</options>!", 
                   "The sky is <options keyword=\"true\">blue, clear, bright</options>",
                   "My favorite color is <options></options> and I like to eat <options></options> for breakfast."
                 ]
@@ -75,6 +75,11 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
                     storing the options
                     then in return doing another if else check and returning jsx depending on the html string found
                     maybe not the best solution
+
+
+                    Drop downs parse teh * in an answer as the corrcet answer
+                    keywords will reference any of the options as a possible right answer
+                    and empty options mean anything except a blank answer is accepted
                  */
                 
                 if (attributes.includes('keyword="true"')) {
