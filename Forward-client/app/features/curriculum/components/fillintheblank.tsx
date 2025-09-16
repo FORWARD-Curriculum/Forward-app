@@ -1,6 +1,6 @@
 import type { FillInTheBlank, FillInTheBlankResponse } from "../types";
 import { useResponse } from "../hooks";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 interface FillInTheBlankProps {
     fillInTheBlank: FillInTheBlank;
@@ -18,10 +18,6 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
         return count;
     }, [fillInTheBlank.content]);
 
-    const [userInputs, setUserInputs] = useState<string[]>(new Array(totalBlanks).fill("")); // Array size of blank user inputs
-    const [validationResults, setValidationResults] = useState<("correct" | "incorrect" | null)[]>(new Array(totalBlanks).fill(null));
-    const [lockedInputs, setLockedInputs] = useState<boolean[]>(new Array(totalBlanks).fill(false)); // Wish to lock messing with inputs when attempts run out
-
     //use response hoook, we cerate an array the size of the empty responses we have
     const[response, setResponse] = useResponse<FillInTheBlankResponse, FillInTheBlank>({
         type: "FillInTheBlank",
@@ -32,6 +28,23 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
             partial_response: true,
         }
     });
+
+    const [userInputs, setUserInputs] = useState<string[]>(new Array(totalBlanks).fill(""));
+
+    useEffect(() => {
+        if (response.submission && response.submission.length > 0){
+            setUserInputs(response.submission);
+
+            if (response.attempts_left <= 0){
+                setLockedInputs(new Array(totalBlanks).fill(true));
+            }
+        }
+    }, [response.id, totalBlanks]);
+
+    // user input is first filled or checked from our useResponse hook
+    // const [userInputs, setUserInputs] = useState<string[]>( response.submission.length > 0 ? response.submission :new Array(totalBlanks).fill("")); // Array size of blank user inputs
+    const [validationResults, setValidationResults] = useState<("correct" | "incorrect" | null)[]>(new Array(totalBlanks).fill(null));
+    const [lockedInputs, setLockedInputs] = useState<boolean[]>(new Array(totalBlanks).fill(false)); // Wish to lock messing with inputs when attempts run out
 
 
     //variables to do with state management
@@ -143,7 +156,7 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
         }
     };
 
-
+    // Just resets all answers blank so the student can start fresh
     const handleReset = () => {
         setUserInputs(new Array(totalBlanks).fill(""));
         setValidationResults(new Array(totalBlanks).fill(null));
@@ -151,7 +164,6 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
         setResponse(prev => ({
             ...prev,
             submission: new Array(totalBlanks).fill(""),
-            attempts_left: 3,
             partial_response: true,
         }));
     };
