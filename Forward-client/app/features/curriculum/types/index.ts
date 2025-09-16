@@ -300,6 +300,6 @@ export interface VideoResponse extends BaseResponse {
 export interface TwineResponse extends BaseResponse {}
 
 export interface FillInTheBlankResponse extends BaseResponse {
-  submission: string[][];
+  submission: string[];
 }
 // #endregion -------------------------- Responses ----------------------------

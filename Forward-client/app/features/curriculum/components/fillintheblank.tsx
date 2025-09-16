@@ -27,7 +27,7 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
         type: "FillInTheBlank",
         activity: fillInTheBlank,
         initialFields: {
-            submission: Array.from({ length: totalBlanks }, () => []),
+            submission: new Array(totalBlanks).fill(""),
             attempts_left: 3,
             partial_response: true,
         }
@@ -36,7 +36,7 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
 
     //variables to do with state management
 
-    const { parsedSentences, optionsData } = useMemo(() => {
+    const { parsedSentences, optionsData, correctAnswers } = useMemo(() => {
         const optionsRegex = /<options([^>]*?)>(.*?)<\/options>/g;
         const options: string[][] = []; // options are stored then given back when retriveing the correct jsx
         const answers: (string | string[] | null)[] = []; // the answers once parsed from the string will be stored here as comparison
@@ -71,7 +71,7 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
 
                     // we have to parse out the * from the correct option in dropdowns
                     const correctOption = opts.find((opt: string) => opt.startsWith('*'));
-                    answers[inputCounter++] = correctOption ? correctOption.subString(1) : null;
+                    answers[inputCounter++] = correctOption ? correctOption.substring(1) : null;
 
                     // remove *
                     const cleanOpts = opts.map((opt: string) => opt.startsWith('*') ? opt.substring(1) : opt);
@@ -99,15 +99,61 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
         setUserInputs(newInputs);
     }
 
-    //test
     const handleCheck = () => {
-        console.log("User inputs:", userInputs);
+        const newValidationResults: ("correct" | "incorrect" | null)[] = [...validationResults];
+        let allCorrect = true;
 
+        // Loop through each user input
+        userInputs.forEach((userInput, index) => {
+            const correctAnswer = correctAnswers[index];
+            let isCorrect = false;
+
+            if (correctAnswer === null) {
+                // Free text --> any answer is accepted
+                isCorrect = userInput.trim() !== ""; // As long as they typed something
+            } else if (Array.isArray(correctAnswer)) {
+                // Keyword matchings
+                const trimmedInput = userInput.trim().toLowerCase();
+                isCorrect = correctAnswer.some(keyword => 
+                    keyword.toLowerCase() === trimmedInput
+                );
+            } else {
+                // Dropdown, exact match with the correct option (the one that had *)
+                isCorrect = userInput.trim() === correctAnswer.trim();
+            }
+
+            newValidationResults[index] = isCorrect ? "correct" : "incorrect";
+            if (!isCorrect) allCorrect = false;
+        });
+
+        // Update validation results
+        setValidationResults(newValidationResults);
+
+    
+        setResponse(prev => ({
+            ...prev,
+            submission: userInputs,
+            attempts_left: allCorrect ? 0 : prev.attempts_left - 1,
+            partial_response: allCorrect ? false : prev.attempts_left - 1 > 0
+        }));
+
+        // If no attempts left, lock all inputs
+        if (!allCorrect && response.attempts_left - 1 <= 0) {
+            setLockedInputs(new Array(totalBlanks).fill(true));
+        }
     };
+
 
     const handleReset = () => {
         setUserInputs(new Array(totalBlanks).fill(""));
         setValidationResults(new Array(totalBlanks).fill(null));
+        setLockedInputs(new Array(totalBlanks).fill(false));
+        setResponse(prev => ({
+            ...prev,
+            submission: new Array(totalBlanks).fill(""),
+            attempts_left: 3,
+            partial_response: true,
+        }));
     };
 
    
@@ -126,20 +172,24 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
                         <div key={sentenceIndex} className="text-lg leading-relaxed text-center">
                             {splitParts.map((part, partIndex) => {
                                 if (part.includes('<input')) {
-                                    const currentIndex = globalInputIndex++; // ✅ Now this continues: 0,1,2,3,4...
+                                    const currentIndex = globalInputIndex++;
                                     return (
                                         <input 
                                             key={partIndex} 
                                             type="text" 
-                                            value={userInputs[currentIndex] || ''} // ✅ Connect to state
-                                            onChange={(e) => handleInputChange(currentIndex, e.target.value)} // ✅ Handle changes
-                                            disabled={lockedInputs[currentIndex]} // ✅ Add locking
-                                            className="inline-block mx-1 px-3 py-2 border-2 border-muted rounded-lg focus:border-primary focus:outline-none bg-background min-w-[120px] text-center" 
+                                            value={userInputs[currentIndex] || ''}
+                                            onChange={(e) => handleInputChange(currentIndex, e.target.value)}
+                                            disabled={lockedInputs[currentIndex]}
+                                            className={`inline-block mx-1 px-3 py-2 border-2 rounded-lg focus:outline-none bg-background min-w-[120px] text-center ${
+                                                validationResults[currentIndex] === 'correct' ? 'border-green-500 bg-green-50' : 
+                                                validationResults[currentIndex] === 'incorrect' ? 'border-red-500 bg-red-50' : 
+                                                'border-muted focus:border-primary'
+                                            }`}
                                         />
                                     );
                                 }
                                 else if (part.includes('<select')) {
-                                    const currentIndex = globalInputIndex++; // ✅ Same global counter
+                                    const currentIndex = globalInputIndex++;
                                     const indexMatch = part.match(/data-index="(\d+)"/);
                                     const optionsIndex = parseInt(indexMatch?.[1] || '0');
                                     const options = optionsData[optionsIndex] || [];
@@ -147,10 +197,14 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
                                     return (
                                         <select 
                                             key={partIndex} 
-                                            value={userInputs[currentIndex] || ''} // ✅ Connect to state
-                                            onChange={(e) => handleInputChange(currentIndex, e.target.value)} // ✅ Handle changes
-                                            disabled={lockedInputs[currentIndex]} // ✅ Add locking
-                                            className="inline-block mx-1 px-3 py-2 border-2 border-muted rounded-lg focus:border-primary focus:outline-none bg-background min-w-[120px] text-center"
+                                            value={userInputs[currentIndex] || ''}
+                                            onChange={(e) => handleInputChange(currentIndex, e.target.value)}
+                                            disabled={lockedInputs[currentIndex]}
+                                            className={`inline-block mx-1 px-3 py-2 border-2 rounded-lg focus:outline-none bg-background min-w-[120px] text-center ${
+                                                validationResults[currentIndex] === 'correct' ? 'border-green-500 bg-green-50' : 
+                                                validationResults[currentIndex] === 'incorrect' ? 'border-red-500 bg-red-50' : 
+                                                'border-muted focus:border-primary'
+                                            }`}
                                         >
                                             <option value="">Choose...</option>
                                             {options.map((opt: any) => <option key={opt} value={opt}>{opt}</option>)}
@@ -170,13 +224,15 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
             <div className="mt-12 flex justify-center gap-4">
                 <button 
                     onClick={handleReset}
-                    className="bg-accent text-secondary-foreground hover:bg-muted rounded-lg px-8 py-3 font-semibold shadow-sm border border-muted transition-colors">
+                    disabled={response.attempts_left <= 0}
+                    className="bg-accent text-secondary-foreground hover:bg-muted rounded-lg px-8 py-3 font-semibold shadow-sm border border-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         Reset
                 </button>
                 <button 
                     onClick={handleCheck}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-8 py-3 font-semibold shadow-sm transition-colors">
-                        Check Answers
+                    disabled={response.attempts_left <= 0}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-8 py-3 font-semibold shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        Check Answers ({response.attempts_left}/3)
                 </button>
             </div>
         </div>
