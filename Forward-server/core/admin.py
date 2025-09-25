@@ -19,7 +19,7 @@ class UserAdmin(BaseUserAdmin):
         (_('Personal info'), {'fields': ('display_name', 'facility', 'profile_picture')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'consent',
                                        'groups', 'user_permissions')}),
-        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined', 'surveyed_at')}),
     )
     
     # Define fields for add user form

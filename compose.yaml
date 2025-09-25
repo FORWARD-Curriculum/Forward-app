@@ -1,6 +1,6 @@
 services:
   backend:
-    image: FORWARD/django
+    #image: FORWARD/django
     build: ./Forward-server
     depends_on:
       - database
@@ -8,9 +8,13 @@ services:
       - ./Forward-server:/app/server
     ports:
       - "127.0.0.1:8000:8000"
+    develop:
+      watch:
+        - path: ./Forward-server/requirements.txt
+          action: rebuild
       
   frontend:
-    image: FORWARD/frontend
+    #image: FORWARD/frontend
     build: ./Forward-client
     volumes:
       - ./Forward-client:/app/server
@@ -19,9 +23,13 @@ services:
       - "127.0.0.1:5173:5173"
     links:
       - backend
+    develop:
+      watch:
+        - path: ./Forward-client/package.json
+          action: rebuild
 
   database:
-    image: postgres:latest
+    image: postgres:alpine
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

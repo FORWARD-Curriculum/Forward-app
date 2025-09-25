@@ -25,6 +25,10 @@ export const initialLessonResponseState: LessonResponse = {
     Identification: [],
     Poll: [],
     Embed: [],
+    LikertScale: [],
+    Twine: [],
+    DndMatch: [],
+    Video: []
   },
 };
 

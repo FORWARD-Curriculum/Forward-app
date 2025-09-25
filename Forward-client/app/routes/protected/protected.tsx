@@ -1,7 +1,13 @@
-import { Navigate, Outlet, useLocation } from "react-router";
+import {
+  Navigate,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { cn } from "@/utils/utils";
+import { useEffect } from "react";
 
 //https://github.com/shadcn-ui/ui/discussions/1694
 export interface ISVGProps extends React.SVGProps<SVGSVGElement> {
@@ -35,7 +41,25 @@ export const LoadingSpinner = ({
 
 export default function Layout() {
   const location = useLocation();
-  const {user, status} = useSelector((state: RootState) => state.user);
+  const navigate = useNavigate();
+  const { user, status } = useSelector((state: RootState) => state.user);
+
+  useEffect(() => {
+    if (
+      user &&
+      user.consent &&
+      !user.surveyed_at &&
+      !location.pathname.startsWith("/account")
+    ) {
+      navigate("/survey", { replace: true, state: { from: location } });
+    }
+  }, [
+    user?.consent,
+    user?.surveyed_at,
+    location.pathname,
+    navigate,
+    location,
+  ]);
 
   if (status === "loading" || status === "idle") {
     return (

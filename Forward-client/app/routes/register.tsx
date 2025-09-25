@@ -205,7 +205,7 @@ export default function Login() {
           <div className="flex gap-2">
             {!instructor && (
               <Button
-                aria-label="Switch to instructor onboarding"
+                aria-label="Switch to instructor surveying"
                 variant={"outline"}
                 className="px-4"
                 onClick={() => {

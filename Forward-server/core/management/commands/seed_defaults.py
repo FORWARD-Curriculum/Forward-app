@@ -1,4 +1,5 @@
 import json
+import datetime
 from pathlib import Path
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -100,6 +101,8 @@ class Command(BaseCommand):
                 'is_superuser': data.get('is_superuser', False),
                 'email': data.get('email'),
                 'facility': facility,
+                'surveyed_at': datetime.datetime.fromisoformat(data.get('surveyed_at')).date()\
+                        if not (data.get('surveyed_at') == None) else None
             }
             
             # Remove None values from defaults to avoid overriding existing DB defaults unnecessarily
