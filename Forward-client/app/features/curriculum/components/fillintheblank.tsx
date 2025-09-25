@@ -31,15 +31,6 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
 
     const [userInputs, setUserInputs] = useState<string[]>(new Array(totalBlanks).fill(""));
 
-    useEffect(() => {
-        if (response.submission && response.submission.length > 0){
-            setUserInputs(response.submission);
-
-            if (response.attempts_left <= 0){
-                setLockedInputs(new Array(totalBlanks).fill(true));
-            }
-        }
-    }, [response.id, totalBlanks]);
 
     // user input is first filled or checked from our useResponse hook
     // const [userInputs, setUserInputs] = useState<string[]>( response.submission.length > 0 ? response.submission :new Array(totalBlanks).fill("")); // Array size of blank user inputs
@@ -110,6 +101,42 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
         };
     }, [fillInTheBlank.content]);
 
+    // Extract the validation logic into a reusable function
+    const validateAnswers = (inputs: string[]): ("correct" | "incorrect" | null)[] => {
+        const newValidationResults: ("correct" | "incorrect" | null)[] = new Array(totalBlanks).fill(null);
+        
+        inputs.forEach((userInput, index) => {
+            const correctAnswer = correctAnswers[index];
+            let isCorrect = false;
+            
+            if (correctAnswer === null) {
+                isCorrect = userInput.trim() !== "";
+            } else if (Array.isArray(correctAnswer)) {
+                const trimmedInput = userInput.trim().toLowerCase();
+                isCorrect = correctAnswer.some(keyword => 
+                    keyword.toLowerCase() === trimmedInput
+                );
+            } else {
+                isCorrect = userInput.trim() === correctAnswer.trim();
+            }
+            
+            newValidationResults[index] = isCorrect ? "correct" : "incorrect";
+        });
+        
+        return newValidationResults;
+    };
+    
+    // when there is a refresh this is used to update values that were changed previously 
+    useEffect(() => {
+        if (response.submission && response.submission.length > 0){
+            setUserInputs(response.submission);
+            
+            if (response.attempts_left <= 0){
+                setLockedInputs(new Array(totalBlanks).fill(true));
+                setValidationResults(validateAnswers(response.submission));
+            }
+        }
+    }, [response.id, totalBlanks, correctAnswers]);
 
     const handleInputChange = (index: number, value: string) => {
         const newInputs = [...userInputs];
@@ -118,50 +145,24 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
     }
 
     const handleCheck = () => {
-        const newValidationResults: ("correct" | "incorrect" | null)[] = [...validationResults];
-        let allCorrect = true;
-
-        // Loop through each user input
-        userInputs.forEach((userInput, index) => {
-            const correctAnswer = correctAnswers[index];
-            let isCorrect = false;
-
-            if (correctAnswer === null) {
-                // Free text --> any answer is accepted
-                isCorrect = userInput.trim() !== ""; // As long as they typed something
-            } else if (Array.isArray(correctAnswer)) {
-                // Keyword matchings
-                const trimmedInput = userInput.trim().toLowerCase();
-                isCorrect = correctAnswer.some(keyword => 
-                    keyword.toLowerCase() === trimmedInput
-                );
-            } else {
-                // Dropdown, exact match with the correct option (the one that had *)
-                isCorrect = userInput.trim() === correctAnswer.trim();
-            }
-
-            newValidationResults[index] = isCorrect ? "correct" : "incorrect";
-            if (!isCorrect) allCorrect = false;
-        });
-
-        // Update validation results
+        const newValidationResults = validateAnswers(userInputs);
         setValidationResults(newValidationResults);
-
-    
+        
+        const allCorrect = !newValidationResults.includes("incorrect");
+        
         setResponse(prev => ({
             ...prev,
             submission: userInputs,
             attempts_left: allCorrect ? 0 : prev.attempts_left - 1,
             partial_response: allCorrect ? false : prev.attempts_left - 1 > 0
         }));
-
-        // If no attempts left, lock all inputs
         if (!allCorrect && response.attempts_left - 1 <= 0) {
             setLockedInputs(new Array(totalBlanks).fill(true));
         }
     };
 
-    // Just resets all answers blank so the student can start fresh
+    // not allowing the amount of tries to be rest to 3 when clicked, but the ui is updated
+    // so all fields become empty
     const handleReset = () => {
         setUserInputs(new Array(totalBlanks).fill(""));
         setValidationResults(new Array(totalBlanks).fill(null));
@@ -173,70 +174,69 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
         }));
     };
 
-   
     return (
         <div className="max-w-4xl mx-auto p-6">
             <h2 className="text-2xl font-bold text-center mb-8">{fillInTheBlank.title}</h2>
             
-        <div className="space-y-6">
-            {(() => {
-                let globalInputIndex = 0; // Move counter outside to persist across sentences
-                
-                return parsedSentences.map((renderedSentence, sentenceIndex) => {
-                    const splitParts = renderedSentence.split(/(<input[^>]*\/>|<select[^>]*>.*?<\/select>)/);
-                
-                    return (
-                        <div key={sentenceIndex} className="text-lg leading-relaxed text-center">
-                            {splitParts.map((part, partIndex) => {
-                                if (part.includes('<input')) {
-                                    const currentIndex = globalInputIndex++;
-                                    return (
-                                        <input 
-                                            key={partIndex} 
-                                            type="text" 
-                                            value={userInputs[currentIndex] || ''}
-                                            onChange={(e) => handleInputChange(currentIndex, e.target.value)}
-                                            disabled={lockedInputs[currentIndex]}
-                                            className={`inline-block mx-1 px-3 py-2 border-2 rounded-lg focus:outline-none bg-background min-w-[120px] text-center ${
-                                                validationResults[currentIndex] === 'correct' ? 'border-green-500 bg-green-50' : 
-                                                validationResults[currentIndex] === 'incorrect' ? 'border-red-500 bg-red-50' : 
-                                                'border-muted focus:border-primary'
-                                            }`}
-                                        />
-                                    );
-                                }
-                                else if (part.includes('<select')) {
-                                    const currentIndex = globalInputIndex++;
-                                    const indexMatch = part.match(/data-index="(\d+)"/);
-                                    const optionsIndex = parseInt(indexMatch?.[1] || '0');
-                                    const options = optionsData[optionsIndex] || [];
-                            
-                                    return (
-                                        <select 
-                                            key={partIndex} 
-                                            value={userInputs[currentIndex] || ''}
-                                            onChange={(e) => handleInputChange(currentIndex, e.target.value)}
-                                            disabled={lockedInputs[currentIndex]}
-                                            className={`inline-block mx-1 px-3 py-2 border-2 rounded-lg focus:outline-none bg-background min-w-[120px] text-center ${
-                                                validationResults[currentIndex] === 'correct' ? 'border-green-500 bg-green-50' : 
-                                                validationResults[currentIndex] === 'incorrect' ? 'border-red-500 bg-red-50' : 
-                                                'border-muted focus:border-primary'
-                                            }`}
-                                        >
-                                            <option value="">Choose...</option>
-                                            {options.map((opt: any) => <option key={opt} value={opt}>{opt}</option>)}
-                                        </select>
-                                    );
-                                }
-                                else {
-                                    return <span key={partIndex}>{part}</span>;
-                                }
-                            })}
-                        </div>
-                    );
-                });
-            })()}
-        </div>
+            <div className="space-y-6">
+                {(() => {
+                    let globalInputIndex = 0;
+                    
+                    return parsedSentences.map((renderedSentence, sentenceIndex) => {
+                        const splitParts = renderedSentence.split(/(<input[^>]*\/>|<select[^>]*>.*?<\/select>)/);
+                    
+                        return (
+                            <div key={sentenceIndex} className="flex flex-wrap items-center justify-start gap-2 text-lg leading-relaxed bg-foreground border border-muted rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                                {splitParts.map((part, partIndex) => {
+                                    if (part.includes('<input')) {
+                                        const currentIndex = globalInputIndex++;
+                                        return (
+                                            <input 
+                                                key={partIndex} 
+                                                type="text" 
+                                                value={userInputs[currentIndex] || ''}
+                                                onChange={(e) => handleInputChange(currentIndex, e.target.value)}
+                                                disabled={lockedInputs[currentIndex]}
+                                                className={`px-3 py-2 border-2 rounded-lg focus:outline-none bg-background min-w-[120px] text-center ${
+                                                    validationResults[currentIndex] === 'correct' ? 'border-green-500 bg-green-50' : 
+                                                    validationResults[currentIndex] === 'incorrect' ? 'border-red-500 bg-red-50' : 
+                                                    'border-muted focus:border-primary'
+                                                }`}
+                                            />
+                                        );
+                                    }
+                                    else if (part.includes('<select')) {
+                                        const currentIndex = globalInputIndex++;
+                                        const indexMatch = part.match(/data-index="(\d+)"/);
+                                        const optionsIndex = parseInt(indexMatch?.[1] || '0');
+                                        const options = optionsData[optionsIndex] || [];
+                                
+                                        return (
+                                            <select 
+                                                key={partIndex} 
+                                                value={userInputs[currentIndex] || ''}
+                                                onChange={(e) => handleInputChange(currentIndex, e.target.value)}
+                                                disabled={lockedInputs[currentIndex]}
+                                                className={`px-3 py-2 border-2 rounded-lg focus:outline-none bg-background min-w-[120px] text-center ${
+                                                    validationResults[currentIndex] === 'correct' ? 'border-green-500 bg-green-50' : 
+                                                    validationResults[currentIndex] === 'incorrect' ? 'border-red-500 bg-red-50' : 
+                                                    'border-muted focus:border-primary'
+                                                }`}
+                                            >
+                                                <option value="">Choose...</option>
+                                                {options.map((opt: any) => <option key={opt} value={opt}>{opt}</option>)}
+                                            </select>
+                                        );
+                                    }
+                                    else {
+                                        return <span key={partIndex} className="whitespace-nowrap">{part}</span>;
+                                    }
+                                })}
+                            </div>
+                        );
+                    });
+                })()}
+            </div>
             
             <div className="mt-12 flex justify-center gap-4">
                 <button 
