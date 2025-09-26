@@ -652,7 +652,41 @@ class DndMatch(BaseActivity):
             "content": regex_image_sub(self.content, key_prefix="dndmatch/"),
         }
 
+class FillInTheBlank(BaseActivity):
+    """
+    It receives a comma seperated array, dividing each fill
+    in the blank activity type from each other.
 
+    There are three types, mainly 
+    
+    * Any words accepted
+    * Keyword recognition?
+    * Drop-down menu for selecting from given options
+
+    """
+
+    content = models.JSONField(
+        help_text= "Array of sentences with <options> markup for blanks"
+    )
+
+    def incorrect_fills(self):
+        # imitating DND, guess this is for analytics
+        responses = FillInTheBlankResponse.objects.filter( # come back to this
+            associated_activity=self
+        )
+
+
+
+    # delete this later comment later, just for me --> but remakes it into a json to give to frontend
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content,
+        }
+
+
+    
+    
 class ConceptMap(BaseActivity):
     """Model for mapping concepts to each other"""
     content = models.CharField(
@@ -1122,7 +1156,6 @@ class BaseResponse(models.Model):
             "associated_activity": self.associated_activity.id,
         }
 
-
 class VideoResponse(BaseResponse):
     """
     Response model for Video activities.
@@ -1186,6 +1219,25 @@ class DndMatchResponse(BaseResponse):
 
     def to_dict(self):
         return {
+            **super().to_dict(),
+            "submission": self.submission
+        }
+
+class FillInTheBlankResponse(BaseResponse):
+    
+    associated_activity = models.ForeignKey(
+        FillInTheBlank,
+        on_delete=models.CASCADE,
+        related_name="associated_fillintheblank",
+        help_text="The fill in the blank activity associated with this response"
+    )
+
+    submission = models.JSONField(
+        help_text="Array of user's answers for each blank"
+    )
+
+    def to_dict(self):
+        return{
             **super().to_dict(),
             "submission": self.submission
         }
@@ -1416,6 +1468,8 @@ class ActivityManager():
         self.registerActivity(Concept, None, child_class=True)
         self.registerActivity(DndMatch, DndMatchResponse, {
                               "submission": ["submission", []]})
+        self.registerActivity(FillInTheBlank, FillInTheBlankResponse, {
+                              "submission": ["submission", []]}) # a little unsure about this part
         self.registerActivity(LikertScale, LikertScaleResponse, {
                               "content": ["content", {}]})
         self.registerActivity(Video, VideoResponse, {

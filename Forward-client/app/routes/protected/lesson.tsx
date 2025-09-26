@@ -19,6 +19,7 @@ import Identification from "@/features/curriculum/components/identification";
 import Embed from "@/features/curriculum/components/embed";
 import ConceptMap from "@/features/curriculum/components/conceptmap";
 import DndMatch from "@/features/curriculum/components/dndmatch";
+import FillInTheBlank from "@/features/curriculum/components/fillintheblank";
 import { useClient } from "@/hooks/useClient";
 import {
   Accordion,
@@ -118,6 +119,8 @@ export function Activity({ activity }: { activity: BaseActivity }) {
       );
     case "DndMatch":
       return <DndMatch key={key} dndmatch={activity as ActivityManager["DndMatch"][0]}/>
+    case "FillInTheBlank":
+      return <FillInTheBlank key={key} fillInTheBlank={activity as ActivityManager["FillInTheBlank"][0]}/>
     case "Video":
       return <Video key={key} video={activity as ActivityManager["Video"][0]} />;
     case "Twine":

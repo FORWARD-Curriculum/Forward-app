@@ -205,6 +205,17 @@
       ]
     },
     {
+      "type": "fillintheblank",
+      "title": "Fill in the Blank",
+      "instructions": "Fill in the blank with your best guess as the the empty fields. Variations include any key words accepted, keyword recognition, and drop-down menu for sleecting options",
+      "content": [  
+                  "Cats are <options>*an animal, a bird, a fish</options> that often are found in <options>*homes, outdoor spaces</options>!", 
+                  "The sky is <options keyword=\"true\">blue, clear, bright</options>",
+                  "My favorite color is <options></options> and I like to eat <options></options> for breakfast."
+                ]
+
+    },
+    {
       "type": "textcontent",
       "title": "Choosing a College",
       "instructions": null,
