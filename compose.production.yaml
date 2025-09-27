@@ -1,0 +1,14 @@
+services:
+  backend:
+    build: 
+      context: ./Forward-server
+      dockerfile: Dockerfile.Production
+    depends_on:
+      - database
+    volumes:
+      - ./Forward-server:/app/server
+    ports:
+      - "8000:8000"
+    restart: always
+    env_file:
+      - ./.env.production
