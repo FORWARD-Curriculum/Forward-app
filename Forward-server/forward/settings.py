@@ -96,10 +96,10 @@ CORS_ALLOW_HEADERS = ['*',
 
 # TODO: Change to true when we have https setup
 
-if not DEBUG:
-    SESSION_COOKIE_DOMAIN = os.environ.get("DOMAIN")
-    CSRF_COOKIE_DOMAIN = os.environ.get("DOMAIN")
-    CSRF_COOKIE_HTTPONLY = False
+COOKIE_DOMAIN = os.environ.get("COOKIE_DOMAIN", "forwardapp.org")
+SESSION_COOKIE_DOMAIN = COOKIE_DOMAIN
+CSRF_COOKIE_DOMAIN = COOKIE_DOMAIN
+CSRF_COOKIE_HTTPONLY = False
 
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'None'
