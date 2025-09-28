@@ -1,14 +1,32 @@
 services:
   backend:
+    container_name: backend
     build: 
       context: ./Forward-server
       dockerfile: Dockerfile.Production
-    depends_on:
-      - database
     volumes:
       - ./Forward-server:/app/server
-    ports:
-      - "8000:8000"
-    restart: always
+    restart: unless-stopped
     env_file:
       - ./.env.production
+    networks:
+      - proxy
+
+  caddy:
+    image: caddy
+    container_name: caddy
+    restart: unless-stopped
+    networks:
+      - proxy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8000:8000"
+    volumes:
+      - ../caddy/data:/config
+      - ../caddy/data:/data
+      - ../caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+
+networks:
+  proxy:
+    external: true
