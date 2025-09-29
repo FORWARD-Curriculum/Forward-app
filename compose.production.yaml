@@ -11,6 +11,8 @@ services:
       - ./.env.production
     networks:
       - proxy
+    volumes:
+      - static_volume:/app/static
 
   caddy:
     image: caddy
@@ -23,10 +25,12 @@ services:
       - "443:443"
       - "8000:8000"
     volumes:
-      - ../caddy/data:/config
-      - ../caddy/data:/data
-      - ../caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - static_volume:/var/www/static
 
 networks:
   proxy:
     external: true
+
+volumes:
+  static_volume:
