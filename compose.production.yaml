@@ -8,7 +8,7 @@ services:
       - ./Forward-server:/app/server
     restart: unless-stopped
     env_file:
-      - ./.env.production
+      - ../env_files/django/.env.production
     networks:
       - proxy
     volumes:
