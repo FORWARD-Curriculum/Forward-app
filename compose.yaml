@@ -35,7 +35,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: forward_db
     volumes:
-      - .postgres_data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql/data
 
   minio:
     image: minio/minio
@@ -48,3 +48,6 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     command: server /data --console-address ":9001"
+
+volumes:
+  pg_data:

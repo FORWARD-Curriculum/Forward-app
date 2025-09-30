@@ -8,11 +8,13 @@ export default function Question({
   question,
   questionNumber,
   quizId,
+  lessonId,
   setDone,
 }: {
   question: Question;
   questionNumber: number;
   quizId: string;
+  lessonId: string;
   setDone: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [response, setResponse, saveResponse] = useResponse<
@@ -23,6 +25,7 @@ export default function Question({
     activity: question,
     initialFields: {
       quiz_id: quizId,
+      lesson_id: lessonId,
       response_data: { selected: [] },
       attempts_left: question.attempts || 3,
     },

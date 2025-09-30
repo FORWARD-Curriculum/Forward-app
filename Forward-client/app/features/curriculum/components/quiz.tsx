@@ -44,6 +44,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
               question={question}
               questionNumber={questionNumber}
               quizId={quiz.id}
+              lessonId={quiz.lesson_id}
               setDone={setDone}
             />
           );

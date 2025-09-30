@@ -391,13 +391,28 @@ class QuestionResponseService:
             response_data = validated_data.get('response_data', {})
             time_spent = validated_data.get('time_spent', 0)
             
+            # Get the quiz first
+            quiz = Quiz.objects.get(id=quiz_id)
+            
+            # Handle lesson_id properly
+            if lesson_id:
+                if isinstance(lesson_id, Lesson):
+                    lesson = lesson_id
+                else:
+                    try:
+                        lesson = Lesson.objects.get(id=lesson_id)
+                    except Lesson.DoesNotExist:
+                        lesson = quiz.lesson
+            else:
+                lesson = quiz.lesson
+                    
             # Get or create the parent quiz response
             quiz_response, created = UserQuizResponse.objects.get_or_create(
                 user=user,
-                associated_activity_id=quiz_id,
+                associated_activity_id=quiz,
                 defaults={
-                    'lesson_id': lesson_id,
-                    'partial_response': True,  # It's partial until explicitly completed
+                    'lesson': lesson,  # ← Changed
+                    'partial_response': True,
                     'completion_percentage': 0.0
                 }
             )
@@ -408,7 +423,7 @@ class QuestionResponseService:
                 quiz_response=quiz_response,
                 question=question,
                 defaults={
-                    'lesson_id': lesson_id,
+                    'lesson': lesson,  # ← Changed
                     'response_data': response_data,
                     'time_spent': time_spent
                 }

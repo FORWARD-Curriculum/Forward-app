@@ -263,6 +263,7 @@ export interface QuizResponse extends BaseResponse {
 export interface QuestionResponse extends BaseResponse {
   response_data: { selected: number[] };
   quiz_id: string;
+  lesson_id: string;
 }
 
 /**
