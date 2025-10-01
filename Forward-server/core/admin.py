@@ -9,6 +9,8 @@ from pathlib import Path
 from django.db.models import JSONField, TextField, CharField
 from django_json_widget.widgets import JSONEditorWidget
 from martor.widgets import AdminMartorWidget
+from django.utils.text import slugify
+from collections import defaultdict
 
 # Import all models from your existing models.py
 from .models import (
@@ -17,10 +19,61 @@ from .models import (
     LikertScale, UserQuizResponse, UserQuestionResponse, VideoResponse,
     DndMatchResponse, WritingResponse, TextContentResponse, TwineResponse,
     PollQuestionResponse, IdentificationResponse, PollResponse, EmbedResponse,
-    ConceptMapResponse, LikertScaleResponse
+    ConceptMapResponse, LikertScaleResponse, FillInTheBlank, FillInTheBlankResponse
 )
 
 # --- NEW: Custom Form for TextContent ---
+
+class CustomAdminSite(admin.AdminSite):
+    site_header = "FORWARD Administration"
+    site_title = "FORWARD Admin Panel"
+    index_title = "Welcome to the FORWARD Admin site"
+
+    def get_app_list(self, request, app_label=None):
+        app_dict = self._build_app_dict(request)
+        default_group_name = "Activities"
+        
+        # Use a defaultdict for cleaner group creation
+        grouped_apps = defaultdict(lambda: {
+            "name": "",
+            "app_label": "",
+            "models": [],
+        })
+
+        for app_name, app_info in app_dict.items():
+            for model_info in app_info['models']:
+                model_admin = self._registry.get(model_info['model'])
+                
+                group_name = getattr(model_admin, 'grouping', app_info.get('name', default_group_name))
+
+                if not grouped_apps[group_name]["name"]:
+                    grouped_apps[group_name]["name"] = group_name
+                    # Create a slug for the app_label to avoid conflicts
+                    grouped_apps[group_name]["app_label"] = slugify(group_name)
+
+                grouped_apps[group_name]["models"].append(model_info)
+
+        # Define the custom order for groups
+        group_order = {
+            'Core': 0,
+            'Curriculum': 1,
+            'Activities': 2,
+            'Responses': 3
+        }
+
+        # Sort groups based on custom order, with any undefined groups at the end
+        app_list = sorted(
+    grouped_apps.values(),
+    key=lambda x: (group_order.get(x['name'], len(group_order)), x['name'])
+)
+        for app in app_list:
+            app['models'].sort(key=lambda x: x['name'])
+            
+        return app_list
+
+# Instantiate your custom site
+custom_admin_site = CustomAdminSite(name='custom_admin')
+
 class TextContentAdminForm(forms.ModelForm):
     image_upload = forms.FileField(
         required=False,
@@ -39,24 +92,28 @@ class TextContentAdminForm(forms.ModelForm):
 
             if default_storage.exists(file_key):
                 default_storage.delete(file_key)
-            
+
             saved_path = default_storage.save(file_key, uploaded_file)
             self.instance.image = saved_path
 
         return super().save(commit=commit)
 
 # --- FIX: Custom Widget and Field for Multiple File Uploads ---
+
+
 class MultipleFileInput(forms.ClearableFileInput):
     """
     A custom widget that allows for the selection of multiple files.
     """
     allow_multiple_selected = True
 
+
 class MultipleFileField(forms.FileField):
     """
     A custom form field that uses the MultipleFileInput widget and can clean
     a list of uploaded files.
     """
+
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("widget", MultipleFileInput())
         super().__init__(*args, **kwargs)
@@ -67,6 +124,7 @@ class MultipleFileField(forms.FileField):
             return [single_file_clean(d, initial) for d in data]
         else:
             return [single_file_clean(data, initial)]
+
 
 class TwineAdminForm(forms.ModelForm):
     # Use the new MultipleFileField for image uploads
@@ -79,7 +137,7 @@ class TwineAdminForm(forms.ModelForm):
     )
 
     file_upload = forms.FileField(
-        required=False, # Make this optional to allow creating an empty object first
+        required=False,  # Make this optional to allow creating an empty object first
         help_text=(
             "Upload a new Twine file. This will be saved to the S3 bucket."
         ),
@@ -114,18 +172,23 @@ class TwineAdminForm(forms.ModelForm):
         return super().save(commit=commit)
 
 # --- User Admin Customization ---
-@admin.register(User)
+
+
+@admin.register(User, site=custom_admin_site)
 class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'display_name', 'email', 'is_staff', 'is_superuser')
+    list_display = ('username', 'display_name',
+                    'email', 'is_staff', 'is_superuser')
     list_filter = ('is_staff', 'is_superuser', 'groups')
     search_fields = ('username', 'display_name', 'email')
     ordering = ('username',)
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        (('Personal info'), {'fields': ('display_name', 'facility', 'profile_picture')}),
+        (('Personal info'), {
+         'fields': ('display_name', 'facility', 'profile_picture')}),
         (('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'consent',
-                                       'groups', 'user_permissions')}),
-        (_('Important dates'), {'fields': ('last_login', 'date_joined', 'surveyed_at')}),
+                                      'groups', 'user_permissions')}),
+        (('Important dates'), {
+         'fields': ('last_login', 'date_joined', 'surveyed_at')}),
     )
     add_fieldsets = (
         (
@@ -138,6 +201,8 @@ class CustomUserAdmin(UserAdmin):
     )
 
 # --- Base Admin for Activities ---
+
+
 class BaseActivityAdmin(admin.ModelAdmin):
     list_display = ('title', 'lesson', 'order', 'updated_at')
     list_filter = ('lesson',)
@@ -146,17 +211,22 @@ class BaseActivityAdmin(admin.ModelAdmin):
     list_editable = ('order',)
 
 # --- Inlines for Parent-Child Models ---
+
+
 class QuestionInline(admin.TabularInline):
     model = Question
     extra = 1
     ordering = ('order',)
-    fields = ('order', 'question_text', 'question_type', 'choices', 'is_required', 'feedback_config')
+    fields = ('order', 'question_text', 'question_type',
+              'choices', 'is_required', 'feedback_config')
+
 
 class PollQuestionInline(admin.TabularInline):
     model = PollQuestion
     extra = 1
     ordering = ('order',)
     fields = ('order', 'question_text', 'options', 'allow_multiple')
+
 
 class ConceptInline(admin.StackedInline):
     model = Concept
@@ -170,44 +240,58 @@ class ConceptInline(admin.StackedInline):
     fields = ('order', 'title', 'description', 'image', 'examples')
 
 # --- Activity Model Admins ---
-@admin.register(Lesson)
+
+
+@admin.register(Lesson, site=custom_admin_site)
 class LessonAdmin(admin.ModelAdmin):
+    grouping = 'Curriculum'
     list_display = ('title', 'order', 'created_at', 'updated_at')
     search_fields = ('title', 'description')
     ordering = ('order',)
     list_editable = ('order',)
 
-@admin.register(Quiz)
+
+@admin.register(Quiz, site=custom_admin_site)
 class QuizAdmin(BaseActivityAdmin):
+    grouping = 'Activities'
     inlines = [QuestionInline]
     list_display = ('title', 'lesson', 'order', 'passing_score')
 
-@admin.register(Poll)
+
+@admin.register(Poll, site=custom_admin_site)
 class PollAdmin(BaseActivityAdmin):
+    grouping = 'Activities'
     inlines = [PollQuestionInline]
 
-@admin.register(ConceptMap)
+
+@admin.register(ConceptMap, site=custom_admin_site)
 class ConceptMapAdmin(BaseActivityAdmin):
+    grouping = 'Activities'
     # summernote_fields = ('content')
     inlines = [ConceptInline]
     formfield_overrides = {
-        TextField: {'widget': AdminMartorWidget},   
+        TextField: {'widget': AdminMartorWidget},
     }
+
 
 def get_public_media_url(s3_key):
     if not s3_key:
         return None
     try:
-        endpoint_url = getattr(settings, 'AWS_S3_ENDPOINT_URL', 'http://localhost:9000')
+        endpoint_url = getattr(
+            settings, 'AWS_S3_ENDPOINT_URL', 'http://localhost:9000')
         bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
         return f"{endpoint_url}/{bucket_name}/{s3_key}"
     except (AttributeError, KeyError):
         return f"/media/{s3_key}"
 
-@admin.register(TextContent)
+
+@admin.register(TextContent, site=custom_admin_site)
 class TextContentAdmin(BaseActivityAdmin):
+    grouping = 'Activities'
     form = TextContentAdminForm
-    fields = ('lesson', 'order', 'title', 'instructions', 'content', 'image_upload', 'image_preview')
+    fields = ('lesson', 'order', 'title', 'instructions',
+              'content', 'image_upload', 'image_preview')
     readonly_fields = ('image_preview',)
 
     def image_preview(self, obj):
@@ -217,9 +301,12 @@ class TextContentAdmin(BaseActivityAdmin):
         return "No Image"
     image_preview.short_description = 'Image Preview'
 
-@admin.register(Video)
+
+@admin.register(Video, site=custom_admin_site)
 class VideoAdmin(BaseActivityAdmin):
+    grouping = 'Activities'
     readonly_fields = ('video_preview',)
+
     def video_preview(self, obj):
         url = get_public_media_url(obj.video)
         if url:
@@ -227,13 +314,17 @@ class VideoAdmin(BaseActivityAdmin):
         return "No Video"
     video_preview.short_description = 'Video Preview'
 
-@admin.register(Twine)
+
+@admin.register(Twine, site=custom_admin_site)
 class TwineAdmin(BaseActivityAdmin):
+    grouping = 'Activities'
     form = TwineAdminForm
     list_display = ('title', 'lesson', 'order', 'file_snippet')
+
     def file_snippet(self, obj):
         return obj.file[:100] + '...' if obj.file else 'No content'
     file_snippet.short_description = 'File Content Snippet'
+
 
 class JsonAdminMixin:
     def formated_json_field(self, obj, field_name):
@@ -242,67 +333,111 @@ class JsonAdminMixin:
             pretty_json = json.dumps(json_data, indent=2)
             return format_html('<pre style="white-space: pre-wrap; word-break: break-all;">{}</pre>', pretty_json)
         return "Empty"
+
     def display_content_as_json(self, obj):
         return self.formated_json_field(obj, 'content')
     display_content_as_json.short_description = 'Content (Formatted)'
+
     def display_prompts_as_json(self, obj):
         return self.formated_json_field(obj, 'prompts')
     display_prompts_as_json.short_description = 'Prompts (Formatted)'
 
-@admin.register(Writing)
+
+@admin.register(Writing, site=custom_admin_site)
 class WritingAdmin(BaseActivityAdmin, JsonAdminMixin):
+    grouping = 'Activities'
     readonly_fields = ('display_prompts_as_json',)
-    fields = ('lesson', 'order', 'title', 'instructions', 'prompts', 'display_prompts_as_json')
+    fields = ('lesson', 'order', 'title', 'instructions',
+              'prompts', 'display_prompts_as_json')
 
-@admin.register(DndMatch)
+
+@admin.register(DndMatch, site=custom_admin_site)
 class DndMatchAdmin(BaseActivityAdmin, JsonAdminMixin):
+    grouping = 'Activities'
     readonly_fields = ('display_content_as_json',)
-    fields = ('lesson', 'order', 'title', 'instructions', 'content', 'display_content_as_json')
+    fields = ('lesson', 'order', 'title', 'instructions',
+              'content', 'display_content_as_json')
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget},
     }
 
-@admin.register(LikertScale)
-class LikertScaleAdmin(BaseActivityAdmin, JsonAdminMixin):
+
+@admin.register(FillInTheBlank, site=custom_admin_site)
+class FillInTheBlankAdmin(BaseActivityAdmin, JsonAdminMixin):
+    grouping = 'Activities'
     readonly_fields = ('display_content_as_json',)
-    fields = ('lesson', 'order', 'title', 'instructions', 'content', 'display_content_as_json')
+    fields = ('lesson', 'order', 'title', 'instructions',
+              'content', 'display_content_as_json')
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget},
     }
+
+
+@admin.register(LikertScale, site=custom_admin_site)
+class LikertScaleAdmin(BaseActivityAdmin, JsonAdminMixin):
+    grouping = 'Activities'
+    readonly_fields = ('display_content_as_json',)
+    fields = ('lesson', 'order', 'title', 'instructions',
+              'content', 'display_content_as_json')
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditorWidget},
+    }
+
 
 class IdenificationAdmin(admin.ModelAdmin):
+    grouping = 'Activities'
     # summernote_fields = ('content')
     formfield_overrides = {
-        TextField: {'widget': AdminMartorWidget},  
-                CharField: {'widget': AdminMartorWidget},
+        TextField: {'widget': AdminMartorWidget},
+        CharField: {'widget': AdminMartorWidget},
     }
 
-admin.site.register(Identification, IdenificationAdmin)
 
-admin.site.register(Embed, BaseActivityAdmin)
+custom_admin_site.register(Identification, IdenificationAdmin)
+
+custom_admin_site.register(Embed, BaseActivityAdmin, grouping='Activities')
+
 
 class ReadOnlyAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
+
     def has_change_permission(self, request, obj=None):
         return False
+
     def has_delete_permission(self, request, obj=None):
         return False
+
     def get_actions(self, request):
         actions = super().get_actions(request)
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
 
-@admin.register(UserQuizResponse)
+
+@admin.register(FillInTheBlankResponse, site=custom_admin_site)
+class FillInTheBlankResponseAdmin(ReadOnlyAdmin):
+    grouping = 'Responses'
+    list_display = ('user', 'associated_activity', 'lesson',
+                    'partial_response', 'updated_at', 'submission')
+    list_filter = ('lesson', 'user')
+
+
+@admin.register(UserQuizResponse, site=custom_admin_site)
 class UserQuizResponseAdmin(ReadOnlyAdmin):
-    list_display = ('user', 'associated_activity', 'lesson', 'score', 'partial_response', 'updated_at')
+    grouping = 'Responses'
+    list_display = ('user', 'associated_activity', 'lesson',
+                    'score', 'partial_response', 'updated_at')
     list_filter = ('lesson', 'associated_activity', 'user')
 
-@admin.register(UserQuestionResponse)
+
+@admin.register(UserQuestionResponse, site=custom_admin_site)
 class UserQuestionResponseAdmin(ReadOnlyAdmin):
-    list_display = ('user', 'question', 'quiz_response', 'is_correct', 'updated_at')
+    grouping = 'Responses'
+    list_display = ('user', 'question', 'quiz_response',
+                    'is_correct', 'updated_at')
     list_filter = ('question__quiz', 'user')
+
 
 response_models = [
     VideoResponse, DndMatchResponse, WritingResponse, TextContentResponse,
@@ -313,6 +448,8 @@ for model in response_models:
     admin_class = type(
         f'{model.__name__}Admin',
         (ReadOnlyAdmin,),
-        {'list_display': ('user', 'associated_activity', 'lesson', 'partial_response', 'updated_at'), 'list_filter': ('lesson', 'user'),}
+        {'list_display': ('user', 'associated_activity', 'lesson',
+                          'partial_response', 'updated_at'), 'list_filter': ('lesson', 'user'),'grouping': 'Responses' }
     )
-    admin.site.register(model, admin_class)
+    custom_admin_site.register(model, admin_class)
+

@@ -1,11 +1,11 @@
 {
   "lesson": {
-    "title": "",
-    "description": "",
+    "title": "Example Lesson For All Activities",
+    "description": "A lesson containing example versions of all activity types available at the moment.",
     "objectives": [
     ],
     "order": 2,
-    "tags": []
+    "tags": ["test", "example", "all activities"]
   },
   "activities": [
     {
@@ -50,15 +50,15 @@
     },
     {
       "type": "textcontent",
-      "title": "Introduction to Going to College",
+      "title": "Example TextContent",
       "instructions": null,
-      "content": "Are you planning on going to college? This lesson will teach you the basics about different types of colleges, degrees, and how to apply and pay for college."
+      "content": "TextContents can contain any markdown (https://www.markdownguide.org/basic-syntax/) formatting, including **bold**, _italic_, and [links](https://forwardinc.org). You can also include images like this:\n\n![Example Image](example_image.png)\n\nAnd you can include lists:\n\n- Item 1\n- Item 2\n- Item 3\n\nOr numbered lists:\n\n1. First item\n2. Second item\n3. Third item. \n\n Headers are also supported:\n\n# Header 1\n## Header 2\n### Header 3\n#### Header 4\n##### Header 5\n###### Header 6. \n\nNew lines are specified by two `\\n\\n` at the end of a line.  \n\nYou can also include blockquotes:\n\n> This is a blockquote.\n\nAnd code blocks:\n\n```\nfunction example() {\n  console.log(\"This is an example code block.\");\n}\n```"
     },
     {
       "type": "conceptmap",
-      "title": "Exploring College Types",
+      "title": "Example Concept Map",
       "instructions": null,
-      "content": "There are many types of colleges and ways to receive <def def='Post-secondary refers to any education or training you pursue after graduating from high school, such as college, university, or trade school.'>post-secondary</def> education. There are also different types of degrees that you can get, providing various levels of <def def='expert skill or knowledge in a particular field.'>expertise</def>. Sometimes you won’t know what a college offers until you ask, so it’s all a matter of finding the perfect fit for you! Let’s explore some different college types here:",
+      "content": "TConcept maps are a way of visually organizing information. They can help you see how different ideas are connected to each other. Below is an example of a concept map about types of colleges.",
       "examples": [
         {
           "title": "Trade/Technical school",
@@ -201,43 +201,15 @@
       ]
     },
     {
-      "type": "textcontent",
-      "title": "Choosing a College",
-      "instructions": null,
-      "content": "Choosing what type of college to attend depends on a lot of factors such as location, cost, the type of experience you are seeking, and importantly, the type of job you want to have. Different jobs require different levels of experience."
-    },
-    {
       "type": "identification",
-      "title": "Job Hunt #1",
+      "title": "Example Identification",
       "minimum_correct": 2,
-      "instructions": "Look at a job listing and see if you can find (1) the required minimum education level and (2) the preferred education level. You will need to click on the job listing in those two places to continue. If you want a challenge, you can try out each job listing.",
-      "content": ":::center\n # COME WORK FOR CONNECTCO!\n:::\n\n## ConnectCo Seeking Customer Service Representative\n\n::::columns\n:::col\n**Company Name:** ConnectCo Communications\n:::\n:::col\n**Location:** Orlando, FL (On-site)<br>**Position Type:** Full-Time<br>**Salary:** $16–$18/hour\n:::\n::::\n\n### About the Job\nAre you looking to start your career in a dynamic yet supportive environment that values work-life balance? ConnectCo Communications is seeking enthusiastic individuals to join our team as Customer Service Representatives. As the first point of contact for our valued customers, you'll play a crucial role in ensuring that their questions and concerns are addressed quickly and professionally. This is a fantastic opportunity for individuals who are eager to learn, grow, and find collaborative and solution-focused approaches. In this role, you'll handle customer inquiries through phone, email, and chat, providing clear and accurate information to resolve their concerns. You'll also document interactions in our customer relationship management system, ensuring that records are up to date.\n\n### What We're Looking For\nOur training program will provide you with the tools and knowledge needed to succeed, even if you don't have prior experience in customer service. While <correct>we require at least a high school diploma or GED</correct>, <correct>candidates who have completed some college coursework or hold an associate degree in business, communication, or a related field are encouraged to apply.</correct> We highly value candidates who bring diverse perspectives to our team, and bilingual individuals or those with multicultural communication experience are encouraged to apply. Successful candidates are detail-oriented, organized, and comfortable working in a fast-paced environment. If you're looking for a role where you can develop professionally, this is the perfect place to start.\n\n### What We Offer\n*   A competitive hourly wage of $16–$18, with opportunities increases.\n*   Health, dental, and vision insurance plans to keep you and your family covered.\n*   Paid time off, including sick leave and vacation days, to support your work-life balance.\n*   Access to an Employee Assistance Program (EAP) for health and wellness support.\n*   Discounts on local attractions, services, and products through our employee perks program.\n\n### Why Join Us\n*   Be part of a team that values empathy, collaboration, and outstanding customer service.\n*   Start your career with a company that invests in your growth through comprehensive training and mentorship programs.\n*   Build connections with a diverse group of colleagues who bring unique perspectives to the workplace.\n\n:::center\n**Apply today and be a part of the ConnectCo Family!**\n:::"
+      "instructions": "Identifications are activities where you need to find specific information in a text.",
+      "content": ":::center\n # In the documentation\n:::\n\n## I explain how to use the custom\n\n::::columns\n:::col\ncentering and\n:::\n:::col\ncolumning notation\n:::\n::::\n\n### for specific formatting\n use the <correct></correct> tags around a section that will count to the correct answers."
     },
-    {
-      "type": "identification",
-      "title": "Job Hunt #2",
-      "minimum_correct": 2,
-      "instructions": "Look at a job listing and see if you can find (1) the required minimum education level and (2) the preferred education level. You will need to click on the job listing in those two places to continue. If you want a challenge, you can try out each job listing.",
-      "content": ":::center\n# Marketing Specialist\n:::\n\n**Company Name:** BrightFuture Marketing <br> **Position:** Marketing Specialist <br> **Location:** Denver, CO (Hybrid options available) <br> **Position Type:** Full-Time <br> **Salary:** $60,000–$70,000/year\n\nBrightFuture Marketing is searching for a motivated and creative Marketing Specialist to join our growing team. This position is perfect for professionals ready to advance their marketing careers and take on exciting new challenges. As a Marketing Specialist, you'll have the opportunity to contribute to impactful campaigns, collaborate with talented colleagues, and make a measurable difference in our clients' success. In this role, you'll design and conduct digital marketing campaigns that engage target audiences and drive results. Whether developing content for social media, crafting email marketing strategies, or managing paid advertising initiatives, you'll play a central role in shaping our clients' brands. Additionally, you'll analyze campaign performance, provide actionable insights, and adjust strategies to ensure continued success.\n\n## Qualifications:\n\n*   Skilled communicator, able to assess clients' needs and offer customized experiences\n*   Portfolio of successful past marketing campaigns/examples\n*   <correct>Master's degree and 3-5 years of experience preferred</correct>\n*   Certifications in digital marketing, SEO, or social media strategy preferred\n\nOur ideal applicant is highly skilled and has substantial marketing experience. Although we prefer candidates with higher levels of education, <correct>we will consider applicants with Bachelor's degrees in marketing, communications, business or related fields</correct> with the right experience and demonstration of skill. We are looking for a team player who can lead campaigns and train lower level employees to support our mission.\n\n## Why Work With Us?\n\n*   Competitive salary and bonus opportunities.\n*   Comprehensive health, dental, and vision insurance.\n*   Generous PTO and flexible scheduling options.\n*   Tuition reimbursement and ongoing professional development.\n*   A collaborative and creative workplace culture.\n\nBrightFuture Marketing's hybrid work model allows you to enjoy the energy of in-office collaboration while maintaining flexibility. We pride ourselves on fostering innovation and supporting our team members' growth. If you're ready to take the next step in your career and join a forward-thinking company, we'd love to hear from you! We are proud to be an Equal Employment Opportunity employer and welcome applications from individuals of all backgrounds, regardless of race, color, religion, gender, sexual orientation, national origin, age, disability, or veteran status.\n"
-    },
-    {
-      "type": "identification",
-      "title": "Job Hunt #3",
-      "minimum_correct": 2,
-      "instructions": "Look at a job listing and see if you can find (1) the required minimum education level and (2) the preferred education level. You will need to click on the job listing in those two places to continue. If you want a challenge, you can try out each job listing.",
-      "content": ":::center\n# Software Development Manager\n:::\n\n**Company Name:** TechInnovate Solutions <br> **Location:** Seattle, WA (Remote with occasional travel to headquarters) <br> **Position Type:** Full-Time <br> **Salary:** $135,000–$155,000/year\n\nTechInnovate Solutions is looking for a visionary **Software Development Manager** to lead our\nteam of talented developers in creating innovative software solutions. This role is pivotal to our\nsuccess as we expand our portfolio of high-quality products and services. We are searching for\nan experienced professional who can blend technical expertise with strong leadership skills to\ndrive our projects forward.\n\nAs the Software Development Manager, you will oversee multiple projects, ensuring they are\ndelivered on time and within budget. You'll lead a team of developers, providing mentorship and\nfostering an environment of growth and collaboration. By working closely with stakeholders and\ncross-functional teams, you'll ensure that all technical solutions align with our broader business\nobjectives.\n\nCandidates for this role must hold a <correct>Bachelor's degree in Computer Science, Software Engineering, or a related field</correct>, with at least 7 years of experience in software development.\nWhile a Bachelor's degree is required, a <correct>Master's degree and significant experience in\nleadership roles are strongly preferred.</correct> Expertise in agile development methodologies,\ncloud-based systems, and programming languages such as Python or Java will be essential to\nyour success.\n\n:::center\n## What We Offer\n:::\n\n*   Competitive salary with annual performance-based bonuses.\n*   Fully remote work with flexible scheduling.\n*   Comprehensive benefits package, including health, dental, and vision coverage.\n*   Generous PTO, parental leave, and professional development opportunities.\n*   Stock options and opportunities for career advancement.\n\nAt TechInnovate Solutions, we pride ourselves on cultivating a supportive and inclusive\nworkplace where innovation thrives. If you're passionate about technology and ready to take on\na leadership role at a company that values excellence, we encourage you to apply. Let's build\nthe future together.\n\nTechInnovate Solutions is an equal opportunity employer.\n"
-    },
-    {
-      "type": "textcontent",
-      "title": "Types of Degrees",
-      "instructions": null,
-      "image": "types_of_degrees.png",
-      "content": "When looking for a job in the future, it’s important to see what level of education the company is seeking so that you know whether to apply. While you may be able to apply for some positions above your skill level, for the most part you should apply for jobs for which you meet the qualifications.\n\n\n For this next activity, read through the infographic to learn about the different types of degrees. Then answer some questions about what you have learned — and what you think!"
-    },
-
     {
       "type": "quiz",
-      "title": "Degree Quiz",
+      "title": "Example Quiz",
       "instructions": "This quiz will test your knowledge about college degrees. There is only one correct answer per question.",
       "passing_score": 3,
       "feedback_config": {
@@ -329,243 +301,11 @@
       ]
     },
     {
-      "type": "poll",
-      "title": "College Degree Opinions",
-      "instructions": "The next few questions ask about what you THINK. There is no correct answer but you will see how others have responded.",
-      "config": {
-        "show_results": true,
-        "anonymous": true
-      },
-      "questions": [
-        {
-          "question_text": "Which degree do you think would be the hardest to get?",
-          "options": [
-            { "id": 1, "text": "High school diploma" },
-            { "id": 2, "text": "GED" },
-            { "id": 3, "text": "Associate degree" },
-            { "id": 4, "text": "Bachelor's degree" },
-            { "id": 5, "text": "Master's degree" },
-            { "id": 6, "text": "Professional degree" },
-            { "id": 7, "text": "Doctoral degree" }
-          ],
-          "allow_multiple": false
-        },
-        {
-          "question_text": "Which degree would you like to have?",
-          "options": [
-            { "id": 1, "text": "High school diploma" },
-            { "id": 2, "text": "GED" },
-            { "id": 3, "text": "Associate degree" },
-            { "id": 4, "text": "Bachelor's degree" },
-            { "id": 5, "text": "Master's degree" },
-            { "id": 6, "text": "Professional degree" },
-            { "id": 7, "text": "Doctoral degree" }
-          ],
-          "allow_multiple": false
-        },
-        {
-          "question_text": "Which degree sounds like the most fun to complete?",
-          "options": [
-            { "id": 1, "text": "High school diploma" },
-            { "id": 2, "text": "GED" },
-            { "id": 3, "text": "Associate degree" },
-            { "id": 4, "text": "Bachelor's degree" },
-            { "id": 5, "text": "Master's degree" },
-            { "id": 6, "text": "Professional degree" },
-            { "id": 7, "text": "Doctoral degree" }
-          ],
-          "allow_multiple": false
-        }
-      ]
-    },
-    {
-      "type": "textcontent",
-      "title": "Finances and College",
-      "instructions": null,
-      "content": "What you've heard is true—college is expensive. Here we'll go over some of the cost and share strategies for making college affordable. With the right plan and resources, it's possible to avoid debt, or at least keep your costs lower when attending college."
-    },
-    {
-      "type": "textcontent",
-      "title": "College Costs",
-      "instructions": null,
-      "content": "College Costs Include: Tuition and Fees, Room and Board, Meal plans, Books and Supplies, Health insurance, Transportation, and Personal Expenses."
-    },
-    {
       "type": "video",
-      "title": "FAFSA",
-      "instructions": "The FASFA, or Free Application for Federal Student Aid, is a form available online that identifies financial aid sources you are eligible for with colleges you consider attending. Watch the video to learn more about the FAFSA.",
+      "title": "Example Video Activity",
+      "instructions": "Allows students to watch a video as part of the lesson. Set scrubbable to true to allow students to skip ahead in the video.",
       "video": "financial_aid_for_college.mp4",
       "scrubbable": false
-    },
-    {
-      "type": "textcontent",
-      "title": "Grants",
-      "instructions": null,
-      "content": "One type of financial support the FAFSA can offer you is grants. Grants are financial support that does not typically have to be repaid. These funds will be either given to you directly or applied to your school financial account. When either happens, the grant should be applied first to your tuition and other academic fees, and secondly to your housing. Additional oney can go toward other school fees and costs such as textbooks and health insurance. "
-      ,"image": "piggy_bank.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Loans",
-      "instructions": null,
-      "content": "FAFSA can also offer you loans, which you will be required to pay back after your degree. Depending on the type of loan, these may begin collecting interest during or after your degree. If you take a loan and don't finish your degree, you still have to pay for the money you have borrowed!  Loans are applied like grants to tuition and fees, then housing and other costs."
-      ,"image": "loan_application.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Work-Study",
-      "instructions": null,
-      "content": "Work-study is a form of financial aid that allows you to earn money by working part-time while attending school. The jobs are often on-campus or related to your field of study, making it easier to balance work and academics. Work-study earnings can help cover expenses like books, transportation, and personal costs. This aid is need-based and awarded through FAFSA, so if you’re interested, make sure to indicate your preference for work-study when completing your application."
-    ,"image": "work_study.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Western Undergraduate Exchange",
-      "instructions": null,
-      "content": "The Western Undergraduate Exchange (WUE) is a program offered by the Western Interstate Commission for Higher Education (WICHE) that helps students save on tuition costs by allowing them to pay reduced out-of-state tuition at participating schools. save on tuition costs by allowing them to pay reduced out-of-state tuition at participating schools. Through WUE, students pay no more than 150% of in-state tuition, which can significantly lower the cost of attending college outside their home state. The program includes students from the following 16 western states and territories: Alaska, Arizona, California, Colorado, Hawaii, Idaho, Montana, Nevada, New Mexico, North Dakota, Oregon, South Dakota, Utah, Washington, Wyoming, and the Commonwealth of the Northern Mariana Islands. To take advantage of WUE, check your eligibility and apply early as some schools have limited spots for WUE students or require separate applications."
-    ,"image": "wiche.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Scholarships",
-      "instructions": null,
-      "content": "Scholarships are another form of financial support that can help you pay for your education. Unlike loans, scholarships do not need to be repaid. They are often awarded based on academic achievements, extracurricular activities, or financial need, and some are specifically for students in certain fields or with unique qualifications. Scholarships do not come from the FAFSA may come from your school, private organizations, or community groups and can be applied to tuition, housing, or other academic expenses. There are many ways to find scholarships online and your college may have a specific page for available scholarships. Some scholarships may require you to submit a resume, an essay, or other work to be considered."
-      ,"image": "scholarships.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "College Majors",
-      "instructions": "TO BE IMPLEMENTED VIA SLIDESHOW ACTIVITY TYPE",
-      "content": "A major is the subject someone chooses to study in-depth while attending college, and ultimately determine the type of career someone will be qualified to have. Majors also determine which classes are required in college to complete a degree."
-    },
-    {
-      "type": "textcontent",
-      "title": "Applying for College",
-      "instructions": null,
-      "content": "Applying for college is an exciting step toward your future, but it can feel overwhelming if you're not sure where to start. Don't worry—we've got you covered! In this section, we'll walk you through the key steps of the application process, help you gather everything you'll need, and share strategies for overcoming challenges along the way. Watch this video to learn the basics of what you need to know."
-    },
-    {
-      "type": "textcontent",
-      "title": "Application Requirements",
-      "instructions": null,
-      "content": "College applications can take quite a bit of time to complete and you may be surprised by everything they ask for you to submit. Being prepared with documents ahead of time and creating checklists of what each school needs can help you stay organized."
-    },
-    {
-      "type": "quiz",
-      "title": "College Knowledge Quiz",
-      "instructions": "Did some of those schools look familiar? Hopefully you were able to recognize some or think of other colleges that might fit into those categories. You should now understand some of the differences between types of colleges. Let’s check and make sure things are making sense so far. TIP: There may be more than one correct answer to the questions since there can be more than one pathway to a career.",
-      "passing_score": 3,
-      "feedback_config": {
-        "default": "Thanks for completing this quiz!",
-        "ranges": [
-          {
-            "min": 0,
-            "max": 2,
-            "feedback": "You might want to review the information about different college types."
-          },
-          {
-            "min": 3,
-            "max": 5,
-            "feedback": "Great job! You understand the basics of college types and career paths."
-          }
-        ]
-      },
-      "questions": [
-        {
-          "question_text": "Which type of college might you choose to attend to become a doctor?",
-          "question_type": "multiple_choice",
-          "has_correct_answer": true,
-          "choices": {
-            "options": [
-              { "id": 1, "text": "Trade school", "is_correct": false },
-              { "id": 2, "text": "Community college", "is_correct": false },
-              { "id": 3, "text": "4-year college", "is_correct": false },
-              { "id": 4, "text": "University", "is_correct": true }
-            ]
-          },
-          "is_required": true,
-          "feedback_config": {
-            "correct": "If you want to become a doctor, you will need to first obtain a bachelor's degree and possibly some additional graduate school training before attending medical school, offered through a University.",
-            "incorrect": "Becoming a doctor requires extensive education through a University.",
-            "default": "Consider the education requirements for becoming a doctor."
-          }
-        },
-        {
-          "question_text": "Which type of college might you choose to attend to become a welder?",
-          "question_type": "multiple_select",
-          "has_correct_answer": true,
-          "choices": {
-            "options": [
-              { "id": 1, "text": "Trade school", "is_correct": true },
-              { "id": 2, "text": "Community college", "is_correct": true },
-              { "id": 3, "text": "4-year college", "is_correct": false },
-              { "id": 4, "text": "University", "is_correct": false }
-            ]
-          },
-          "is_required": true,
-          "feedback_config": {
-            "correct": "If you want to become a welder, you would likely attend a trade school or maybe a community college offering a certificate or associate's degree in welding.",
-            "incorrect": "Welding is typically taught at trade schools or community colleges.",
-            "default": "Consider the hands-on nature of welding training."
-          }
-        },
-        {
-          "question_text": "Which type of college might you choose to attend to become an elementary school teacher?",
-          "question_type": "multiple_select",
-          "has_correct_answer": true,
-          "choices": {
-            "options": [
-              { "id": 1, "text": "Trade school", "is_correct": false },
-              { "id": 2, "text": "Community college", "is_correct": false },
-              { "id": 3, "text": "4-year college", "is_correct": true },
-              { "id": 4, "text": "University", "is_correct": true }
-            ]
-          },
-          "is_required": true,
-          "feedback_config": {
-            "correct": "If you want to become a teacher, you would need to attend a 4-year college or university to obtain a bachelor's degree.",
-            "incorrect": "Teaching requires a bachelor's degree from a 4-year college or university.",
-            "default": "Consider the education requirements for becoming a teacher."
-          }
-        },
-        {
-          "question_text": "Which type of college might you choose to attend to become a professor?",
-          "question_type": "multiple_choice",
-          "has_correct_answer": true,
-          "choices": {
-            "options": [
-              { "id": 1, "text": "Trade school", "is_correct": false },
-              { "id": 2, "text": "Community college", "is_correct": false },
-              { "id": 3, "text": "4-year college", "is_correct": false },
-              { "id": 4, "text": "University", "is_correct": true }
-            ]
-          },
-          "is_required": true,
-          "feedback_config": {
-            "correct": "Becoming a professor would require a master's degree or higher, which can be obtained through graduate school at a university, although you might attend other types of colleges before this.",
-            "incorrect": "Professors typically need advanced degrees from universities.",
-            "default": "Consider the advanced education needed to become a professor."
-          }
-        },
-        {
-          "question_text": "Which type of college might you choose to attend to become a chef?",
-          "question_type": "multiple_select",
-          "has_correct_answer": true,
-          "choices": {
-            "options": [
-              { "id": 1, "text": "Trade school", "is_correct": true },
-              { "id": 2, "text": "Community college", "is_correct": true },
-              { "id": 3, "text": "4-year college", "is_correct": true },
-              { "id": 4, "text": "University", "is_correct": false }
-            ]
-          },
-          "is_required": true,
-          "feedback_config": {
-            "correct": "To become a chef, you might attend a trade school specializing in culinary arts, a community college or a 4-year college to receive an associate's or bachelor's degree in culinary arts.",
-            "default": "Consider where culinary programs are typically offered."
-          }
-        }
-      ]
     },
     {
       "type": "twine",
