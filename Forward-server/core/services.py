@@ -407,9 +407,9 @@ class QuestionResponseService:
                 lesson = quiz.lesson
                     
             # Get or create the parent quiz response
-            quiz_response, created = UserQuizResponse.objects.get_or_create(
+            quiz_response, created = UserQuizResponse.objects.update_or_create(
                 user=user,
-                associated_activity_id=quiz,
+                associated_activity=quiz,
                 defaults={
                     'lesson': lesson,  # ← Changed
                     'partial_response': True,

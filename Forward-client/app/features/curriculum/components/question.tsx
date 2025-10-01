@@ -37,7 +37,7 @@ export default function Question({
   const correctAnswers = question.choices.options.filter(
     (option) => option.is_correct,
   );
-  const selectedAnswers = response.response_data.selected;
+  const selectedAnswers = response.response_data?.selected || [];
 
   // question state
   const isDisabled = response.attempts_left <= 0;
@@ -59,7 +59,7 @@ export default function Question({
     setResponse((prevResponse) => {
       // new selection state
       const newSelected = isMultipleSelect
-        ? toggleArrayItem(prevResponse.response_data.selected, choiceId)
+        ? toggleArrayItem(prevResponse.response_data?.selected || [], choiceId)
         : [choiceId];
 
       // attempts left

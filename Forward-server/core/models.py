@@ -867,19 +867,19 @@ class LikertScale(BaseActivity):
             "content": self.content
         }
 
-# TODO: Make quiz and question response inherit from BaseResponse, or make
-# them adhere to the contract enforced by BaseResponse
-
-
-class UserQuizResponse(models.Model):
+class BaseResponse(models.Model):
     """
-    Stores a user's complete response to a quiz
+    Abstract base model for responses.
+    Subclasses MUST define their own 'associatedId' ForeignKey field.
     """
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='quiz_responses',
-        help_text='The user who submitted this quiz response'
+    class Meta:
+        abstract = True
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
     )
 
     lesson = models.ForeignKey(
@@ -888,15 +888,50 @@ class UserQuizResponse(models.Model):
         related_name='%(class)s_lesson',
         null=False,
         blank=False,
-        help_text='The lesson related to this quiz response'
+        help_text='The lesson related to this response'
     )
 
-    associated_activity = models.ForeignKey(
-        Quiz,
+    user = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
-        related_name='user_responses',
-        help_text='The quiz that was answered'
+        related_name='%(class)s_response_user',
+        null=False,
+        blank=False,
+        help_text='The user who submitted this response'
     )
+
+    # Meant to be overwritten by subclasses
+    associated_activity = None
+
+    partial_response = models.BooleanField(default=True)
+
+    time_spent = models.PositiveIntegerField(default=0)
+
+    attempts_left = models.PositiveIntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "partial_response": self.partial_response,
+            "time_spent": self.time_spent,
+            "attempts_left": self.attempts_left,
+            "associated_activity": self.associated_activity.id,
+        }
+    
+# TODO: Make quiz and question response inherit from BaseResponse, or make
+# them adhere to the contract enforced by BaseResponse
+
+class UserQuizResponse(BaseResponse):
+    """
+    Stores a user's complete response to a quiz
+    """
+
+    # Note to self removing some fields that are inherited by baseResponse
+    # Removed user, lesson, associated_activity , partial_response, time_spent, created and updated at --- Lorran Alves Galdino
+
 
     score = models.PositiveSmallIntegerField(
         null=True,
@@ -904,24 +939,11 @@ class UserQuizResponse(models.Model):
         help_text="The user's score on this quiz"
     )
 
-    partial_response = models.BooleanField(
-        default=False,
-        help_text='Whether the quiz has been completed and submitted'
-    )
-
     completion_percentage = models.FloatField(
         default=0.0,
         help_text="Percentage completion of the lesson"
     )
 
-    time_spent = models.IntegerField(
-        null=True,
-        blank=True,
-        help_text='The total time spent on this question'
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ['user', 'associated_activity']  # TODO
@@ -970,8 +992,8 @@ class UserQuizResponse(models.Model):
             "question_responses": [qr.to_dict() for qr in self.question_responses.all()]
         }
 
-
-class UserQuestionResponse(models.Model):
+    
+class UserQuestionResponse(models.Model): # keeping questions from inheriting from their superclass as they are child classes and are not considered actvities
     """
     Stores a user's response to an individual question within a quiz
     """
@@ -1037,7 +1059,7 @@ class UserQuestionResponse(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['quiz_response', 'question']
+        unique_together = ['quiz_response', 'question'] 
         verbose_name = "question response"
         verbose_name_plural = "question responses"
 
@@ -1099,61 +1121,6 @@ class UserQuestionResponse(models.Model):
             "is_correct": self.is_correct,
             "time_spent": self.time_spent,
             "feedback": self.feedback
-        }
-
-
-class BaseResponse(models.Model):
-    """
-    Abstract base model for responses.
-    Subclasses MUST define their own 'associatedId' ForeignKey field.
-    """
-    class Meta:
-        abstract = True
-
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        help_text='the uuid of the database item'
-    )
-
-    lesson = models.ForeignKey(
-        Lesson,
-        on_delete=models.CASCADE,
-        related_name='%(class)s_lesson',
-        null=False,
-        blank=False,
-        help_text='The lesson related to this response'
-    )
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='%(class)s_response_user',
-        null=False,
-        blank=False,
-        help_text='The user who submitted this response'
-    )
-
-    # Meant to be overwritten by subclasses
-    associated_activity = None
-
-    partial_response = models.BooleanField(default=True)
-
-    time_spent = models.PositiveIntegerField(default=0)
-
-    attempts_left = models.PositiveIntegerField(default=0)
-    
-    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "partial_response": self.partial_response,
-            "time_spent": self.time_spent,
-            "attempts_left": self.attempts_left,
-            "associated_activity": self.associated_activity.id,
         }
 
 class VideoResponse(BaseResponse):
@@ -1460,7 +1427,7 @@ class ActivityManager():
         self.registerActivity(
             PollQuestion, PollQuestionResponse, child_class=True)
         self.registerActivity(Quiz, UserQuizResponse)
-        self.registerActivity(Question, UserQuestionResponse, child_class=True)
+        # self.registerActivity(Question, UserQuestionResponse, child_class=True) # Testing this
         self.registerActivity(Embed, EmbedResponse, {
                               "inputted_code": ["inputted_code", None]})
         self.registerActivity(ConceptMap, ConceptMapResponse)
