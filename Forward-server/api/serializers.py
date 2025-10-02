@@ -5,6 +5,7 @@ from django.contrib.auth.password_validation import validate_password
 from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager, Facility
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
@@ -17,9 +18,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     - User creation follows service layer pattern
     """
     
-    facility = serializers.SlugRelatedField(
-        slug_field='code', 
-        queryset=Facility.objects.all(), 
+    facility = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
     )
     
     password = serializers.CharField(
@@ -37,7 +39,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     )
     
     def validate_facility(self, value):
-        return Facility.objects.filter(code__iexact=value.code).first() or value
+        """
+        Case-insensitively validate the facility code and return the Facility object.
+        """
+        # If no facility code is provided, return None, as it's an optional field.
+        if not value:
+            return None
+        try:
+            # Perform a case-insensitive lookup on the Facility model.
+            return Facility.objects.get(code__iexact=value)
+        except Facility.DoesNotExist:
+            raise serializers.ValidationError("A facility with this code does not exist.")
 
     class Meta:
         model = User
@@ -47,10 +59,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'password_confirm',
             'display_name',
             'facility',
-            'consent'
+            'consent',
+            'surveyed_at'
         ]
         extra_kwargs = {
             'display_name': {'required': True},
+            'consent': {'required': False, 'default': False},
+            'surveyed_at': {'required': False, 'default': None}
         }
 
     def validate(self, attrs):
@@ -83,7 +98,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
         # Delegate user creation to the service layer
         from core.services import UserService
-        return UserService.create_user(validated_data)
+        try:
+            return UserService.create_user(validated_data)
+        except DjangoValidationError as e:
+            # Normalize to DRF serializer error shape
+            detail = getattr(e, "message_dict", None) or getattr(e, "messages", e)
+            raise serializers.ValidationError(detail)
 
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)

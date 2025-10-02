@@ -27,6 +27,10 @@ class Facility(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Facility'
+        verbose_name_plural = 'Facilities'
 
 
 class User(AbstractUser):
@@ -107,7 +111,7 @@ class User(AbstractUser):
     # Automatically set when the user is created and updated
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    surveyed_at = models.DateTimeField(null=True)
+    surveyed_at = models.DateTimeField(null=True, blank=True, default=None)
 
     # This is not data we collect, its ugly but the other option is to inherit
     # from AbstractBaseUser and all the stuff that comes with that
@@ -264,7 +268,7 @@ class BaseActivity(models.Model):
         ordering = ['order', 'created_at']
 
     def __str__(self):
-        return f"{self.__class__.__name__} - {self.title}"
+        return self.title
 
     @property
     def activity_type(self):

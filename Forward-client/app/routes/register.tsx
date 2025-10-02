@@ -57,23 +57,29 @@ export default function Login() {
       const result = await response.json();
 
       if (!response.ok) {
-        if (result.detail) {
-          if (typeof result.detail === "object") {
-            // Handle field-specific errors
-            const errorMessages = Object.values(result.detail)
-              .map((messages) => (messages as string[]).join("\n"))
+        const flatten = (errObj: any): string => {
+          if (!errObj) return "Registration failed. Please try again.";
+          if (typeof errObj === "string") return errObj;
+          if (Array.isArray(errObj)) return errObj.join("\n");
+          if (typeof errObj === "object") {
+            // DRF field errors: {field: [msg1, msg2], non_field_errors: [...]}
+            return Object.entries(errObj)
+              .map(([field, msgs]) => {
+                const joined =
+                  Array.isArray(msgs) ? msgs.join(", ") : String(msgs);
+                return field === "non_field_errors"
+                  ? joined
+                  : `${field}: ${joined}`;
+              })
               .join("\n");
-            throw new Error(errorMessages);
-          } else {
-            // Handle simple string errors
-            throw new Error(result.detail);
           }
-        }
-        // Handle invalid server responses / Server non-responses
-        toast.error("Registration failed. Please try again.");
-        throw new Error("Registration failed. Please try again.");
-      }
+          return "Registration failed. Please try again.";
+        };
 
+        const message = result?.detail ? flatten(result.detail) : flatten(result);
+        toast.error(message);
+        throw new Error(message);
+       }
       login({...result.data.user});
 
       // Redirect to the dashboard on success
