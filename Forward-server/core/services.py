@@ -256,28 +256,30 @@ class QuizResponseService:
             else:
                 quiz_id = quiz_obj
                 
-            lesson_id = validated_data.get('lesson_id')
+            # lesson_id = validated_data.get('lesson_id')
             partial_response = validated_data.get('partial_response', True)
             
             # Get the quiz object
             quiz = Quiz.objects.get(id=quiz_id)
             
-            # If we have a lesson ID, get the lesson object
-            if lesson_id:
-                if isinstance(lesson_id, Lesson):
-                    lesson = lesson_id
-                else:
-                    try:
-                        lesson = Lesson.objects.get(id=lesson_id)
-                    except Lesson.DoesNotExist:
-                        # Try to get lesson from quiz
-                        lesson = quiz.lesson
-            else:
-                # Try to get lesson from quiz
-                lesson = quiz.lesson
+            # # If we have a lesson ID, get the lesson object
+            # if lesson_id:
+            #     if isinstance(lesson_id, Lesson):
+            #         lesson = lesson_id
+            #     else:
+            #         try:
+            #             lesson = Lesson.objects.get(id=lesson_id)
+            #         except Lesson.DoesNotExist:
+            #             # Try to get lesson from quiz
+            #             lesson = quiz.lesson
+            # else:
+            #     # Try to get lesson from quiz
+            #     lesson = quiz.lesson
+
+            lesson = quiz.lesson
                 
             # Create or get quiz response
-            quiz_response, created = UserQuizResponse.objects.get_or_create(
+            quiz_response, created = UserQuizResponse.objects.update_or_create( # change to updatte lets see
                 user=user,
                 associated_activity=quiz,
                 defaults={
@@ -387,7 +389,6 @@ class QuestionResponseService:
             # Extract the question object from validated_data
             question = validated_data.get('associated_activity')
             quiz_id = validated_data.get('quiz_id')
-            lesson_id = validated_data.get('lesson_id')
             response_data = validated_data.get('response_data', {})
             time_spent = validated_data.get('time_spent', 0)
             
@@ -395,16 +396,18 @@ class QuestionResponseService:
             quiz = Quiz.objects.get(id=quiz_id)
             
             # Handle lesson_id properly
-            if lesson_id:
-                if isinstance(lesson_id, Lesson):
-                    lesson = lesson_id
-                else:
-                    try:
-                        lesson = Lesson.objects.get(id=lesson_id)
-                    except Lesson.DoesNotExist:
-                        lesson = quiz.lesson
-            else:
-                lesson = quiz.lesson
+            # if lesson_id:
+            #     if isinstance(lesson_id, Lesson):
+            #         lesson = lesson_id
+            #     else:
+            #         try:
+            #             lesson = Lesson.objects.get(id=lesson_id)
+            #         except Lesson.DoesNotExist:
+            #             lesson = quiz.lesson
+            # else:
+            #     lesson = quiz.lesson
+
+            lesson = quiz.lesson
                     
             # Get or create the parent quiz response
             quiz_response, created = UserQuizResponse.objects.update_or_create(
@@ -489,7 +492,7 @@ class EmbedResponseService:
         response_object.save()
         return response_object
 
-ActivityManager().registerService("response", Quiz, QuizResponseService.submit_quiz_response)
-ActivityManager().registerService("response", Question, QuestionResponseService.submit_question_response)
+ActivityManager().registerService("response", Quiz, QuizResponseService.submit_quiz_response) # temp for now
+# ActivityManager().registerService("response", Question, QuestionResponseService.submit_question_response) 
 
 ActivityManager().registerService("response", Embed, EmbedResponseService.update_embed_completion_status)

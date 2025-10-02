@@ -944,6 +944,13 @@ class UserQuizResponse(BaseResponse):
         help_text="Percentage completion of the lesson"
     )
 
+    associated_activity = models.ForeignKey(
+        Quiz,
+        on_delete=models.CASCADE,
+        related_name='quiz_responses',
+        help_text='The quiz this response is for'
+    )
+
 
     class Meta:
         unique_together = ['user', 'associated_activity']  # TODO
