@@ -199,12 +199,23 @@ class Lesson(models.Model):
         verbose_name_plural = "Lessons"
 
     def __str__(self):
-        return self.title
+        return f"{self.title} - {self.total_activities} Activities"
 
     @property
     def section_count(self):
         """Returns the number of sections in this lesson."""
         return self.sections.count()
+
+    @property
+    def total_activities(self):
+        """Returns the count of all top-level activities associated with this lesson."""
+        manager = ActivityManager()
+        total = 0
+        for _, (ActivityClass, _, __, child_class, ___) in manager.registered_activities.items():
+            if child_class:
+                continue
+            total += ActivityClass.objects.filter(lesson_id=self.id).count()
+        return total
 
     def get_ordered_sections(self):
         """Returns all sections for this lesson in their specified order."""
