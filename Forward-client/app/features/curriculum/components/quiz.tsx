@@ -14,27 +14,27 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
     parseInt(hash.substring(1).split("/").at(1) || "1"),
   );
 
-  const [response, setResponse] = useResponse<QuizResponse, Quiz>({
-    type: "Quiz",
-    activity: quiz,
-    trackTime: false,
-    initialFields: { highest_question_reached: 1, score: 0, completion_percentage: 0 },
-  });
+  // const [response, setResponse] = useResponse<QuizResponse, Quiz>({
+  //   type: "Quiz",
+  //   activity: quiz,
+  //   trackTime: false,
+  //   initialFields: { highest_question_reached: 1, score: 0, completion_percentage: 0 },
+  // });
 
-  const [done,setDone] = useState(false);
+  // const [done,setDone] = useState(false);
 
-  useEffect(() => {
-    console.log(done,response.highest_question_reached,quiz.questions.length)
-    if (done && response.highest_question_reached == quiz.questions.length) {
-      setResponse((prevResponse) => ({
-        ...prevResponse,
-        partial_response: false,
-      }));}
-  }, [done]);
+  // useEffect(() => {
+  //   console.log(done,response.highest_question_reached,quiz.questions.length)
+  //   if (done && response.highest_question_reached == quiz.questions.length) {
+  //     setResponse((prevResponse) => ({
+  //       ...prevResponse,
+  //       partial_response: false,
+  //     }));}
+  // }, [done]);
 
   return (
     <div>
-      <p>Time spent: {response.time_spent}</p>
+      {/* <p>Time spent: {response.time_spent}</p> */}
       <p className="mb-4 text-sm font-light">{quiz.instructions}</p>
       {quiz.questions.map((question: QuestionType, questionNumber) => {
         if (currentQuestion - 1 === questionNumber)
@@ -45,7 +45,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
               questionNumber={questionNumber}
               quizId={quiz.id}
               lessonId={quiz.lesson_id}
-              setDone={setDone}
+              // setDone={setDone}
             />
           );
       })}
@@ -73,11 +73,11 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
             <button
               className="bg-primary text-primary-foreground col-span-1 col-start-3 col-end-3 flex h-full w-16 items-center justify-center rounded-md text-center active:brightness-90"
               onClick={() => {
-                if (response.highest_question_reached < currentQuestion + 1)
-                  setResponse({
-                    ...response,
-                    highest_question_reached: currentQuestion + 1,
-                  });
+                // if (response.highest_question_reached < currentQuestion + 1)
+                //   setResponse({
+                //     ...response,
+                //     highest_question_reached: currentQuestion + 1,
+                //   });
                 history.replaceState(
                   null,
                   "",
