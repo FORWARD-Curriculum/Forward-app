@@ -8,6 +8,8 @@ services:
       - ./Forward-server:/app/server
     ports:
       - "127.0.0.1:8000:8000"
+    env_file:
+      - ./Forward-server/.env.development
     develop:
       watch:
         - path: ./Forward-server/requirements.txt
@@ -35,7 +37,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: forward_db
     volumes:
-      - .postgres_data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql/data
 
   minio:
     image: minio/minio
@@ -48,3 +50,6 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     command: server /data --console-address ":9001"
+
+volumes:
+  pg_data:

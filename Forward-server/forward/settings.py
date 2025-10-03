@@ -15,6 +15,9 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+STATIC_URL = 'static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -95,6 +98,11 @@ CORS_ALLOW_HEADERS = ['*',
 ]
 
 # TODO: Change to true when we have https setup
+
+COOKIE_DOMAIN = os.environ.get("COOKIE_DOMAIN", "forwardapp.org")
+SESSION_COOKIE_DOMAIN = COOKIE_DOMAIN
+CSRF_COOKIE_DOMAIN = COOKIE_DOMAIN
+CSRF_COOKIE_HTTPONLY = False
 
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'None'
