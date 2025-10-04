@@ -29,7 +29,7 @@ export default function Question({
       response_data: { selected: [] },
       attempts_left: question.attempts || 3,
     },
-    nonRootActivity: true,
+    // nonRootActivity: true,
   });
 
   // question configuration
@@ -96,6 +96,17 @@ export default function Question({
       handleSubmit();
     }
   }, [isCorrect, isDisabled, selectedAnswers]);
+
+  //handles maintaining an updated ui utilizing useResponse, even if the user navigates away
+  useEffect(() => {
+    console.log('Question component mounted/updated:', {
+      questionId: question.id,
+      responseId: response.id,
+      selectedAnswers: response.response_data?.selected,
+      attemptsLeft: response.attempts_left,
+      partialResponse: response.partial_response
+    });
+  }, [response.id]);
 
   return (
     <div className="flex flex-col items-center gap-7">

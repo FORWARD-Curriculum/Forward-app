@@ -999,8 +999,10 @@ class UserQuizResponse(BaseResponse):
             "question_responses": [qr.to_dict() for qr in self.question_responses.all()]
         }
 
-    
-class UserQuestionResponse(models.Model): # keeping questions from inheriting from their superclass as they are child classes and are not considered actvities
+# This might not be the correct approach but I am keeping userQuestionResponses from
+#  Inheriting from BaseResponse as I think that teh current structures assume they are an activity
+# So I will initialzie all its fields here independently    
+class UserQuestionResponse(models.Model): 
     """
     Stores a user's response to an individual question within a quiz
     """
@@ -1034,6 +1036,22 @@ class UserQuestionResponse(models.Model): # keeping questions from inheriting fr
         on_delete=models.CASCADE,
         related_name='user_responses',
         help_text="The question that was answered"
+    )
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+
+    attempts_left = models.PositiveBigIntegerField(
+        default=3,
+        help_text="Number of attempts remaining for this question"
+    )
+
+    partial_response = models.BooleanField(
+        default=True,
+        help_text="Whether this is still in progress"
     )
 
     # Store the selected answer(s) as JSON
@@ -1122,12 +1140,17 @@ class UserQuestionResponse(models.Model): # keeping questions from inheriting fr
     def to_dict(self):
         return {
             "id": self.id,
+            "associated_activity": self.question_id,
             "quiz_response_id": self.quiz_response_id,
             "question_id": self.question_id,
             "response_data": self.response_data,
             "is_correct": self.is_correct,
             "time_spent": self.time_spent,
-            "feedback": self.feedback
+            "feedback": self.feedback,
+            "attempts_left": self.attempts_left,
+            "partial_response": self.partial_response,
+            "quiz_id": self.quiz_response_id,
+            "lesson_id": self.lesson_id
         }
 
 class VideoResponse(BaseResponse):
