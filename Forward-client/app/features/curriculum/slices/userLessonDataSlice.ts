@@ -100,6 +100,7 @@ export const saveUserResponseThunk = createAsyncThunk(
     //   console.log("Transformed Question response:", transformed);
     //   return transformed;
     // }
+      return { type: data.type, response: json.data as BaseResponse };
     }
   },
 );
