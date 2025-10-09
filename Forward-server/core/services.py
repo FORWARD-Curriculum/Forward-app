@@ -283,7 +283,7 @@ class QuizResponseService:
                     question = Question.objects.get(id=question_id)
                     
                     # Create or update the question response
-                    question_response, _ = UserQuestionResponse.objects.update_or_create(
+                    question_response, qr_created = UserQuestionResponse.objects.update_or_create(
                         user=user,
                         quiz_response=quiz_response,
                         question=question,
@@ -294,8 +294,19 @@ class QuizResponseService:
                         }
                     )
                     
+                    # if not created and not question_response.is_correct:
+                    #     question_response.attempts_left = max(0, question_response.attempts_left - 1)
+                    
+                    #     question_response.evaluate_correctness()
+                    #     question_response.save()  
+                     # Decrement attempts if this is a retry of a wrong answer
+                    if not qr_created and not question_response.is_correct:
+                        question_response.attempts_left = max(0, question_response.attempts_left - 1)
+
+
                     # evaluate correctness
                     question_response.evaluate_correctness()
+                    question_response.save()  
             
             # calculate completion percentage
             total_questions = Question.objects.filter(quiz=quiz).count()

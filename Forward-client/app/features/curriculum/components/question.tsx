@@ -1,23 +1,20 @@
 import { Skeleton } from "../../../components/ui/skeleton";
 import MarkdownTTS from "../../../components/ui/markdown-tts";
-import type { Question } from "@/features/curriculum/types";
-import { useEffect } from "react";
+import type { Question, QuestionResponse } from "@/features/curriculum/types";
 
 export default function Question({
-  // question,
-  // questionNumber,
-  // quizId,
-  // lessonId,
   question,
   questionNumber,
   answer,
   onAnswerChange,
-  disabled //whether quiz is already submitted
+  onCheckAnswer,
+  disabled
 }: {
   question: Question;
   questionNumber: number;
-  answer: { selected: number[] } | null;
+  answer: QuestionResponse | null;
   onAnswerChange: (questionId: string, answerData: { selected: number[] }) => void;
+  onCheckAnswer: (questionId: string) => void;
   disabled: boolean;
 }) {
 
@@ -27,10 +24,10 @@ export default function Question({
   const correctAnswers = question.choices.options.filter(
     (option) => option.is_correct,
   );
-  const selectedAnswers = answer?.selected || [];
+  const selectedAnswers = answer?.response_data?.selected || [];
 
   // question state
-  const isDisabled = disabled;
+  const isDisabled = disabled || (answer?.attempts_left ?? 3) <= 0;
   const isAnswered =
     selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
 
@@ -46,7 +43,7 @@ export default function Question({
    * Handles when a user selects or deselects an option
    */
   const handleOptionChange = (choiceId: number) => {
-    const currentSelected = answer?.selected || [];
+    const currentSelected = answer?.response_data?.selected || [];
     const newSelected = isMultipleSelect
       ? toggleArrayItem(currentSelected, choiceId)
       : [choiceId];
@@ -54,37 +51,6 @@ export default function Question({
     // informsa parent
     onAnswerChange(question.id, { selected: newSelected });
   };
-
-  /**
-   * Handles final submission of the answer
-   */
-  // const handleSubmit = () => {
-  //   setResponse((prevResponse) => ({
-  //     ...prevResponse,
-  //     partial_response: false,
-  //     attempts_left: 0,
-  //   }));
-  //   setDone(true);
-  //   saveResponse();
-  // };
-
-  // submit on correct answer
-  // useEffect(() => {
-  //   if (isCorrect && !isDisabled && selectedAnswers.length > 0) {
-  //     handleSubmit();
-  //   }
-  // }, [isCorrect, isDisabled, selectedAnswers]);
-
-  // //handles maintaining an updated ui utilizing useResponse, even if the user navigates away
-  // useEffect(() => {
-  //   console.log('Question component mounted/updated:', {
-  //     questionId: question.id,
-  //     responseId: response.id,
-  //     selectedAnswers: response.response_data?.selected,
-  //     attemptsLeft: response.attempts_left,
-  //     partialResponse: response.partial_response
-  //   });
-  // }, [response.id]);
 
   return (
     <div className="flex flex-col items-center gap-7">
@@ -139,7 +105,7 @@ export default function Question({
         </MarkdownTTS>
 
         {/* Feedback area */}
-        {disabled && isAnswered && (
+        {isDisabled && isAnswered && (
           <p className="max-w-[40ch]">
             {isCorrect ? (
               <>
@@ -154,6 +120,20 @@ export default function Question({
             )}
           </p>
         )}
+      </div>
+
+      <div className="flex flex-col items-center gap-3">
+        <button
+          onClick={() => onCheckAnswer(question.id)}
+          disabled={isDisabled || selectedAnswers.length === 0}
+          className="bg-primary disabled:bg-muted disabled:text-muted-foreground text-primary-foreground rounded-md px-6 py-2"
+        >
+          Check Answer
+        </button>
+        
+        <p className="text-sm text-gray-600">
+          Attempts left: {answer?.attempts_left ?? 3}
+        </p>
       </div>
     </div>
   );

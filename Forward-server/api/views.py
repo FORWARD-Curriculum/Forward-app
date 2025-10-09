@@ -5,7 +5,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, QuizSubmissionSerializer, UserQuizResponseDetailSerializer, ResponseSerializer
+from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, ResponseSerializer
+# QuizSubmissionSerializer, UserQuizResponseDetailSerializer,
 from core.services import UserService, LessonService, QuizResponseService, ResponseService
 # , QuestionResponseService
 from .utils import json_go_brrr, messages

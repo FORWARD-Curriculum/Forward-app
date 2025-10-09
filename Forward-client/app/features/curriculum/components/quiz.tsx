@@ -5,7 +5,7 @@ import type {
   QuestionResponse,
 } from "@/features/curriculum/types";
 import { useLocation } from "react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useResponse } from "@/features/curriculum/hooks";
 import Question from "./question";
 
@@ -63,10 +63,9 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
 
   // Get answer for a specific question from submission
   const getAnswerForQuestion = (questionId: string) => {
-    const answer = response.submission.find(
+    return response.submission.find(
       (item) => item.associated_activity === questionId
-    );
-    return answer?.response_data || null;
+    ) || null;
   };
 
   // Update submission when user answers
@@ -77,12 +76,8 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
     }));
   };
 
-  // Handle "Check Answers" button click
-  const handleCheckAnswers = async () => {
-    setResponse((prev) => ({
-      ...prev,
-      partial_response: false,
-    }));
+  // Handle "Check Answer" button click
+  const handleCheckAnswer = async (questionId: string) => {
     await saveResponse();
   };
 
@@ -99,6 +94,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
               questionNumber={questionNumber}
               answer={getAnswerForQuestion(question.id)}
               onAnswerChange={handleAnswerChange}
+              onCheckAnswer={handleCheckAnswer}
               disabled={!response.partial_response}
             />
           );
@@ -141,17 +137,6 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
             </button>
           )}
         </div>
-      </div>
-
-      {/* Check Answers button */}
-      <div className="mt-8 flex justify-center">
-        <button
-          onClick={handleCheckAnswers}
-          disabled={!response.partial_response || response.submission.length === 0}
-          className="bg-primary text-primary-foreground disabled:bg-muted disabled:text-muted-foreground rounded-md px-6 py-2 font-semibold shadow-sm disabled:!cursor-not-allowed disabled:opacity-50"
-        >
-          Check Answers ({response.submission.length}/{quiz.questions.length})
-        </button>
       </div>
     </div>
   );
