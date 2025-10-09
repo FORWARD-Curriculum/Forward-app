@@ -990,13 +990,16 @@ class UserQuizResponse(BaseResponse):
     def to_dict(self):
         return {
             "id": self.id,
-            "user_id": self.user_id,
-            "associated_activity_id": self.associated_activity_id,
+            # "user_id": self.user_id,
+            "associated_activity": self.associated_activity.id,
+            "lesson_id": self.lesson.id,
             "score": self.score,
             "partial_response": self.partial_response,
-            "completion_percentage": self.completion_percentage,
             "time_spent": self.time_spent,
-            "question_responses": [qr.to_dict() for qr in self.question_responses.all()]
+            "attempts_left": self.attempts_left,
+            "score": self.score,
+            "completion_percentage": self.completion_percentage,
+            "submission": [qr.to_dict() for qr in self.question_responses.all()]
         }
 
 # This might not be the correct approach but I am keeping userQuestionResponses from
@@ -1141,16 +1144,14 @@ class UserQuestionResponse(models.Model):
         return {
             "id": self.id,
             "associated_activity": self.question_id,
-            "quiz_response_id": self.quiz_response_id,
-            "question_id": self.question_id,
             "response_data": self.response_data,
-            "is_correct": self.is_correct,
-            "time_spent": self.time_spent,
-            "feedback": self.feedback,
-            "attempts_left": self.attempts_left,
+            "quiz_id": self.quiz_response.associated_activity.id,
+            # "is_correct": self.is_correct,
+            "lesson_id": self.lesson_id,
             "partial_response": self.partial_response,
-            "quiz_id": self.quiz_response_id,
-            "lesson_id": self.lesson_id
+            "time_spent": self.time_spent,
+            # "feedback": self.feedback,
+            "attempts_left": self.attempts_left,
         }
 
 class VideoResponse(BaseResponse):
@@ -1456,7 +1457,8 @@ class ActivityManager():
         self.registerActivity(Poll, PollResponse)
         self.registerActivity(
             PollQuestion, PollQuestionResponse, child_class=True)
-        self.registerActivity(Quiz, UserQuizResponse)
+        self.registerActivity(Quiz, UserQuizResponse, {
+                                "submission": ["submission", []]}) # test
         # self.registerActivity(Question, UserQuestionResponse, child_class=True) # Testing this
         self.registerActivity(Embed, EmbedResponse, {
                               "inputted_code": ["inputted_code", None]})

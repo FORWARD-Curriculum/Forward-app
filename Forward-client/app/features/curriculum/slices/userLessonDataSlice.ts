@@ -19,7 +19,8 @@ export const initialLessonResponseState: LessonResponse = {
     Quiz: [],
     PollQuestion: [],
     Writing: [],
-    Question: [],
+    FillInTheBlank: [],
+    // Question: [],
     TextContent: [],
     ConceptMap: [],
     Identification: [],
@@ -63,9 +64,7 @@ export const saveUserResponseThunk = createAsyncThunk(
     };
 
     // NOTE: SERVER ***ONLY*** RECIEVES THE AGGREGATE TIME
-    const url = data.type === "Question"
-      ? `/quizzes/${(data.response as any).quiz_id}/questions/${data.response.associated_activity}/response`
-      : `/responses/${data.type.toLowerCase()}`;
+    const url = `/responses/${data.type.toLowerCase()}`;
 
     const response = await apiFetch(url, {
       method: "POST",
@@ -79,27 +78,6 @@ export const saveUserResponseThunk = createAsyncThunk(
     if (response.ok) {
       if (data.trackTime) thunkAPI.dispatch(resetTimeSpent());
       const json = await response.json();
-
-      // lets see if this will work on the question edge case, since it is 
-      // treated differently as a child
-      // please worrrrrrk
-    // if (data.type === "Question") {
-    //   const transformed = {
-    //     type: data.type,
-    //     response: {
-    //       id: json.data.id,
-    //       associated_activity: json.data.question_id,
-    //       response_data: json.data.response_data,
-    //       attempts_left: json.data.attempts_left,
-    //       partial_response: json.data.partial_response,
-    //       quiz_id: json.data.quiz_response_id,
-    //       lesson_id: state.lesson.lesson?.id,
-    //       time_spent: json.data.time_spent
-    //     }
-    //   };
-    //   console.log("Transformed Question response:", transformed);
-    //   return transformed;
-    // }
       return { type: data.type, response: json.data as BaseResponse };
     }
   },

@@ -1,46 +1,36 @@
 import { Skeleton } from "../../../components/ui/skeleton";
 import MarkdownTTS from "../../../components/ui/markdown-tts";
-import { useResponse } from "@/features/curriculum/hooks";
-import type { Question, QuestionResponse } from "@/features/curriculum/types";
+import type { Question } from "@/features/curriculum/types";
 import { useEffect } from "react";
 
 export default function Question({
+  // question,
+  // questionNumber,
+  // quizId,
+  // lessonId,
   question,
   questionNumber,
-  quizId,
-  lessonId,
-  setDone,
+  answer,
+  onAnswerChange,
+  disabled //whether quiz is already submitted
 }: {
   question: Question;
   questionNumber: number;
-  quizId: string;
-  lessonId: string;
-  setDone: React.Dispatch<React.SetStateAction<boolean>>;
+  answer: { selected: number[] } | null;
+  onAnswerChange: (questionId: string, answerData: { selected: number[] }) => void;
+  disabled: boolean;
 }) {
-  const [response, setResponse, saveResponse] = useResponse<
-    QuestionResponse,
-    Question
-  >({
-    type: "Question",
-    activity: question,
-    initialFields: {
-      quiz_id: quizId,
-      lesson_id: lessonId,
-      response_data: { selected: [] },
-      attempts_left: question.attempts || 3,
-    },
-    // nonRootActivity: true,
-  });
+
 
   // question configuration
   const isMultipleSelect = question.question_type === "multiple_select";
   const correctAnswers = question.choices.options.filter(
     (option) => option.is_correct,
   );
-  const selectedAnswers = response.response_data?.selected || [];
+  const selectedAnswers = answer?.selected || [];
 
   // question state
-  const isDisabled = response.attempts_left <= 0;
+  const isDisabled = disabled;
   const isAnswered =
     selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
 
@@ -56,67 +46,52 @@ export default function Question({
    * Handles when a user selects or deselects an option
    */
   const handleOptionChange = (choiceId: number) => {
-    setResponse((prevResponse) => {
-      // new selection state
-      const newSelected = isMultipleSelect
-        ? toggleArrayItem(prevResponse.response_data?.selected || [], choiceId)
-        : [choiceId];
-
-      // attempts left
-      const newAttemptsLeft = isMultipleSelect
-        ? isAnswered
-          ? prevResponse.attempts_left - 1
-          : prevResponse.attempts_left
-        : prevResponse.attempts_left - 1;
-
-      return {
-        ...prevResponse,
-        attempts_left: newAttemptsLeft,
-        response_data: { selected: newSelected },
-      };
-    });
+    const currentSelected = answer?.selected || [];
+    const newSelected = isMultipleSelect
+      ? toggleArrayItem(currentSelected, choiceId)
+      : [choiceId];
+    
+    // informsa parent
+    onAnswerChange(question.id, { selected: newSelected });
   };
 
   /**
    * Handles final submission of the answer
    */
-  const handleSubmit = () => {
-    setResponse((prevResponse) => ({
-      ...prevResponse,
-      partial_response: false,
-      attempts_left: 0,
-    }));
-    setDone(true);
-    saveResponse();
-  };
+  // const handleSubmit = () => {
+  //   setResponse((prevResponse) => ({
+  //     ...prevResponse,
+  //     partial_response: false,
+  //     attempts_left: 0,
+  //   }));
+  //   setDone(true);
+  //   saveResponse();
+  // };
 
   // submit on correct answer
-  useEffect(() => {
-    if (isCorrect && !isDisabled && selectedAnswers.length > 0) {
-      handleSubmit();
-    }
-  }, [isCorrect, isDisabled, selectedAnswers]);
+  // useEffect(() => {
+  //   if (isCorrect && !isDisabled && selectedAnswers.length > 0) {
+  //     handleSubmit();
+  //   }
+  // }, [isCorrect, isDisabled, selectedAnswers]);
 
-  //handles maintaining an updated ui utilizing useResponse, even if the user navigates away
-  useEffect(() => {
-    console.log('Question component mounted/updated:', {
-      questionId: question.id,
-      responseId: response.id,
-      selectedAnswers: response.response_data?.selected,
-      attemptsLeft: response.attempts_left,
-      partialResponse: response.partial_response
-    });
-  }, [response.id]);
+  // //handles maintaining an updated ui utilizing useResponse, even if the user navigates away
+  // useEffect(() => {
+  //   console.log('Question component mounted/updated:', {
+  //     questionId: question.id,
+  //     responseId: response.id,
+  //     selectedAnswers: response.response_data?.selected,
+  //     attemptsLeft: response.attempts_left,
+  //     partialResponse: response.partial_response
+  //   });
+  // }, [response.id]);
 
   return (
     <div className="flex flex-col items-center gap-7">
       {/* Question Image and Caption */}
       <div className="flex flex-col gap-2">
         {question.image ? (
-          <img
-            src={question.image}
-            alt={question.caption || "Question image"}
-          />
+          <img src={question.image} alt={question.caption || "Question image"} />
         ) : (
           <Skeleton className="size-70" />
         )}
@@ -139,7 +114,6 @@ export default function Question({
             <legend className="max-w-[70ch]">
               {questionNumber + 1}. {question.question_text}
             </legend>
-
             {question.choices.options.map((option) => (
               <div className="flex pl-6" key={option.id}>
                 <input
@@ -165,7 +139,7 @@ export default function Question({
         </MarkdownTTS>
 
         {/* Feedback area */}
-        {isAnswered && (
+        {disabled && isAnswered && (
           <p className="max-w-[40ch]">
             {isCorrect ? (
               <>
@@ -180,21 +154,6 @@ export default function Question({
             )}
           </p>
         )}
-      </div>
-
-      {/* Submit Button and Attempts Counter */}
-      <div className="flex flex-col items-center gap-3">
-        <button
-          onClick={handleSubmit}
-          disabled={isDisabled || selectedAnswers.length === 0}
-          className={`bg-primary disabled:bg-muted disabled:text-muted-foreground text-primary-foreground rounded-md px-6`}
-        >
-          Submit Answer
-        </button>
-
-        <p className="text-sm text-gray-600">
-          Attempts left: {response.attempts_left}
-        </p>
       </div>
     </div>
   );

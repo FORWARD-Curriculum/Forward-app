@@ -6,7 +6,8 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, QuizSubmissionSerializer, UserQuizResponseDetailSerializer, ResponseSerializer
-from core.services import UserService, LessonService, QuizResponseService, ResponseService, QuestionResponseService
+from core.services import UserService, LessonService, QuizResponseService, ResponseService
+# , QuestionResponseService
 from .utils import json_go_brrr, messages
 from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, User
 from rest_framework import serializers, request
@@ -486,39 +487,39 @@ class QuizResponseStatusView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-class QuestionResponseView(APIView):
-    """Handle individual question responses within a quiz, god i hate this, so now questions wil be embedded and more coupled to quizes"""
-    permission_classes = [IsAuthenticated]
+# class QuestionResponseView(APIView):
+#     """Handle individual question responses within a quiz, god i hate this, so now questions wil be embedded and more coupled to quizes"""
+#     permission_classes = [IsAuthenticated]
     
-    def post(self, request, quiz_id, question_id):
-        """Submit answer to a specific question"""
-        try:
-            question = Question.objects.get(id=question_id, quiz_id=quiz_id)
-            quiz = Quiz.objects.get(id=quiz_id)
+#     def post(self, request, quiz_id, question_id):
+#         """Submit answer to a specific question"""
+#         try:
+#             question = Question.objects.get(id=question_id, quiz_id=quiz_id)
+#             quiz = Quiz.objects.get(id=quiz_id)
             
-            # Prepare data for service
-            validated_data = {
-                'associated_activity': question,
-                'quiz_id': quiz_id,
-                'lesson_id': quiz.lesson,
-                'response_data': request.data.get('response_data', {}),
-                'time_spent': request.data.get('time_spent', 0)
-            }
+#             # Prepare data for service
+#             validated_data = {
+#                 'associated_activity': question,
+#                 'quiz_id': quiz_id,
+#                 'lesson_id': quiz.lesson,
+#                 'response_data': request.data.get('response_data', {}),
+#                 'time_spent': request.data.get('time_spent', 0)
+#             }
             
-            question_response = QuestionResponseService.submit_question_response(
-                validated_data, request
-            )
+#             question_response = QuestionResponseService.submit_question_response(
+#                 validated_data, request
+#             )
             
-            return json_go_brrr(
-                message="Question response submitted successfully",
-                data=question_response.to_dict(),
-                status=status.HTTP_200_OK
-            )
-        except Exception as e:
-            return json_go_brrr(
-                message=str(e),
-                status=status.HTTP_400_BAD_REQUEST
-            )
+#             return json_go_brrr(
+#                 message="Question response submitted successfully",
+#                 data=question_response.to_dict(),
+#                 status=status.HTTP_200_OK
+#             )
+#         except Exception as e:
+#             return json_go_brrr(
+#                 message=str(e),
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
             
 class OnboardView(APIView):
     def get(self, request):

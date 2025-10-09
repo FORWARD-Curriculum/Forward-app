@@ -3,7 +3,8 @@ from .views import (
     QuizResponseStatusView, UserRegistrationView, SessionView, CurrentUserView, QuizView,
     LessonView, LessonContentView, TextContentView, WritingView,
     PollView, QuizResponseView, QuizResponseDetailView, GetLessonIds,
-    CurriculumView, ResponseView, OnboardView, QuestionResponseView
+    CurriculumView, ResponseView, OnboardView
+    # , QuestionResponseView
 )
 
 urlpatterns = [
@@ -21,7 +22,7 @@ urlpatterns = [
     path('quizzes/response', QuizResponseView.as_view(), name='quiz-responses'),
     path('quizzes/response/<uuid:response_id>', QuizResponseDetailView.as_view(), name='quiz-response-detail'),
 
-    path('quizzes/<uuid:quiz_id>/questions/<uuid:question_id>/response', QuestionResponseView.as_view(), name='question-response'),
+    # path('quizzes/<uuid:quiz_id>/questions/<uuid:question_id>/response', QuestionResponseView.as_view(), name='question-response'), # playing around with this
 
     path('textcontent/<uuid:id>', TextContentView.as_view(), name='text-content'),
     path('writing/<uuid:id>', WritingView.as_view(), name='writings'),
