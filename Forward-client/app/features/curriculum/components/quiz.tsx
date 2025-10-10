@@ -55,7 +55,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
           lesson_id: quiz.lesson_id,
           partial_response: true,
           time_spent: 0,
-          attempts_left: 3,
+          // attempts_left: 3,
         } as QuestionResponse,
       ];
     }

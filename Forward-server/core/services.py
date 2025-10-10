@@ -6,6 +6,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, Embed, EmbedResponse, Facility
 from rest_framework.request import Request as DRFRequest
+import logging
+logger = logging.getLogger(__name__)
 
 
 class UserService:
@@ -281,18 +283,35 @@ class QuizResponseService:
                 
                 if question_id:
                     question = Question.objects.get(id=question_id)
+
+                    logger.error(f"DEBUG: Processing question {question_id}")
+                    logger.error(f"DEBUG: response_data from payload = {response_data}")
                     
                     # Create or update the question response
-                    question_response, qr_created = UserQuestionResponse.objects.update_or_create(
+                    question_response, qr_created = UserQuestionResponse.objects.get_or_create(
                         user=user,
                         quiz_response=quiz_response,
                         question=question,
                         defaults={
                             'lesson': lesson,
                             'response_data': response_data,
-                            'time_spent': 0  # Could extract from question_data if needed
+                            'time_spent': 0,  # Could extract from question_data if needed
+                            "attempts_left": 2 # weird workaround, there are actually 3 attempts, but the first attemp also creates the question, id is null during teh first request but it is evaluated. This will make it decrement correctly 3 times
                         }
                     )
+
+                    logger.error(f"DEBUG: qr_created = {qr_created}")
+                    logger.error(f"DEBUG: attempts_left BEFORE decrement = {question_response.attempts_left}")
+
+                    # test
+                    logger.error(f"DEBUG: Quiz response created? {created}")
+                    logger.error(f"DEBUG: Quiz response ID: {quiz_response.id}")
+
+                    #If this is a retry (not first attempt), decrement attempts BEFORE evaluating
+                    if not qr_created:
+                        question_response.attempts_left = max(0, question_response.attempts_left -1)
+                        question_response.response_data = response_data
+                        logger.error(f"DEBUG: attempts_left AFTER decrement = {question_response.attempts_left}")
                     
                     # if not created and not question_response.is_correct:
                     #     question_response.attempts_left = max(0, question_response.attempts_left - 1)
@@ -300,8 +319,7 @@ class QuizResponseService:
                     #     question_response.evaluate_correctness()
                     #     question_response.save()  
                      # Decrement attempts if this is a retry of a wrong answer
-                    if not qr_created and not question_response.is_correct:
-                        question_response.attempts_left = max(0, question_response.attempts_left - 1)
+
 
 
                     # evaluate correctness
