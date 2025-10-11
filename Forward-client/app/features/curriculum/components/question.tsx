@@ -1,4 +1,3 @@
-import { Skeleton } from "../../../components/ui/skeleton";
 import MarkdownTTS from "../../../components/ui/markdown-tts";
 import type { Question, QuestionResponse } from "@/features/curriculum/types";
 
@@ -17,20 +16,16 @@ export default function Question({
   onCheckAnswer: (questionId: string) => void;
   disabled: boolean;
 }) {
-
-
   // question configuration
   const isMultipleSelect = question.question_type === "multiple_select";
   const correctAnswers = question.choices.options.filter(
     (option) => option.is_correct,
   );
   const selectedAnswers = answer?.response_data?.selected || [];
-
   // question state
   const isDisabled = disabled || (answer?.attempts_left ?? 3) <= 0;
   const isAnswered =
     selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
-
   // Check if the answer is correct
   const isCorrect = isMultipleSelect
     ? areArraysEqual(
@@ -38,7 +33,6 @@ export default function Question({
         correctAnswers.map((c) => c.id).sort(),
       )
     : correctAnswers.map((c) => c.id).includes(selectedAnswers[0]);
-
   /**
    * Handles when a user selects or deselects an option
    */
@@ -53,85 +47,85 @@ export default function Question({
   };
 
   return (
-    <div className="flex flex-col items-center gap-7">
-      {/* Question Image and Caption */}
-      <div className="flex flex-col gap-2">
-        {question.image ? (
-          <img src={question.image} alt={question.caption || "Question image"} />
-        ) : (
-          <Skeleton className="size-70" />
+    <div className="bg-foreground rounded-lg p-4 shadow-sm border border-muted max-w-3xl mx-auto">
+      <div className="space-y-4">
+        {question.caption && (
+          <p className="text-sm text-muted-foreground italic">
+            {question.caption}
+          </p>
         )}
-        {question.caption ? (
-          <p>{question.caption}</p>
-        ) : (
-          <Skeleton className="h-[var(--txt-base)] w-70" />
-        )}
-      </div>
 
-      <div className="flex">
         {/* Question Text and Options */}
-        <MarkdownTTS
-          className="flex flex-col items-center"
-          controlsClassName="flex gap-2"
-          controlsOrientation="vertical"
-          key={questionNumber}
-        >
-          <fieldset>
-            <legend className="max-w-[70ch]">
+        <div className="space-y-3">
+          <div className="space-y-3">
+            <MarkdownTTS className="text-base font-medium leading-relaxed">
               {questionNumber + 1}. {question.question_text}
-            </legend>
-            {question.choices.options.map((option) => (
-              <div className="flex pl-6" key={option.id}>
-                <input
-                  className="bg-primary"
-                  type={isMultipleSelect ? "checkbox" : "radio"}
-                  disabled={isDisabled}
-                  checked={selectedAnswers.includes(option.id)}
-                  onChange={() => handleOptionChange(option.id)}
-                  id={`question-${questionNumber}:option-${option.id}`}
-                  name={`question-${questionNumber}`}
-                />
+            </MarkdownTTS>
+            
+            <div className="space-y-2">
+              {question.choices.options.map((option) => (
                 <label
-                  className="ml-2"
+                  key={option.id}
                   htmlFor={`question-${questionNumber}:option-${option.id}`}
+                  className={`flex items-start gap-3 p-3 rounded-md border-2 transition-all cursor-pointer ${
+                    selectedAnswers.includes(option.id)
+                      ? "border-primary bg-primary/5"
+                      : "border-muted hover:border-primary/50 bg-foreground"
+                  } ${isDisabled ? "opacity-60 cursor-not-allowed" : ""}`}
                 >
-                  {/* This adds a pause between reading the options */}
-                  <span className="text-[0px] opacity-0">.</span>
-                  {option.text}
+                  <input
+                    type={isMultipleSelect ? "checkbox" : "radio"}
+                    checked={selectedAnswers.includes(option.id)}
+                    disabled={isDisabled}
+                    onChange={() => handleOptionChange(option.id)}
+                    id={`question-${questionNumber}:option-${option.id}`}
+                    name={`question-${questionNumber}`}
+                    className="mt-0.5 accent-primary"
+                  />
+                  <MarkdownTTS className="flex-1 text-base">
+                    {/* This adds a pause between reading the options */}
+                    .
+                    {option.text}
+                  </MarkdownTTS>
                 </label>
-              </div>
-            ))}
-          </fieldset>
-        </MarkdownTTS>
+              ))}
+            </div>
+          </div>
+        </div>
 
         {/* Feedback area */}
         {isDisabled && isAnswered && (
-          <p className="max-w-[40ch]">
+          <div
+            className={`rounded-md p-3 text-sm ${
+              isCorrect
+                ? "bg-accent/10 border border-accent"
+                : "bg-error/10 border border-error"
+            }`}
+          >
             {isCorrect ? (
               <>
-                <span className="text-green-600">Correct!</span>{" "}
+                <span className="font-semibold text-accent">Correct!</span>{" "}
                 {question.feedback_config.correct}
               </>
             ) : (
               <>
-                <span className="text-error">Not quite!</span>{" "}
+                <span className="font-semibold text-error">Not quite!</span>{" "}
                 {question.feedback_config.incorrect}
               </>
             )}
-          </p>
+          </div>
         )}
       </div>
 
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex items-center justify-between mt-4 pt-3 border-t border-muted">
         <button
           onClick={() => onCheckAnswer(question.id)}
           disabled={isDisabled || selectedAnswers.length === 0}
-          className="bg-primary disabled:bg-muted disabled:text-muted-foreground text-primary-foreground rounded-md px-6 py-2"
+          className="bg-primary disabled:bg-muted disabled:text-muted-foreground text-primary-foreground rounded-md px-6 py-2 font-medium transition-all hover:brightness-110 active:brightness-90"
         >
           Check Answer
         </button>
-        
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted-foreground">
           Attempts left: {answer?.attempts_left ?? 3}
         </p>
       </div>

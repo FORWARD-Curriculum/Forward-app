@@ -324,6 +324,8 @@ class QuizResponseService:
 
                     # evaluate correctness
                     question_response.evaluate_correctness()
+                    if question_response.is_correct:
+                        question_response.attempts_left = 0 # If they got it correct just lock it
                     question_response.save()  
             
             # calculate completion percentage
