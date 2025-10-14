@@ -1307,7 +1307,10 @@ class WritingResponse(BaseResponse):
         help_text='The writing that was answered'
     )
 
-    response = models.CharField(default="", max_length=10000)
+    responses = models.JSONField(
+        help_text="The user's written responses in JSON Array format",
+        default=list
+    )
 
     class Meta:
         verbose_name = "Writing Response"
@@ -1316,7 +1319,7 @@ class WritingResponse(BaseResponse):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "response": self.response
+            "responses": self.responses
         }
 
 
@@ -1547,7 +1550,7 @@ class ActivityManager():
         self.registerActivity(TextContent, TextContentResponse)
         self.registerActivity(Identification, IdentificationResponse)
         self.registerActivity(Writing, WritingResponse, {
-                              "response": ["response"]})
+                              "responses": ["responses", []]})
         self.registerActivity(Poll, PollResponse)
         self.registerActivity(
             PollQuestion, PollQuestionResponse, child_class=True)

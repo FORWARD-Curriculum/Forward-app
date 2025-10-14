@@ -246,6 +246,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
           </span>
           {activity?.title}
         </h1>
+        {activity?.instructions && <p className="mb-6 font-light italic">{activity.instructions}</p>}
         {activity && <Activity activity={activity} />}
         <div className="mt-auto flex">
           <button

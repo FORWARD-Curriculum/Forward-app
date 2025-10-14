@@ -1,7 +1,5 @@
 // Fields should always be snake_case, and class names should always be ProperCase
 
-import exp from "constants";
-
 export interface Lesson {
   id: string;
   title: string;
@@ -273,7 +271,7 @@ export interface PollQuestionResponse extends BaseResponse {
 }
 
 export interface WritingResponse extends BaseResponse {
-  response: string;
+  responses: string[];
 }
 
 export interface TextContentResponse extends BaseResponse {}

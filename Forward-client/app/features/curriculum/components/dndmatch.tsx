@@ -321,7 +321,6 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
 
   return (
     <>
-      <p className="mb-4 font-light">{dndmatch.instructions}</p>
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}

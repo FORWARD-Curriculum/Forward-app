@@ -66,7 +66,6 @@ export default function Video({ video }: { video: VideoType }) {
 
   return (
     <div>
-      <p className="mb-4 font-light">{video.instructions}</p>
       <div className="flex w-full flex-col items-center gap-4 p-4">
         <video
           ref={videoRef}

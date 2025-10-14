@@ -20,6 +20,7 @@ python manage.py collectstatic --noinput
 
 python manage.py seed_defaults --reset defaults.json
 python manage.py seed_lessons_data --reset lesson1/lesson1.json
+python manage.py seed_lessons_data --reset lesson2/lesson2.json
 
 
 

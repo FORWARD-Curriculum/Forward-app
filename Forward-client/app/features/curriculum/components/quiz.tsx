@@ -35,7 +35,6 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
   return (
     <div>
       <p>Time spent: {response.time_spent}</p>
-      <p className="mb-4 text-sm font-light">{quiz.instructions}</p>
       {quiz.questions.map((question: QuestionType, questionNumber) => {
         if (currentQuestion - 1 === questionNumber)
           return (
