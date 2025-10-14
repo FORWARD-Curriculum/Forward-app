@@ -1,5 +1,6 @@
 import MarkdownTTS from "../../../components/ui/markdown-tts";
 import type { Question, QuestionResponse } from "@/features/curriculum/types";
+import { useEffect } from "react";
 
 export default function Question({
   question,
@@ -16,6 +17,12 @@ export default function Question({
   onCheckAnswer: (questionId: string) => void;
   disabled: boolean;
 }) {
+
+  // test
+  useEffect(() => {
+    console.log("📝 Question component - answer prop changed:", answer);
+  }, [answer]);
+
   // question configuration
   const isMultipleSelect = question.question_type === "multiple_select";
   const correctAnswers = question.choices.options.filter(

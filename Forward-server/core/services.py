@@ -308,11 +308,27 @@ class QuizResponseService:
                     logger.error(f"DEBUG: Quiz response ID: {quiz_response.id}")
 
                     #If this is a retry (not first attempt), decrement attempts BEFORE evaluating
+                    # if not qr_created:
+                    #     question_response.attempts_left = max(0, question_response.attempts_left -1)
+                    #     question_response.response_data = response_data
+                    #     logger.error(f"DEBUG: attempts_left AFTER decrement = {question_response.attempts_left}")
+
                     if not qr_created:
-                        question_response.attempts_left = max(0, question_response.attempts_left -1)
                         question_response.response_data = response_data
-                        logger.error(f"DEBUG: attempts_left AFTER decrement = {question_response.attempts_left}")
-                    
+
+                    question_response.evaluate_correctness()
+
+                    logger.error(f"DEBUG: After evaluate - is_correct = {question_response.is_correct}")
+
+
+                    if question_response.is_correct:
+                        question_response.attempts_left = 0
+                        logger.error(f"DEBUG: Set attempts_left to 0!")
+                    elif not qr_created:
+                        # then we decrement
+                        question_response.attempts_left = max(0, question_response.attempts_left - 1)
+                        logger.error(f"DEBUG: Decremented attempts_left")
+
                     # if not created and not question_response.is_correct:
                     #     question_response.attempts_left = max(0, question_response.attempts_left - 1)
                     
@@ -323,10 +339,13 @@ class QuizResponseService:
 
 
                     # evaluate correctness
-                    question_response.evaluate_correctness()
-                    if question_response.is_correct:
-                        question_response.attempts_left = 0 # If they got it correct just lock it
-                    question_response.save()  
+                    # question_response.evaluate_correctness()
+                    # if question_response.is_correct:
+                    #     question_response.attempts_left = 0 # If they got it correct just lock it
+                    # question_response.save()  
+                    logger.error(f"DEBUG: attempts_left BEFORE save = {question_response.attempts_left}")
+                    question_response.save()
+                    logger.error(f"DEBUG: attempts_left AFTER save = {question_response.attempts_left}")
             
             # calculate completion percentage
             total_questions = Question.objects.filter(quiz=quiz).count()

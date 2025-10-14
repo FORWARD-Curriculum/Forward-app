@@ -11,6 +11,8 @@ from botocore.exceptions import ClientError
 import logging
 import re
 import json
+import logging
+logger = logging.getLogger(__name__)
 
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
@@ -1098,11 +1100,23 @@ class UserQuestionResponse(models.Model):
         """Determine if the response is correct based on question type and correct answer"""
         if not self.question.has_correct_answer:
             self.is_correct = None
-            self.save()
+            # self.save()
             return None
 
+        options = self.question.choices.get('options', [])
         # Get correct answers from the question
-        correct_answers = self.question.choices.get('correct_answers', [])
+        correct_answers = self.question.choices.get('is_correct', [])
+
+        #lets try and extract the ID's of options where is_correct is TRUE
+        correct_answer_ids = []
+        for opt in options:
+            if opt.get('is_correct', False):
+                correct_answer_ids.append(opt['id'])
+        
+
+        logger.error(f"DEBUG evaluate_correctness: options = {options}")
+        logger.error(f"DEBUG evaluate_correctness: correct_answers = {correct_answers}")
+
         selected = self.response_data.get('selected', None)
 
         # Set default feedback
@@ -1114,19 +1128,22 @@ class UserQuestionResponse(models.Model):
             self.is_correct = False
             self.feedback = feedback_config.get(
                 'no_response', default_feedback)
-            self.save()
+            # self.save()
             return False
 
         # Handle different question types
         if self.question.question_type == 'multiple_choice':
-            self.is_correct = selected in correct_answers
+            # self.is_correct = selected in correct_answers
+            self.is_correct = selected[0] in correct_answer_ids
+            logger.error(f"DEBUG evaluate_correctness: multiple_choice check - selected[0]={selected[0] if selected else None} in {correct_answers} = {self.is_correct}")
         elif self.question.question_type == 'multiple_select':
             if not isinstance(selected, list):
                 self.is_correct = False
             else:
-                self.is_correct = sorted(selected) == sorted(correct_answers)
+                self.is_correct = sorted(selected) == sorted(correct_answer_ids)
         elif self.question.question_type == 'true_false':
-            self.is_correct = selected == correct_answers
+            # might need to come back to this one
+             self.is_correct = selected in correct_answer_ids or selected == correct_answer_ids
         else:
             # Unknown question type
             self.is_correct = None
@@ -1137,7 +1154,7 @@ class UserQuestionResponse(models.Model):
         else:
             self.feedback = feedback_config.get('incorrect', default_feedback)
 
-        self.save()
+        # self.save()
         return self.is_correct
 
     def to_dict(self):

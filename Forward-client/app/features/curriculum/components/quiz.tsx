@@ -78,7 +78,9 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
 
   // Handle "Check Answer" button click
   const handleCheckAnswer = async (questionId: string) => {
+    console.log("🔍 BEFORE saveResponse - submission:", response.submission);
     await saveResponse();
+    console.log("🔍 AFTER saveResponse - submission:", response.submission);
   };
 
   return (
