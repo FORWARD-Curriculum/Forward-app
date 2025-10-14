@@ -721,7 +721,7 @@ class WritingResponseAdmin(ReadOnlyAdmin):
 
 
 # Auto-register the rest of response models via ActivityManager (DRY)
-EXCLUDE_RESPONSES = {UserQuizResponse, UserQuestionResponse, FillInTheBlankResponse}
+EXCLUDE_RESPONSES = {UserQuizResponse, UserQuestionResponse, FillInTheBlankResponse, WritingResponse}
 for _, (ActivityClass, ResponseClass, _, _child, _) in ActivityManager().registered_activities.items():
     if not ResponseClass or ResponseClass in EXCLUDE_RESPONSES:
         continue
