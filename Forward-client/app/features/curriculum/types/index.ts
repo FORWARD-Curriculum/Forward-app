@@ -41,7 +41,7 @@ export type ActivityManager = {
   Quiz: [Quiz, QuizResponse, false];
   Poll: [Poll, PollResponse, false];
   ConceptMap: [ConceptMap, ConceptMapResponse, false];
-  Question: [Question, QuestionResponse, true];
+  // Question: [Question, QuestionResponse, true];
   PollQuestion: [PollQuestion, PollQuestionResponse, true];
   Embed: [Embed, EmbedResponse, false];
   DndMatch: [DndMatch, DndMatchResponse, false];
@@ -247,8 +247,9 @@ export interface BaseResponse {
 
 export interface QuizResponse extends BaseResponse {
   score: number | null;
-  highest_question_reached: number;
+  // highest_question_reached: number;
   completion_percentage: number;
+  submission: QuestionResponse[]; // array of question responses
 }
 
 /**
@@ -261,6 +262,7 @@ export interface QuizResponse extends BaseResponse {
 export interface QuestionResponse extends BaseResponse {
   response_data: { selected: number[] };
   quiz_id: string;
+  lesson_id: string;
 }
 
 /**
