@@ -255,9 +255,7 @@ class QuizResponseService:
             quiz = validated_data.get('associated_activity')
             lesson = quiz.lesson
             partial_response = validated_data.get('partial_response', True)
-            print("DEBUG: validated_data =", validated_data) #test
             submission = validated_data.get('submission', [])  # NEW: Get submission data
-            print("DEBUG: submission =", submission) #test
             time_spent = validated_data.get('time_spent', 0)
             attempts_left = validated_data.get('attempts_left', 3)
             

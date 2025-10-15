@@ -99,6 +99,15 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
       <p className="mb-4 text-sm text-muted-foreground italic">
         Note: Any checked answers will be automatically submitted when you leave this quiz.
       </p>
+      <div className="mb-4 text-sm text-muted-foreground">
+        Progress: {response.completion_percentage.toFixed(0)}% complete
+      </div>
+
+      {response.score !== null && (
+        <div className="mb-4 text-sm font-medium">
+          Score: {response.score} / {quiz.questions.length}
+        </div>
+      )}
       
       {quiz.questions.map((question: QuestionType, questionNumber) => {
         if (currentQuestion - 1 === questionNumber)
