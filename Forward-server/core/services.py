@@ -6,9 +6,6 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, Embed, EmbedResponse, Facility
 from rest_framework.request import Request as DRFRequest
-import logging
-logger = logging.getLogger(__name__)
-
 
 class UserService:
     @staticmethod
@@ -284,9 +281,6 @@ class QuizResponseService:
                 if question_id:
                     question = Question.objects.get(id=question_id)
 
-                    logger.error(f"DEBUG: Processing question {question_id}")
-                    logger.error(f"DEBUG: response_data from payload = {response_data}")
-                    
                     # Create or update the question response
                     question_response, qr_created = UserQuestionResponse.objects.get_or_create(
                         user=user,
@@ -300,52 +294,21 @@ class QuizResponseService:
                         }
                     )
 
-                    logger.error(f"DEBUG: qr_created = {qr_created}")
-                    logger.error(f"DEBUG: attempts_left BEFORE decrement = {question_response.attempts_left}")
-
-                    # test
-                    logger.error(f"DEBUG: Quiz response created? {created}")
-                    logger.error(f"DEBUG: Quiz response ID: {quiz_response.id}")
-
-                    #If this is a retry (not first attempt), decrement attempts BEFORE evaluating
-                    # if not qr_created:
-                    #     question_response.attempts_left = max(0, question_response.attempts_left -1)
-                    #     question_response.response_data = response_data
-                    #     logger.error(f"DEBUG: attempts_left AFTER decrement = {question_response.attempts_left}")
-
                     if not qr_created:
                         question_response.response_data = response_data
 
                     question_response.evaluate_correctness()
 
-                    logger.error(f"DEBUG: After evaluate - is_correct = {question_response.is_correct}")
-
-
                     if question_response.is_correct:
                         question_response.attempts_left = 0
-                        logger.error(f"DEBUG: Set attempts_left to 0!")
+                      
                     elif not qr_created:
                         # then we decrement
                         question_response.attempts_left = max(0, question_response.attempts_left - 1)
-                        logger.error(f"DEBUG: Decremented attempts_left")
-
-                    # if not created and not question_response.is_correct:
-                    #     question_response.attempts_left = max(0, question_response.attempts_left - 1)
-                    
-                    #     question_response.evaluate_correctness()
-                    #     question_response.save()  
-                     # Decrement attempts if this is a retry of a wrong answer
 
 
-
-                    # evaluate correctness
-                    # question_response.evaluate_correctness()
-                    # if question_response.is_correct:
-                    #     question_response.attempts_left = 0 # If they got it correct just lock it
-                    # question_response.save()  
-                    logger.error(f"DEBUG: attempts_left BEFORE save = {question_response.attempts_left}")
                     question_response.save()
-                    logger.error(f"DEBUG: attempts_left AFTER save = {question_response.attempts_left}")
+                    
             
             # calculate completion percentage
             total_questions = Question.objects.filter(quiz=quiz).count()

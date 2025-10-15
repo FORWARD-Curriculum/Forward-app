@@ -78,14 +78,27 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
 
   // Handle "Check Answer" button click
   const handleCheckAnswer = async (questionId: string) => {
-    console.log("🔍 BEFORE saveResponse - submission:", response.submission);
-    await saveResponse();
-    console.log("🔍 AFTER saveResponse - submission:", response.submission);
+
+      const questionToCheck = response.submission.find(
+        (item) => item.associated_activity === questionId
+      );
+      
+    
+      if (questionToCheck) {
+        // Only send THIS question's data
+        await saveResponse({ 
+          submission: [questionToCheck] 
+        } as Partial<QuizResponse>);
+      }
+    
   };
 
   return (
     <div>
       <p className="mb-4 text-sm font-light">{quiz.instructions}</p>
+      <p className="mb-4 text-sm text-muted-foreground italic">
+        Note: Any checked answers will be automatically submitted when you leave this quiz.
+      </p>
       
       {quiz.questions.map((question: QuestionType, questionNumber) => {
         if (currentQuestion - 1 === questionNumber)

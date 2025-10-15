@@ -18,11 +18,6 @@ export default function Question({
   disabled: boolean;
 }) {
 
-  // test
-  useEffect(() => {
-    console.log("📝 Question component - answer prop changed:", answer);
-  }, [answer]);
-
   // question configuration
   const isMultipleSelect = question.question_type === "multiple_select";
   const correctAnswers = question.choices.options.filter(

@@ -8,11 +8,8 @@ import boto3  # pyright: ignore[reportMissingImports]
 from django.conf import settings
 # pyright: ignore[reportMissingImports]
 from botocore.exceptions import ClientError
-import logging
 import re
 import json
-import logging
-logger = logging.getLogger(__name__)
 
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
@@ -1112,10 +1109,6 @@ class UserQuestionResponse(models.Model):
         for opt in options:
             if opt.get('is_correct', False):
                 correct_answer_ids.append(opt['id'])
-        
-
-        logger.error(f"DEBUG evaluate_correctness: options = {options}")
-        logger.error(f"DEBUG evaluate_correctness: correct_answers = {correct_answers}")
 
         selected = self.response_data.get('selected', None)
 
@@ -1135,7 +1128,6 @@ class UserQuestionResponse(models.Model):
         if self.question.question_type == 'multiple_choice':
             # self.is_correct = selected in correct_answers
             self.is_correct = selected[0] in correct_answer_ids
-            logger.error(f"DEBUG evaluate_correctness: multiple_choice check - selected[0]={selected[0] if selected else None} in {correct_answers} = {self.is_correct}")
         elif self.question.question_type == 'multiple_select':
             if not isinstance(selected, list):
                 self.is_correct = False

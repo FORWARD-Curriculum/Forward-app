@@ -5,8 +5,7 @@ from django.contrib.auth.password_validation import validate_password
 from core.models import User, UserQuizResponse, Quiz, Question, BaseResponse, Lesson, ActivityManager, Facility
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
-import logging
-logger = logging.getLogger(__name__)
+
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
@@ -330,11 +329,6 @@ class ResponseSerializer(serializers.Serializer):
         activity_type = ActivityModel.__name__.lower()
     
         if activity_type in ActivityManager.registered_services.get("response", {}):
-            logger.error("=" * 50)
-            logger.error(f"SERIALIZER: activity_type = {activity_type}")
-            logger.error(f"SERIALIZER: validated_data = {validated_data}")
-            logger.error(f"SERIALIZER: request.data = {dict(self.context['request'].data)}")
-            logger.error("=" * 50)
 
             service_func = ActivityManager.registered_services["response"][activity_type]
             return service_func(validated_data, self.context["request"])
