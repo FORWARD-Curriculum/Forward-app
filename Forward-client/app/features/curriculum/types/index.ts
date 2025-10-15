@@ -9,6 +9,7 @@ export interface Lesson {
   tags: string[];
   image: string | undefined;
   activities: BaseActivity[];
+  completion: number;
 }
 /**
  * A mapping between activity names and their corresponding interface types.

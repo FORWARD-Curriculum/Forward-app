@@ -119,6 +119,15 @@ class UserService:
 
 class LessonService:
     @staticmethod
+    def get_lesson_completion(user: User, lesson: Lesson):
+        responses = 0                       
+        for value in ActivityManager.registered_activities.values():
+            [_, Response, _, child_class] = value[:4]
+            if not child_class:
+                responses += Response.objects.filter(lesson=lesson,user=user).count()
+        return responses/lesson.total_activities
+    
+    @staticmethod
     def get_lesson_content(lesson_id):
         """
         Retrieve all content associated with a lesson.

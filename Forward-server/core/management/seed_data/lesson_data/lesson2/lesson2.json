@@ -5,7 +5,8 @@
     "objectives": [
     ],
     "order": 2,
-    "tags": ["test", "example", "all activities"]
+    "tags": ["test", "example", "all activities"],
+    "image": "papers.png"
   },
   "activities": [
         {

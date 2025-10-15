@@ -118,13 +118,19 @@ class Command(BaseCommand):
 
     def _create_lesson(self, lesson_data):
         """Creates or updates a lesson."""
+        
+        if 'image' in lesson_data and lesson_data['image']:
+            self.bucket_url_call(lesson_data['image'], key_prefix="lessons/")
+            lesson_data['image'] = f"lessons/{lesson_data['image']}"
+        
         lesson, created = Lesson.objects.update_or_create(
             title=lesson_data.get('title'),
             defaults={
                 'description': lesson_data.get('description', ''),
                 'objectives': lesson_data.get('objectives', []),
                 'order': lesson_data.get('order'), # Keep lesson order from JSON for now
-                'tags': lesson_data.get('tags', [])
+                'tags': lesson_data.get('tags', []),
+                "image": f"public/{lesson_data.get('image')}" if lesson_data.get('image') else None
             }
         )
         action = 'Created' if created else 'Updated'

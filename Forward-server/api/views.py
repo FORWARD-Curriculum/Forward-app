@@ -184,7 +184,7 @@ class CurriculumView(APIView):
 
         return Response({
             "detail": messages['successful_id'],
-            "data": [l.to_dict() for l in lessons]},
+            "data": [{**l.to_dict(), "completion": LessonService.get_lesson_completion(request.user, l)} for l in lessons]},
             status=status.HTTP_200_OK)
 
 
