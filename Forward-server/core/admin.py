@@ -470,6 +470,13 @@ class QuestionInline(admin.TabularInline):
         "is_required",
         "feedback_config",
     )
+    formfield_overrides = {
+        models.JSONField: {
+        "widget": JSONEditorWidget(
+            attrs={"style": "min-width: 600px; font-family: monospace;"}
+        )
+    }
+    }
 
 
 class PollQuestionInline(admin.TabularInline):
@@ -514,6 +521,7 @@ class QuizAdmin(BaseActivityAdmin):
     grouping = "Activities"
     inlines = [QuestionInline]
     list_display = ("title", "lesson", "order", "passing_score")
+    formfield_overrides = {**JSON_EDITOR_OVERRIDES}
 
 
 @admin.register(Poll, site=custom_admin_site)
