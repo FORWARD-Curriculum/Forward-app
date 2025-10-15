@@ -8,7 +8,6 @@ import boto3  # pyright: ignore[reportMissingImports]
 from django.conf import settings
 # pyright: ignore[reportMissingImports]
 from botocore.exceptions import ClientError
-import logging
 import re
 import json
 
@@ -867,241 +866,6 @@ class LikertScale(BaseActivity):
             "content": self.content
         }
 
-# TODO: Make quiz and question response inherit from BaseResponse, or make
-# them adhere to the contract enforced by BaseResponse
-
-
-class UserQuizResponse(models.Model):
-    """
-    Stores a user's complete response to a quiz
-    """
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='quiz_responses',
-        help_text='The user who submitted this quiz response'
-    )
-
-    lesson = models.ForeignKey(
-        Lesson,
-        on_delete=models.CASCADE,
-        related_name='%(class)s_lesson',
-        null=False,
-        blank=False,
-        help_text='The lesson related to this quiz response'
-    )
-
-    associated_activity = models.ForeignKey(
-        Quiz,
-        on_delete=models.CASCADE,
-        related_name='user_responses',
-        help_text='The quiz that was answered'
-    )
-
-    score = models.PositiveSmallIntegerField(
-        null=True,
-        blank=True,
-        help_text="The user's score on this quiz"
-    )
-
-    partial_response = models.BooleanField(
-        default=False,
-        help_text='Whether the quiz has been completed and submitted'
-    )
-
-    completion_percentage = models.FloatField(
-        default=0.0,
-        help_text="Percentage completion of the lesson"
-    )
-
-    time_spent = models.IntegerField(
-        null=True,
-        blank=True,
-        help_text='The total time spent on this question'
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ['user', 'associated_activity']  # TODO
-        verbose_name = 'quiz response'
-        verbose_name_plural = 'quiz responses'
-
-    def __str__(self):
-        return f"{self.user.username}'s response to {self.associated_activity.title}"
-
-    def calculate_score(self):
-        """Calculate and set the score based on the question responses"""
-        if not self.partial_response:
-            return None
-
-        # Only count questions that have correct answers defined
-        gradable_questions = self.question_responses.filter(
-            # self note: This is a field lookup feature in Django's ORM.
-            #  Translates to a single JOIN query instead of having to loop through all responses and check each question
-            question__has_correct_answer=True
-        )
-
-        correct_count = 0
-        total_count = gradable_questions.count()
-
-        if total_count == 0:
-            return None
-
-        for response in gradable_questions:
-            if response.is_correct:
-                correct_count += 1
-
-        self.score = correct_count
-        self.save()
-
-        return self.score
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "associated_activity_id": self.associated_activity_id,
-            "score": self.score,
-            "partial_response": self.partial_response,
-            "completion_percentage": self.completion_percentage,
-            "time_spent": self.time_spent,
-            "question_responses": [qr.to_dict() for qr in self.question_responses.all()]
-        }
-
-
-class UserQuestionResponse(models.Model):
-    """
-    Stores a user's response to an individual question within a quiz
-    """
-    lesson = models.ForeignKey(
-        Lesson,
-        on_delete=models.CASCADE,
-        related_name='%(class)s_lesson',
-        null=False,
-        blank=False,
-        help_text='The lesson related to this question response'
-    )
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='%(class)s_response_user',
-        null=False,
-        blank=False,
-        help_text='The user who submitted this question response'
-    )
-
-    quiz_response = models.ForeignKey(
-        UserQuizResponse,
-        on_delete=models.CASCADE,
-        related_name='question_responses',
-        help_text="The parent quiz response this question response belongs to"
-    )
-
-    question = models.ForeignKey(
-        Question,
-        on_delete=models.CASCADE,
-        related_name='user_responses',
-        help_text="The question that was answered"
-    )
-
-    # Store the selected answer(s) as JSON
-    # For multiple choice: {"selected": "option_id"}
-    # For multiple select: {"selected": ["option_id1", "option_id2"]}
-    # For true/false: {"selected": true} or {"selected": false}
-    response_data = models.JSONField(
-        help_text="The user's response data in JSON format"
-    )
-
-    is_correct = models.BooleanField(
-        null=True,
-        blank=True,
-        help_text="Whether this response is correct (null if not automatically gradable)"
-    )
-
-    feedback = models.TextField(
-        null=True,
-        blank=True,
-        help_text="Feedback provided for this response"
-    )
-
-    time_spent = models.IntegerField(
-        null=True,
-        blank=True,
-        help_text='The total time spent on this question'
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ['quiz_response', 'question']
-        verbose_name = "question response"
-        verbose_name_plural = "question responses"
-
-    def __str__(self):
-        return f"Response to question {self.question.order} in {self.quiz_response}"
-
-    def evaluate_correctness(self):
-        """Determine if the response is correct based on question type and correct answer"""
-        if not self.question.has_correct_answer:
-            self.is_correct = None
-            self.save()
-            return None
-
-        # Get correct answers from the question
-        correct_answers = self.question.choices.get('correct_answers', [])
-        selected = self.response_data.get('selected', None)
-
-        # Set default feedback
-        feedback_config = self.question.feedback_config or {}
-        default_feedback = feedback_config.get('default', '')
-
-        # If nothing's selected, it's incorrect
-        if selected is None:
-            self.is_correct = False
-            self.feedback = feedback_config.get(
-                'no_response', default_feedback)
-            self.save()
-            return False
-
-        # Handle different question types
-        if self.question.question_type == 'multiple_choice':
-            self.is_correct = selected in correct_answers
-        elif self.question.question_type == 'multiple_select':
-            if not isinstance(selected, list):
-                self.is_correct = False
-            else:
-                self.is_correct = sorted(selected) == sorted(correct_answers)
-        elif self.question.question_type == 'true_false':
-            self.is_correct = selected == correct_answers
-        else:
-            # Unknown question type
-            self.is_correct = None
-
-        # Set appropriate feedback based on correctness
-        if self.is_correct:
-            self.feedback = feedback_config.get('correct', default_feedback)
-        else:
-            self.feedback = feedback_config.get('incorrect', default_feedback)
-
-        self.save()
-        return self.is_correct
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "quiz_response_id": self.quiz_response_id,
-            "question_id": self.question_id,
-            "response_data": self.response_data,
-            "is_correct": self.is_correct,
-            "time_spent": self.time_spent,
-            "feedback": self.feedback
-        }
-
-
 class BaseResponse(models.Model):
     """
     Abstract base model for responses.
@@ -1154,6 +918,249 @@ class BaseResponse(models.Model):
             "time_spent": self.time_spent,
             "attempts_left": self.attempts_left,
             "associated_activity": self.associated_activity.id,
+        }
+    
+# TODO: Make quiz and question response inherit from BaseResponse, or make
+# them adhere to the contract enforced by BaseResponse
+
+class UserQuizResponse(BaseResponse):
+    """
+    Stores a user's complete response to a quiz
+    """
+
+    # Note to self removing some fields that are inherited by baseResponse
+    # Removed user, lesson, associated_activity , partial_response, time_spent, created and updated at --- Lorran Alves Galdino
+
+
+    score = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text="The user's score on this quiz"
+    )
+
+    completion_percentage = models.FloatField(
+        default=0.0,
+        help_text="Percentage completion of the lesson"
+    )
+
+    associated_activity = models.ForeignKey(
+        Quiz,
+        on_delete=models.CASCADE,
+        related_name='quiz_responses',
+        help_text='The quiz this response is for'
+    )
+
+
+    class Meta:
+        unique_together = ['user', 'associated_activity']  # TODO
+        verbose_name = 'quiz response'
+        verbose_name_plural = 'quiz responses'
+
+    def __str__(self):
+        return f"{self.user.username}'s response to {self.associated_activity.title}"
+
+    def calculate_score(self):
+        """Calculate and set the score based on the question responses"""
+        if not self.partial_response:
+            return None
+
+        # Only count questions that have correct answers defined
+        gradable_questions = self.question_responses.filter(
+            # self note: This is a field lookup feature in Django's ORM.
+            #  Translates to a single JOIN query instead of having to loop through all responses and check each question
+            question__has_correct_answer=True
+        )
+
+        correct_count = 0
+        total_count = gradable_questions.count()
+
+        if total_count == 0:
+            return None
+
+        for response in gradable_questions:
+            if response.is_correct:
+                correct_count += 1
+
+        self.score = correct_count
+        self.save()
+
+        return self.score
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            # "user_id": self.user_id,
+            "associated_activity": self.associated_activity.id,
+            "lesson_id": self.lesson.id,
+            "score": self.score,
+            "partial_response": self.partial_response,
+            "time_spent": self.time_spent,
+            "attempts_left": self.attempts_left,
+            "score": self.score,
+            "completion_percentage": self.completion_percentage,
+            "submission": [qr.to_dict() for qr in self.question_responses.all()]
+        }
+
+# This might not be the correct approach but I am keeping userQuestionResponses from
+#  Inheriting from BaseResponse as I think that teh current structures assume they are an activity
+# So I will initialzie all its fields here independently    
+class UserQuestionResponse(models.Model): 
+    """
+    Stores a user's response to an individual question within a quiz
+    """
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='%(class)s_lesson',
+        null=False,
+        blank=False,
+        help_text='The lesson related to this question response'
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='%(class)s_response_user',
+        null=False,
+        blank=False,
+        help_text='The user who submitted this question response'
+    )
+
+    quiz_response = models.ForeignKey(
+        UserQuizResponse,
+        on_delete=models.CASCADE,
+        related_name='question_responses',
+        help_text="The parent quiz response this question response belongs to"
+    )
+
+    question = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE,
+        related_name='user_responses',
+        help_text="The question that was answered"
+    )
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+
+    attempts_left = models.PositiveBigIntegerField(
+        default=3,
+        help_text="Number of attempts remaining for this question"
+    )
+
+    partial_response = models.BooleanField(
+        default=True,
+        help_text="Whether this is still in progress"
+    )
+
+    # Store the selected answer(s) as JSON
+    # For multiple choice: {"selected": "option_id"}
+    # For multiple select: {"selected": ["option_id1", "option_id2"]}
+    # For true/false: {"selected": true} or {"selected": false}
+    response_data = models.JSONField(
+        help_text="The user's response data in JSON format"
+    )
+
+    is_correct = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text="Whether this response is correct (null if not automatically gradable)"
+    )
+
+    feedback = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Feedback provided for this response"
+    )
+
+    time_spent = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text='The total time spent on this question'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['quiz_response', 'question'] 
+        verbose_name = "question response"
+        verbose_name_plural = "question responses"
+
+    def __str__(self):
+        return f"Response to question {self.question.order} in {self.quiz_response}"
+
+    def evaluate_correctness(self):
+        """Determine if the response is correct based on question type and correct answer"""
+        if not self.question.has_correct_answer:
+            self.is_correct = None
+            # self.save()
+            return None
+
+        options = self.question.choices.get('options', [])
+        # Get correct answers from the question
+        correct_answers = self.question.choices.get('is_correct', [])
+
+        #lets try and extract the ID's of options where is_correct is TRUE
+        correct_answer_ids = []
+        for opt in options:
+            if opt.get('is_correct', False):
+                correct_answer_ids.append(opt['id'])
+
+        selected = self.response_data.get('selected', None)
+
+        # Set default feedback
+        feedback_config = self.question.feedback_config or {}
+        default_feedback = feedback_config.get('default', '')
+
+        # If nothing's selected, it's incorrect
+        if selected is None:
+            self.is_correct = False
+            self.feedback = feedback_config.get(
+                'no_response', default_feedback)
+            # self.save()
+            return False
+
+        # Handle different question types
+        if self.question.question_type == 'multiple_choice':
+            # self.is_correct = selected in correct_answers
+            self.is_correct = selected[0] in correct_answer_ids
+        elif self.question.question_type == 'multiple_select':
+            if not isinstance(selected, list):
+                self.is_correct = False
+            else:
+                self.is_correct = sorted(selected) == sorted(correct_answer_ids)
+        elif self.question.question_type == 'true_false':
+            # might need to come back to this one
+             self.is_correct = selected in correct_answer_ids or selected == correct_answer_ids
+        else:
+            # Unknown question type
+            self.is_correct = None
+
+        # Set appropriate feedback based on correctness
+        if self.is_correct:
+            self.feedback = feedback_config.get('correct', default_feedback)
+        else:
+            self.feedback = feedback_config.get('incorrect', default_feedback)
+
+        # self.save()
+        return self.is_correct
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "associated_activity": self.question_id,
+            "response_data": self.response_data,
+            "quiz_id": self.quiz_response.associated_activity.id,
+            # "is_correct": self.is_correct,
+            "lesson_id": self.lesson_id,
+            "partial_response": self.partial_response,
+            "time_spent": self.time_spent,
+            # "feedback": self.feedback,
+            "attempts_left": self.attempts_left,
         }
 
 class VideoResponse(BaseResponse):
@@ -1459,8 +1466,9 @@ class ActivityManager():
         self.registerActivity(Poll, PollResponse)
         self.registerActivity(
             PollQuestion, PollQuestionResponse, child_class=True)
-        self.registerActivity(Quiz, UserQuizResponse)
-        self.registerActivity(Question, UserQuestionResponse, child_class=True)
+        self.registerActivity(Quiz, UserQuizResponse, {
+                                "submission": ["submission", []]}) # test
+        # self.registerActivity(Question, UserQuestionResponse, child_class=True) # Testing this
         self.registerActivity(Embed, EmbedResponse, {
                               "inputted_code": ["inputted_code", None]})
         self.registerActivity(ConceptMap, ConceptMapResponse)

@@ -1,46 +1,36 @@
-import { Skeleton } from "../../../components/ui/skeleton";
 import MarkdownTTS from "../../../components/ui/markdown-tts";
-import { useResponse } from "@/features/curriculum/hooks";
 import type { Question, QuestionResponse } from "@/features/curriculum/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Question({
   question,
   questionNumber,
-  quizId,
-  setDone,
+  answer,
+  onAnswerChange,
+  onCheckAnswer,
+  disabled,
 }: {
   question: Question;
   questionNumber: number;
-  quizId: string;
-  setDone: React.Dispatch<React.SetStateAction<boolean>>;
+  answer: QuestionResponse | null;
+  onAnswerChange: (
+    questionId: string,
+    answerData: { selected: number[] },
+  ) => void;
+  onCheckAnswer: (questionId: string) => void;
+  disabled: boolean;
 }) {
-  const [response, setResponse, saveResponse] = useResponse<
-    QuestionResponse,
-    Question
-  >({
-    type: "Question",
-    activity: question,
-    initialFields: {
-      quiz_id: quizId,
-      response_data: { selected: [] },
-      attempts_left: question.attempts || 3,
-    },
-    nonRootActivity: true,
-  });
-
   // question configuration
+  const [isChecked, setIsChecked] = useState(false);
   const isMultipleSelect = question.question_type === "multiple_select";
   const correctAnswers = question.choices.options.filter(
     (option) => option.is_correct,
   );
-  const selectedAnswers = response.response_data.selected;
-
+  const selectedAnswers = answer?.response_data?.selected || [];
   // question state
-  const isDisabled = response.attempts_left <= 0;
+  const isDisabled = disabled || (answer?.attempts_left ?? 3) <= 0;
   const isAnswered =
     selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
-
   // Check if the answer is correct
   const isCorrect = isMultipleSelect
     ? areArraysEqual(
@@ -48,138 +38,104 @@ export default function Question({
         correctAnswers.map((c) => c.id).sort(),
       )
     : correctAnswers.map((c) => c.id).includes(selectedAnswers[0]);
-
   /**
    * Handles when a user selects or deselects an option
    */
   const handleOptionChange = (choiceId: number) => {
-    setResponse((prevResponse) => {
-      // new selection state
-      const newSelected = isMultipleSelect
-        ? toggleArrayItem(prevResponse.response_data.selected, choiceId)
-        : [choiceId];
+    const currentSelected = answer?.response_data?.selected || [];
+    const newSelected = isMultipleSelect
+      ? toggleArrayItem(currentSelected, choiceId)
+      : [choiceId];
 
-      // attempts left
-      const newAttemptsLeft = isMultipleSelect
-        ? isAnswered
-          ? prevResponse.attempts_left - 1
-          : prevResponse.attempts_left
-        : prevResponse.attempts_left - 1;
-
-      return {
-        ...prevResponse,
-        attempts_left: newAttemptsLeft,
-        response_data: { selected: newSelected },
-      };
-    });
+    // informsa parent
+    onAnswerChange(question.id, { selected: newSelected });
   };
-
-  /**
-   * Handles final submission of the answer
-   */
-  const handleSubmit = () => {
-    setResponse((prevResponse) => ({
-      ...prevResponse,
-      partial_response: false,
-      attempts_left: 0,
-    }));
-    setDone(true);
-    saveResponse();
-  };
-
-  // submit on correct answer
-  useEffect(() => {
-    if (isCorrect && !isDisabled && selectedAnswers.length > 0) {
-      handleSubmit();
-    }
-  }, [isCorrect, isDisabled, selectedAnswers]);
 
   return (
-    <div className="flex flex-col items-center gap-7">
-      {/* Question Image and Caption */}
-      <div className="flex flex-col gap-2">
-        {question.image ? (
-          <img
-            src={question.image}
-            alt={question.caption || "Question image"}
-          />
-        ) : (
-          <Skeleton className="size-70" />
+    <div className="bg-foreground border-muted mx-auto max-w-3xl rounded-lg border p-4 shadow-sm mb-4">
+      <div className="space-y-4">
+        {question.caption && (
+          <p className="text-muted-foreground text-sm italic">
+            {question.caption}
+          </p>
         )}
-        {question.caption ? (
-          <p>{question.caption}</p>
-        ) : (
-          <Skeleton className="h-[var(--txt-base)] w-70" />
-        )}
-      </div>
 
-      <div className="flex">
         {/* Question Text and Options */}
-        <MarkdownTTS
-          className="flex flex-col items-center"
-          controlsClassName="flex gap-2"
-          controlsOrientation="vertical"
-          key={questionNumber}
-        >
-          <fieldset>
-            <legend className="max-w-[70ch]">
+        <div className="space-y-3">
+          <div className="space-y-3">
+            <MarkdownTTS className="text-base leading-relaxed font-medium" controlsClassName="flex gap-2">
               {questionNumber + 1}. {question.question_text}
-            </legend>
+            </MarkdownTTS>
 
-            {question.choices.options.map((option) => (
-              <div className="flex pl-6" key={option.id}>
-                <input
-                  className="bg-primary"
-                  type={isMultipleSelect ? "checkbox" : "radio"}
-                  disabled={isDisabled}
-                  checked={selectedAnswers.includes(option.id)}
-                  onChange={() => handleOptionChange(option.id)}
-                  id={`question-${questionNumber}:option-${option.id}`}
-                  name={`question-${questionNumber}`}
-                />
+            <div className="space-y-2">
+              {question.choices.options.map((option) => (
                 <label
-                  className="ml-2"
+                  key={option.id}
                   htmlFor={`question-${questionNumber}:option-${option.id}`}
+                  className={`flex cursor-pointer gap-3 rounded-md border-2 p-3 transition-all items-center ${
+                    selectedAnswers.includes(option.id)
+                      ? "border-primary bg-primary/5"
+                      : "border-muted hover:border-primary/50 bg-foreground"
+                  } ${isDisabled ? "cursor-not-allowed opacity-60" : ""}`}
                 >
-                  {/* This adds a pause between reading the options */}
-                  <span className="text-[0px] opacity-0">.</span>
-                  {option.text}
+                  <input
+                    type={isMultipleSelect ? "checkbox" : "radio"}
+                    checked={selectedAnswers.includes(option.id)}
+                    disabled={isDisabled}
+                    onChange={() => {handleOptionChange(option.id), setIsChecked(false)}}
+                    id={`question-${questionNumber}:option-${option.id}`}
+                    name={`question-${questionNumber}`}
+                    className="accent-primary mt-0.5"
+                  />
+                  <MarkdownTTS
+                    className="flex grow"
+                    controlsClassName="flex flex-row-reverse grow justify-between items-center"
+                    controlsOrientation="horizontal"
+                  >
+                    {/* This adds a pause between reading the options */}
+                    <span className="text-[0px] opacity-0">.</span>
+                    {option.text}
+                  </MarkdownTTS>
                 </label>
-              </div>
-            ))}
-          </fieldset>
-        </MarkdownTTS>
+              ))}
+            </div>
+          </div>
+        </div>
 
         {/* Feedback area */}
-        {isAnswered && (
-          <p className="max-w-[40ch]">
+        {(isDisabled || (isAnswered && isChecked)) && (
+          <div
+            className={`rounded-md p-3 text-sm ${
+              isCorrect
+                ? "bg-green-300/10 border-green-600 border"
+                : "bg-error/10 border-error border"
+            }`}
+          >
             {isCorrect ? (
               <>
-                <span className="text-green-600">Correct!</span>{" "}
+                <span className="text-green-600 font-semibold">Correct!</span>{" "}
                 {question.feedback_config.correct}
               </>
             ) : (
               <>
-                <span className="text-error">Not quite!</span>{" "}
+                <span className="text-error font-semibold">Not quite!</span>{" "}
                 {question.feedback_config.incorrect}
               </>
             )}
-          </p>
+          </div>
         )}
       </div>
 
-      {/* Submit Button and Attempts Counter */}
-      <div className="flex flex-col items-center gap-3">
+      <div className="border-muted mt-4 flex items-center justify-between border-t pt-3">
         <button
-          onClick={handleSubmit}
+          onClick={() => {onCheckAnswer(question.id), setIsChecked(true)}}
           disabled={isDisabled || selectedAnswers.length === 0}
-          className={`bg-primary disabled:bg-muted disabled:text-muted-foreground text-primary-foreground rounded-md px-6`}
+          className="bg-primary disabled:bg-muted disabled:text-muted-foreground text-primary-foreground rounded-md px-6 py-2 font-medium transition-all hover:brightness-110 active:brightness-90"
         >
-          Submit Answer
+          Check Answer
         </button>
-
-        <p className="text-sm text-gray-600">
-          Attempts left: {response.attempts_left}
+        <p className="text-muted-foreground text-sm">
+          Attempts left: {answer?.attempts_left ?? 3}
         </p>
       </div>
     </div>

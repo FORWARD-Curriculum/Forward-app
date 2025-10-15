@@ -101,12 +101,20 @@ export const useResponse = <
 
   /**
    * Dispatch to `saveUserResponseThunk` to save the current response state.
+   * 
+   * NOTE : The override currently exists for the quiz component which deal with many questions
+   * This allows it to override and send a single question as a parameter to be evlauated by the backend 
+   * Rather than the all the questions together. 
    */
-  const saveResponse = async () => {
+  const saveResponse = async (overrideResponse?: Partial<T>) => {
+    const dataToSave = overrideResponse
+      ? { ...responseRef.current, ...overrideResponse}
+      : responseRef.current
+    
     const saved = await dispatch(
       saveUserResponseThunk({
         type,
-        response: responseRef.current,
+        response: dataToSave,
         trackTime,
       }),
     );
