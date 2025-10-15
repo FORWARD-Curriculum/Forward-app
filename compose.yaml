@@ -8,6 +8,8 @@ services:
       - ./Forward-server:/app/server
     ports:
       - "127.0.0.1:8000:8000"
+    env_file:
+      - ./Forward-server/.env.development
     develop:
       watch:
         - path: ./Forward-server/requirements.txt
