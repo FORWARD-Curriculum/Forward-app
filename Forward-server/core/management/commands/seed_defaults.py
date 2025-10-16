@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.hashers import make_password
 from core.models import User, Facility
 from django.db import transaction
+from django.contrib.auth.models import Group
 
 class Command(BaseCommand):
     help = 'Seed default users, groups, and other essential data into the database'
@@ -39,6 +40,12 @@ class Command(BaseCommand):
             return
         
         with transaction.atomic():
+                instructors, created = Group.objects.get_or_create(name='Instructors')
+                if created:
+                    self.stdout.write(self.style.SUCCESS('Created "Instructors" group'))
+                else:
+                    self.stdout.write(self.style.WARNING('"Instructors" group already exists'))
+                
                 if options['reset']:
                     self.delete_existing_defaults()
                 facility_data = data.get('facilities', [])

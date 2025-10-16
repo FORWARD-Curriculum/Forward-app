@@ -26,6 +26,13 @@ class Facility(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.name}"
+    
+    class Meta:
+        verbose_name = 'Facility'
+        verbose_name_plural = 'Facilities'
 
 
 class User(AbstractUser):
@@ -106,7 +113,7 @@ class User(AbstractUser):
     # Automatically set when the user is created and updated
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    surveyed_at = models.DateTimeField(null=True)
+    surveyed_at = models.DateTimeField(null=True, blank=True, default=None)
 
     # This is not data we collect, its ugly but the other option is to inherit
     # from AbstractBaseUser and all the stuff that comes with that
@@ -190,14 +197,27 @@ class Lesson(models.Model):
         indexes = [
             models.Index(fields=['order']),
         ]
+        verbose_name = "Lesson"
+        verbose_name_plural = "Lessons"
 
     def __str__(self):
-        return self.title
+        return f"{self.title} - {self.total_activities} Activities"
 
     @property
     def section_count(self):
         """Returns the number of sections in this lesson."""
         return self.sections.count()
+
+    @property
+    def total_activities(self):
+        """Returns the count of all top-level activities associated with this lesson."""
+        manager = ActivityManager()
+        total = 0
+        for _, (ActivityClass, _, __, child_class, ___) in manager.registered_activities.items():
+            if child_class:
+                continue
+            total += ActivityClass.objects.filter(lesson_id=self.id).count()
+        return total
 
     def get_ordered_sections(self):
         """Returns all sections for this lesson in their specified order."""
@@ -261,7 +281,7 @@ class BaseActivity(models.Model):
         ordering = ['order', 'created_at']
 
     def __str__(self):
-        return f"{self.__class__.__name__} - {self.title}"
+        return self.title
 
     @property
     def activity_type(self):
@@ -295,8 +315,8 @@ class TextContent(BaseActivity):
 
     class Meta:
         ordering = ['order', 'created_at']
-        verbose_name = "text content"
-        verbose_name_plural = "text contents"
+        verbose_name = "Reading"
+        verbose_name_plural = "Readings"
 
     def __str__(self):
         return f"Text Content: {self.title}"
@@ -329,8 +349,8 @@ class Video(BaseActivity):
 
     class Meta:
         ordering = ['order', 'created_at']
-        verbose_name = "video content"
-        verbose_name_plural = "video contents"
+        verbose_name = "Video"
+        verbose_name_plural = "Videos"
 
     def __str__(self):
         return f"Video Content: {self.title}"
@@ -350,8 +370,8 @@ class Writing(BaseActivity):
     )
 
     class Meta(BaseActivity.Meta):
-        verbose_name = "writing activity"
-        verbose_name_plural = "writing activities"
+        verbose_name = "Writing"
+        verbose_name_plural = "Writings"
 
     def get_prompts(self):
         """Returns the list of prompts or an empty list if none set"""
@@ -370,6 +390,10 @@ class Identification(BaseActivity):
         max_length=50000,
         default="",
     )
+    
+    class Meta:
+        verbose_name = "Identification"
+        verbose_name_plural = "Identifications"
 
     minimum_correct = models.PositiveIntegerField(default=0)
 
@@ -396,8 +420,8 @@ class Quiz(BaseActivity):
     )
 
     class Meta(BaseActivity.Meta):
-        verbose_name = "quiz"
-        verbose_name_plural = "quizzes"
+        verbose_name = "Quiz"
+        verbose_name_plural = "Quizzes"
 
     def to_dict(self):
         return {
@@ -415,8 +439,8 @@ class Twine(BaseActivity):
     )
 
     class Meta(BaseActivity.Meta):
-        verbose_name = "twine activity"
-        verbose_name_plural = "twine activities"
+        verbose_name = "Twine Story"
+        verbose_name_plural = "Twine Stories"
 
     def to_dict(self):
         return {
@@ -483,6 +507,8 @@ class Question(models.Model):
 
     class Meta:
         ordering = ['order']
+        verbose_name = "Quiz Question"
+        verbose_name_plural = "Quiz Questions"
 
     def __str__(self):
         return f"Question {self.order}: {self.question_text[:50]}..."
@@ -512,8 +538,8 @@ class Poll(BaseActivity):
     )
 
     class Meta:
-        verbose_name = "poll"
-        verbose_name_plural = "polls"
+        verbose_name = "Poll"
+        verbose_name_plural = "Polls"
 
     def to_dict(self):
         return {
@@ -562,6 +588,8 @@ class PollQuestion(models.Model):
 
     class Meta:
         ordering = ['order']
+        verbose_name = "Poll Question"
+        verbose_name_plural = "Poll Questions"
 
     def __str__(self):
         return f"Poll Question {self.order}: {self.question_text[:50]}..."
@@ -594,8 +622,8 @@ class Embed(BaseActivity):
 
     class Meta:
         ordering = ['order', 'created_at']
-        verbose_name = "embed"
-        verbose_name_plural = "embeds"
+        verbose_name = "Web Embed"
+        verbose_name_plural = "Web Embeds"
 
     def __str__(self):
         return f"Embed: {self.title}"
@@ -638,6 +666,10 @@ class DndMatch(BaseActivity):
     content = models.JSONField(
         help_text="List of arrays to match in the format [[drop, drag], ...]"
     )
+    
+    class Meta:
+        verbose_name = "Drag N' Drop"
+        verbose_name_plural = "Drag N' Drops"
 
     def incorrect_matches(self):
         """Returns a list of the top 3 consistently incorrect matches made by users"""
@@ -663,6 +695,9 @@ class FillInTheBlank(BaseActivity):
     * Drop-down menu for selecting from given options
 
     """
+    class Meta:
+        verbose_name = "Fill in the Blank"
+        verbose_name_plural = "Fill in the Blanks"
 
     content = models.JSONField(
         help_text= "Array of sentences with <options> markup for blanks"
@@ -692,6 +727,9 @@ class ConceptMap(BaseActivity):
         max_length=50000,
         default="",
     )
+    class Meta:
+        verbose_name = "Concept Map"
+        verbose_name_plural = "Concept Maps"
 
     def to_dict(self):
         return {
@@ -748,6 +786,11 @@ class Concept(BaseActivity):
         default=list,
         help_text="List of examples for this concept"
     )
+    
+    class Meta:
+        verbose_name = "Concept Map Concept"
+        verbose_name_plural = "Concept Map Concepts"
+    
     def to_dict(self):
         print(f"DEBUG: to_dict() method called for concept ID: {self.id}")
         
@@ -857,8 +900,8 @@ class LikertScale(BaseActivity):
     )
 
     class Meta:
-        verbose_name = "likert scale"
-        verbose_name_plural = "likert scales"
+        verbose_name = "Likert Scale"
+        verbose_name_plural = "Likert Scales"
 
     def to_dict(self):
         return {
@@ -1179,6 +1222,10 @@ class VideoResponse(BaseResponse):
         help_text="Percentage of the video that has been watched"
     )
 
+    class Meta:
+        verbose_name = "Video Response"
+        verbose_name_plural = "Video Responses"
+
     def to_dict(self):
         return {
             **super().to_dict(),
@@ -1224,6 +1271,10 @@ class DndMatchResponse(BaseResponse):
     """
     submission = models.JSONField()
 
+    class Meta:
+        verbose_name = "Drag N' Drop Response"
+        verbose_name_plural = "Drag N' Drop Responses"
+
     def to_dict(self):
         return {
             **super().to_dict(),
@@ -1243,6 +1294,10 @@ class FillInTheBlankResponse(BaseResponse):
         help_text="Array of user's answers for each blank"
     )
 
+    class Meta:
+        verbose_name = "Fill in the Blank Response"
+        verbose_name_plural = "Fill in the Blank Responses"
+
     def to_dict(self):
         return{
             **super().to_dict(),
@@ -1260,6 +1315,10 @@ class WritingResponse(BaseResponse):
 
     response = models.CharField(default="", max_length=10000)
 
+    class Meta:
+        verbose_name = "Writing Response"
+        verbose_name_plural = "Writing Responses"
+
     def to_dict(self):
         return {
             **super().to_dict(),
@@ -1274,6 +1333,10 @@ class TextContentResponse(BaseResponse):
         related_name='associated_textcontent',
         help_text='The text content associated with this response'
     )
+
+    class Meta:
+        verbose_name = "Text Content Response"
+        verbose_name_plural = "Text Content Responses"
 
     def to_dict(self):
         return {
@@ -1290,6 +1353,10 @@ class TwineResponse(BaseResponse):
         related_name='associated_twine',
         help_text='The text content associated with this response'
     )
+
+    class Meta:
+        verbose_name = "Twine Response"
+        verbose_name_plural = "Twine Responses"
 
     def to_dict(self):
         return {
@@ -1309,6 +1376,10 @@ class PollQuestionResponse(BaseResponse):
         help_text="The poll associated with this question"
     )
 
+    class Meta:
+        verbose_name = "Poll Question Response"
+        verbose_name_plural = "Poll Question Responses"
+
     def to_dict(self):
         return {
             **super().to_dict(),
@@ -1324,6 +1395,10 @@ class IdentificationResponse(BaseResponse):
         help_text='The identification activity associated with this response'
     )
 
+    class Meta:
+        verbose_name = "Identification Response"
+        verbose_name_plural = "Identification Responses"
+
     def to_dict(self):
         return {
             **super().to_dict(),
@@ -1337,6 +1412,10 @@ class PollResponse(BaseResponse):
         related_name='associated_poll',
         help_text='The poll associated with this response'
     )
+
+    class Meta:
+        verbose_name = "Poll Response"
+        verbose_name_plural = "Poll Responses"
 
     def to_dict(self):
         return {
@@ -1354,6 +1433,10 @@ class EmbedResponse(BaseResponse):
 
     inputted_code: str = None
 
+    class Meta:
+        verbose_name = "Embed Response"
+        verbose_name_plural = "Embed Responses"
+
     def to_dict(self):
         return {
             **super().to_dict(),
@@ -1368,6 +1451,10 @@ class ConceptMapResponse(BaseResponse):
         related_name='associated_conceptmap',
         help_text='The concept map associated with this response'
     )
+
+    class Meta:
+        verbose_name = "Concept Map Response"
+        verbose_name_plural = "Concept Map Responses"
 
     def to_dict(self):
         return {
@@ -1386,6 +1473,10 @@ class LikertScaleResponse(BaseResponse):
     content = models.JSONField(
         help_text="The user's responses to the likert scale"
     )
+
+    class Meta:
+        verbose_name = "Likert Scale Response"
+        verbose_name_plural = "Likert Scale Responses"
 
     def to_dict(self):
         return {

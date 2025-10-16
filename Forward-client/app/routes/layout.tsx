@@ -15,7 +15,7 @@ import Fetch from "@/components/layout/fetch";
 // This runs only on browser reloads or initial page loads, as it its the highest level layout
 // it fetches the current user's data
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  const res = await apiFetch("/users/me",{},true);
+  const res = await apiFetch("/users/me", {}, true);
   const resp = await res.json();
   const user =
     (resp as { detail?: string; data?: { user: User } })?.data?.user ?? null;
@@ -39,6 +39,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   const textSize = user?.preferences?.text_size;
 
   // Apply theme and text size classes to the root element, this fixes dialog and modal issues
+  // Apply theme and text size classes to the root element, this fixes dialog and modal issues
   useEffect(() => {
     const root = document.documentElement;
     const themeClasses = ["dark", "high-contrast"]; // Add any other theme classes
@@ -58,7 +59,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
         } ${user?.preferences?.text_size || "txt-base"}`}
       >
         <Header />
-        <Fetch/>
+        <Fetch />
         <div className="flex flex-grow">
           <Outlet />
         </div>

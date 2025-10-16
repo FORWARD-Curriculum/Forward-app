@@ -6,6 +6,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, Embed, EmbedResponse, Facility
 from rest_framework.request import Request as DRFRequest
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 class UserService:
     @staticmethod
@@ -58,10 +59,13 @@ class UserService:
 
 
             return user
-        except ValidationError as e:
-            raise ValidationError({'password': e.messages})
+        except DjangoValidationError as e:
+            # Preserve field-level errors from model full_clean()
+            if hasattr(e, "message_dict"):
+                raise DjangoValidationError(e.message_dict)
+            raise DjangoValidationError(e.messages)
         except KeyError as e:
-            raise ValidationError(f'Missing required field: {str(e)}')
+            raise DjangoValidationError(f'Missing required field: {str(e)}')
 
 
     @staticmethod

@@ -29,10 +29,14 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG') == 'True'
 
 ALLOWED_HOSTS_RAW = os.environ.get('ALLOWED_HOSTS', '')
-ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_RAW.split(',') if host.strip()]
+ALLOWED_HOSTS = [host.strip()
+                 for host in ALLOWED_HOSTS_RAW.split(',') if host.strip()]
 
 CSRF_TRUSTED_ORIGINS_RAW = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
-CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in CSRF_TRUSTED_ORIGINS_RAW.split(',') if origin.strip()]
+CSRF_TRUSTED_ORIGINS = [origin.strip(
+) for origin in CSRF_TRUSTED_ORIGINS_RAW.split(',') if origin.strip()]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Application definition
 INSTALLED_APPS = [
@@ -42,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_json_widget',
+    'martor',
     'rest_framework',
     'corsheaders',
     'api',
@@ -72,30 +78,31 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS_RAW = os.environ.get('CORS_ALLOWED_ORIGINS', '')
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_RAW.split(',')]
+CORS_ALLOWED_ORIGINS = [origin.strip()
+                        for origin in CORS_ALLOWED_ORIGINS_RAW.split(',')]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
-   'DELETE',
-   'GET',
-   'OPTIONS',
-   'PATCH',
-   'POST',
-   'PUT',
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
 ]
 
 CORS_ALLOW_HEADERS = ['*',
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'X-CSRFToken',
-    'x-requested-with',
-]
+                      'accept',
+                      'accept-encoding',
+                      'authorization',
+                      'content-type',
+                      'dnt',
+                      'origin',
+                      'user-agent',
+                      'X-CSRFToken',
+                      'x-requested-with',
+                      ]
 
 # TODO: Change to true when we have https setup
 
@@ -183,7 +190,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -233,3 +240,57 @@ else: # Production with s3 bucket configuration
         }
     }
 
+
+
+
+## MARTOR CONFIG
+
+
+MARTOR_ENABLE_CONFIGS = {
+    'emoji': 'true',        # to enable/disable emoji icons.
+    'imgur': 'true',        # to enable/disable imgur/custom uploader.
+    'mention': 'false',     # to enable/disable mention
+    'jquery': 'true',       # to include/revoke jquery (require for admin default django)
+    'living': 'true',      # to enable/disable live updates in preview
+    'spellcheck': 'true',  # to enable/disable spellcheck in form textareas
+    'hljs': 'true',         # to enable/disable hljs highlighting in preview
+}
+
+MARTOR_TOOLBAR_BUTTONS = [
+    'bold', 'italic', 'horizontal', 'heading', 'pre-code',
+    'blockquote', 'unordered-list', 'ordered-list',
+    'link', 'image-upload', 'emoji',
+    'toggle-maximize', 'help'
+]
+
+MARTOR_MARKDOWNIFY_FUNCTION = 'martor.utils.markdownify' # default
+MARTOR_MARKDOWNIFY_URL = '/martor/markdownify/' # default
+
+MARTOR_MARKDOWNIFY_TIMEOUT = 0 # update the preview instantly
+
+MARTOR_MARKDOWN_EXTENSIONS = [
+    'markdown.extensions.extra',
+    'markdown.extensions.nl2br',
+    'markdown.extensions.smarty',
+    'markdown.extensions.fenced_code',
+    'markdown.extensions.sane_lists',
+
+    # Custom markdown extensions.
+    'martor.extensions.urlize',
+    'martor.extensions.del_ins',      # ~~strikethrough~~ and ++underscores++
+    'martor.extensions.emoji',        # to parse markdown emoji
+]
+
+ALLOWED_HTML_TAGS = [
+    "a", "abbr", "b", "blockquote", "br", "cite", "code", "command",
+    "dd", "del", "dl", "dt", "em", "fieldset", "h1", "h2", "h3", "h4", "h5", "h6",
+    "hr", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend",
+    "li", "ol", "optgroup", "option", "p", "pre", "small", "span", "strong",
+    "sub", "sup", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "u", "ul", "def", "correct"
+]
+
+ALLOWED_HTML_ATTRIBUTES = [
+    "alt", "class", "color", "colspan", "datetime",  # "data",
+    "height", "href", "id", "name", "reversed", "rowspan",
+    "scope", "src", "style", "title", "type", "width", "def"
+]
