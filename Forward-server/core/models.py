@@ -191,6 +191,8 @@ class Lesson(models.Model):
         blank=True,
         help_text="Tags for categorizing and searching lessons"
     )
+    
+    image = models.CharField(null=True, blank=True, max_length=200, help_text="Optional image to represent the lesson")
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -231,6 +233,7 @@ class Lesson(models.Model):
             "objectives": self.objectives,
             "order": self.order,
             "tags": self.tags,
+            "image": create_presigned_url(self.image) if self.image else None,
         }
 
 
@@ -815,7 +818,8 @@ Lesser priority but will look into later
 """
 def create_presigned_url(s3_key):
     
-    print(f"DEBUG: Starting presigned URL generation for path: {s3_key}")
+    if (settings.DEBUG):
+        print(f"DEBUG: Starting presigned URL generation for path: {s3_key}")
     
     # Get settings from your STORAGES configuration
     storage_options = settings.STORAGES['default']['OPTIONS']
@@ -828,7 +832,8 @@ def create_presigned_url(s3_key):
         use_ssl=storage_options.get('use_ssl', True)
     )
     bucket_name = storage_options['bucket_name']
-    print(f"DEBUG: Using bucket: {bucket_name}")
+    if (settings.DEBUG):
+        print(f"DEBUG: Using bucket: {bucket_name}")
     
     try:
         response = s3_client.generate_presigned_url(
@@ -837,10 +842,12 @@ def create_presigned_url(s3_key):
             ExpiresIn= 3600, # 3 hour expiration time at the moment
         )
     except ClientError as e:
-        print(f"ERROR: Failed to generate presigned URL: {e}")
+        if (settings.DEBUG):
+            print(f"ERROR: Failed to generate presigned URL: {e}")
         return None
     
-    print(f"SUCCESS: Generated presigned URL: {response}")
+    if (settings.DEBUG):
+        print(f"SUCCESS: Generated presigned URL: {response}")
     return response
     
 

@@ -31,16 +31,16 @@ function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
           src={props.lesson?.image || "grad_cap.png"}
           className="h-full max-w-20"
         ></img>
-        <MarkdownTTS className="" controlsClassName="flex flex-row-reverse">
+        <MarkdownTTS className="flex grow" controlsClassName="flex flex-row-reverse grow justify-between">
           <div className="flex flex-col text-left">
             <Link
               prefetch="intent"
               to={"/lesson/" + props.lesson?.id}
-              className="text-accent text-xl"
+              className="text-accent text-xl underline"
             >
               {props.lesson?.title}
             </Link>
-            <p className="text-secondary-foreground text-base">
+            <p className="text-secondary-foreground text-base ">
               {props.lesson?.description}
             </p>
           </div>
@@ -57,8 +57,8 @@ function Accordion(props: { children?: ReactNode }) {
     <div className="text-secondary-foreground flex flex-col">
       <div
         className={`overflow-hidden transition-all duration-400 ease-in-out ${
-          open ? "max-h-screen" : "max-h-0"
-        }`}
+          open ? "max-h-screen pb-4" : "max-h-0 pb-0"
+        } px-4`}
       >
         <div>{props.children}</div>
       </div>
@@ -69,7 +69,7 @@ function Accordion(props: { children?: ReactNode }) {
           className="flex items-center gap-1.5 text-sm"
           onClick={() => setOpen(!open)}
         >
-          View {open ? <ChevronUp /> : <ChevronDown />}
+          More Info {open ? <ChevronUp /> : <ChevronDown />}
         </button>
       </div>
     </div>
@@ -81,7 +81,7 @@ export function meta() {
 }
 
 export default function Dashboard({ loaderData }: Route.ComponentProps) {
-  const [sortType, setSortType] = useState<"recent" | "date" | "progress">(
+  const [sortType, setSortType] = useState<"name" | "order" | "progress">(
     "progress",
   );
   const dispatch = useDispatch();
@@ -101,31 +101,31 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
         <div className="text-secondary-foreground mb-4 flex w-full gap-3 text-sm">
           <p>Sort By:</p>
           <button
-            aria-label="Sort by recent"
-            className="bg-secondary outline-foreground-border rounded-md px-8 text-center outline-1 drop-shadow-xs"
-            onClick={() => {
-              setSortType("recent");
-            }}
-          >
-            Recent
-          </button>
-          <button
-            aria-label="Sort by date"
-            className="bg-secondary outline-foreground-border rounded-md px-8 text-center outline-1 drop-shadow-xs"
-            onClick={() => {
-              setSortType("date");
-            }}
-          >
-            Date
-          </button>
-          <button
             aria-label="Sort by progress"
-            className="bg-secondary outline-foreground-border rounded-md px-8 text-center outline-1 drop-shadow-xs"
+            className={`${sortType == "progress" ? "bg-muted" : "bg-secondary"} outline-foreground-border rounded-md px-8 text-center outline-1 drop-shadow-xs`}
             onClick={() => {
               setSortType("progress");
             }}
           >
             Progress
+          </button>
+          <button
+            aria-label="Sort by name"
+            className={`${sortType == "name" ? "bg-muted" : "bg-secondary"} outline-foreground-border rounded-md px-8 text-center outline-1 drop-shadow-xs`}
+            onClick={() => {
+              setSortType("name");
+            }}
+          >
+            Name
+          </button>
+          <button
+            aria-label="Sort by order"
+            className={`${sortType == "order" ? "bg-muted" : "bg-secondary"} outline-foreground-border rounded-md px-8 text-center outline-1 drop-shadow-xs`}
+            onClick={() => {
+              setSortType("order");
+            }}
+          >
+            Order
           </button>
         </div>
         <div className="flex flex-col-reverse gap-8 lg:grid lg:grid-cols-12 lg:gap-0">
@@ -138,25 +138,46 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
               {!lessons ? (
                 <p>Loading...</p>
               ) : (
-                lessons.map((e) => (
-                  <LessonCard key={e.id} lesson={e}>
-                    <Accordion>
-                      This has been left undesigned as the API we need to build
-                      out will dictate how each lesson will be passed into the
-                      frontend. For the sake of showing off the footer's
-                      positioning, have some standard text: <br />
-                      <br />
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                      ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                      Duis aute irure dolor in reprehenderit in voluptate velit
-                      esse cillum dolore eu fugiat nulla pariatur. Excepteur
-                      sint occaecat cupidatat non proident, sunt in culpa qui
-                      officia deserunt mollit anim id est laborum.
-                    </Accordion>
-                  </LessonCard>
-                ))
+                [...lessons]
+                  .sort((a, b) => {
+                    switch (sortType) {
+                      case "order":
+                        return a.order - b.order;
+                      case "name":
+                        return a.title.localeCompare(b.title);
+                      case "progress":
+                        return (b.completion || 0) - (a.completion || 0);
+                    }
+                  })
+                  .map((e) => (
+                    <LessonCard key={e.id} lesson={e}>
+                      <Accordion>
+                        {e.objectives.length > 0 && (
+                          <p className="ml-4 mb-4">
+                            <span className="font-medium">
+                              Lesson Objectives:
+                            </span>{" "}
+                            <ul>
+                              {e.objectives.map((o) => (
+                                <li className="ml-10 list-disc font-light">{o}</li>
+                              ))}
+                            </ul>
+                          </p>
+                        )}
+                        {e.tags && (
+                          <div className="flex gap-2 ml-4 italic">
+                            Tags: {e.tags.map((t) => (
+                              <p
+                                className={`bg-secondary outline-foreground-border rounded-md px-2 text-center outline-1 drop-shadow-xs`}
+                              >
+                                {t}
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                      </Accordion>
+                    </LessonCard>
+                  ))
               )}
             </div>
           </div>
@@ -193,25 +214,53 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                 Edit
               </Link>
             </div>
-            <div className="text-secondary-foreground bg-foreground outline-foreground-border col-start-2 col-end-2 rounded-3xl p-4 outline-1">
-              <p className="text-left font-medium">Your Progress</p>
-              {!lessons ? (
-                <p>Loading...</p>
-              ) : (
-                lessons.map((e) => (
-                  <div className="flex items-center" key={e.id}>
-                    <Pie size={120} percentage={20} color="" />
-                    <h2 className="text-base">{e.title}</h2>
-                  </div>
-                ))
-              )}
-            </div>
+            {lessons?.some((e) => e.completion != 0) && (
+              <div className="text-secondary-foreground bg-foreground outline-foreground-border col-start-2 col-end-2 rounded-3xl p-4 outline-1">
+                <p className="text-left font-medium">Your Progress</p>
+                {!lessons ? (
+                  <p>Loading...</p>
+                ) : (
+                  [...lessons]
+                    .sort((a, b) => {
+                      switch (sortType) {
+                        case "order":
+                          return a.order - b.order;
+                        case "name":
+                          return a.title.localeCompare(b.title);
+                        case "progress":
+                          return (b.completion || 0) - (a.completion || 0);
+                      }
+                    })
+                    .map((e) => {
+                      if (e.completion != 0)
+                        return (
+                          <div className="flex items-center" key={e.id}>
+                            <Pie
+                              size={120}
+                              percentage={e.completion * 100}
+                              color=""
+                            />
+                            <Link
+                              prefetch="intent"
+                              to={"/lesson/" + e.id}
+                              className="text-base underline"
+                            >
+                              {e.title}
+                            </Link>
+                          </div>
+                        );
+                    })
+                )}
+              </div>
+            )}
             {user?.consent && (
               <div className="text-secondary-foreground bg-foreground outline-foreground-border col-start-2 col-end-2 rounded-3xl p-4 outline-1">
-                <p className="text-left font-medium mb-2">FORWARD Readiness Survey</p>
+                <p className="mb-2 text-left font-medium">
+                  FORWARD Readiness Survey
+                </p>
                 <Link
                   to="/survey"
-                  className="bg-primary text-primary-foreground outline-primary-border ml-auto flex justify-center rounded-xl p-2 w-full outline-1"
+                  className="bg-primary text-primary-foreground outline-primary-border ml-auto flex w-full justify-center rounded-xl p-2 outline-1"
                 >
                   Re-Take
                 </Link>
