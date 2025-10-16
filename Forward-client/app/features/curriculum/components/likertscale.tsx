@@ -76,8 +76,6 @@ export default function LikertScale({
 
   return (
     <div className="likert-scale mb-6">
-      <p className="mb-6 text-sm">{likertScale.instructions}</p>
-
       <div className="flex flex-col gap-6 px-4 md:px-10">
         {likertScale.content.map((item, index) => {
           const scale = item.scale;

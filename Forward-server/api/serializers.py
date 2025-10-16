@@ -356,6 +356,8 @@ class ResponseSerializer(serializers.Serializer):
             try:
                 extra_fields = {}
                 for key, value in self.context['activity_config'][2].items():
+                    # If you get a "not enough values to unpack (expected 2, got 1)", the
+                    # default value is probably missing in the activity manager config
                     field_name, default = value
                     extra_fields[key] = self.context['request'].data.get(field_name, default)
                 
@@ -381,9 +383,9 @@ class ResponseSerializer(serializers.Serializer):
                     "attempts_left", 0)
                 response_object.save()
                    
-            except:
+            except Exception as e:
                 # If ID provided but not found for user, treat as error
                 raise serializers.ValidationError(
-                    {"response_object": f"{ResponseModel.__name__} could not be created or found."})
+                    {"response_object": f"{ResponseModel.__name__} could not be created or found.", "detail": str(e)})
 
             return response_object
