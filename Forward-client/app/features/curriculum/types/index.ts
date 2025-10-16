@@ -9,31 +9,32 @@ export interface Lesson {
   tags: string[];
   image: string | undefined;
   activities: BaseActivity[];
+  completion: number;
 }
- /**
-  * A mapping between activity names and their corresponding interface types.
-  *
-  * Each entry in the mapping uses a key-value structure where:
-  * - **Key**: A string representing the activity name (in PascalCase).
-  * - **Value**: An array tuple containing:
-  *    1. The Activity Interface.
-  *    2. The Activity Response Interface.
-  *    3. A boolean flag indicating whether the activity is a child class.
-  *
-  * The KV format is:
-  * ```javascript
-  *   ActivityName: [ActivityInterface, ActivityResponseInterface, child_class]
-  * ```
-  *
-  * This structure mirrors the backend implementation in the
-  * [ActivityManager class]({@link ../../../../../Forward-server/core/models.py}),
-  * which centralizes activity management. In the backend, the ActivityManager
-  * registers each activity with its corresponding response type and any additional
-  * non-standard response fields via a method signature similar to:
-  * ```js
-  *   registerActivity(ActivityClass, ResponseClass, nonstandard_resp_fields, child_class)
-  * ```
-  */
+/**
+ * A mapping between activity names and their corresponding interface types.
+ *
+ * Each entry in the mapping uses a key-value structure where:
+ * - **Key**: A string representing the activity name (in PascalCase).
+ * - **Value**: An array tuple containing:
+ *    1. The Activity Interface.
+ *    2. The Activity Response Interface.
+ *    3. A boolean flag indicating whether the activity is a child class.
+ *
+ * The KV format is:
+ * ```javascript
+ *   ActivityName: [ActivityInterface, ActivityResponseInterface, child_class]
+ * ```
+ *
+ * This structure mirrors the backend implementation in the
+ * [ActivityManager class]({@link ../../../../../Forward-server/core/models.py}),
+ * which centralizes activity management. In the backend, the ActivityManager
+ * registers each activity with its corresponding response type and any additional
+ * non-standard response fields via a method signature similar to:
+ * ```js
+ *   registerActivity(ActivityClass, ResponseClass, nonstandard_resp_fields, child_class)
+ * ```
+ */
 export type ActivityManager = {
   Identification: [Identification, IdentificationResponse, false];
   TextContent: [TextContent, TextContentResponse, false];
@@ -41,9 +42,14 @@ export type ActivityManager = {
   Quiz: [Quiz, QuizResponse, false];
   Poll: [Poll, PollResponse, false];
   ConceptMap: [ConceptMap, ConceptMapResponse, false];
-  Question: [Question, QuestionResponse, true];
+  // Question: [Question, QuestionResponse, true];
   PollQuestion: [PollQuestion, PollQuestionResponse, true];
   Embed: [Embed, EmbedResponse, false];
+  DndMatch: [DndMatch, DndMatchResponse, false];
+  LikertScale: [LikertScale, LikertScaleResponse, false];
+  Video: [Video, VideoResponse, false];
+  Twine: [Twine, TwineResponse, false];
+  FillInTheBlank: [FillInTheBlank, FillInTheBlankResponse, false]
 };
 
 /**
@@ -51,7 +57,10 @@ export type ActivityManager = {
  * this must be seperate from the ActivityManager interface because TypeScript does not exist
  * at runtime.
  */
-export const ActivityTypeDisplayNames: Record<BaseActivity["type"] | "Default", string> = {
+export const ActivityTypeDisplayNames: Record<
+  BaseActivity["type"] | "Default",
+  string
+> = {
   Writing: "Writing",
   Quiz: "Quiz",
   TextContent: "Info",
@@ -60,7 +69,12 @@ export const ActivityTypeDisplayNames: Record<BaseActivity["type"] | "Default", 
   ConceptMap: "Concept Map",
   Identification: "Identification",
   Embed: "Embed",
-}
+  DndMatch: "Drag and Drop Match",
+  LikertScale: "Likert Scale",
+  Video: "Video",
+  Twine: "Twine",
+  FillInTheBlank: "Fill In The Blank"
+};
 
 // #region -------------------------- Activities ---------------------------
 
@@ -79,7 +93,13 @@ export interface BaseActivity {
 }
 
 export interface TextContent extends BaseActivity {
-  content: string;
+  content?: string;
+  image?: string; // Optional image URL to accompany the text content
+}
+
+export interface Video extends BaseActivity {
+  video: string;
+  scrubbable: boolean;
 }
 
 export interface Writing extends BaseActivity {
@@ -139,6 +159,14 @@ export interface PollQuestion {
   order: number;
 }
 
+export interface DndMatch extends BaseActivity {
+  content: string[][];
+}
+
+export interface FillInTheBlank extends BaseActivity {
+  content: string[];
+}
+
 export interface ConceptMap extends BaseActivity {
   content: string;
   concepts: {
@@ -167,6 +195,18 @@ export interface Embed extends BaseActivity {
   has_code: boolean;
   link: string;
 }
+
+export interface LikertScale extends BaseActivity {
+  content: {
+    statement: string;
+    scale: (number | string)[];
+    continuous: boolean;
+  }[];
+}
+
+export interface Twine extends BaseActivity {
+  file: string; 
+  }
 
 // #endregion -------------------------- Activities ---------------------------
 
@@ -208,8 +248,9 @@ export interface BaseResponse {
 
 export interface QuizResponse extends BaseResponse {
   score: number | null;
-  highest_question_reached: number;
+  // highest_question_reached: number;
   completion_percentage: number;
+  submission: QuestionResponse[]; // array of question responses
 }
 
 /**
@@ -222,6 +263,7 @@ export interface QuizResponse extends BaseResponse {
 export interface QuestionResponse extends BaseResponse {
   response_data: { selected: number[] };
   quiz_id: string;
+  lesson_id: string;
 }
 
 /**
@@ -232,7 +274,7 @@ export interface PollQuestionResponse extends BaseResponse {
 }
 
 export interface WritingResponse extends BaseResponse {
-  response: string;
+  responses: string[];
 }
 
 export interface TextContentResponse extends BaseResponse {}
@@ -242,5 +284,23 @@ export interface PollResponse extends BaseResponse {}
 export interface EmbedResponse extends BaseResponse {
   inputted_code: string;
 }
+export interface DndMatchResponse extends BaseResponse {
+  submission: number[][][];
+}
 
+export interface LikertScaleResponse extends BaseResponse {
+  content: {
+    selection: number[];
+    explanation: string | null;
+  };
+}
+
+export interface VideoResponse extends BaseResponse {
+  watched_percentage: number; 
+}
+export interface TwineResponse extends BaseResponse {}
+
+export interface FillInTheBlankResponse extends BaseResponse {
+  submission: string[];
+}
 // #endregion -------------------------- Responses ----------------------------

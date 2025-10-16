@@ -1,0 +1,36 @@
+services:
+  backend:
+    container_name: backend
+    build: 
+      context: ./Forward-server
+      dockerfile: Dockerfile.Production
+    volumes:
+      - ./Forward-server:/app/server
+    restart: unless-stopped
+    env_file:
+      - ../env_files/django/.env.production
+    networks:
+      - proxy
+    volumes:
+      - static_volume:/app/static
+
+  caddy:
+    image: caddy
+    container_name: caddy
+    restart: unless-stopped
+    networks:
+      - proxy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8000:8000"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - static_volume:/var/www/static
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  static_volume:

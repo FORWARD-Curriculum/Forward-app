@@ -46,7 +46,6 @@ export default function Identification({
 
   return (
     <>
-    <p className="mb-4 font-light">{identification.instructions}</p>
       <MarkdownTTS
         customComponents={{ correct: Correct}}
         controlsOrientation="horizontal"

@@ -36,7 +36,6 @@ export default function Writing({ poll }: { poll: Poll }) {
 
   return (
     <div>
-      <p>{poll.instructions}</p>
       <ul>
         {poll.questions.map((question: PollQuestion, index: number) => {
           return (

@@ -1,2 +1,11 @@
 .venv/
 .vscode/
+.postgres_data/
+minio_data/
+.env*
+*.mp4
+!Forward-server/.env.development
+!Forward-client/
+!Forward-client/.env.development
+!Forward-client/
+Forward-server/staticfiles/*

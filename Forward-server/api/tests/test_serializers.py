@@ -18,7 +18,7 @@ class UserRegistrationSerializerTests(TestCase):
             'password': 'TestPassword123!',
             'password_confirm': 'TestPassword123!',
             'display_name': 'Test User',
-            'facility_id': 'FAC123',
+            'facility': 'rop-dla',
             'consent': False
         }
         

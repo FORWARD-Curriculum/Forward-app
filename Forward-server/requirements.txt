@@ -4,3 +4,9 @@ django-cors-headers==4.7.0
 djangorestframework==3.16.0
 python-dotenv==1.1.0
 sqlparse==0.5.3
+psycopg[binary]
+django-storages[s3]==1.14.2
+boto3==1.40.0
+botocore==1.40.0
+django-json-widget==2.0.3
+martor

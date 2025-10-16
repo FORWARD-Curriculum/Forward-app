@@ -15,17 +15,21 @@ export default function Login() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
+    
+
     const formData = new FormData(e.target);
+    const bm = (formData.get("birth_month")??"00") as string;
+    const by = (formData.get("birth_year")?.slice(2,5)??"XX") as string;
     const username = (formData.get("first_name")?.toString().toLowerCase().slice(0,2)??"")
                     +(formData.get("last_name")?.toString().toLowerCase().slice(0,2)??"")
-                    +(formData.get("birth_month")??"00")
-                    +(formData.get("birth_year")?.slice(2,5)??"XX");
+                    +bm[0] + by[0] + bm[1] + by[1];
     const data = {
 
       username,
       display_name: username,
       password: formData.get("password"),
       password_confirm: formData.get("password2"),
+      facility: (formData.get("facility") as string).toLowerCase()
 
     };
 
@@ -53,23 +57,29 @@ export default function Login() {
       const result = await response.json();
 
       if (!response.ok) {
-        if (result.detail) {
-          if (typeof result.detail === "object") {
-            // Handle field-specific errors
-            const errorMessages = Object.values(result.detail)
-              .map((messages) => (messages as string[]).join("\n"))
+        const flatten = (errObj: any): string => {
+          if (!errObj) return "Registration failed. Please try again.";
+          if (typeof errObj === "string") return errObj;
+          if (Array.isArray(errObj)) return errObj.join("\n");
+          if (typeof errObj === "object") {
+            // DRF field errors: {field: [msg1, msg2], non_field_errors: [...]}
+            return Object.entries(errObj)
+              .map(([field, msgs]) => {
+                const joined =
+                  Array.isArray(msgs) ? msgs.join(", ") : String(msgs);
+                return field === "non_field_errors"
+                  ? joined
+                  : `${field}: ${joined}`;
+              })
               .join("\n");
-            throw new Error(errorMessages);
-          } else {
-            // Handle simple string errors
-            throw new Error(result.detail);
           }
-        }
-        // Handle invalid server responses / Server non-responses
-        toast.error("Registration failed. Please try again.");
-        throw new Error("Registration failed. Please try again.");
-      }
+          return "Registration failed. Please try again.";
+        };
 
+        const message = result?.detail ? flatten(result.detail) : flatten(result);
+        toast.error(message);
+        throw new Error(message);
+       }
       login({...result.data.user});
 
       // Redirect to the dashboard on success
@@ -176,12 +186,12 @@ export default function Login() {
             />
           </div>
           <div>
-            <label htmlFor="institution">Institution ID</label>
+            <label htmlFor="facility">Facility ID</label>
             <Input
               type="text"
-              name="institution"
-              id="institution"
-              placeholder="Institution ID"
+              name="facility"
+              id="facility"
+              placeholder="Facility ID"
               className="input min-w-[25vw]"
             />
           </div>
@@ -201,7 +211,7 @@ export default function Login() {
           <div className="flex gap-2">
             {!instructor && (
               <Button
-                aria-label="Switch to instructor onboarding"
+                aria-label="Switch to instructor surveying"
                 variant={"outline"}
                 className="px-4"
                 onClick={() => {

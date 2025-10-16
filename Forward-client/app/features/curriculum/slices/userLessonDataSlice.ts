@@ -19,12 +19,17 @@ export const initialLessonResponseState: LessonResponse = {
     Quiz: [],
     PollQuestion: [],
     Writing: [],
-    Question: [],
+    FillInTheBlank: [],
+    // Question: [],
     TextContent: [],
     ConceptMap: [],
     Identification: [],
     Poll: [],
     Embed: [],
+    LikertScale: [],
+    Twine: [],
+    DndMatch: [],
+    Video: []
   },
 };
 
@@ -59,7 +64,9 @@ export const saveUserResponseThunk = createAsyncThunk(
     };
 
     // NOTE: SERVER ***ONLY*** RECIEVES THE AGGREGATE TIME
-    const response = await apiFetch(`/responses/${data.type.toLowerCase()}`, {
+    const url = `/responses/${data.type.toLowerCase()}`;
+
+    const response = await apiFetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

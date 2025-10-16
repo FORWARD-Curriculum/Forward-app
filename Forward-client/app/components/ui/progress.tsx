@@ -1,82 +1,29 @@
-import React from "react";
+import * as React from "react"
+import * as ProgressPrimitive from "@radix-ui/react-progress"
+import { cn } from "@/utils/utils"
 
-const cleanPercentage = (percentage: number) => {
-  const isNegativeOrNaN = !Number.isFinite(+percentage) || percentage < 0;
-  const isTooHigh = percentage > 100;
-  return isNegativeOrNaN ? 0 : isTooHigh ? 100 : +percentage;
-};
 
-const Circle = ({
-  color,
-  percentage,
-  size = 200,
-}: {
-  percentage?: number;
-  color?: string;
-  size: number;
-}) => {
-  const r = size * 0.35; // Make radius relative to size
-  const circ = 2 * Math.PI * r;
-  if (!percentage) percentage = 0;
-  const strokePct = ((100 - percentage) * circ) / 100;
+function Progress({
+  className,
+  value,
+  ...props
+}: React.ComponentProps<typeof ProgressPrimitive.Root>) {
   return (
-    <circle
-      r={r}
-      cx={size / 2}
-      cy={size / 2}
-      fill="transparent"
-      stroke={strokePct !== circ ? color || "var(--accent, currentColor)" : ""}
-      strokeWidth={size * 0.1} // Make stroke width relative to size
-      strokeDasharray={circ}
-      strokeDashoffset={percentage ? strokePct : 0}
-    ></circle>
-  );
-};
-
-const Text = ({
-  percentage,
-  size = 200,
-}: {
-  percentage: number;
-  size: number;
-}) => {
-  return (
-    <text
-      x="50%"
-      y="50%"
-      dominantBaseline="central"
-      textAnchor="middle"
-      fontSize={`${size * 0.15}px`} // Make font size relative to container size
-      fill="var(--text-secondary-foreground, currentColor)"
+    <ProgressPrimitive.Root
+      data-slot="progress"
+      className={cn(
+        "bg-primary/20 relative h-2 w-full overflow-hidden rounded-full",
+        className
+      )}
+      {...props}
     >
-      {percentage.toFixed(0)}%
-    </text>
-  );
-};
-/**
- * A circle who's border represents something's progress
- * @param {number} percentage - 0-100
- * @returns
- */
-const Pie = ({
-  percentage,
-  color,
-  size = 200,
-}: {
-  percentage: number;
-  color: string;
-  size: number;
-}) => {
-  const pct = cleanPercentage(percentage);
-  return (
-    <svg width={size} height={size}>
-      <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
-        <Circle size={size} color="lightgrey" />
-        <Circle size={size} color={color} percentage={pct} />
-      </g>
-      <Text percentage={pct} size={size} />
-    </svg>
-  );
-};
+      <ProgressPrimitive.Indicator
+        data-slot="progress-indicator"
+        className="bg-accent h-full w-full flex-1 transition-all"
+        style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+      />
+    </ProgressPrimitive.Root>
+  )
+}
 
-export default Pie;
+export { Progress }

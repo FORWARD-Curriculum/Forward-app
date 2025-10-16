@@ -4,9 +4,13 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.hashers import make_password
 from django.db import transaction, IntegrityError
 from django.conf import settings
+from django.core.files.storage import default_storage
+import boto3 # pyright: ignore[reportMissingImports]
+import re
+
 # Import all necessary models, including the ActivityManager
 from core.models import (
-    User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
+    Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
     Identification, Embed, ActivityManager, UserQuizResponse, UserQuestionResponse,
     Concept, ConceptMap
 )
@@ -17,7 +21,6 @@ MODEL_DELETE_ORDER = [
     Question, PollQuestion, UserQuizResponse, UserQuestionResponse, # Responses first if they existed
     Quiz, Poll, Writing, TextContent, Identification, Embed, Concept, ConceptMap, # Activities
     Lesson, # Lesson
-    User, # User (excluding superusers)
 ]
 
 class Command(BaseCommand):
@@ -32,12 +35,14 @@ class Command(BaseCommand):
         parser.add_argument(
             '--reset',
             action='store_true',
-            help='Delete existing data (matching lesson title and non-superusers) before seeding'
+            help='Delete existing data (matching lesson title) before seeding'
         )
 
     def handle(self, *args, **options):
-        json_file_path = Path(settings.BASE_DIR) / 'core' / 'management' / options['json_file']
+        json_file_path = Path(settings.BASE_DIR) / 'core' / 'management' / 'seed_data' / 'lesson_data' / options['json_file']
+        self.folder_path = json_file_path.parent
         activity_manager = ActivityManager() # Get the singleton instance
+
 
         # Read the JSON file
         try:
@@ -59,12 +64,8 @@ class Command(BaseCommand):
         try:
             with transaction.atomic():
                 if options['reset']:
-                    self.stdout.write(self.style.WARNING('Resetting data for this lesson and non-superusers...'))
+                    self.stdout.write(self.style.WARNING('Resetting data for this lesson...'))
                     self._delete_existing_data(lesson_title, activity_manager)
-
-                # Process users
-                user_data = data.get('users', [])
-                self._create_users(user_data)
 
                 # Process lesson data
                 lesson = self._create_lesson(lesson_data)
@@ -84,7 +85,7 @@ class Command(BaseCommand):
             raise
 
     def _delete_existing_data(self, lesson_title, activity_manager):
-        """Deletes data related to the specific lesson title and non-superuser users."""
+        """Deletes data related to the specific lesson title."""
         # Find the lesson to delete (if it exists)
         lesson_to_delete = Lesson.objects.filter(title=lesson_title).first()
 
@@ -115,57 +116,21 @@ class Command(BaseCommand):
         else:
             self.stdout.write(f"Lesson '{lesson_title}' not found, skipping lesson/activity deletion.")
 
-        # Delete non-superuser users (be careful with this in production)
-        deleted_users, _ = User.objects.filter(is_superuser=False).delete()
-        if deleted_users:
-            self.stdout.write(f"Deleted {deleted_users} non-superuser User objects.")
-
-    def _create_users(self, user_data):
-        """Creates or updates users from the provided data."""
-        for data in user_data:
-            username = data.get('username')
-            if not username:
-                self.stdout.write(self.style.WARNING("Skipping user entry with no username."))
-                continue
-
-            password = data.get('password', 'password') # Default password if not provided
-            # Hash the password if it's plain text
-            if not password.startswith(('pbkdf2_sha256$', 'bcrypt$', 'argon2$')):
-                password = make_password(password)
-
-            defaults = {
-                'password': password,
-                'display_name': data.get('display_name', username), # Default display name to username
-                'facility_id': data.get('facility_id'), # Use get for optional fields
-                'consent': data.get('consent', False),
-                'profile_picture': data.get('profile_picture'),
-                'theme': data.get('theme', 'light'),
-                'text_size': data.get('text_size', 'txt-base'),
-                'speech_uri_index': data.get('speech_uri_index'),
-                'speech_speed': data.get('speech_speed'),
-                'is_staff': data.get('is_staff', False),
-                'is_superuser': data.get('is_superuser', False),
-                'email': data.get('email') # Add email if present in JSON
-            }
-            # Remove None values from defaults to avoid overriding existing DB defaults unnecessarily
-            defaults = {k: v for k, v in defaults.items() if v is not None}
-
-            user, created = User.objects.update_or_create(
-                username=username,
-                defaults=defaults
-            )
-            action = 'Created' if created else 'Updated'
-            self.stdout.write(f"{action} user: {user.username}")
-
     def _create_lesson(self, lesson_data):
         """Creates or updates a lesson."""
+        
+        if 'image' in lesson_data and lesson_data['image']:
+            self.bucket_url_call(lesson_data['image'], key_prefix="lessons/")
+            lesson_data['image'] = f"lessons/{lesson_data['image']}"
+        
         lesson, created = Lesson.objects.update_or_create(
             title=lesson_data.get('title'),
             defaults={
                 'description': lesson_data.get('description', ''),
                 'objectives': lesson_data.get('objectives', []),
                 'order': lesson_data.get('order'), # Keep lesson order from JSON for now
-                'tags': lesson_data.get('tags', [])
+                'tags': lesson_data.get('tags', []),
+                "image": f"public/{lesson_data.get('image')}" if lesson_data.get('image') else None
             }
         )
         action = 'Created' if created else 'Updated'
@@ -225,6 +190,26 @@ class Command(BaseCommand):
             }
 
             try:
+                if activity_type_str == 'dndmatch':  # intermediate parsing
+                    self.regex_image_upload(defaults.get(
+                        'content', ''), key_prefix="dndmatch/")
+                    
+                if activity_type_str == 'textcontent' and 'image' in defaults:
+                    self.bucket_url_call(defaults.get(
+                        'image'), key_prefix="text_content_image/")
+                    defaults['image'] = f"public/text_content_image/{defaults['image']}"
+                    
+                if activity_type_str == 'video':
+                    self.bucket_url_call(defaults.get(
+                        'video'), key_prefix="video/")
+                    defaults['video'] = f"public/video/{defaults['video']}"
+                    
+                if activity_type_str == 'twine':
+                    print(f"DEBUG: Processing Twine activity with file: {defaults.get('file', '')}")
+                    raw_html = open(self.folder_path / defaults.get('file', ''), 'r', encoding='utf-8').read()
+                    defaults['file'] = raw_html
+                    self.regex_image_upload(raw_html, key_prefix="twine/", subfolder="twine/")
+                      
                 # Use the 'order' from enumerate in update_or_create
                 activity_obj, created = ActivityModel.objects.update_or_create(
                     lesson=lesson,
@@ -250,7 +235,11 @@ class Command(BaseCommand):
                 traceback.print_exc() # Print full traceback for debugging
                 # Depending on desired behavior. For seeding, maybe log and continue.
                 # raise # Uncomment to stop on first error
-
+                
+    def regex_image_upload(self, content, key_prefix="", subfolder=""):
+        images = re.findall(r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))", str(content))
+        [self.bucket_url_call(f"{subfolder}{m[0]}",key_prefix) for m in images]
+        
     def _create_questions(self, quiz, questions_data):
         """Creates or updates questions for a given quiz, deriving order from list position."""
         self.stdout.write(f"  Processing {len(questions_data)} questions for quiz: {quiz.title}") # Debug print
@@ -307,15 +296,19 @@ class Command(BaseCommand):
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update poll question (Order: {order}) for poll '{poll.title}': {e}"))
 
+
     def _create_concepts(self, concept_map, concepts_data):
         """Creates or updates concepts for a given concept map, deriving order from list position."""
         self.stdout.write(f"  Processing {len(concepts_data)} concepts for concept map: {concept_map.title}") # Debug print
         # Use enumerate to get the index (order), starting from 1
         for order, concept_data in enumerate(concepts_data, start=1):
+
+            image_filename = concept_data.get('image')
+            self.bucket_url_call(image_filename)
             # Prepare defaults for the Concept model
             concept_defaults = {
                 'title': concept_data.get('title', f'Concept {order}'), # Use title from data or default
-                'image': concept_data.get('image'),
+                'image': f"public/{image_filename}",
                 'description': concept_data.get('description', ''),
                 'examples': concept_data.get('examples', []),
                 # Instructions might be on concept_data or inherit from BaseActivity defaults
@@ -338,3 +331,79 @@ class Command(BaseCommand):
             except Exception as e:
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update concept (Order: {order}) for concept map '{concept_map.title}': {e}"))
+
+
+    # TODO: Change everything to be stored as a KEY not URL, so it is not hardcoded to some bucket
+
+    #Helper method to upload an image file to the bucket
+    def _upload_image_to_bucket(self, image_filename, key_prefix=''):
+        
+        # Url path is constructed over here, 
+        final_path = self.folder_path / image_filename
+        with open(final_path, 'rb') as f:
+            saved_path = default_storage.save(f"public/{key_prefix}{Path(image_filename).name}", f) # the default storage is the s3/minio configured in djanago settings, its uses boto under the hood
+            url = default_storage.url(saved_path)
+            self.stdout.write(".UPLOADED")
+            return url
+
+
+    def bucket_url_call(self, image_filename, key_prefix=''):
+        upload_message = f"  UPLOADING: '{image_filename}' INTO 'public/{key_prefix}'"
+        self.stdout.write(f"{upload_message:.<77}", ending="")
+        final_s3_key = f"public/{key_prefix}{Path(image_filename).name}"
+
+        try:
+            # Use the consistently generated key for the check
+            if default_storage.exists(final_s3_key):
+                # And use it to generate the URL
+                self.stdout.write("CACHE HIT")
+                return default_storage.url(final_s3_key)
+            else:
+                # File doesn't exist, upload it.
+                # _upload_image_to_bucket already uses the correct logic.
+                return self._upload_image_to_bucket(image_filename, key_prefix)
+
+        # This error would be thrown if no existing bucket.
+        # It's better to be more specific with the exception if possible,
+        # but for now, this will work with the key fix.
+        except Exception:
+            self.stdout.write(self.style.ERROR('No bucket found or connection error.'))
+            self.stdout.write(self.style.ERROR('Attempting to create bucket...'))
+
+            #Create a minio bucket if this is development mode
+            if settings.DEBUG:
+
+                self.stdout.write(self.style.WARNING('Development mode: Creating MinIO bucket'))
+                self.create_minio_bucket()
+                # Now upload the image after creating the bucket
+                return self._upload_image_to_bucket(image_filename, key_prefix)
+            else:
+
+                # Production mode, don't try to create buckets. This should be done in AWS first and the 
+                # Correct bucket name given to PROD_AWS_MEDIA_BUCKET_NAME in .env variables
+                self.stdout.write(self.style.ERROR(
+                    f'Production error: Bucket or file access failed for {image_filename}. '
+                    'Skipping this image. Please ensure S3 bucket exists and permissions are correct.'
+                ))
+                return None  
+            
+    # Creates bucket in development if none has been created yet
+    def create_minio_bucket(self):
+                
+        s3_client = boto3.client(
+            's3',
+            endpoint_url='http://minio:9000',   # upload endpoint
+            aws_access_key_id='minioadmin',   # maybe need to change these to os.getenv
+            aws_secret_access_key='minioadmin'  
+        )
+        bucket_name = settings.STORAGES['default']['OPTIONS']['bucket_name']
+        
+        
+        try:
+            s3_client.create_bucket(Bucket=bucket_name)
+            self.stdout.write(self.style.SUCCESS(f'Bucket Created: {bucket_name}'))
+        except s3_client.exceptions.BucketAlreadyOwnedByYou:
+            self.stdout.write(self.style.WARNING(f'Bucket "{bucket_name}" already exists. Continuing.'))
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f'Failed to create or configure bucket: {e}'))
+            raise

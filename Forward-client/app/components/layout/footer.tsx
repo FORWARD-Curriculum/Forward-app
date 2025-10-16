@@ -12,23 +12,7 @@ export default function Footer() {
         </Link>
         <ul className="flex list-none flex-col items-center gap-1 *:hover:underline lg:flex-row">
           <li>
-            <Link prefetch="intent" to="/Linkccessibility">Accessibility</Link>
-          </li>
-          <li className="hidden lg:block">|</li>
-          <li>
-            <Link prefetch="intent" to="/technical-help">Technical Help</Link>
-          </li>
-          <li className="hidden lg:block">|</li>
-          <li>
-            <Link prefetch="intent" to="/feedback">Feedback</Link>
-          </li>
-          <li className="hidden lg:block">|</li>
-          <li>
-            <Link prefetch="intent" to="/privacy-policy">Privacy Policy</Link>
-          </li>
-          <li className="hidden lg:block">|</li>
-          <li>
-            <Link prefetch="intent" to="/cookie-settings">Cookie Settings</Link>
+            <Link prefetch="intent" to="/supportersOfYouth">About</Link>
           </li>
           <li className="hidden lg:block">|</li>
           <li className="mt-4 !no-underline lg:mt-0">©2025 Annee Grayson</li>

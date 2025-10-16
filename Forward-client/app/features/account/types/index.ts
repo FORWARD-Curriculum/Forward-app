@@ -7,9 +7,10 @@ export interface User {
     display_name: string;
     username: string;
     id: string;
-    facility_id: string | null;
+    facility: string | null;
     profile_picture?: string;
     consent: boolean;
+    surveyed_at: string | null;
     preferences: {
       theme: "light" | "dark" | "high-contrast";
       text_size: "txt-sm" | "txt-base" | "txt-lg" | "txt-xl";

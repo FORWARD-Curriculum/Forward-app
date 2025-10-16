@@ -2,11 +2,37 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
 from django.urls import reverse
+from django.contrib.postgres.fields import ArrayField
 import uuid
+import boto3  # pyright: ignore[reportMissingImports]
+from django.conf import settings
+# pyright: ignore[reportMissingImports]
+from botocore.exceptions import ClientError
+import re
+import json
 
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
 # while allowing us to add our own custom fields and methods
+
+
+class Facility(models.Model):
+    """
+    Represents an facility that users can be associated with.
+    """
+    name = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=50, unique=True,
+                            help_text="Unique code for the facility, used for user association on signup")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.name}"
+    
+    class Meta:
+        verbose_name = 'Facility'
+        verbose_name_plural = 'Facilities'
 
 
 class User(AbstractUser):
@@ -30,20 +56,19 @@ class User(AbstractUser):
         help_text='the uuid of the database item'
     )
 
+    facility = models.ForeignKey(
+        Facility,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        help_text="The facility this user is associated with, if any"
+    )
+
     # User's first name - minimum 2 characters required
     display_name = models.CharField(
         'display name',
         max_length=50,
         validators=[MinLengthValidator(2)],
-    )
-
-    # Facility Id - Still need to decide how we are implementing
-    facility_id = models.CharField(
-        'facility id',
-        null=True,
-        max_length=50,
-        validators=[MinLengthValidator(2)],
-        blank=True
     )
 
     # Optional
@@ -88,6 +113,7 @@ class User(AbstractUser):
     # Automatically set when the user is created and updated
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    surveyed_at = models.DateTimeField(null=True, blank=True, default=None)
 
     # This is not data we collect, its ugly but the other option is to inherit
     # from AbstractBaseUser and all the stuff that comes with that
@@ -103,9 +129,19 @@ class User(AbstractUser):
 
     def to_dict(self):
         return {
-            "id": self.id,
-            "username": self.username,
-            "display_name": self.display_name,
+            'id': self.id,
+            'username': self.username,
+            'display_name': self.display_name,
+            'facility': self.facility.name if self.facility else None,
+            'profile_picture': self.profile_picture,
+            'consent': self.consent,
+            'surveyed_at': self.surveyed_at,
+            'preferences': {
+                'theme': self.theme,
+                'text_size': self.text_size,
+                'speech_uri_index': self.speech_uri_index,
+                'speech_speed': self.speech_speed
+            }
         }
 
 
@@ -155,20 +191,35 @@ class Lesson(models.Model):
         blank=True,
         help_text="Tags for categorizing and searching lessons"
     )
+    
+    image = models.CharField(null=True, blank=True, max_length=200, help_text="Optional image to represent the lesson")
 
     class Meta:
         ordering = ['order', 'created_at']
         indexes = [
             models.Index(fields=['order']),
         ]
+        verbose_name = "Lesson"
+        verbose_name_plural = "Lessons"
 
     def __str__(self):
-        return self.title
+        return f"{self.title} - {self.total_activities} Activities"
 
     @property
     def section_count(self):
         """Returns the number of sections in this lesson."""
         return self.sections.count()
+
+    @property
+    def total_activities(self):
+        """Returns the count of all top-level activities associated with this lesson."""
+        manager = ActivityManager()
+        total = 0
+        for _, (ActivityClass, _, __, child_class, ___) in manager.registered_activities.items():
+            if child_class:
+                continue
+            total += ActivityClass.objects.filter(lesson_id=self.id).count()
+        return total
 
     def get_ordered_sections(self):
         """Returns all sections for this lesson in their specified order."""
@@ -182,6 +233,7 @@ class Lesson(models.Model):
             "objectives": self.objectives,
             "order": self.order,
             "tags": self.tags,
+            "image": create_presigned_url(self.image) if self.image else None,
         }
 
 
@@ -216,6 +268,7 @@ class BaseActivity(models.Model):
 
     instructions = models.TextField(
         null=True,
+        blank=True,
         help_text="Instructions for completing the activity"
     )
 
@@ -231,7 +284,7 @@ class BaseActivity(models.Model):
         ordering = ['order', 'created_at']
 
     def __str__(self):
-        return f"{self.__class__.__name__} - {self.title}"
+        return self.title
 
     @property
     def activity_type(self):
@@ -255,13 +308,18 @@ class TextContent(BaseActivity):
     """
     # User's generated uuid
     content = models.TextField(
+        null=True, blank=True,
         help_text="The main content text, can include HTML/markdown formatting"
+
     )
+
+    image = models.TextField(
+        null=True, blank=True, help_text="Optional image to accompany the text content")
 
     class Meta:
         ordering = ['order', 'created_at']
-        verbose_name = "text content"
-        verbose_name_plural = "text contents"
+        verbose_name = "Reading"
+        verbose_name_plural = "Readings"
 
     def __str__(self):
         return f"Text Content: {self.title}"
@@ -274,6 +332,36 @@ class TextContent(BaseActivity):
         return {
             **super().to_dict(),
             "content": self.content,
+            "image": create_presigned_url(self.image) if self.image else None,
+        }
+
+
+class Video(BaseActivity):
+    """
+    Model for video content within a lesson.
+    Can be used to embed videos from external sources or local files.
+    """
+    video = models.TextField(
+        help_text="URL of the video to be embedded"
+    )
+
+    scrubbable = models.BooleanField(
+        default=False,
+        help_text="Whether the video can be scrubbed by the user"
+    )
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "Video"
+        verbose_name_plural = "Videos"
+
+    def __str__(self):
+        return f"Video Content: {self.title}"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "video": create_presigned_url(self.video),
         }
 
 
@@ -285,8 +373,8 @@ class Writing(BaseActivity):
     )
 
     class Meta(BaseActivity.Meta):
-        verbose_name = "writing activity"
-        verbose_name_plural = "writing activities"
+        verbose_name = "Writing"
+        verbose_name_plural = "Writings"
 
     def get_prompts(self):
         """Returns the list of prompts or an empty list if none set"""
@@ -305,6 +393,10 @@ class Identification(BaseActivity):
         max_length=50000,
         default="",
     )
+    
+    class Meta:
+        verbose_name = "Identification"
+        verbose_name_plural = "Identifications"
 
     minimum_correct = models.PositiveIntegerField(default=0)
 
@@ -331,8 +423,8 @@ class Quiz(BaseActivity):
     )
 
     class Meta(BaseActivity.Meta):
-        verbose_name = "quiz"
-        verbose_name_plural = "quizzes"
+        verbose_name = "Quiz"
+        verbose_name_plural = "Quizzes"
 
     def to_dict(self):
         return {
@@ -340,6 +432,23 @@ class Quiz(BaseActivity):
             "passing_score": self.passing_score,
             "feedback_config": self.feedback_config,
             "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')]
+        }
+
+
+class Twine(BaseActivity):
+    """Model for Twine activities, which are interactive stories or games."""
+    file = models.TextField(
+        help_text="The Twine story as a built HTML file in string format"
+    )
+
+    class Meta(BaseActivity.Meta):
+        verbose_name = "Twine Story"
+        verbose_name_plural = "Twine Stories"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "file": regex_image_sub(self.file, key_prefix="twine/", isJson=False),
         }
 
 
@@ -401,6 +510,8 @@ class Question(models.Model):
 
     class Meta:
         ordering = ['order']
+        verbose_name = "Quiz Question"
+        verbose_name_plural = "Quiz Questions"
 
     def __str__(self):
         return f"Question {self.order}: {self.question_text[:50]}..."
@@ -411,7 +522,7 @@ class Question(models.Model):
             "quiz_id": self.quiz_id,
             "question_text": self.question_text,
             "question_type": self.question_type,
-            "has_orrect_answer": self.has_correct_answer,
+            "has_correct_answer": self.has_correct_answer,
             "choices": self.choices,
             "is_required": self.is_required,
             "order": self.order,
@@ -430,8 +541,8 @@ class Poll(BaseActivity):
     )
 
     class Meta:
-        verbose_name = "poll"
-        verbose_name_plural = "polls"
+        verbose_name = "Poll"
+        verbose_name_plural = "Polls"
 
     def to_dict(self):
         return {
@@ -480,6 +591,8 @@ class PollQuestion(models.Model):
 
     class Meta:
         ordering = ['order']
+        verbose_name = "Poll Question"
+        verbose_name_plural = "Poll Questions"
 
     def __str__(self):
         return f"Poll Question {self.order}: {self.question_text[:50]}..."
@@ -512,8 +625,8 @@ class Embed(BaseActivity):
 
     class Meta:
         ordering = ['order', 'created_at']
-        verbose_name = "embed"
-        verbose_name_plural = "embeds"
+        verbose_name = "Web Embed"
+        verbose_name_plural = "Web Embeds"
 
     def __str__(self):
         return f"Embed: {self.title}"
@@ -529,12 +642,97 @@ class Embed(BaseActivity):
             "has_code": self.code is not None,
         }
 
+
+class DndMatch(BaseActivity):
+    """Model for drag-and-drop matching activities"""
+
+    """
+        Stored as an Array of Arrays, in which the first element is the drop target
+        and the second and onwards are the drag items. Null values are allowed, and
+        correspond to items that have no counterpart associated with them.
+        
+        Any item may be prefixed with "image:" to indicate that it is an image URL.
+        These will be stored in the S3 bucket, and served as presigned URLs on request,
+        inlined with the data. They will also be prefixed with "image:" in the payload to
+        the frontend to indicate that they are images.
+        
+        Example:
+        [
+            ["Trade School", "image:welder.png", "image:electrician.png"],
+            ["University", "programmer", "ecologist"],
+            ["Typically offers associate level programs for 2 years of study.", "Community College"],
+            [null,"red herring drag"],
+            ["red herring drop", null]
+        ]
+    """
+
+    content = models.JSONField(
+        help_text="List of arrays to match in the format [[drop, drag], ...]"
+    )
+    
+    class Meta:
+        verbose_name = "Drag N' Drop"
+        verbose_name_plural = "Drag N' Drops"
+
+    def incorrect_matches(self):
+        """Returns a list of the top 3 consistently incorrect matches made by users"""
+        responses = DndMatchResponse.objects.filter(
+            associated_activity=self
+        )
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": regex_image_sub(self.content, key_prefix="dndmatch/"),
+        }
+
+class FillInTheBlank(BaseActivity):
+    """
+    It receives a comma seperated array, dividing each fill
+    in the blank activity type from each other.
+
+    There are three types, mainly 
+    
+    * Any words accepted
+    * Keyword recognition?
+    * Drop-down menu for selecting from given options
+
+    """
+    class Meta:
+        verbose_name = "Fill in the Blank"
+        verbose_name_plural = "Fill in the Blanks"
+
+    content = models.JSONField(
+        help_text= "Array of sentences with <options> markup for blanks"
+    )
+
+    def incorrect_fills(self):
+        # imitating DND, guess this is for analytics
+        responses = FillInTheBlankResponse.objects.filter( # come back to this
+            associated_activity=self
+        )
+
+
+
+    # delete this later comment later, just for me --> but remakes it into a json to give to frontend
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content,
+        }
+
+
+    
+    
 class ConceptMap(BaseActivity):
     """Model for mapping concepts to each other"""
     content = models.CharField(
         max_length=50000,
         default="",
     )
+    class Meta:
+        verbose_name = "Concept Map"
+        verbose_name_plural = "Concept Maps"
 
     def to_dict(self):
         return {
@@ -543,10 +741,11 @@ class ConceptMap(BaseActivity):
             "concepts": [c.to_dict() for c in Concept.objects.filter(concept_map=self).order_by('order')]
         }
 
+
 class Concept(BaseActivity):
     """Model for a concept in the concept map"""
     # TODO use jsonschema to enforce and validate the schema of the example field
-    
+
     """
     {
       "type": "array",
@@ -572,267 +771,150 @@ class Concept(BaseActivity):
       },
     }
     """
-    
+
     concept_map = models.ForeignKey(
         ConceptMap,
         on_delete=models.CASCADE,
         related_name="concepts",
         help_text="The concept map this concept belongs to"
     )
-    
+
     image = models.TextField(blank=True, null=True)
-    
+
     description = models.TextField(
         help_text="A detailed description of the concept"
     )
-    
+
     examples = models.JSONField(
         default=list,
         help_text="List of examples for this concept"
     )
+    
+    class Meta:
+        verbose_name = "Concept Map Concept"
+        verbose_name_plural = "Concept Map Concepts"
+    
+    def to_dict(self):
+        print(f"DEBUG: to_dict() method called for concept ID: {self.id}")
+        
+        try:
+            image_url = create_presigned_url(self.image) if self.image else None
+            print(f"DEBUG: Image URL generated: {image_url}")
+        except Exception as e:
+            print(f"ERROR: Error generating presigned URL: {e}")
+            image_url = None
+        
+        return {
+            **super().to_dict(),
+            "id": self.id,
+            "image": image_url,
+            "description": self.description,
+            "examples": self.examples,
+        }
+# Helper method to generate presigned urls
+"""
+There might be a better way to do this useing django storages settings setting it to presigned url without creating a client here
+Lesser priority but will look into later
+"""
+def create_presigned_url(s3_key):
+    
+    if (settings.DEBUG):
+        print(f"DEBUG: Starting presigned URL generation for path: {s3_key}")
+    
+    # Get settings from your STORAGES configuration
+    storage_options = settings.STORAGES['default']['OPTIONS']
+    s3_client = boto3.client(
+        's3',
+        endpoint_url=storage_options.get('custom_domain'),  # None for AWS S3
+        aws_access_key_id=storage_options.get('access_key'),
+        aws_secret_access_key=storage_options.get('secret_key'),
+        region_name=storage_options.get('region_name'),
+        use_ssl=storage_options.get('use_ssl', True)
+    )
+    bucket_name = storage_options['bucket_name']
+    if (settings.DEBUG):
+        print(f"DEBUG: Using bucket: {bucket_name}")
+    
+    try:
+        response = s3_client.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': bucket_name, 'Key': s3_key},
+            ExpiresIn= 3600, # 3 hour expiration time at the moment
+        )
+    except ClientError as e:
+        if (settings.DEBUG):
+            print(f"ERROR: Failed to generate presigned URL: {e}")
+        return None
+    
+    if (settings.DEBUG):
+        print(f"SUCCESS: Generated presigned URL: {response}")
+    return response
+    
+
+
+
+def regex_image_sub(tosub: any, key_prefix="", isJson: bool = True):
+    """Substitutes image URLs in the input string with presigned URLs.
+        Args:
+        tosub (str): The input string containing image URLs.
+        key_prefix (str): The prefix to add to the S3 key for the image.
+        isJson (bool): Whether the input is a JSON string or a regular string.
+    Returns:
+        str: The modified string with image URLs replaced by presigned URLs.
+    """
+    result = re.sub(
+        r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))",
+        lambda m: f"image:{create_presigned_url(f'public/{key_prefix}{m.group(1)}')}",
+        isJson and json.dumps(tosub) or str(tosub)
+    )
+    return isJson and json.loads(result) or result
+
+
+class LikertScale(BaseActivity):
+    """"
+    "type": "array",
+    "items": {
+    "type": "object",
+    "properties": {
+      "explain": {
+        "type": "boolean",
+        "description": "Indicates whether an explanation is required for the statement."
+      },
+      "statement": {
+        "type": "string",
+        "description": "The statement or question being presented."
+      },
+      "map": {
+        "type": "array",
+        "description": "Possible answer options or numeric scale values.",
+        "items": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "description": "Numeric scale value (e.g., 0–5)."
+            },
+            {
+              "type": "string",
+              "description": "Textual option (e.g., Likert scale labels)."
+            }
+          ]
+        }
+      }
+    },
+    """
+    content = models.JSONField(
+
+    )
+
+    class Meta:
+        verbose_name = "Likert Scale"
+        verbose_name_plural = "Likert Scales"
 
     def to_dict(self):
         return {
             **super().to_dict(),
-            "id": self.id,
-            "image": self.image,
-            "description": self.description,
-            "examples": self.examples,
+            "content": self.content
         }
-
-# TODO: Make quiz and question response inherit from BaseResponse, or make
-# them adhere to the contract enforced by BaseResponse
-
-
-class UserQuizResponse(models.Model):
-    """
-    Stores a user's complete response to a quiz
-    """
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='quiz_responses',
-        help_text='The user who submitted this quiz response'
-    )
-
-    lesson = models.ForeignKey(
-        Lesson,
-        on_delete=models.CASCADE,
-        related_name='%(class)s_lesson',
-        null=False,
-        blank=False,
-        help_text='The lesson related to this quiz response'
-    )
-
-    associated_activity = models.ForeignKey(
-        Quiz,
-        on_delete=models.CASCADE,
-        related_name='user_responses',
-        help_text='The quiz that was answered'
-    )
-
-    score = models.PositiveSmallIntegerField(
-        null=True,
-        blank=True,
-        help_text="The user's score on this quiz"
-    )
-
-    partial_response = models.BooleanField(
-        default=False,
-        help_text='Whether the quiz has been completed and submitted'
-    )
-
-    completion_percentage = models.FloatField(
-        default=0.0,
-        help_text="Percentage completion of the lesson"
-    )
-
-    time_spent = models.IntegerField(
-        null=True,
-        blank=True,
-        help_text='The total time spent on this question'
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ['user', 'associated_activity'] # TODO
-        verbose_name = 'quiz response'
-        verbose_name_plural = 'quiz responses'
-
-    def __str__(self):
-        return f"{self.user.username}'s response to {self.associated_activity.title}"
-
-    def calculate_score(self):
-        """Calculate and set the score based on the question responses"""
-        if not self.partial_response:
-            return None
-
-        # Only count questions that have correct answers defined
-        gradable_questions = self.question_responses.filter(
-            # self note: This is a field lookup feature in Django's ORM.
-            #  Translates to a single JOIN query instead of having to loop through all responses and check each question
-            question__has_correct_answer=True
-        )
-
-        correct_count = 0
-        total_count = gradable_questions.count()
-
-        if total_count == 0:
-            return None
-
-        for response in gradable_questions:
-            if response.is_correct:
-                correct_count += 1
-
-        self.score = correct_count
-        self.save()
-
-        return self.score
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "associated_activity_id": self.associated_activity_id,
-            "score": self.score,
-            "partial_response": self.partial_response,
-            "completion_percentage": self.completion_percentage,
-            "time_spent": self.time_spent,
-            "question_responses": [qr.to_dict() for qr in self.question_responses.all()]
-        }
-
-class UserQuestionResponse(models.Model):
-    """
-    Stores a user's response to an individual question within a quiz
-    """
-    lesson = models.ForeignKey(
-        Lesson,
-        on_delete=models.CASCADE,
-        related_name='%(class)s_lesson',
-        null=False,
-        blank=False,
-        help_text='The lesson related to this question response'
-    )
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='%(class)s_response_user',
-        null=False,
-        blank=False,
-        help_text='The user who submitted this question response'
-    )
-
-    quiz_response = models.ForeignKey(
-        UserQuizResponse,
-        on_delete=models.CASCADE,
-        related_name='question_responses',
-        help_text="The parent quiz response this question response belongs to"
-    )
-
-    question = models.ForeignKey(
-        Question,
-        on_delete=models.CASCADE,
-        related_name='user_responses',
-        help_text="The question that was answered"
-    )
-
-    # Store the selected answer(s) as JSON
-    # For multiple choice: {"selected": "option_id"}
-    # For multiple select: {"selected": ["option_id1", "option_id2"]}
-    # For true/false: {"selected": true} or {"selected": false}
-    response_data = models.JSONField(
-        help_text="The user's response data in JSON format"
-    )
-
-    is_correct = models.BooleanField(
-        null=True,
-        blank=True,
-        help_text="Whether this response is correct (null if not automatically gradable)"
-    )
-
-    feedback = models.TextField(
-        null=True,
-        blank=True,
-        help_text="Feedback provided for this response"
-    )
-
-    time_spent = models.IntegerField(
-        null=True,
-        blank=True,
-        help_text='The total time spent on this question'
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ['quiz_response', 'question']
-        verbose_name = "question response"
-        verbose_name_plural = "question responses"
-
-    def __str__(self):
-        return f"Response to question {self.question.order} in {self.quiz_response}"
-
-    def evaluate_correctness(self):
-        """Determine if the response is correct based on question type and correct answer"""
-        if not self.question.has_correct_answer:
-            self.is_correct = None
-            self.save()
-            return None
-
-        # Get correct answers from the question
-        correct_answers = self.question.choices.get('correct_answers', [])
-        selected = self.response_data.get('selected', None)
-
-        # Set default feedback
-        feedback_config = self.question.feedback_config or {}
-        default_feedback = feedback_config.get('default', '')
-
-        # If nothing's selected, it's incorrect
-        if selected is None:
-            self.is_correct = False
-            self.feedback = feedback_config.get(
-                'no_response', default_feedback)
-            self.save()
-            return False
-
-        # Handle different question types
-        if self.question.question_type == 'multiple_choice':
-            self.is_correct = selected in correct_answers
-        elif self.question.question_type == 'multiple_select':
-            if not isinstance(selected, list):
-                self.is_correct = False
-            else:
-                self.is_correct = sorted(selected) == sorted(correct_answers)
-        elif self.question.question_type == 'true_false':
-            self.is_correct = selected == correct_answers
-        else:
-            # Unknown question type
-            self.is_correct = None
-
-        # Set appropriate feedback based on correctness
-        if self.is_correct:
-            self.feedback = feedback_config.get('correct', default_feedback)
-        else:
-            self.feedback = feedback_config.get('incorrect', default_feedback)
-
-        self.save()
-        return self.is_correct
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "quiz_response_id": self.quiz_response_id,
-            "question_id": self.question_id,
-            "response_data": self.response_data,
-            "is_correct": self.is_correct,
-            "time_spent": self.time_spent,
-            "feedback": self.feedback
-        }
-
 
 class BaseResponse(models.Model):
     """
@@ -875,6 +957,9 @@ class BaseResponse(models.Model):
     time_spent = models.PositiveIntegerField(default=0)
 
     attempts_left = models.PositiveIntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def to_dict(self):
         return {
@@ -883,6 +968,347 @@ class BaseResponse(models.Model):
             "time_spent": self.time_spent,
             "attempts_left": self.attempts_left,
             "associated_activity": self.associated_activity.id,
+        }
+    
+# TODO: Make quiz and question response inherit from BaseResponse, or make
+# them adhere to the contract enforced by BaseResponse
+
+class UserQuizResponse(BaseResponse):
+    """
+    Stores a user's complete response to a quiz
+    """
+
+    # Note to self removing some fields that are inherited by baseResponse
+    # Removed user, lesson, associated_activity , partial_response, time_spent, created and updated at --- Lorran Alves Galdino
+
+
+    score = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text="The user's score on this quiz"
+    )
+
+    completion_percentage = models.FloatField(
+        default=0.0,
+        help_text="Percentage completion of the lesson"
+    )
+
+    associated_activity = models.ForeignKey(
+        Quiz,
+        on_delete=models.CASCADE,
+        related_name='quiz_responses',
+        help_text='The quiz this response is for'
+    )
+
+
+    class Meta:
+        unique_together = ['user', 'associated_activity']  # TODO
+        verbose_name = 'quiz response'
+        verbose_name_plural = 'quiz responses'
+
+    def __str__(self):
+        return f"{self.user.username}'s response to {self.associated_activity.title}"
+
+    def calculate_score(self):
+        """Calculate and set the score based on the question responses"""
+        if not self.partial_response:
+            return None
+
+        # Only count questions that have correct answers defined
+        gradable_questions = self.question_responses.filter(
+            # self note: This is a field lookup feature in Django's ORM.
+            #  Translates to a single JOIN query instead of having to loop through all responses and check each question
+            question__has_correct_answer=True
+        )
+
+        correct_count = 0
+        total_count = gradable_questions.count()
+
+        if total_count == 0:
+            return None
+
+        for response in gradable_questions:
+            if response.is_correct:
+                correct_count += 1
+
+        self.score = correct_count
+        self.save()
+
+        return self.score
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            # "user_id": self.user_id,
+            "associated_activity": self.associated_activity.id,
+            "lesson_id": self.lesson.id,
+            "score": self.score,
+            "partial_response": self.partial_response,
+            "time_spent": self.time_spent,
+            "attempts_left": self.attempts_left,
+            "score": self.score,
+            "completion_percentage": self.completion_percentage,
+            "submission": [qr.to_dict() for qr in self.question_responses.all()]
+        }
+
+# This might not be the correct approach but I am keeping userQuestionResponses from
+#  Inheriting from BaseResponse as I think that teh current structures assume they are an activity
+# So I will initialzie all its fields here independently    
+class UserQuestionResponse(models.Model): 
+    """
+    Stores a user's response to an individual question within a quiz
+    """
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='%(class)s_lesson',
+        null=False,
+        blank=False,
+        help_text='The lesson related to this question response'
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='%(class)s_response_user',
+        null=False,
+        blank=False,
+        help_text='The user who submitted this question response'
+    )
+
+    quiz_response = models.ForeignKey(
+        UserQuizResponse,
+        on_delete=models.CASCADE,
+        related_name='question_responses',
+        help_text="The parent quiz response this question response belongs to"
+    )
+
+    question = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE,
+        related_name='user_responses',
+        help_text="The question that was answered"
+    )
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+
+    attempts_left = models.PositiveBigIntegerField(
+        default=3,
+        help_text="Number of attempts remaining for this question"
+    )
+
+    partial_response = models.BooleanField(
+        default=True,
+        help_text="Whether this is still in progress"
+    )
+
+    # Store the selected answer(s) as JSON
+    # For multiple choice: {"selected": "option_id"}
+    # For multiple select: {"selected": ["option_id1", "option_id2"]}
+    # For true/false: {"selected": true} or {"selected": false}
+    response_data = models.JSONField(
+        help_text="The user's response data in JSON format"
+    )
+
+    is_correct = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text="Whether this response is correct (null if not automatically gradable)"
+    )
+
+    feedback = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Feedback provided for this response"
+    )
+
+    time_spent = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text='The total time spent on this question'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['quiz_response', 'question'] 
+        verbose_name = "question response"
+        verbose_name_plural = "question responses"
+
+    def __str__(self):
+        return f"Response to question {self.question.order} in {self.quiz_response}"
+
+    def evaluate_correctness(self):
+        """Determine if the response is correct based on question type and correct answer"""
+        if not self.question.has_correct_answer:
+            self.is_correct = None
+            # self.save()
+            return None
+
+        options = self.question.choices.get('options', [])
+        # Get correct answers from the question
+        correct_answers = self.question.choices.get('is_correct', [])
+
+        #lets try and extract the ID's of options where is_correct is TRUE
+        correct_answer_ids = []
+        for opt in options:
+            if opt.get('is_correct', False):
+                correct_answer_ids.append(opt['id'])
+
+        selected = self.response_data.get('selected', None)
+
+        # Set default feedback
+        feedback_config = self.question.feedback_config or {}
+        default_feedback = feedback_config.get('default', '')
+
+        # If nothing's selected, it's incorrect
+        if selected is None:
+            self.is_correct = False
+            self.feedback = feedback_config.get(
+                'no_response', default_feedback)
+            # self.save()
+            return False
+
+        # Handle different question types
+        if self.question.question_type == 'multiple_choice':
+            # self.is_correct = selected in correct_answers
+            self.is_correct = selected[0] in correct_answer_ids
+        elif self.question.question_type == 'multiple_select':
+            if not isinstance(selected, list):
+                self.is_correct = False
+            else:
+                self.is_correct = sorted(selected) == sorted(correct_answer_ids)
+        elif self.question.question_type == 'true_false':
+            # might need to come back to this one
+             self.is_correct = selected in correct_answer_ids or selected == correct_answer_ids
+        else:
+            # Unknown question type
+            self.is_correct = None
+
+        # Set appropriate feedback based on correctness
+        if self.is_correct:
+            self.feedback = feedback_config.get('correct', default_feedback)
+        else:
+            self.feedback = feedback_config.get('incorrect', default_feedback)
+
+        # self.save()
+        return self.is_correct
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "associated_activity": self.question_id,
+            "response_data": self.response_data,
+            "quiz_id": self.quiz_response.associated_activity.id,
+            # "is_correct": self.is_correct,
+            "lesson_id": self.lesson_id,
+            "partial_response": self.partial_response,
+            "time_spent": self.time_spent,
+            # "feedback": self.feedback,
+            "attempts_left": self.attempts_left,
+        }
+
+class VideoResponse(BaseResponse):
+    """
+    Response model for Video activities.
+    """
+    associated_activity = models.ForeignKey(
+        Video,
+        on_delete=models.CASCADE,
+        related_name='associated_video',
+        help_text='The video activity associated with this response'
+    )
+
+    watched_percentage = models.FloatField(
+        default=0.0,
+        help_text="Percentage of the video that has been watched"
+    )
+
+    class Meta:
+        verbose_name = "Video Response"
+        verbose_name_plural = "Video Responses"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "watched_percentage": self.watched_percentage
+        }
+
+
+class DndMatchResponse(BaseResponse):
+    """
+    Response model for DndMatch activities.
+    """
+    associated_activity = models.ForeignKey(
+        DndMatch,
+        on_delete=models.CASCADE,
+        related_name='associated_dndmatch',
+        help_text='The DnD match activity associated with this response'
+    )
+
+    """
+    The submission field is a list of list of typles where each inner list contains a tuple of indices into the
+    origial content array of the DnDMatch activity. 
+    
+    Take for example the following content:
+    [
+            ["Trade School", "image:welder.png", "image:electrician.png"],
+            ["University", "programmer", "ecologist"],
+            ["Typically offers associate level programs for 2 years of study.", "Community College"],
+            [null,"red herring drag"],
+            ["red herring drop", null]
+    ]
+    
+    an example of a partial submission with no incorrect answers would be:
+    [
+        [[0, 1], [0, 2]],
+        [[1, 2], [1, 1]],
+    ]
+    
+    an example of a full submission with one incorrect answer would be:
+    [
+        [[0, 1], [3, 1]],
+    ]
+    
+    """
+    submission = models.JSONField()
+
+    class Meta:
+        verbose_name = "Drag N' Drop Response"
+        verbose_name_plural = "Drag N' Drop Responses"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "submission": self.submission
+        }
+
+class FillInTheBlankResponse(BaseResponse):
+    
+    associated_activity = models.ForeignKey(
+        FillInTheBlank,
+        on_delete=models.CASCADE,
+        related_name="associated_fillintheblank",
+        help_text="The fill in the blank activity associated with this response"
+    )
+
+    submission = models.JSONField(
+        help_text="Array of user's answers for each blank"
+    )
+
+    class Meta:
+        verbose_name = "Fill in the Blank Response"
+        verbose_name_plural = "Fill in the Blank Responses"
+
+    def to_dict(self):
+        return{
+            **super().to_dict(),
+            "submission": self.submission
         }
 
 
@@ -894,12 +1320,19 @@ class WritingResponse(BaseResponse):
         help_text='The writing that was answered'
     )
 
-    response = models.CharField(default="", max_length=10000)
+    responses = models.JSONField(
+        help_text="The user's written responses in JSON Array format",
+        default=list
+    )
+
+    class Meta:
+        verbose_name = "Writing Response"
+        verbose_name_plural = "Writing Responses"
 
     def to_dict(self):
         return {
             **super().to_dict(),
-            "response": self.response
+            "responses": self.responses
         }
 
 
@@ -910,6 +1343,30 @@ class TextContentResponse(BaseResponse):
         related_name='associated_textcontent',
         help_text='The text content associated with this response'
     )
+
+    class Meta:
+        verbose_name = "Text Content Response"
+        verbose_name_plural = "Text Content Responses"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
+
+
+class TwineResponse(BaseResponse):
+    """Response model for Twine activities.
+    It's really just a boolean field to indicate if the user has completed the Twine activity."""
+    associated_activity = models.ForeignKey(
+        Twine,
+        on_delete=models.CASCADE,
+        related_name='associated_twine',
+        help_text='The text content associated with this response'
+    )
+
+    class Meta:
+        verbose_name = "Twine Response"
+        verbose_name_plural = "Twine Responses"
 
     def to_dict(self):
         return {
@@ -929,6 +1386,10 @@ class PollQuestionResponse(BaseResponse):
         help_text="The poll associated with this question"
     )
 
+    class Meta:
+        verbose_name = "Poll Question Response"
+        verbose_name_plural = "Poll Question Responses"
+
     def to_dict(self):
         return {
             **super().to_dict(),
@@ -944,6 +1405,10 @@ class IdentificationResponse(BaseResponse):
         help_text='The identification activity associated with this response'
     )
 
+    class Meta:
+        verbose_name = "Identification Response"
+        verbose_name_plural = "Identification Responses"
+
     def to_dict(self):
         return {
             **super().to_dict(),
@@ -957,6 +1422,10 @@ class PollResponse(BaseResponse):
         related_name='associated_poll',
         help_text='The poll associated with this response'
     )
+
+    class Meta:
+        verbose_name = "Poll Response"
+        verbose_name_plural = "Poll Responses"
 
     def to_dict(self):
         return {
@@ -974,11 +1443,16 @@ class EmbedResponse(BaseResponse):
 
     inputted_code: str = None
 
+    class Meta:
+        verbose_name = "Embed Response"
+        verbose_name_plural = "Embed Responses"
+
     def to_dict(self):
         return {
             **super().to_dict(),
             "inputted_code": self.inputted_code
         }
+
 
 class ConceptMapResponse(BaseResponse):
     associated_activity = models.ForeignKey(
@@ -988,10 +1462,38 @@ class ConceptMapResponse(BaseResponse):
         help_text='The concept map associated with this response'
     )
 
+    class Meta:
+        verbose_name = "Concept Map Response"
+        verbose_name_plural = "Concept Map Responses"
+
     def to_dict(self):
         return {
             **super().to_dict(),
         }
+
+
+class LikertScaleResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        LikertScale,
+        on_delete=models.CASCADE,
+        related_name='associated_likertscale',
+        help_text='The likert scale associated with this response'
+    )
+
+    content = models.JSONField(
+        help_text="The user's responses to the likert scale"
+    )
+
+    class Meta:
+        verbose_name = "Likert Scale Response"
+        verbose_name_plural = "Likert Scale Responses"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "content": self.content
+        }
+
 
 class ActivityManager():
     """A centralized management class meant to streamline the process of creating and using a
@@ -1008,7 +1510,8 @@ class ActivityManager():
 
     registered_activities: dict[str, tuple[BaseActivity, BaseResponse,
                                            dict[str, tuple[str, any]], bool]] = {}
-    registered_services: dict[str, dict[BaseActivity, callable]] = {"response": {}}
+    registered_services: dict[str,
+                              dict[BaseActivity, callable]] = {"response": {}}
 
     def registerActivity(self,
                          ActivityClass: BaseActivity,
@@ -1049,8 +1552,9 @@ class ActivityManager():
         if service_type not in self.registered_services:
             raise ValueError(
                 f"{service_type} is an invalid service type.")
-            
-        self.registered_services[service_type][ActivityClass.__name__.lower()] = service
+
+        self.registered_services[service_type][ActivityClass.__name__.lower(
+        )] = service
 
     def __init__(self):
         if self._initialized:
@@ -1059,16 +1563,28 @@ class ActivityManager():
         self.registerActivity(TextContent, TextContentResponse)
         self.registerActivity(Identification, IdentificationResponse)
         self.registerActivity(Writing, WritingResponse, {
-                              "response": ["response"]})
+                              "responses": ["responses", []]})
         self.registerActivity(Poll, PollResponse)
         self.registerActivity(
             PollQuestion, PollQuestionResponse, child_class=True)
-        self.registerActivity(Quiz, UserQuizResponse)
-        self.registerActivity(Question, UserQuestionResponse, child_class=True)
+        self.registerActivity(Quiz, UserQuizResponse, {
+                                "submission": ["submission", []]}) # test
+        # self.registerActivity(Question, UserQuestionResponse, child_class=True) # Testing this
         self.registerActivity(Embed, EmbedResponse, {
                               "inputted_code": ["inputted_code", None]})
         self.registerActivity(ConceptMap, ConceptMapResponse)
-        self.registerActivity(Concept, None, child_class=True) # None here means no response is expected
+        # None here means no response is expected
+        self.registerActivity(Concept, None, child_class=True)
+        self.registerActivity(DndMatch, DndMatchResponse, {
+                              "submission": ["submission", []]})
+        self.registerActivity(FillInTheBlank, FillInTheBlankResponse, {
+                              "submission": ["submission", []]}) # a little unsure about this part
+        self.registerActivity(LikertScale, LikertScaleResponse, {
+                              "content": ["content", {}]})
+        self.registerActivity(Video, VideoResponse, {
+                              "watched_percentage": ["watched_percentage", 0.0]
+                              })
+        self.registerActivity(Twine, TwineResponse)
 
 
 # Register on launch

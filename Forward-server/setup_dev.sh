@@ -6,19 +6,23 @@ set -e
 # Print commands
 set -x
 
-rm -rf .venv
-# Create and activate cirtual environment
-python -m venv .venv
-source .venv/bin/activate # Uncomment for Mac/Linux
+echo "Setting up Django development environment..."
 
-# Install dependencies
-pip install -r requirements.txt
+# Run migrations
+python manage.py makemigrations
 
 # Run migrations
 python manage.py migrate
 
+python manage.py collectstatic --noinput
+
 # Seed database with test data
-python manage.py seed_lessons_data --reset lesson_seed_data/lesson1.json
+
+python manage.py seed_defaults --reset defaults.json
+python manage.py seed_lessons_data --reset lesson1/lesson1.json
+python manage.py seed_lessons_data --reset lesson2/lesson2.json
+
+
 
 
 echo "Development environment is ready"

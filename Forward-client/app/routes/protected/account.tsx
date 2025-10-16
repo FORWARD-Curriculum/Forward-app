@@ -140,7 +140,7 @@ export default function account() {
   const originalState = useRef({
     theme: user.preferences?.theme,
     textSize: user.preferences?.text_size,
-    profilePicture: user.profile_picture,
+    profile_picture: user.profile_picture,
     displayName: user.display_name,
     consent: user.consent,
   });
@@ -162,7 +162,7 @@ export default function account() {
      * niceties.
      */
     const data = {
-      profilePicture: formState.removedPicture
+      profile_picture: formState.removedPicture
         ? null
         : (formState.profilePic || user.profile_picture || "").trim() || null,
       display_name: formData.get("display_name"),

@@ -13,10 +13,13 @@ import { act, useEffect } from "react";
 import TextContent from "@/features/curriculum/components/textcontent";
 import Poll from "@/features/curriculum/components/poll";
 import Quiz from "@/features/curriculum/components/quiz";
+import Twine from "@/features/curriculum/components/twine";
 import Writing from "@/features/curriculum/components/writing";
 import Identification from "@/features/curriculum/components/identification";
 import Embed from "@/features/curriculum/components/embed";
 import ConceptMap from "@/features/curriculum/components/conceptmap";
+import DndMatch from "@/features/curriculum/components/dndmatch";
+import FillInTheBlank from "@/features/curriculum/components/fillintheblank";
 import { useClient } from "@/hooks/useClient";
 import {
   Accordion,
@@ -36,6 +39,8 @@ import {
   setActivity,
   setLesson,
 } from "@/features/curriculum/slices/lessonSlice";
+import LikertScale from "@/features/curriculum/components/likertscale";
+import Video from "@/features/curriculum/components/video";
 
 export async function clientLoader({
   params,
@@ -96,9 +101,31 @@ export function Activity({ activity }: { activity: BaseActivity }) {
       );
     case "ConceptMap":
       return (
-        <ConceptMap key={key} conceptmap={activity as ActivityManager['ConceptMap'][0]}/>);
+        <ConceptMap
+          key={key}
+          conceptmap={activity as ActivityManager["ConceptMap"][0]}
+        />
+      );
     case "Embed":
-      return <Embed key={key} embed={activity as ActivityManager["Embed"][0]}/>
+      return (
+        <Embed key={key} embed={activity as ActivityManager["Embed"][0]} />
+      );
+    case "LikertScale":
+      return (
+        <LikertScale
+          key={key}
+          likertScale={activity as ActivityManager["LikertScale"][0]}
+        />
+      );
+    case "DndMatch":
+      return <DndMatch key={key} dndmatch={activity as ActivityManager["DndMatch"][0]}/>
+    case "FillInTheBlank":
+      return <FillInTheBlank key={key} fillInTheBlank={activity as ActivityManager["FillInTheBlank"][0]}/>
+    case "Video":
+      return <Video key={key} video={activity as ActivityManager["Video"][0]} />;
+    case "Twine":
+      return <Twine key={key} twine={activity as ActivityManager["Twine"][0]} />;
+    // No default case needed, as all types are handled
     default:
       return <p>Out of bounds</p>;
   }
@@ -150,7 +177,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   }, [loaderData]);
 
   return (
-    <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:flex-row lg:items-start lg:gap-8">
+    <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:mt-14 lg:flex-row lg:items-start lg:gap-8">
       <div className="flex flex-col lg:h-full">
         <Accordion
           type="single"
@@ -219,10 +246,10 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
           </span>
           {activity?.title}
         </h1>
+        {activity?.instructions && <p className="mb-6 font-light italic">{activity.instructions}</p>}
         {activity && <Activity activity={activity} />}
         <div className="mt-auto flex">
           <button
-            
             /*disabled={response.current_response?.partial_response || undefined}*/
             className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden"
             onClick={() => {

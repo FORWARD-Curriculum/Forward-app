@@ -5,10 +5,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, QuizSubmissionSerializer, UserQuizResponseDetailSerializer, ResponseSerializer
+from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUpdateSerializer, ResponseSerializer
+# QuizSubmissionSerializer, UserQuizResponseDetailSerializer,
 from core.services import UserService, LessonService, QuizResponseService, ResponseService
+# , QuestionResponseService
 from .utils import json_go_brrr, messages
-from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question
+from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, User
 from rest_framework import serializers, request
 
 
@@ -105,23 +107,10 @@ class CurrentUserView(APIView):
         Return the current user's information.
         Only accessible to authenticated users.
         """
-        user = request.user
+        user: User = request.user
         return json_go_brrr(
             data={
-                'user': {
-                    'id': user.id,
-                    'username': user.username,
-                    'display_name': user.display_name,
-                    'facility_id': user.facility_id,
-                    'profile_picture': user.profile_picture,
-                    'consent': user.consent,
-                    'preferences': {
-                        'theme': user.theme,
-                        'text_size': user.text_size,
-                        'speech_uri_index': user.speech_uri_index,
-                        'speech_speed': user.speech_speed
-                    }
-                }
+                'user': user.to_dict()
             },
             status=status.HTTP_200_OK
         )
@@ -131,7 +120,7 @@ class CurrentUserView(APIView):
         Update the current user's information.
         Only accessible to authenticated users.
         """
-        user = request.user
+        user: User = request.user
         serializer = UserUpdateSerializer(
             user, data=request.data, partial=True)
         if serializer.is_valid():
@@ -139,20 +128,7 @@ class CurrentUserView(APIView):
             return json_go_brrr(
                 message="User information updated successfully",
                 data={
-                    'user': {
-                        'id': user.id,
-                        'username': user.username,
-                        'display_name': user.display_name,
-                        'facility_id': user.facility_id,
-                        'profile_picture': user.profile_picture,
-                        'consent': user.consent,
-                        'preferences': {
-                            'theme': user.theme,
-                            'text_size': user.text_size,
-                            'speech_uri_index': user.speech_uri_index,
-                            'speech_speed': user.speech_speed
-                        }
-                    }
+                    'user': user.to_dict()
                 },
                 status=status.HTTP_200_OK
             )
@@ -186,7 +162,7 @@ class QuizView(APIView):
                 "questions": [q.to_dict() for q in questions]}},
             status=status.HTTP_200_OK
         )
-    
+
 
 class GetLessonIds(APIView):
     permission_classess = [IsAuthenticated]
@@ -210,7 +186,7 @@ class CurriculumView(APIView):
 
         return Response({
             "detail": messages['successful_id'],
-            "data": [l.to_dict() for l in lessons]},
+            "data": [{**l.to_dict(), "completion": LessonService.get_lesson_completion(request.user, l)} for l in lessons]},
             status=status.HTTP_200_OK)
 
 
@@ -509,5 +485,62 @@ class QuizResponseStatusView(APIView):
         except Quiz.DoesNotExist:
             return json_go_brrr(
                 message="Quiz not found",
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+# class QuestionResponseView(APIView):
+#     """Handle individual question responses within a quiz, god i hate this, so now questions wil be embedded and more coupled to quizes"""
+#     permission_classes = [IsAuthenticated]
+    
+#     def post(self, request, quiz_id, question_id):
+#         """Submit answer to a specific question"""
+#         try:
+#             question = Question.objects.get(id=question_id, quiz_id=quiz_id)
+#             quiz = Quiz.objects.get(id=quiz_id)
+            
+#             # Prepare data for service
+#             validated_data = {
+#                 'associated_activity': question,
+#                 'quiz_id': quiz_id,
+#                 'lesson_id': quiz.lesson,
+#                 'response_data': request.data.get('response_data', {}),
+#                 'time_spent': request.data.get('time_spent', 0)
+#             }
+            
+#             question_response = QuestionResponseService.submit_question_response(
+#                 validated_data, request
+#             )
+            
+#             return json_go_brrr(
+#                 message="Question response submitted successfully",
+#                 data=question_response.to_dict(),
+#                 status=status.HTTP_200_OK
+#             )
+#         except Exception as e:
+#             return json_go_brrr(
+#                 message=str(e),
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+            
+class OnboardView(APIView):
+    def get(self, request):
+        user: User = request.user
+        if user:
+            if(user.consent):
+                return json_go_brrr(
+                    message="Nessecary surveying info:",
+                    data={
+                        "survey": "https://asu.co1.qualtrics.com/jfe/form/SV_9BtOetx46YdBQW2"
+                    },
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return json_go_brrr(
+                    message="You have not agreed to participate in the FORWARD research program.",
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        else:
+            return json_go_brrr(
+                message="Must be logged in to take the survey.",
                 status=status.HTTP_404_NOT_FOUND
             )

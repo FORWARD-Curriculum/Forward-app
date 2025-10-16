@@ -2,9 +2,10 @@ import type {
   Quiz,
   Question as QuestionType,
   QuizResponse,
+  QuestionResponse,
 } from "@/features/curriculum/types";
 import { useLocation } from "react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useResponse } from "@/features/curriculum/hooks";
 import Question from "./question";
 
@@ -14,28 +15,100 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
     parseInt(hash.substring(1).split("/").at(1) || "1"),
   );
 
-  const [response, setResponse] = useResponse<QuizResponse, Quiz>({
+  const [response, setResponse, saveResponse] = useResponse<QuizResponse, Quiz>({
     type: "Quiz",
     activity: quiz,
     trackTime: false,
-    initialFields: { highest_question_reached: 1, score: 0, completion_percentage: 0 },
+    initialFields: { 
+      score: null, 
+      completion_percentage: 0,
+      submission: []
+    },
   });
 
-  const [done,setDone] = useState(false);
+  // Helper function to update or add an answer in the submission array
+  const updateOrAddAnswer = (
+    submission: QuestionResponse[],
+    questionId: string,
+    answerData: { selected: number[] }
+  ): QuestionResponse[] => {
+    const existingIndex = submission.findIndex(
+      (item) => item.associated_activity === questionId
+    );
 
-  useEffect(() => {
-    console.log(done,response.highest_question_reached,quiz.questions.length)
-    if (done && response.highest_question_reached == quiz.questions.length) {
-      setResponse((prevResponse) => ({
-        ...prevResponse,
-        partial_response: false,
-      }));}
-  }, [done]);
+    if (existingIndex >= 0) {
+      // Update existing answer
+      return submission.map((item, index) =>
+        index === existingIndex
+          ? { ...item, response_data: answerData }
+          : item
+      );
+    } else {
+      // Add new answer
+      return [
+        ...submission,
+        {
+          id: null,
+          associated_activity: questionId,
+          response_data: answerData,
+          quiz_id: quiz.id,
+          lesson_id: quiz.lesson_id,
+          partial_response: true,
+          time_spent: 0,
+          // attempts_left: 3,
+        } as QuestionResponse,
+      ];
+    }
+  };
+
+  // Get answer for a specific question from submission
+  const getAnswerForQuestion = (questionId: string) => {
+    return response.submission.find(
+      (item) => item.associated_activity === questionId
+    ) || null;
+  };
+
+  // Update submission when user answers
+  const handleAnswerChange = (questionId: string, answerData: { selected: number[] }) => {
+    setResponse((prev) => ({
+      ...prev,
+      submission: updateOrAddAnswer(prev.submission, questionId, answerData),
+    }));
+  };
+
+  // Handle "Check Answer" button click
+  const handleCheckAnswer = async (questionId: string) => {
+
+      const questionToCheck = response.submission.find(
+        (item) => item.associated_activity === questionId
+      );
+      
+    
+      if (questionToCheck) {
+        // Only send THIS question's data
+        await saveResponse({ 
+          submission: [questionToCheck] 
+        } as Partial<QuizResponse>);
+      }
+    
+  };
 
   return (
     <div>
-      <p>Time spent: {response.time_spent}</p>
       <p className="mb-4 text-sm font-light">{quiz.instructions}</p>
+      <p className="mb-4 text-sm text-muted-foreground italic">
+        Note: Any checked answers will be automatically submitted when you leave this quiz.
+      </p>
+      <div className="mb-4 text-sm text-muted-foreground">
+        Progress: {response.completion_percentage.toFixed(0)}% complete
+      </div>
+
+      {response.score !== null && (
+        <div className="mb-4 text-sm font-medium">
+          Score: {response.score} / {quiz.questions.length}
+        </div>
+      )}
+      
       {quiz.questions.map((question: QuestionType, questionNumber) => {
         if (currentQuestion - 1 === questionNumber)
           return (
@@ -43,11 +116,15 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
               key={questionNumber}
               question={question}
               questionNumber={questionNumber}
-              quizId={quiz.id}
-              setDone={setDone}
+              answer={getAnswerForQuestion(question.id)}
+              onAnswerChange={handleAnswerChange}
+              onCheckAnswer={handleCheckAnswer}
+              disabled={!response.partial_response}
             />
           );
       })}
+
+      {/* Navigation buttons */}
       <div className="mx-auto flex w-full justify-center">
         <div className="grid grid-cols-3 items-center justify-center">
           {currentQuestion != 1 && (
@@ -72,11 +149,6 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
             <button
               className="bg-primary text-primary-foreground col-span-1 col-start-3 col-end-3 flex h-full w-16 items-center justify-center rounded-md text-center active:brightness-90"
               onClick={() => {
-                if (response.highest_question_reached < currentQuestion + 1)
-                  setResponse({
-                    ...response,
-                    highest_question_reached: currentQuestion + 1,
-                  });
                 history.replaceState(
                   null,
                   "",

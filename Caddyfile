@@ -1,0 +1,10 @@
+api.forwardapp.org {
+    handle_path /static/* {
+        root * /var/www/static
+        file_server
+    }
+
+    handle {
+        reverse_proxy backend:8000
+    }
+}

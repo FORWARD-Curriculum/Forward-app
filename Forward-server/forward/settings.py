@@ -15,42 +15,30 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+STATIC_URL = 'static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=esmn7v4(rjy@9#cs1gpv3$m^6i!z-5a1l0hbt@elyr!!tpi9)'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = os.environ.get('DEBUG') == 'False'
-DEBUG = False
+DEBUG = os.environ.get('DEBUG') == 'True'
 
-ALLOWED_HOSTS = [
-    'backend',
-    'backend:8000',
-    'localhost',
-    '127.0.0.1',
-    'frontend',
-    'testserver',
-    'backend-latest-ma6c.onrender.com',
-    'forward-app-a9ew.onrender.com',
-]
+ALLOWED_HOSTS_RAW = os.environ.get('ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = [host.strip()
+                 for host in ALLOWED_HOSTS_RAW.split(',') if host.strip()]
 
-CSRF_TRUSTED_ORIGINS = [
-    'http://backend:8000',
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:8000',
-    "http://localhost:8080",
-    "https://localhost:5173",
-    "https://127.0.0.1:5173",
-    'https://backend-latest-ma6c.onrender.com',
-    'https://forward-app-a9ew.onrender.com',
-]
+CSRF_TRUSTED_ORIGINS_RAW = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
+CSRF_TRUSTED_ORIGINS = [origin.strip(
+) for origin in CSRF_TRUSTED_ORIGINS_RAW.split(',') if origin.strip()]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -58,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_json_widget',
+    'martor',
     'rest_framework',
     'corsheaders',
     'api',
@@ -87,47 +77,46 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# CORS_ALLOWED_ORIGINS_RAW = os.environ.get('CORS_ALLOWED_ORIGINS', '')
-# CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_RAW.split(',')]
-CORS_ALLOWED_ORIGINS = [
-   "http://localhost:8080",
-   "http://127.0.0.1:8080",
-   "http://localhost:5173",
-   "http://127.0.0.1:5173",
-   "https://localhost:5173",
-   "https://127.0.0.1:5173",
-   'https://backend-latest-ma6c.onrender.com',
-   'https://forward-app-a9ew.onrender.com',
-]
+CORS_ALLOWED_ORIGINS_RAW = os.environ.get('CORS_ALLOWED_ORIGINS', '')
+CORS_ALLOWED_ORIGINS = [origin.strip()
+                        for origin in CORS_ALLOWED_ORIGINS_RAW.split(',')]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
-   'DELETE',
-   'GET',
-   'OPTIONS',
-   'PATCH',
-   'POST',
-   'PUT',
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
 ]
 
-CORS_ALLOW_HEADERS = ['*'
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'X-CSRFToken',
-    'x-requested-with',
-]
+CORS_ALLOW_HEADERS = ['*',
+                      'accept',
+                      'accept-encoding',
+                      'authorization',
+                      'content-type',
+                      'dnt',
+                      'origin',
+                      'user-agent',
+                      'X-CSRFToken',
+                      'x-requested-with',
+                      ]
 
 # TODO: Change to true when we have https setup
+
+COOKIE_DOMAIN = os.environ.get("COOKIE_DOMAIN", "forwardapp.org")
+SESSION_COOKIE_DOMAIN = COOKIE_DOMAIN
+CSRF_COOKIE_DOMAIN = COOKIE_DOMAIN
+CSRF_COOKIE_HTTPONLY = False
+
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = 'None'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 ROOT_URLCONF = 'forward.urls'
 
@@ -155,8 +144,12 @@ WSGI_APPLICATION = 'forward.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        "NAME": os.environ.get("DB_NAME", "forward_db"),
+        "USER": os.environ.get("DB_USER", "forward_user"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", "forward_password"),
+        "HOST": os.environ.get("DB_HOST", "localhost"),
+        "PORT": os.environ.get("DB_PORT", "5432"),
     }
 }
 
@@ -197,9 +190,107 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Sets up the django-storages s3 configuration with minio container
+
+if DEBUG: # uses Minio for development
+    print("Development mode active")
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS":{
+                "bucket_name": "media-bucket",
+                "access_key": "minioadmin",
+                "secret_key": "minioadmin",
+                "endpoint_url": "http://minio:9000",
+                "custom_domain": "http://localhost:9000", # test
+                "url_protocol": "http:",
+                "default_acl": "public-read",
+                "querystring_auth": False,
+                "use_ssl": False # set to false for local development
+            }
+        },
+        # Required to satisfy django storages but we do not use static files i believe
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        }
+    }
+else: # Production with s3 bucket configuration
+    print("Production mode active")
+    STORAGES= {
+        "default": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS":{
+                "bucket_name": os.getenv("PROD_AWS_MEDIA_BUCKET_NAME"),
+                "access_key": os.getenv("PROD_AWS_ACCESS_KEY_ID"),
+                "secret_key": os.getenv("PROD_AWS_SECRET_ACCESS_KEY"), 
+                "region_name": os.getenv("PROD_AWS_REGION"),
+                "use_ssl": True
+            }
+        },
+        # Required to satisfy django storages but we do not use static files i believe
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        }
+    }
+
+
+
+
+## MARTOR CONFIG
+
+
+MARTOR_ENABLE_CONFIGS = {
+    'emoji': 'true',        # to enable/disable emoji icons.
+    'imgur': 'true',        # to enable/disable imgur/custom uploader.
+    'mention': 'false',     # to enable/disable mention
+    'jquery': 'true',       # to include/revoke jquery (require for admin default django)
+    'living': 'true',      # to enable/disable live updates in preview
+    'spellcheck': 'true',  # to enable/disable spellcheck in form textareas
+    'hljs': 'true',         # to enable/disable hljs highlighting in preview
+}
+
+MARTOR_TOOLBAR_BUTTONS = [
+    'bold', 'italic', 'horizontal', 'heading', 'pre-code',
+    'blockquote', 'unordered-list', 'ordered-list',
+    'link', 'image-upload', 'emoji',
+    'toggle-maximize', 'help'
+]
+
+MARTOR_MARKDOWNIFY_FUNCTION = 'martor.utils.markdownify' # default
+MARTOR_MARKDOWNIFY_URL = '/martor/markdownify/' # default
+
+MARTOR_MARKDOWNIFY_TIMEOUT = 0 # update the preview instantly
+
+MARTOR_MARKDOWN_EXTENSIONS = [
+    'markdown.extensions.extra',
+    'markdown.extensions.nl2br',
+    'markdown.extensions.smarty',
+    'markdown.extensions.fenced_code',
+    'markdown.extensions.sane_lists',
+
+    # Custom markdown extensions.
+    'martor.extensions.urlize',
+    'martor.extensions.del_ins',      # ~~strikethrough~~ and ++underscores++
+    'martor.extensions.emoji',        # to parse markdown emoji
+]
+
+ALLOWED_HTML_TAGS = [
+    "a", "abbr", "b", "blockquote", "br", "cite", "code", "command",
+    "dd", "del", "dl", "dt", "em", "fieldset", "h1", "h2", "h3", "h4", "h5", "h6",
+    "hr", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend",
+    "li", "ol", "optgroup", "option", "p", "pre", "small", "span", "strong",
+    "sub", "sup", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "u", "ul", "def", "correct"
+]
+
+ALLOWED_HTML_ATTRIBUTES = [
+    "alt", "class", "color", "colspan", "datetime",  # "data",
+    "height", "href", "id", "name", "reversed", "rowspan",
+    "scope", "src", "style", "title", "type", "width", "def"
+]
