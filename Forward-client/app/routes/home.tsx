@@ -39,7 +39,7 @@ export default function Home() {
           </Link>
           <Link 
             prefetch="intent"
-            to={"/supportersOfYouth"}
+            to={"/youth"}
             className="bg-secondary/80 backdrop-blur-sm text-secondary-foreground px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 border border-secondary-border hover:border-muted-foreground shadow-sm hover:shadow-md">
             Learn More
           </Link>
