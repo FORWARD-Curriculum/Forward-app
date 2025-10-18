@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Outlet } from "react-router";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import BugReport from "@/features/logging/components/bugreport";
 import { Toaster } from "@/components/ui/sonner";
 import { useClient } from "@/hooks/useClient";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,7 +20,7 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   const resp = await res.json();
   const user =
     (resp as { detail?: string; data?: { user: User } })?.data?.user ?? null;
-  console.log("clientLoader user", user);
+  // console.log("clientLoader user", user);
   return user;
 }
 
@@ -62,6 +63,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
         <Fetch />
         <div className="flex flex-grow">
           <Outlet />
+          <BugReport/>
         </div>
         <Footer />
         <Toaster richColors closeButton={windowDimensions.width > 1024} />

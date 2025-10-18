@@ -167,7 +167,7 @@ export function MarkdownTTSControls({
   const [warned, setWarned] = useState(!customComponents);
   const [isWarningDialogOpen, setIsWarningDialogOpen] = useState(false);
   // TODO: Pausing is not handled by library, at least as far as I can tell
-  useEffect(() => {console.log(warned,isWarningDialogOpen)},[warned,isWarningDialogOpen])
+  // useEffect(() => {console.log(warned,isWarningDialogOpen)},[warned,isWarningDialogOpen])
   return (
     <div
       className={cn(

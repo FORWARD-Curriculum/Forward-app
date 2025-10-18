@@ -12,6 +12,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.text import slugify
+from django.utils.safestring import mark_safe
+from django.utils.text import Truncator
 
 from django_json_widget.widgets import JSONEditorWidget
 from martor.widgets import AdminMartorWidget
@@ -50,6 +52,7 @@ from .models import (
     FillInTheBlank,
     FillInTheBlankResponse,
     Facility,
+    BugReport,
 )
 
 # ---------------------------------------------------------------------
@@ -121,7 +124,7 @@ class CustomAdminSite(admin.AdminSite):
                     grouped_apps[group_name]["app_label"] = slugify(group_name)
                 grouped_apps[group_name]["models"].append(model_info)
 
-        group_order = {"Core": 0, "Curriculum": 1, "Activities": 2, "Responses": 3}
+        group_order = {"Core": 0, "Curriculum": 1, "Activities": 2, "Responses": 3, "Administration": 4}
 
         app_list = sorted(
             grouped_apps.values(),
@@ -410,7 +413,6 @@ class UserInline(admin.TabularInline):
         # Safer to disable deletes from inline for instructors
         return request.user.is_superuser
 
-
 @admin.register(Facility, site=custom_admin_site)
 class FacilityAdmin(admin.ModelAdmin):
     grouping = "Core"
@@ -452,6 +454,78 @@ class FacilityAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
 
+@admin.register(BugReport, site=custom_admin_site)
+class BugReportAdmin(ReadOnlyAdmin):
+    grouping = "Administration"
+    list_display = ("id","user__username", "short_description", "app_version", "created_at")
+    list_filter = ("app_version", "created_at")
+    search_fields = ("user__username", "description", "steps_to_reproduce")
+    ordering = ("-created_at",)
+    readonly_fields = (
+        "id",
+        "user",
+        "description",
+        "steps_to_reproduce",
+        "created_at",
+        "recent_window_locations",
+        "device_info",
+        "app_version",
+    )
+    fieldsets = (
+        ("Basic Information", {
+            "fields": ("id", "user", "app_version", "created_at"),
+        }),
+        ("Bug Details", {
+            "fields": ("description", "steps_to_reproduce"),
+        }),
+        ("Technical Details", {
+            "classes": ("collapse",),
+            "fields": (
+                "device_info",
+                "recent_window_locations",
+                "recent_errors",
+                "recent_dispatches",
+                "app_state_short",
+            ),
+        }),
+    )
+    
+    def short_description(self, obj):
+        return Truncator(obj.description).chars(60)
+    short_description.short_description = "description"
+    short_description.admin_order_field = "description"
+    
+    @property
+    def media(self):
+        return super().media + JSONEditorWidget().media
+    
+    def _render_json(self, name: str, data, obj_id: int) -> str:
+        """Helper to render JSON data with JSONEditorWidget."""
+        widget = JSONEditorWidget(mode="form")
+        return mark_safe(widget.render(
+            name=f"{name}_{obj_id}",
+            value=json.dumps(data),
+            attrs={'id': f"{name}_{obj_id}_render", 'style': 'disabled;'}
+        ))
+
+    def recent_dispatches(self, obj: BugReport):
+        return self._render_json('recent_dispatches', obj.recent_dispatches(), obj.id) + mark_safe(f"""<style> .readonly {{width: 100% !important;display: block;}}</style>""")
+    recent_dispatches.short_description = "Recent Redux Dispatches"
+    
+    def recent_errors(self, obj: BugReport):
+        return self._render_json('recent_errors', obj.recent_errors(), obj.id)
+    recent_errors.short_description = "Recent Errors"
+    
+    def app_state_short(self, obj: BugReport):
+        return self._render_json('app_state_short', obj.app_state_short(), obj.id)  
+    app_state_short.short_description = "App State (Formatted)"
+    
+    
+    formfield_overrides = {
+        models.JSONField: {
+            "widget": JSONEditorWidget
+        }
+    }
 
 # ---------------------------------------------------------------------
 # Inlines for Activity Children

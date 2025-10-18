@@ -10,9 +10,56 @@ from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUp
 from core.services import UserService, LessonService, QuizResponseService, ResponseService
 # , QuestionResponseService
 from .utils import json_go_brrr, messages
-from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, User
+from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, User, BugReport
 from rest_framework import serializers, request
 
+class BugReportView(APIView):
+    """
+    API endpoint for submitting bug reports.
+
+    POST: Submit a bug report
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        """Submit a bug report"""
+        # Extract bug report details from the request data
+        description = request.data.get('description')
+        steps_to_reproduce = request.data.get('steps_to_reproduce')
+        recent_window_locations = request.data.get('recent_window_locations')
+        app_state = request.data.get('app_state')
+        device_info = request.data.get('device_info')
+        app_version = request.data.get('app_version')
+        
+        if not description:
+            return json_go_brrr(
+                message="Description is required for a bug report",
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        br = BugReport.objects.create(
+            user=request.user,
+            description=description,
+            steps_to_reproduce=steps_to_reproduce,
+            recent_window_locations=recent_window_locations,
+            app_state=app_state,
+            device_info=device_info,
+            app_version=app_version
+        )
+        
+        if not br:
+            return json_go_brrr(
+                message="Failed to submit bug report",
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )     
+
+        return json_go_brrr(
+            message="Bug report submitted successfully",
+            data={
+                "id": br.id,
+            },
+            status=status.HTTP_201_CREATED
+        )
 
 class UserRegistrationView(generics.CreateAPIView):
     """
