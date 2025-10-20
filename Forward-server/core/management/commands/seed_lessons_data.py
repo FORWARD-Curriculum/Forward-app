@@ -194,10 +194,17 @@ class Command(BaseCommand):
                     self.regex_image_upload(defaults.get(
                         'content', ''), key_prefix="dndmatch/")
                     
-                if activity_type_str == 'textcontent' and 'image' in defaults:
-                    self.bucket_url_call(defaults.get(
-                        'image'), key_prefix="text_content_image/")
-                    defaults['image'] = f"public/text_content_image/{defaults['image']}"
+                if activity_type_str == 'textcontent':
+                    if 'image' in defaults:
+                        self.bucket_url_call(defaults.get('image'), key_prefix="text_content_image/")
+                        defaults['image'] = f"public/text_content_image/{defaults['image']}"
+                    else:
+                        # 10/19/25: Annee's jsons have images embedded in markdown content, as opposed to separate field
+                        images = re.findall(r"!\[.*\]\((.*)\)", str(defaults.get('content', '')))
+                        if images:
+                            self.bucket_url_call(images[0], key_prefix="text_content_image/")
+                            defaults['image'] = f"public/text_content_image/{images[0]}"
+                            defaults['content'] = re.sub(r"!\[.*\]\(.*\)", "", defaults.get('content', ''), count=1).strip() # Remove first image markdown
                     
                 if activity_type_str == 'video':
                     self.bucket_url_call(defaults.get(
@@ -304,13 +311,28 @@ class Command(BaseCommand):
         for order, concept_data in enumerate(concepts_data, start=1):
 
             image_filename = concept_data.get('image')
+            print(f"DEBUG: Processing concept with image: {image_filename}")
             self.bucket_url_call(image_filename)
+            
+            examples = concept_data.get('examples', [])
+            for example in examples:
+                example_image = example.get('image')
+                print(f"DEBUG: Processing concept example with image: {example_image}")
+                try:
+                    self.bucket_url_call(example_image)
+                    example['image'] = f"public/{example_image}"
+                except Exception as e:
+                    self.stdout.write(self.style.ERROR(f"    Failed to upload example image '{example_image}' for concept (Order: {order}): {e}"))
+                    example['image'] = None  # Set to None or handle as needed
+                
+            
+            
             # Prepare defaults for the Concept model
             concept_defaults = {
                 'title': concept_data.get('title', f'Concept {order}'), # Use title from data or default
                 'image': f"public/{image_filename}",
                 'description': concept_data.get('description', ''),
-                'examples': concept_data.get('examples', []),
+                'examples': examples,
                 # Instructions might be on concept_data or inherit from BaseActivity defaults
                 'instructions': concept_data.get('instructions'),
             }

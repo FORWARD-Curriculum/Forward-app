@@ -41,6 +41,7 @@ import {
 } from "@/features/curriculum/slices/lessonSlice";
 import LikertScale from "@/features/curriculum/components/likertscale";
 import Video from "@/features/curriculum/components/video";
+import MarkdownTTS from "@/components/ui/markdown-tts";
 
 export async function clientLoader({
   params,
@@ -118,13 +119,27 @@ export function Activity({ activity }: { activity: BaseActivity }) {
         />
       );
     case "DndMatch":
-      return <DndMatch key={key} dndmatch={activity as ActivityManager["DndMatch"][0]}/>
+      return (
+        <DndMatch
+          key={key}
+          dndmatch={activity as ActivityManager["DndMatch"][0]}
+        />
+      );
     case "FillInTheBlank":
-      return <FillInTheBlank key={key} fillInTheBlank={activity as ActivityManager["FillInTheBlank"][0]}/>
+      return (
+        <FillInTheBlank
+          key={key}
+          fillInTheBlank={activity as ActivityManager["FillInTheBlank"][0]}
+        />
+      );
     case "Video":
-      return <Video key={key} video={activity as ActivityManager["Video"][0]} />;
+      return (
+        <Video key={key} video={activity as ActivityManager["Video"][0]} />
+      );
     case "Twine":
-      return <Twine key={key} twine={activity as ActivityManager["Twine"][0]} />;
+      return (
+        <Twine key={key} twine={activity as ActivityManager["Twine"][0]} />
+      );
     // No default case needed, as all types are handled
     default:
       return <p>Out of bounds</p>;
@@ -188,7 +203,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         >
           <AccordionItem value="1">
             <AccordionTrigger className="bg-secondary border-secondary-border text-secondary-foreground data-[state=open]:border-b-muted-foreground/50 rounded-t-3xl border-1 p-4 duration-50 data-[state=closed]:rounded-3xl data-[state=closed]:delay-300 data-[state=open]:rounded-b-none data-[state=open]:border-b-1">
-              <h1 className="text-lg font-bold text-nowrap">
+              <h1 className="text-lg font-bold text-nowrap w-[30ch] overflow-hidden overflow-ellipsis" >
                 {lesson.lesson?.title}: Table of Contents
               </h1>
             </AccordionTrigger>
@@ -200,7 +215,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                       // FIXME for now, we are not using the response to disable the button
                       // disabled={activityIndex.order > response.highest_activity}
                       key={activityIndex.order}
-                      className={`${activityIndex.order === lesson.current_activity ? "bg-accent/40" : ""} disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
+                      className={`${activityIndex.order === lesson.current_activity ? "bg-accent/40" : ""} group disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                       onClick={() => {
                         dispatch(setActivity(activityIndex.order));
                         history.replaceState(
@@ -211,7 +226,15 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                       }}
                     >
                       <p>{activityIndex.order}.</p>
-                      <p>{activityIndex.title}</p>
+                      <span className="ml-auto w-[35ch] overflow-hidden **:text-right">
+                        <p className={activityIndex.title.length > 45 ? "group-hover:hidden" : ""}>
+                          {activityIndex.title.trunc(45)}
+                        </p>
+                        {activityIndex.title.length > 45 && (
+                        <p className="group-hover:animate-marquee hidden group-hover:block items-center whitespace-nowrap">
+                          {activityIndex.title} {activityIndex.title}
+                        </p>)}
+                      </span>
                     </button>
                   );
                 })}
@@ -246,7 +269,9 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
           </span>
           {activity?.title}
         </h1>
-        {activity?.instructions && <p className="mb-6 font-light italic">{activity.instructions}</p>}
+        {activity?.instructions && (
+          <MarkdownTTS className="mb-6 font-light italic" controlsClassName="flex flex-row-reverse justify-between">{activity.instructions}</MarkdownTTS>
+        )}
         {activity && <Activity activity={activity} />}
         <div className="mt-auto flex">
           <button

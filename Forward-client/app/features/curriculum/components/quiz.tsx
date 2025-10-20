@@ -95,19 +95,21 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
 
   return (
     <div>
-      <p className="mb-4 text-sm font-light">{quiz.instructions}</p>
+      <div className="flex lg:flex-row flex-col justify-between">
       <p className="mb-4 text-sm text-muted-foreground italic">
         Note: Any checked answers will be automatically submitted when you leave this quiz.
       </p>
+      
       <div className="mb-4 text-sm text-muted-foreground">
         Progress: {response.completion_percentage.toFixed(0)}% complete
-      </div>
+      </div></div>
 
       {response.score !== null && (
         <div className="mb-4 text-sm font-medium">
           Score: {response.score} / {quiz.questions.length}
         </div>
       )}
+      
       
       {quiz.questions.map((question: QuestionType, questionNumber) => {
         if (currentQuestion - 1 === questionNumber)

@@ -415,7 +415,8 @@ class Identification(BaseActivity):
 class Quiz(BaseActivity):
     """Model for quiz activities that contain multiple questions and track scores."""
     passing_score = models.PositiveIntegerField(
-        help_text="Minimum score required to pass the quiz"
+        help_text="Minimum score required to pass the quiz",
+        default=80
     )
 
     feedback_config = models.JSONField(
@@ -804,6 +805,17 @@ class Concept(BaseActivity):
         except Exception as e:
             print(f"ERROR: Error generating presigned URL: {e}")
             image_url = None
+            
+        for example in self.examples:
+            print(f"DEBUG: Processing example: {example}")
+            if 'image' in example and example['image']:
+                try:
+                    presigned_url = create_presigned_url(example['image'])
+                    example['image'] = presigned_url
+                    print(f"DEBUG: Example image URL generated: {presigned_url}")
+                except Exception as e:
+                    print(f"ERROR: Error generating presigned URL for example image: {e}")
+                    example['image'] = None
         
         return {
             **super().to_dict(),

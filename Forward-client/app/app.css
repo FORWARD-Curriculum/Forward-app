@@ -13,6 +13,7 @@
   --animate-slide-down: slideDown 0.3s ease-out;
   --animate-slide-left: slideLeft 0.115s ease-out 75ms;
   --animate-slide-right: slideRight 0.115s ease-in;
+  --animate-marquee: marquee 7s linear infinite;
 
   /* Dynamic theming */
   --color-background: var(--background);
@@ -46,6 +47,18 @@
   --text-7xl: var(--txt-7xl);
   --text-8xl: var(--txt-8xl);
   --text-9xl: var(--txt-9xl);
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    5% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
 
   @keyframes slide-out-to-right {
     from {
