@@ -198,7 +198,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   }, [loaderData]);
 
   return (
-    <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:mt-14 lg:flex-row lg:items-start lg:gap-8">
+    <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:mt-7 lg:flex-row lg:items-start lg:gap-8">
       <div className="flex flex-col lg:h-full">
         <Accordion
           type="single"
@@ -207,10 +207,10 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
             client.windowDimensions.width >= 1024 ? "horizontal" : "vertical"
           }
         >
-          <AccordionItem value="1">
+          <AccordionItem value="1" className="transition-transform duration-100 ease-in-out data-[state=open]:lg:translate-x-0 data-[state=open]:translate-x-6.5">
             <AccordionTrigger className="bg-secondary border-secondary-border text-secondary-foreground data-[state=open]:border-b-muted-foreground/50 relative rounded-t-3xl border-1 p-4 duration-50 data-[state=closed]:rounded-3xl data-[state=closed]:delay-300 data-[state=open]:rounded-b-none data-[state=open]:border-b-1">
               <button
-                className={`bg-foreground absolute top-2.75 -left-15 rounded-full p-2 transition-transform duration-100 ease-in-out group-data-[state=closed]:scale-0 hover:scale-110 hover:duration-75`}
+                className={`bg-foreground absolute top-2.75 -left-15 rounded-full border-secondary-border p-2 border-1 transition-transform duration-100 ease-in-out group-data-[state=closed]:scale-0 hover:scale-110 hover:duration-75`}
                 onClick={(e) => {
                   e.stopPropagation(), setShowFullToc(!showFullToc);
                 }}
@@ -220,13 +220,13 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
               </button>
               <h1
                 title={`${lesson.lesson?.title}: Table of Contents`}
-                className="w-[30ch] overflow-hidden text-lg font-bold text-nowrap overflow-ellipsis hover:underline"
+                className="lg:w-[30ch] w-[20ch] overflow-hidden text-lg font-bold text-nowrap overflow-ellipsis hover:underline"
               >
                 {lesson.lesson?.title}: Table of Contents
               </h1>
             </AccordionTrigger>
             <AccordionContent className="bg-secondary text-secondary-foreground border-secondary-border overflow-hidden rounded-b-3xl border-1 border-t-0 pb-0 text-nowrap">
-              <div className="flex flex-col overflow-y-auto">
+              <div className="flex flex-col overflow-y-auto ">
                 {(showFullToc
                   ? lesson.lesson?.activities || []
                   : [...(lesson.lesson?.activities || [])].splice(
@@ -242,7 +242,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                     <button
                       // FIXME: for now, we are not using the response to disable the button
                       title={`${activityIndex.order}. ${activityIndex.title}`}
-                      disabled={activityIndex.order > response.highest_activity}
+                      // disabled={activityIndex.order > response.highest_activity}
                       key={activityIndex.order}
                       className={`${activityIndex.order === lesson.current_activity ? "bg-accent/40" : ""} group disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                       onClick={() => {
@@ -255,7 +255,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                       }}
                     >
                       <p>{activityIndex.order}.</p>
-                      <span className="ml-auto w-[35ch] overflow-hidden **:text-right">
+                      <span className="ml-auto lg:w-[35ch] w-[20ch]  overflow-hidden **:text-right">
                         <p
                           className={
                             activityIndex.title.length > 45
