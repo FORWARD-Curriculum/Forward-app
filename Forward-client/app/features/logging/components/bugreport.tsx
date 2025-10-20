@@ -53,89 +53,92 @@ export default function BugReport() {
       className={[
         "fixed right-3 bottom-3",
         "bg-foreground shadow-md",
-        reporting
-          ? "p-4 w-[360px] max-w-[90vw]"
-          : "p-0 w-12 h-12",
+        reporting ? "w-[360px] max-w-[90vw] p-4" : "h-12 w-12 p-0",
         reporting ? "rounded-lg" : "rounded-full",
         "transition-none duration-300 ease-out",
         "z-49",
         "overflow-hidden",
+        "text-secondary-foreground",
+        "border-foreground-border",
+        "border-1",
       ].join(" ")}
       style={{
         maxHeight: reporting ? 520 : 48,
       }}
     >
-      <button
-        type="button"
-        onClick={() => setReporting(true)}
-        aria-label="Open bug report"
-        className={[
-          reporting ? "pointer-events-none opacity-0 absolute" : "opacity-100 scale-100",
-          "transition-none",
-          "w-full h-full",
-          "grid place-items-center",
-        ].join(" ")}
-      >
-        <Bug size={20} />
-      </button>
-
-      <div
-        className={[
-          reporting
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-1 pointer-events-none",
-          "transition-none duration-300 ease-out",
-        ].join(" ")}
-      >
-        <div className="flex items-start justify-between gap-3 mb-2">
-          <h2 className="text-base font-semibold">Bug Report</h2>
-          <button
-            type="button"
-            onClick={() => setReporting(false)}
-            aria-label="Close bug report"
-            className="inline-flex items-center justify-center rounded-md p-1 hover:bg-black/10 transition"
-          >
-            <X size={16} />
-          </button>
-        </div>
-
-        <p className="text-sm text-black/80 mb-3">
-          FORWARD is developed by students just like you. Your bug reports help us
-          improve the app and fix issues. Thank you for contributing!
-        </p>
-
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-3"
+      {!reporting ? (
+        <button
+          type="button"
+          onClick={() => setReporting(true)}
+          aria-label="Open bug report"
+          className={[
+            "transition-none",
+            "h-full w-full",
+            "grid place-items-center",
+          ].join(" ")}
         >
-          <label className="block">
-            <span className="block text-sm font-medium mb-1">Description</span>
-            <textarea
-              name="description"
-              rows={4}
-              className="w-full rounded-md border border-black/15 p-2 text-sm outline-none focus:ring-2 focus:ring-black/20"
-            />
-          </label>
-
-          <label className="block">
-            <span className="block text-sm font-medium mb-1">Steps to Reproduce</span>
-            <textarea
-              name="steps"
-              rows={4}
-              className="w-full rounded-md border border-black/15 p-2 text-sm outline-none focus:ring-2 focus:ring-black/20"
-            />
-          </label>
-
-          <div className="flex justify-end">
+          <Bug size={20} />
+        </button>
+      ) : (
+        <div
+          className={[
+            reporting
+              ? "translate-y-0 opacity-100"
+              : "pointer-events-none -translate-y-1 opacity-0",
+            "transition-none duration-300 ease-out",
+          ].join(" ")}
+        >
+          <div className="mb-2 flex items-start justify-between gap-3">
+            <h2 className="text-base font-semibold">Bug Report</h2>
             <button
-              type="submit"
-              className="inline-flex items-center rounded-md bg-black text-white px-3 py-2 text-sm hover:bg-black/90 transition"
+              type="button"
+              onClick={() => setReporting(false)}
+              aria-label="Close bug report"
+              className="inline-flex items-center justify-center rounded-md p-1 transition hover:bg-black/10"
             >
-              Submit Report
+              <X size={16} />
             </button>
           </div>
-        </form>
-      </div>
+
+          <p className="text-secondary-foreground/80 mb-3 text-sm">
+            FORWARD is developed by students just like you. Your bug reports
+            help us improve the app and fix issues. Thank you for contributing!
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium">
+                Description
+              </span>
+              <textarea
+                name="description"
+                rows={4}
+                className="bg-background w-full rounded-md border border-foreground-border p-2 text-sm outline-none focus:ring-2 focus:ring-black/20"
+              />
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium">
+                Steps to Reproduce
+              </span>
+              <textarea
+                name="steps"
+                rows={4}
+                className="bg-background w-full rounded-md border border-foreground-border p-2 text-sm outline-none focus:ring-2 focus:ring-black/20"
+              />
+            </label>
+
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className="inline-flex items-center rounded-md bg-black px-3 py-2 text-sm text-white transition hover:bg-black/90 border-foreground-border border-1"
+              >
+                Submit Report
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
