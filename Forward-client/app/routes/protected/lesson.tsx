@@ -27,7 +27,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ArrowRightIcon, ArrowUpIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  ArrowUpIcon,
+  ChevronsDownUp,
+  ChevronsUpDown,
+} from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "react-router";
 import {
@@ -154,6 +159,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   const response = useSelector((state: RootState) => state.response);
   const activity = lesson.lesson?.activities[lesson.current_activity - 1];
   const [showsScrolBtn, setShowScrolBtn] = useState(false);
+  const [showFullToc, setShowFullToc] = useState(false);
 
   // Mount/Unmount
   useEffect(() => {
@@ -202,18 +208,41 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
           }
         >
           <AccordionItem value="1">
-            <AccordionTrigger className="bg-secondary border-secondary-border text-secondary-foreground data-[state=open]:border-b-muted-foreground/50 rounded-t-3xl border-1 p-4 duration-50 data-[state=closed]:rounded-3xl data-[state=closed]:delay-300 data-[state=open]:rounded-b-none data-[state=open]:border-b-1">
-              <h1 className="text-lg font-bold text-nowrap w-[30ch] overflow-hidden overflow-ellipsis" >
+            <AccordionTrigger className="bg-secondary border-secondary-border text-secondary-foreground data-[state=open]:border-b-muted-foreground/50 relative rounded-t-3xl border-1 p-4 duration-50 data-[state=closed]:rounded-3xl data-[state=closed]:delay-300 data-[state=open]:rounded-b-none data-[state=open]:border-b-1">
+              <button
+                className={`bg-foreground absolute top-2.75 -left-15 rounded-full p-2 transition-transform duration-100 ease-in-out group-data-[state=closed]:scale-0 hover:scale-110 hover:duration-75`}
+                onClick={(e) => {
+                  e.stopPropagation(), setShowFullToc(!showFullToc);
+                }}
+                title="Toggle full Table of Contents"
+              >
+                {showFullToc ? <ChevronsDownUp /> : <ChevronsUpDown />}
+              </button>
+              <h1
+                title={`${lesson.lesson?.title}: Table of Contents`}
+                className="w-[30ch] overflow-hidden text-lg font-bold text-nowrap overflow-ellipsis hover:underline"
+              >
                 {lesson.lesson?.title}: Table of Contents
               </h1>
             </AccordionTrigger>
             <AccordionContent className="bg-secondary text-secondary-foreground border-secondary-border overflow-hidden rounded-b-3xl border-1 border-t-0 pb-0 text-nowrap">
-              <div className="flex flex-col">
-                {lesson.lesson?.activities.map((activityIndex) => {
+              <div className="flex flex-col overflow-y-auto">
+                {(showFullToc
+                  ? lesson.lesson?.activities || []
+                  : [...(lesson.lesson?.activities || [])].splice(
+                      lesson.current_activity < 6
+                        ? 0
+                        : lesson.current_activity + 6 > lesson.lesson!.activities.length
+                        ? lesson.lesson!.activities.length - 12
+                        : lesson.current_activity - 6,
+                      12,
+                    )
+                ).map((activityIndex) => {
                   return (
                     <button
-                      // FIXME for now, we are not using the response to disable the button
-                      // disabled={activityIndex.order > response.highest_activity}
+                      // FIXME: for now, we are not using the response to disable the button
+                      title={`${activityIndex.order}. ${activityIndex.title}`}
+                      disabled={activityIndex.order > response.highest_activity}
                       key={activityIndex.order}
                       className={`${activityIndex.order === lesson.current_activity ? "bg-accent/40" : ""} group disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                       onClick={() => {
@@ -227,13 +256,20 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                     >
                       <p>{activityIndex.order}.</p>
                       <span className="ml-auto w-[35ch] overflow-hidden **:text-right">
-                        <p className={activityIndex.title.length > 45 ? "group-hover:hidden" : ""}>
+                        <p
+                          className={
+                            activityIndex.title.length > 45
+                              ? "group-hover:hidden"
+                              : ""
+                          }
+                        >
                           {activityIndex.title.trunc(45)}
                         </p>
                         {activityIndex.title.length > 45 && (
-                        <p className="group-hover:animate-marquee hidden group-hover:block items-center whitespace-nowrap">
-                          {activityIndex.title} {activityIndex.title}
-                        </p>)}
+                          <p className="group-hover:animate-marquee hidden items-center whitespace-nowrap group-hover:block">
+                            {activityIndex.title} {activityIndex.title}
+                          </p>
+                        )}
                       </span>
                     </button>
                   );
@@ -270,11 +306,17 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
           {activity?.title}
         </h1>
         {activity?.instructions && (
-          <MarkdownTTS className="mb-6 font-light italic" controlsClassName="flex flex-row-reverse justify-between">{activity.instructions}</MarkdownTTS>
+          <MarkdownTTS
+            className="mb-6 font-light italic"
+            controlsClassName="flex flex-row-reverse justify-between"
+          >
+            {activity.instructions}
+          </MarkdownTTS>
         )}
         {activity && <Activity activity={activity} />}
         <div className="mt-auto flex">
           <button
+            //FIXME: allows going forward even if activity is incomplete
             /*disabled={response.current_response?.partial_response || undefined}*/
             className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden"
             onClick={() => {

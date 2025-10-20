@@ -41,7 +41,7 @@ function AccordionTrigger({
         className={cn(
           "group focus-visible:border-ring focus-visible:ring-ring/50 items-start rounded-md \
           justify-between flex gap-2 data-[orientation=horizontal]:data-[state=closed]:gap-0 py-4 \
-          text-left text-sm font-medium transition-all outline-none hover:underline \
+          text-left text-sm font-medium transition-all outline-none \
           focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 \
           [&[data-state=open]>svg]:rotate-180",
           className,
