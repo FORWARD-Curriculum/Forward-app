@@ -583,6 +583,14 @@ class LessonAdmin(admin.ModelAdmin):
     search_fields = ("title", "description")
     ordering = ("order",)
     list_editable = ("order",)
+    fields = ("title","order","objectives","tags","image","image_preview")
+    readonly_fields = ("image_preview",)
+
+    
+    def image_preview(self, obj):
+        return _image_tag(obj.image.url)
+
+    image_preview.short_description = "Image Preview"
 
 
 # ---------------------------------------------------------------------
@@ -611,28 +619,16 @@ class ConceptMapAdmin(BaseActivityAdmin):
     formfield_overrides = {models.TextField: {"widget": AdminMartorWidget}}
 
 
-def _image_tag(url: str | None, max_h=150, max_w=300):
+def _image_tag(url: str | None, max_h=500, max_w=800):
     if not url:
         return "No Image"
     return format_html(
-        '<img src="{}" style="max-height: {}px; max-width: {}px;" />',
+        '<img src="{}" style="max-height: {}px; max-width: {}px; width:100%; height: 100%;" />',
         url,
         max_h,
         max_w,
     )
 
-
-def _video_tag(url: str | None, width=320, height=240):
-    if not url:
-        return "No Video"
-    return format_html(
-        '<video width="{}" height="{}" controls>'
-        '<source src="{}" type="video/mp4">'
-        "Your browser does not support the video tag.</video>",
-        width,
-        height,
-        url,
-    )
 
 
 @admin.register(TextContent, site=custom_admin_site)
@@ -645,13 +641,13 @@ class TextContentAdmin(BaseActivityAdmin):
         "title",
         "instructions",
         "content",
-        "image_upload",
+        "image",
         "image_preview",
     )
     readonly_fields = ("image_preview",)
 
     def image_preview(self, obj):
-        return _image_tag(storage_url(obj.image))
+        return _image_tag(obj.image.url)
 
     image_preview.short_description = "Image Preview"
 
@@ -659,11 +655,26 @@ class TextContentAdmin(BaseActivityAdmin):
 @admin.register(Video, site=custom_admin_site)
 class VideoAdmin(BaseActivityAdmin):
     grouping = "Activities"
+    fields = (
+        "lesson",
+        "order",
+        "title",
+        "instructions",
+        "video",
+        "video_preview",
+    )
     readonly_fields = ("video_preview",)
 
     def video_preview(self, obj):
-        return _video_tag(storage_url(obj.video))
-
+        return format_html(
+            '<video width="{}" height="{}" controls>'
+            '<source src="{}" type="video/mp4">'
+            "Your browser does not support the video tag.</video>",
+            800,
+            500,
+            obj.video.url,
+        )
+        
     video_preview.short_description = "Video Preview"
 
 

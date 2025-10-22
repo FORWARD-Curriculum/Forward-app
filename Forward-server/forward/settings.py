@@ -208,12 +208,12 @@ if DEBUG: # uses Minio for development
                 "bucket_name": "media-bucket",
                 "access_key": "minioadmin",
                 "secret_key": "minioadmin",
-                "endpoint_url": "http://minio:9000",
-                "custom_domain": "http://localhost:9000", # test
-                "url_protocol": "http:",
-                "default_acl": "public-read",
-                "querystring_auth": False,
-                "use_ssl": False # set to false for local development
+                "endpoint_url": "http://localhost:9000",
+                # "custom_domain": "http://localhost:9000", # test
+                # "url_protocol": "http:",
+                # "default_acl": "public-read",
+                "querystring_auth": True,
+                # "use_ssl": False # set to false for local development
             }
         },
         # Required to satisfy django storages but we do not use static files i believe

@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
 from django.urls import reverse
 from django.contrib.postgres.fields import ArrayField
+from django.core.validators import FileExtensionValidator
 import uuid
 import boto3  # pyright: ignore[reportMissingImports]
 from django.conf import settings
@@ -193,7 +194,9 @@ class Lesson(models.Model):
         help_text="Tags for categorizing and searching lessons"
     )
     
-    image = models.CharField(null=True, blank=True, max_length=200, help_text="Optional image to represent the lesson")
+    # image = models.CharField(null=True, blank=True, max_length=200, help_text="Optional image to represent the lesson")
+    image = models.ImageField(upload_to='public/lesson/', null=True, blank=True,
+                              help_text="Optional image to represent the lesson in the dashboard")
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -234,7 +237,7 @@ class Lesson(models.Model):
             "objectives": self.objectives,
             "order": self.order,
             "tags": self.tags,
-            "image": create_presigned_url(self.image) if self.image else None,
+            "image": self.image.url if self.image else None,
         }
 
 
@@ -274,7 +277,7 @@ class BaseActivity(models.Model):
     )
 
     order = models.PositiveIntegerField(
-        help_text="Order within the lesson"
+        help_text="Order of the activity within the lesson. When creating a new activity,<br> this value should be 1 + the number of activities in the lesson found above."
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -314,8 +317,11 @@ class TextContent(BaseActivity):
 
     )
 
-    image = models.TextField(
-        null=True, blank=True, help_text="Optional image to accompany the text content")
+    # image = models.TextField(
+    #     null=True, blank=True, help_text="Optional image to accompany the text content")
+    
+    image = models.ImageField(upload_to='public/textcontent/', null=True, blank=True, help_text="Optional image to accompany the text content")
+    
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -333,7 +339,7 @@ class TextContent(BaseActivity):
         return {
             **super().to_dict(),
             "content": self.content,
-            "image": create_presigned_url(self.image) if self.image else None,
+            "image": self.image.url if self.image else None,
         }
 
 
@@ -342,9 +348,9 @@ class Video(BaseActivity):
     Model for video content within a lesson.
     Can be used to embed videos from external sources or local files.
     """
-    video = models.TextField(
-        help_text="URL of the video to be embedded"
-    )
+    video = models.FileField(
+        upload_to="public/video/",
+        validators=[FileExtensionValidator(allowed_extensions=['mp4'])])
 
     scrubbable = models.BooleanField(
         default=False,
@@ -362,7 +368,7 @@ class Video(BaseActivity):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "video": create_presigned_url(self.video),
+            "video": self.video.url,
         }
 
 
@@ -781,7 +787,7 @@ class Concept(BaseActivity):
         help_text="The concept map this concept belongs to"
     )
 
-    image = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='publiic/concept/', blank=False, null=False, help_text="An image representing the concept.")
 
     description = models.TextField(
         help_text="A detailed description of the concept"
@@ -797,33 +803,14 @@ class Concept(BaseActivity):
         verbose_name_plural = "Concept Map Concepts"
     
     def to_dict(self):
-        print(f"DEBUG: to_dict() method called for concept ID: {self.id}")
-        
-        try:
-            image_url = create_presigned_url(self.image) if self.image else None
-            print(f"DEBUG: Image URL generated: {image_url}")
-        except Exception as e:
-            print(f"ERROR: Error generating presigned URL: {e}")
-            image_url = None
-            
-        for example in self.examples:
-            print(f"DEBUG: Processing example: {example}")
-            if 'image' in example and example['image']:
-                try:
-                    presigned_url = create_presigned_url(example['image'])
-                    example['image'] = presigned_url
-                    print(f"DEBUG: Example image URL generated: {presigned_url}")
-                except Exception as e:
-                    print(f"ERROR: Error generating presigned URL for example image: {e}")
-                    example['image'] = None
-        
         return {
             **super().to_dict(),
             "id": self.id,
-            "image": image_url,
+            "image": self.image.url,
             "description": self.description,
             "examples": self.examples,
         }
+        
 # Helper method to generate presigned urls
 """
 There might be a better way to do this useing django storages settings setting it to presigned url without creating a client here
@@ -862,6 +849,7 @@ def create_presigned_url(s3_key):
     if (settings.DEBUG):
         print(f"SUCCESS: Generated presigned URL: {response}")
     return response
+
     
 
 
