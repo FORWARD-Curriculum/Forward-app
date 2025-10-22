@@ -201,6 +201,27 @@ export default function account() {
     }
   };
 
+  const clearLessonData = async () => {
+    try {
+      const response = await apiFetch(``, {
+        method: "DELETE"
+      });
+
+      const result = await response.json();
+
+      if (!response.ok){
+        throw new Error(result.detail || "Reset Failed");
+      }
+
+      //add correct toast here later
+      toast.success("Lesson progress rest successfully!")
+    }
+    catch (err: any){
+      //add error toast here
+      toast.error(err.message || "Failed to resest progress")
+    }
+  }
+
   return (
     <div className="flex w-screen grow items-center justify-center">
       <form
@@ -288,6 +309,13 @@ export default function account() {
                 >
                   Remove Picture
                 </button>
+                {['student1', 'student2'].includes(user.username) && (
+                  <Button
+                    onClick={clearLessonData}
+                  >
+                    Clear Lesson Progress
+                  </Button>
+                )}
               </div>
             </div>
           </div>
