@@ -149,8 +149,15 @@ class ResetStudentProgressView(APIView):
 
         user = request.user
 
+        #failsafe on teh chance of frontend manipulation
+        if user.username not in ['student1', 'student2']:
+            return Response(
+                {"error": "Unauthorized: only test acounts can reset progress"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         manager = ActivityManager()
-        for activity_name, (ActivityClass, ResponseClass, _, __, ___) in manager.registered_activities.items():
+        for activity_name, (ActivityClass, ResponseClass, _, __, ___) in manager.registered_activities.items(): # syntax for unpacking tuple / activity manager
             if ResponseClass:  # some activities have no response (like Concept)
                 ResponseClass.objects.filter(user=user).delete()
 
