@@ -138,6 +138,28 @@ class CurrentUserView(APIView):
             data=serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+
+class ResetStudentProgressView(APIView):
+
+    permission_classes=[IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        """Delete all lesson response data for teh current user"""
+
+        user = request.user
+
+        manager = ActivityManager()
+        for activity_name, (ActivityClass, ResponseClass, _, __, ___) in manager.registered_activities.items():
+            if ResponseClass:  # some activities have no response (like Concept)
+                ResponseClass.objects.filter(user=user).delete()
+
+
+        return json_go_brrr(
+            message="All lesson progress reset successfully",
+            status=status.HTTP_200_OK
+        )
+      
 
 
 class QuizView(APIView):
