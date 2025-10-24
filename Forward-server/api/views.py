@@ -12,6 +12,10 @@ from core.services import UserService, LessonService, QuizResponseService, Respo
 from .utils import json_go_brrr, messages
 from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, User
 from rest_framework import serializers, request
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -173,7 +177,8 @@ class GetLessonIds(APIView):
 
 
 class CurriculumView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] # need to double check this
 
     def get(self, request, *args, **kwargs):
         '''
@@ -184,9 +189,18 @@ class CurriculumView(APIView):
         if not lessons:
             return Response({"detail": "cannot find any lessons"}, status=status.HTTP_404_NOT_FOUND)
 
+        lesson_data = []
+        for i in lessons:
+            data = i.to_dict()
+            if request.user.is_authenticated:
+                data["completion"] = LessonService.get_lesson_completion(request.user, i)
+            else:
+                data["completion"] = 0 
+            lesson_data.append(data)
         return Response({
             "detail": messages['successful_id'],
-            "data": [{**l.to_dict(), "completion": LessonService.get_lesson_completion(request.user, l)} for l in lessons]},
+            # "data": [{**l.to_dict(), "completion": LessonService.get_lesson_completion(request.user, l)} for l in lessons]},
+            "data": lesson_data},
             status=status.HTTP_200_OK)
 
 
