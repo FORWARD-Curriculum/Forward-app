@@ -120,44 +120,47 @@
       "title": "Sorting Wants and Needs",
       "instructions": "Sort the list of <def def='Money spent on items or services.'>expenses</def> into '<strong>Wants</strong>', '<strong>Needs</strong>', or 'Not <def def='Something that fits or makes sense for a certain situation.'>Applicable</def> to Me.' Identifying the difference between wants and needs becomes important when you are trying to manage your finances. This will help later when you start to build a <def def='A plan for managing income and spending over a period of time.'>budget</def> and determine how to <def def='Distribute or set aside money for specific purposes.'>allocate</def> money. There are no right or wrong answers--just sort based on your opinion.",
       "content": [
-        ["Wants"],
-        ["Needs"],
-        ["Not Applicable to Me"],
-        [
-          "Housing",
-          "Fashionable clothes",
-          "Monthly haircuts",
-          "Childcare",
-          "Car insurance",
-          "Gas for car",
-          "Other transportation costs",
-          "Streaming services (example: Netflix, Hulu)",
-          "Monthly mobile phone plan",
-          "Health insurance",
-          "Gym membership",
-          "Groceries",
-          "Donations to charity or religious organization",
-          "Clothes",
-          "Air conditioning/heating",
-          "Electricity",
-          "Running water",
-          "Pet expenses",
-          "Video games",
-          "Concert/event tickets",
-          "Personal vehicle upgrades (example: custom paint jobs)",
-          "School supplies",
-          "Medical costs (example: prescriptions)",
-          "Hygiene products (example: toothpaste, shampoo)",
-          "Eating out",
-          "Vacation",
-          "Internet subscription",
-          "Books or ebooks",
-          "Gifts for friends and family",
-          "Clothes for special events",
-          "Savings"
-        ]
+        { "category": "Wants", "matches": [] },
+        { "category": "Needs", "matches": [] },
+        {
+          "category": "Not Applicable to Me",
+          "matches": [
+            "Housing",
+            "Fashionable clothes",
+            "Monthly haircuts",
+            "Childcare",
+            "Car insurance",
+            "Gas for car",
+            "Other transportation costs",
+            "Streaming services (example: Netflix, Hulu)",
+            "Monthly mobile phone plan",
+            "Health insurance",
+            "Gym membership",
+            "Groceries",
+            "Donations to charity or religious organization",
+            "Clothes",
+            "Air conditioning/heating",
+            "Electricity",
+            "Running water",
+            "Pet expenses",
+            "Video games",
+            "Concert/event tickets",
+            "Personal vehicle upgrades (example: custom paint jobs)",
+            "School supplies",
+            "Medical costs (example: prescriptions)",
+            "Hygiene products (example: toothpaste, shampoo)",
+            "Eating out",
+            "Vacation",
+            "Internet subscription",
+            "Books or ebooks",
+            "Gifts for friends and family",
+            "Clothes for special events",
+            "Savings"
+          ]
+        }
       ],
-      "feedback_config": {
+      "strict": false,
+      "_comment_feedback_config": {
         "condition": "if more than 15 items are placed in any single category",
         "message": "Hold up! Are you sure that all of these items belong in this box? Which ones could you move to other boxes?"
       }
@@ -287,74 +290,73 @@
       "video": "Types of Pay.mp4",
       "scrubbable": false
     },
-    
-      {
-        "type": "textcontent",
-        "title": "Understanding Paychecks",
-        "instructions": null,
-        "content": "After you get paid, your money has to go somewhere--and there are a couple of ways that can happen. Some people get their paycheck through direct deposit, which means the money goes straight into their bank account. Others get a paper paycheck they can take to a bank or cash at a check-cashing place.\n\n![ATM cash checking](atm cash checking.jpg)"
-      },
-      {
-        "type": "textcontent",
-        "title": "Checking Accounts",
-        "instructions": null,
-        "content": "It's a good idea to have a checking account, which helps you keep your money safe and makes it easy to pay for things using a debit card.\n\n![Online banking](online banking.jpg)"
-      },
-      {
-        "type": "textcontent",
-        "title": "What Is Debit?",
-        "instructions": null,
-        "content": "Now let's talk about debit. A debit is money taken out of your bank account to pay for something. When you use a debit card, the money comes out right away. It's money you already earned. If you don't keep track of how much you spend, you might run out before your next paycheck--and that can cause problems like <def def='a banking fee that occurs if you spend more money than you have available'>overdraft fees</def> or missed payments.\n\n![Debit purchase](pexels-woodysmedia-2858691-4395057.jpg)"
-      },
-      {
-        "type": "textcontent",
-        "title": "Budgeting Tip",
-        "instructions": null,
-        "content": "Tip: Always know how much money is coming in and how much is going out. That's how you stay in control of your money.\n\n![Budgeting](budgeting.jpg)"
-      },
-      {
-        "type": "textcontent",
-        "title": "What Is Credit?",
-        "instructions": null,
-        "content": "Some people use credit cards to pay for things instead of using money they already have. When you use a credit card, you're borrowing money from a bank or company--and you promise to pay it back later.\n\n![Credit card](cool man credit card.jpg)"
-      },
-      {
-        "type": "textcontent",
-        "title": "Credit and Interest",
-        "instructions": null,
-        "content": "Unlike debit cards, the money doesn't come out of your account right away. But if you don't pay it back on time, you can be charged <def def='extra money charged when borrowing money or earned when saving money'>interest</def>, which means you'll owe even more than you spent.\n\n![Empty wallet](empty wallet.jpg)"
-      },
-      {
-        "type": "textcontent",
-        "title": "Credit Limits",
-        "instructions": null,
-        "content": "Most credit cards come with a credit limit, which is the maximum amount you're allowed to borrow. If you go over that amount, your card might be declined or you might get charged extra fees.\n\n![Declined payment](declined payment.jpg)"
-      },
-      {
-        "type": "textcontent",
-        "title": "Applying for a Credit Card",
-        "instructions": null,
-        "content": "To get a credit card, you usually need to apply through a bank or credit union, and they'll check things like your income or credit history to decide if you qualify.\n\n![Bank application](bank application.jpg)"
-      },
-      {
-        "type": "textcontent",
-        "title": "Building Credit",
-        "instructions": null,
-        "content": "Using credit can help you build a credit score, which shows how good you are at paying back money. A good credit score can help you in the future if you want to rent an apartment, buy a car, or even get some jobs. But using credit the wrong way--like spending more than you can pay back--can hurt your score and make it harder to borrow money later.\n\n![First home](first home.jpg)"
-      },
-      {
-        "type": "textcontent",
-        "title": "Credit Score Range",
-        "instructions": null,
-        "content": "A credit score is usually a number between 300 and 850--the higher the number, the better. A score of 670 or higher is generally considered good and can help you get approved for loans, credit cards, and lower interest rates.\n\n![Thumbs up](thumbs up.jpg)"
-      },
-      {
-        "type": "textcontent",
-        "title": "Credit Tip",
-        "instructions": null,
-        "content": "Tip: Only use credit when you know you can pay it back--and try to pay off the full amount each month. That way, you avoid extra fees and build a strong credit history.\n\n![Chase bank](chase bank.jpg)"
-      }
-    ,
+
+    {
+      "type": "textcontent",
+      "title": "Understanding Paychecks",
+      "instructions": null,
+      "content": "After you get paid, your money has to go somewhere--and there are a couple of ways that can happen. Some people get their paycheck through direct deposit, which means the money goes straight into their bank account. Others get a paper paycheck they can take to a bank or cash at a check-cashing place.\n\n![ATM cash checking](atm cash checking.jpg)"
+    },
+    {
+      "type": "textcontent",
+      "title": "Checking Accounts",
+      "instructions": null,
+      "content": "It's a good idea to have a checking account, which helps you keep your money safe and makes it easy to pay for things using a debit card.\n\n![Online banking](online banking.jpg)"
+    },
+    {
+      "type": "textcontent",
+      "title": "What Is Debit?",
+      "instructions": null,
+      "content": "Now let's talk about debit. A debit is money taken out of your bank account to pay for something. When you use a debit card, the money comes out right away. It's money you already earned. If you don't keep track of how much you spend, you might run out before your next paycheck--and that can cause problems like <def def='a banking fee that occurs if you spend more money than you have available'>overdraft fees</def> or missed payments.\n\n![Debit purchase](pexels-woodysmedia-2858691-4395057.jpg)"
+    },
+    {
+      "type": "textcontent",
+      "title": "Budgeting Tip",
+      "instructions": null,
+      "content": "Tip: Always know how much money is coming in and how much is going out. That's how you stay in control of your money.\n\n![Budgeting](budgeting.jpg)"
+    },
+    {
+      "type": "textcontent",
+      "title": "What Is Credit?",
+      "instructions": null,
+      "content": "Some people use credit cards to pay for things instead of using money they already have. When you use a credit card, you're borrowing money from a bank or company--and you promise to pay it back later.\n\n![Credit card](cool man credit card.jpg)"
+    },
+    {
+      "type": "textcontent",
+      "title": "Credit and Interest",
+      "instructions": null,
+      "content": "Unlike debit cards, the money doesn't come out of your account right away. But if you don't pay it back on time, you can be charged <def def='extra money charged when borrowing money or earned when saving money'>interest</def>, which means you'll owe even more than you spent.\n\n![Empty wallet](empty wallet.jpg)"
+    },
+    {
+      "type": "textcontent",
+      "title": "Credit Limits",
+      "instructions": null,
+      "content": "Most credit cards come with a credit limit, which is the maximum amount you're allowed to borrow. If you go over that amount, your card might be declined or you might get charged extra fees.\n\n![Declined payment](declined payment.jpg)"
+    },
+    {
+      "type": "textcontent",
+      "title": "Applying for a Credit Card",
+      "instructions": null,
+      "content": "To get a credit card, you usually need to apply through a bank or credit union, and they'll check things like your income or credit history to decide if you qualify.\n\n![Bank application](bank application.jpg)"
+    },
+    {
+      "type": "textcontent",
+      "title": "Building Credit",
+      "instructions": null,
+      "content": "Using credit can help you build a credit score, which shows how good you are at paying back money. A good credit score can help you in the future if you want to rent an apartment, buy a car, or even get some jobs. But using credit the wrong way--like spending more than you can pay back--can hurt your score and make it harder to borrow money later.\n\n![First home](first home.jpg)"
+    },
+    {
+      "type": "textcontent",
+      "title": "Credit Score Range",
+      "instructions": null,
+      "content": "A credit score is usually a number between 300 and 850--the higher the number, the better. A score of 670 or higher is generally considered good and can help you get approved for loans, credit cards, and lower interest rates.\n\n![Thumbs up](thumbs up.jpg)"
+    },
+    {
+      "type": "textcontent",
+      "title": "Credit Tip",
+      "instructions": null,
+      "content": "Tip: Only use credit when you know you can pay it back--and try to pay off the full amount each month. That way, you avoid extra fees and build a strong credit history.\n\n![Chase bank](chase bank.jpg)"
+    },
     {
       "type": "twine",
       "title": "Spend or Save: Decision Game",
@@ -709,45 +711,49 @@
       "instructions": "Great work on budgeting your vacation! You have planned to spend $xxxx and have $zzzz leftover. You have a few options on how to spend or save your remaining money. Since this is a zero-based budget, the goal is to plan for every dollar! Let's see how close to $1200 you can get. Select what else you would like to spend money on for your vacation.\n\nThis part of the activity will not calculate your money for you, so you should use a calculator or a piece of paper to make sure you don't go over budget! Select as many items as you would like that will fit within your budget.",
       "_comment": "Tech Note: Replace $xxxx and $zzzz dynamically with values from the previous page (total spent and remaining balance). Implement this activity as either a checklist or drag-and-drop, with a single category labeled 'Additional Vacation Purchases' that can accept multiple items. Include a 'See More' button halfway down the list to expand the second half.",
       "content": [
-        [
-          "Additional Vacation Purchases",
-          "Custom postcards $10",
-          "Special dessert $10",
-          "Fitness class $10",
-          "Portable charger $10",
-          "Sunscreen $10",
-          "Guided tour $20",
-          "Scooter rental $20",
-          "First aid kit $20",
-          "Wifi Hotspot $30",
-          "Live sporting event $30",
-          "Food delivery $30",
-          "Reusable water bottle $30",
-          "Memory book of photos $30",
-          "Rideshare to attractions further away $40",
-          "Attend a local play/musical $40",
-          "Art class $40",
-          "Travel backpack $40",
-          "Specialty coffee daily $40",
-          "Packing organizers $40",
-          "_See more_",
-          "Extra snacks $50",
-          "Spa day or massage $50",
-          "Travel gear $50",
-          "Photoshoot $50",
-          "Specialty foods $50",
-          "Water park day pass $60",
-          "Upscale restaurant dinner $70",
-          "Private cabana rental at the beach $70",
-          "Polaroid camera rental $70",
-          "Perfume/cologne $80",
-          "Travel insurance $100",
-          "Extreme sport $130",
-          "Sunset cruise $140",
-          "Shopping spree $150",
-          "Helicopter ride $200"
-        ]
-      ]
+        {
+          "category": "Additional Vacation Purchases",
+          "matches": [
+            "Additional Vacation Purchases",
+            "Custom postcards $10",
+            "Special dessert $10",
+            "Fitness class $10",
+            "Portable charger $10",
+            "Sunscreen $10",
+            "Guided tour $20",
+            "Scooter rental $20",
+            "First aid kit $20",
+            "Wifi Hotspot $30",
+            "Live sporting event $30",
+            "Food delivery $30",
+            "Reusable water bottle $30",
+            "Memory book of photos $30",
+            "Rideshare to attractions further away $40",
+            "Attend a local play/musical $40",
+            "Art class $40",
+            "Travel backpack $40",
+            "Specialty coffee daily $40",
+            "Packing organizers $40",
+            "_See more_",
+            "Extra snacks $50",
+            "Spa day or massage $50",
+            "Travel gear $50",
+            "Photoshoot $50",
+            "Specialty foods $50",
+            "Water park day pass $60",
+            "Upscale restaurant dinner $70",
+            "Private cabana rental at the beach $70",
+            "Polaroid camera rental $70",
+            "Perfume/cologne $80",
+            "Travel insurance $100",
+            "Extreme sport $130",
+            "Sunset cruise $140",
+            "Shopping spree $150",
+            "Helicopter ride $200"
+          ]
+        }
+      ],
+      "strict": false
     },
     {
       "type": "fillintheblank",

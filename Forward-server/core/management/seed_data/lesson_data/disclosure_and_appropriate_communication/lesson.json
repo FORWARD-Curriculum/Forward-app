@@ -353,7 +353,7 @@
       },
       "questions": [
         "That you got a bad grade on a test.",
-        "That you're nervous before a sports game.",
+        "That you're nervous before a sportjs game.",
         "That you have a crush on someone at school.",
         "A photo of your report card.",
         "How much money you made at work.",
@@ -367,7 +367,8 @@
         "That you got in trouble with the law.",
         "That your cousin is pregnant.",
         "Something you're proud of achieving."
-      ]
+      ],
+      "_comment": "FIXME: this is formatted incorrectly"
     },
     {
       "type": "writing",

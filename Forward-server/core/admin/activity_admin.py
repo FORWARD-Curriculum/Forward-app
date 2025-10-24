@@ -1,0 +1,302 @@
+from core.models import (Lesson, ActivityManager, BaseActivity, Twine, TextContent, Quiz, Question, Poll, PollQuestion, Writing, Embed, DndMatch, Concept, ConceptMap, Video, LikertScale, FillInTheBlank, Identification)
+from django import forms
+from .admin import custom_admin_site
+from django.utils.html import format_html
+from django.contrib import admin
+import json
+from pathlib import Path
+from django.core.files.storage import default_storage
+from django.urls import reverse
+from django.utils.text import capfirst
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        if not data:
+            return []
+        single_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            return [single_clean(d, initial) for d in data]
+        return [single_clean(data, initial)]
+
+class JsonAdminMixin:
+    def formatted_json_field(self, obj, field_name):
+        data = getattr(obj, field_name, None)
+        if data:
+            pretty = json.dumps(data, indent=2)
+            return format_html(
+                '<pre style="white-space: pre-wrap; word-break: break-all;">{}</pre>',
+                pretty,
+            )
+        return "Empty"
+
+    def display_content_as_json(self, obj):
+        return self.formatted_json_field(obj, "content")
+
+    display_content_as_json.short_description = "Content (Formatted)"
+
+    def display_prompts_as_json(self, obj):
+        return self.formatted_json_field(obj, "prompts")
+
+    display_prompts_as_json.short_description = "Prompts (Formatted)"
+
+
+def save_file(uploaded_file, key_prefix: str) -> str:
+    """
+    Save a file to default storage under public/{key_prefix}{filename}.
+    Replaces any existing file with the same key.
+    Returns the saved storage key.
+    """
+    file_key = f"public/{key_prefix}{Path(uploaded_file.name).name}"
+    if default_storage.exists(file_key):
+        default_storage.delete(file_key)
+    return default_storage.save(file_key, uploaded_file)
+
+# ---------------------------------------------------------------------
+# Curriculum
+# ---------------------------------------------------------------------
+
+@admin.register(Lesson, site=custom_admin_site)
+class LessonAdmin(admin.ModelAdmin):
+    grouping = "Curriculum"
+    list_display = ("title", "order", "created_at", "updated_at")
+    search_fields = ("title", "description")
+    ordering = ("order",)
+    list_editable = ("order",)
+    
+    fields = ("title", "order", "objectives", "tags", "image", "image_preview", "sorted_activities")
+    readonly_fields = ("image_preview", "sorted_activities")
+
+    def sorted_activities(self, obj: Lesson):
+        """
+        Gathers all related activity instances from various registered models,
+        sorts them by their 'order' attribute, and renders them as an HTML list
+        with links to their admin change pages.
+        """
+        if not obj.id:
+            return format_html("<strong>Save the lesson to view and add activities.</strong>")
+
+        all_activities = []
+        
+        for value in ActivityManager.registered_activities.values():
+            ActivityModel, child_class = value[0], value[3]
+            if not child_class:
+                activities = list(ActivityModel.objects.filter(
+                    lesson=obj))
+                for activity in activities:
+                    all_activities.append(activity)
+
+        all_activities.sort(key=lambda x: x.order)
+
+        if not all_activities:
+            return "No activities found for this lesson."
+
+        # Build the HTML list
+        html_list_items = []
+        for activity in all_activities:
+            meta = activity._meta
+            
+            # Generate the URL to the admin change view for the specific activity object
+            url = reverse(f'admin:{meta.app_label}_{meta.model_name}_change', args=(activity.pk,))
+            
+            # Create a list item with the model name, a link to the object, and its order
+            list_item = format_html(
+                '<tr style="margin-bottom: 5px;">'
+                    '<td>{order}</td>'
+                    '<td>{model_name}</a></td>'
+                    '<td><a href="{url}">{obj_str}</a></td>'
+                '</tr>',
+                model_name=capfirst(meta.verbose_name),
+                url=url,
+                obj_str=str(activity),
+                order=activity.order
+            )
+            html_list_items.append(list_item)
+        
+        return format_html(
+            '<style>'
+            '.readonly:has(table) {{flex-grow: 1;}}'
+            '</style>'
+            '<table style="width: 100%;">'
+            '<thead>'
+                '<tr>'
+                    '<th scope="col">'
+                        '<div class="text">Order</div>'
+                    '</th>'
+                    '<th scope="col">'
+                        '<div class="text">Type</div>'
+                    '</th>'
+                    '<th scope="col">'
+                        '<div class="text">Title</div>'
+                    '</th>'
+                '</tr>'
+            '</thead>'
+            '<tbody>{}</tbody>''</table>', format_html("".join(html_list_items)))
+
+    sorted_activities.short_description = "Activities (sorted by order)"
+
+    # The get_inlines method is no longer needed with this approach.
+    # def get_inlines(self, request, obj=None):
+    #     ...
+
+    def image_preview(self, obj):
+        if obj.image and hasattr(obj.image, 'url'):
+            return _image_tag(obj.image.url)
+        return "No Image"
+
+    image_preview.short_description = "Image Preview"
+
+
+# ---------------------------------------------------------------------
+# Activities
+# ---------------------------------------------------------------------
+
+
+def _image_tag(url: str | None, max_h=500, max_w=800):
+    if not url:
+        return "No Image"
+    return format_html(
+        '<img src="{}" style="max-height: {}px; max-width: {}px; width:100%; height: 100%;" />',
+        url,
+        max_h,
+        max_w,
+    )
+
+class BaseActivityAdmin(admin.ModelAdmin):
+    list_display = ("title", "lesson", "order", "updated_at")
+    list_filter = ("lesson",)
+    search_fields = ("title", "instructions")
+    ordering = ("lesson", "order")
+    list_editable = ("order",)
+    
+
+class QuestionInline(admin.TabularInline):
+    model = Question
+    extra = 1
+    ordering = ("order",)
+
+@admin.register(Quiz, site=custom_admin_site)
+class QuizAdmin(BaseActivityAdmin):
+    grouping = "Activities"
+    inlines = [QuestionInline]
+    list_display = ("title", "lesson", "order", "passing_score")
+
+
+class ConceptInline(admin.StackedInline):
+    model = Concept
+    extra = 1
+    ordering = ("order",)
+    fields = ("order", "title", "description", "image", "examples")
+
+
+@admin.register(ConceptMap, site=custom_admin_site)
+class ConceptMapAdmin(BaseActivityAdmin):
+    grouping = "Activities"
+    inlines = [ConceptInline]
+
+@admin.register(TextContent, site=custom_admin_site)
+class TextContentAdmin(BaseActivityAdmin):
+    grouping = "Activities"
+    readonly_fields = ("image_preview",)
+
+    def image_preview(self, obj):
+        return _image_tag(obj.image.url)
+
+    image_preview.short_description = "Image Preview"
+
+
+@admin.register(Video, site=custom_admin_site)
+class VideoAdmin(BaseActivityAdmin):
+    grouping = "Activities"
+    readonly_fields = ("video_preview",)
+
+    def video_preview(self, obj):
+        return format_html(
+            '<video width="{}" height="{}" controls>'
+            '<source src="{}" type="video/mp4">'
+            "Your browser does not support the video tag.</video>",
+            800,
+            500,
+            obj.video.url,
+        )
+        
+    video_preview.short_description = "Video Preview"
+
+class TwineAdminForm(forms.ModelForm):
+    images_upload = MultipleFileField(
+        required=False,
+        help_text=(
+            "Upload all referenced images for the Twine file. "
+            "They will be saved to the S3 bucket."
+        ),
+    )
+
+    class Meta:
+        model = Twine
+        # exclude = ("title",)
+        fields = '__all__'
+
+    def save(self, commit=True):
+        uploaded_images = self.cleaned_data.get("images_upload")
+        if uploaded_images:
+            for uf in uploaded_images:
+                save_file(uf, "twine/")
+
+        uploaded_file = self.cleaned_data.get("file_upload")
+        if uploaded_file:
+            uploaded_file.seek(0)
+            self.instance.file = uploaded_file.read().decode("utf-8")
+        return super().save(commit=commit)
+
+@admin.register(Twine, site=custom_admin_site)
+class TwineAdmin(BaseActivityAdmin):
+    grouping = "Activities"
+    form = TwineAdminForm
+    list_display = ("title", "lesson", "order")
+    
+    # TODO: embed twine in page as twine_preview
+
+    # def file_snippet(self, obj):
+    #     return obj.file[:100] + "..." if obj.file else "No content"
+
+    # file_snippet.short_description = "File Content Snippet"
+
+
+@admin.register(Writing, site=custom_admin_site)
+class WritingAdmin(BaseActivityAdmin, JsonAdminMixin):
+    grouping = "Activities"
+    readonly_fields = ("display_prompts_as_json",)
+
+
+@admin.register(DndMatch, site=custom_admin_site)
+class DndMatchAdmin(BaseActivityAdmin, JsonAdminMixin):
+    grouping = "Activities"
+    readonly_fields = ("display_content_as_json",)
+
+
+@admin.register(FillInTheBlank, site=custom_admin_site)
+class FillInTheBlankAdmin(BaseActivityAdmin, JsonAdminMixin):
+    grouping = "Activities"
+    readonly_fields = ("display_content_as_json",)
+    # TODO: content needs a lengthy desscription of the text formatting
+
+
+@admin.register(LikertScale, site=custom_admin_site)
+class LikertScaleAdmin(BaseActivityAdmin, JsonAdminMixin):
+    grouping = "Activities"
+    readonly_fields = ("display_content_as_json",)
+
+
+@admin.register(Identification, site=custom_admin_site)
+class IdentificationAdmin(BaseActivityAdmin):
+    grouping = "Activities"
+
+
+custom_admin_site.register(Embed, BaseActivityAdmin, grouping="Activities")

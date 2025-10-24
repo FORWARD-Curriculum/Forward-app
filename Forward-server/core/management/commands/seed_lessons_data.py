@@ -319,8 +319,8 @@ class Command(BaseCommand):
                 example_image = example.get('image')
                 print(f"DEBUG: Processing concept example with image: {example_image}")
                 try:
-                    self.bucket_url_call(example_image)
-                    example['image'] = f"public/{example_image}"
+                    self.bucket_url_call(example_image,key_prefix="concept/")
+                    example['image'] = f"public/concept/{example_image}"
                 except Exception as e:
                     self.stdout.write(self.style.ERROR(f"    Failed to upload example image '{example_image}' for concept (Order: {order}): {e}"))
                     example['image'] = None  # Set to None or handle as needed
