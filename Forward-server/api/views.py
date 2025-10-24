@@ -238,13 +238,18 @@ class LessonView(APIView):
 
 
 class LessonContentView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
         lesson_id = kwargs.get('id')
         lesson = LessonService.get_lesson_content(lesson_id=lesson_id)
-        response = ResponseService.get_response_data(
-            lesson_id=lesson_id, user=request.user)
+
+        if (request.user.is_authenticated):
+            response = ResponseService.get_response_data(
+                lesson_id=lesson_id, user=request.user)
+        else:
+            response = {} # empty for now
 
         return json_go_brrr(
             message="Successfully retrieved lesson content",
@@ -253,6 +258,13 @@ class LessonContentView(APIView):
         )
 
     def post(self, request, *args, **kwargs):
+
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "Guest users cannot save responses"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
         data_type = self.request.body.data_type
         time = self.request.body.time
         score = self.request.body.score
