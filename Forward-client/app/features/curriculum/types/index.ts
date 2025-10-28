@@ -160,8 +160,13 @@ export interface PollQuestion {
 }
 
 export interface DndMatch extends BaseActivity {
-  content: string[][];
+  content: {
+    category: string;
+    matches: (string | { image: string; key: string })[];
+  }[];
+  strict: boolean;
 }
+
 
 export interface FillInTheBlank extends BaseActivity {
   content: string[];
@@ -285,7 +290,10 @@ export interface EmbedResponse extends BaseResponse {
   inputted_code: string;
 }
 export interface DndMatchResponse extends BaseResponse {
-  submission: number[][][];
+  submission: {
+    category: string;
+    matches: (string | { image: string; key: string })[];
+  }[];
 }
 
 export interface LikertScaleResponse extends BaseResponse {

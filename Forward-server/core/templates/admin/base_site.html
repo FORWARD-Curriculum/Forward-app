@@ -1,6 +1,9 @@
 {% extends "admin/base_site.html" %}
 {% block extrahead %}
     <style>
+        .rjf-form-group, .rjf-form-group-wrapper {
+            max-width: 100% !important;
+        }
             {% comment %} div.martor-preview, .ace-github {
                 background: var(--body-bg) !important;
                 color: var(--body-fg);
@@ -9,7 +12,7 @@
             body {
                 background: var(--body-bg) !important;
             }
-
+        
             .ace-github .ace_marker-layer .ace_active-line {
                 background: #333333;
             } {% endcomment %}

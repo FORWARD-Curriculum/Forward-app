@@ -85,42 +85,32 @@
     {
       "type": "dndmatch",
       "title": "Professional vs. Casual Communication",
-      "instructions": null,
-      "content": "Knowing which type of communication to use, and how to communicate professionally, can help you build stronger connections in all areas of life. Sort the following quotes into Professional Communication, Casual Communication, or Either.",
-      "categories": [
-        {
-          "title": "Professional Communication",
-          "options": [
+      "instructions": "Knowing which type of communication to use, and how to communicate professionally, can help you build stronger connections in all areas of life. Sort the following quotes into Professional Communication, Casual Communication, or Either.",
+      "content": [
+        { "category": "Professional Communication", "matches": [
             "Good morning, how are you today?",
             "Thank you for your time, I really appreciate it.",
             "Could you please explain that again?",
             "I look forward to working with you.",
             "Yes, ma'am / No, sir",
             "My name is Jordan Smith, nice to meet you."
-          ]
-        },
-        {
-          "title": "Casual Communication",
-          "options": [
+          ] },
+        { "category": "Casual Communication", "matches": [
             "Hey, what's up?",
             "These fries are bussin",
             "Ohio rizz",
             "That movie was fire",
             "You coming to the game?",
             "No cap"
-          ]
-        },
-        {
-          "title": "Either",
-          "options": [
+          ] },
+        { "category": "Either", "matches": [
             "Please",
             "Thanks so much!",
             "Sorry, my bad.",
             "Good job, that was solid.",
             "See you later!",
             "That makes sense."
-          ]
-        }
+          ] }
       ]
     },
     {

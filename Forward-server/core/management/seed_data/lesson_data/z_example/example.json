@@ -53,18 +53,22 @@
     },
     {
       "type": "dndmatch",
-      "title": "Drag N' Drop Example",
+      "title": "DnD Match Test",
       "instructions": "Match items from the <source> to the correct (category/description/definition)",
       "_comment": "This is a test activity for the DnD Match type.",
       "content": [
-        ["Trade School", "image:welder.webp", "image:electrician.jpeg"],
-        ["University", "programmer", "ecologist"],
-        [
-          "Typically offers associate level programs for 2 years of study.",
-          "Community College"
-        ],
-        [null,"red herring drag"],
-        ["red herring drop", null]
+        {
+          "category": "Trade School",
+          "matches": [
+            { "image": "welder.webp" },
+            { "image": "electrician.jpeg" }
+          ]
+        },
+        { "category": "University", "matches": ["programmer", "ecologist"] },
+        {
+          "category": "Typically offers associate level programs for 2 years of study.",
+          "matches": ["Community College"]
+        }
       ]
     },
         {

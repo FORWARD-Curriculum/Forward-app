@@ -7,12 +7,13 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 import boto3 # pyright: ignore[reportMissingImports]
 import re
+from django.core.files import File
 
 # Import all necessary models, including the ActivityManager
 from core.models import (
     Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
     Identification, Embed, ActivityManager, UserQuizResponse, UserQuestionResponse,
-    Concept, ConceptMap
+    Concept, ConceptMap, BaseActivity
 )
 
 # Mapping for deletion order (reverse dependency)
@@ -119,129 +120,146 @@ class Command(BaseCommand):
     def _create_lesson(self, lesson_data):
         """Creates or updates a lesson."""
         
-        if 'image' in lesson_data and lesson_data['image']:
-            self.bucket_url_call(lesson_data['image'], key_prefix="lessons/")
-            lesson_data['image'] = f"lessons/{lesson_data['image']}"
+        # Pop the image filename from the data to handle it separately.
+        image_filename = lesson_data.pop('image', None)
         
+        # Create or update the lesson with all non-file data first.
         lesson, created = Lesson.objects.update_or_create(
             title=lesson_data.get('title'),
-            defaults={
-                'description': lesson_data.get('description', ''),
-                'objectives': lesson_data.get('objectives', []),
-                'order': lesson_data.get('order'), # Keep lesson order from JSON for now
-                'tags': lesson_data.get('tags', []),
-                "image": f"public/{lesson_data.get('image')}" if lesson_data.get('image') else None
-            }
+            defaults=lesson_data # The rest of the data serves as defaults
         )
+        
+        # If an image filename was provided, open the file and save it to the ImageField.
+        if image_filename:
+            image_path = self.folder_path / image_filename
+            try:
+                with open(image_path, 'rb') as image_file:
+                    # The .save() method on the field handles the storage and updates the model.
+                    lesson.image.save(Path(image_filename).name, File(image_file), save=True)
+            except FileNotFoundError:
+                self.stdout.write(self.style.ERROR(f"  Image file not found: {image_path}. Lesson saved without image."))
+        
         action = 'Created' if created else 'Updated'
         self.stdout.write(f"{action} lesson: {lesson.title}")
         return lesson
 
     def _create_activities(self, lesson, activities_data, activity_manager):
         """Creates activities using the ActivityManager, deriving order from list position."""
-        # Use enumerate to get the index (order), starting from 1
         for order, activity_data in enumerate(activities_data, start=1):
-            # Make a copy to avoid modifying the original dict if needed elsewhere
             current_activity_data = activity_data.copy()
+            activity_type_str = current_activity_data.pop('type', '').lower()
 
-            activity_type_str = current_activity_data.pop('type', None)
-            if not activity_type_str:
-                self.stdout.write(self.style.WARNING(f"Skipping activity entry at position {order} with no 'type' specified."))
+            if not activity_type_str or activity_type_str not in activity_manager.registered_activities:
+                self.stdout.write(self.style.WARNING(f"Skipping activity at position {order} with invalid or missing type: '{activity_type_str}'"))
                 continue
 
-            activity_type_str = activity_type_str.lower() # Ensure lowercase key
-
-            if activity_type_str not in activity_manager.registered_activities:
-                self.stdout.write(self.style.WARNING(f"Skipping unknown activity type '{activity_type_str}' at position {order}"))
-                continue
-
-            ActivityModel, _, nonstandard_fields, is_child, _ = activity_manager.registered_activities[activity_type_str]
-
-            # Skip child types that should be created under their parents
+            ActivityModel, _, _, is_child, _ = activity_manager.registered_activities[activity_type_str]
             if is_child:
                 continue
+            
+            ActivityModel: BaseActivity = ActivityModel
 
-            # Explicitly pop child data *before* creating the parent defaults
-            questions_data = None
-            poll_questions_data = None
-            concepts_data = None
-            if activity_type_str == 'quiz':
-                # Pop 'questions' from the data intended for the Quiz model defaults
-                questions_data = current_activity_data.pop('questions', None)
-            elif activity_type_str == 'poll':
-                 # Pop 'questions' from the data intended for the Poll model defaults
-                poll_questions_data = current_activity_data.pop('questions', None)
-            elif activity_type_str == 'conceptmap':
-                concepts_data = current_activity_data.pop('examples', None)
+            # Pop child data and file data before preparing defaults
+            questions_data = current_activity_data.pop('questions', None) if activity_type_str in ['quiz', 'poll'] else None
+            concepts_data = current_activity_data.pop('examples', None) if activity_type_str == 'conceptmap' else None
 
-            # Base defaults common to most BaseActivity children
+            # Base defaults for the activity model
             defaults = {
-                'title': current_activity_data.pop('title', f'{activity_type_str.capitalize()} Activity {order}'), # Add order to default title
+                'title': current_activity_data.pop('title', f'{activity_type_str.capitalize()} Activity {order}'),
                 'instructions': current_activity_data.pop('instructions', None),
-                # Now 'questions' key (if it existed) is NOT in current_activity_data when unpacked
-                **current_activity_data # Add remaining fields from JSON
+                **current_activity_data
             }
+            
+            # --- Pop file field data to be handled after object creation ---
+            image_filename = defaults.pop('image', None) if activity_type_str == 'textcontent' else None
+            video_filename = defaults.pop('video', None) if activity_type_str == 'video' else None
+            twine_filename = defaults.pop('file', None) if activity_type_str == 'twine' else None
 
-            # Remove None values from defaults unless the field explicitly allows null=True
+            # Handle special cases for content that might contain image references
+            if activity_type_str == 'textcontent' and not image_filename:
+                images = re.findall(r"!\[.*\]\((.*)\)", str(defaults.get('content', '')))
+                if images:
+                    image_filename = images[0]
+                    defaults['content'] = re.sub(r"!\[.*\]\(.*\)", "", defaults.get('content', ''), count=1).strip()
+            
+            if activity_type_str == 'dndmatch':
+                for group in defaults.get('content',[]):
+                    for match in group.get('matches',[]):
+                        if type(match) != str:
+                            image_rel = match["image"]
+                            with open(self.folder_path / image_rel, 'rb') as image:
+                                name = default_storage.save(f"public/dndmatch/images/{image_rel}", image)
+                                match["image"] = name
+                                
+                self.regex_image_upload(defaults.get('content', ''), key_prefix="dndmatch/")
+            
+            if activity_type_str == 'twine' and twine_filename:
+                twine_path = self.folder_path / twine_filename
+                try:
+                    with open(twine_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        image_tuples = re.findall(r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))", content)
+                        for image_info_tuple in image_tuples:
+                            relative_image_path = image_info_tuple[0].strip()
+                            local_image_full_path = self.folder_path / 'twine' / relative_image_path
+                            try:
+                                with open(local_image_full_path, 'rb') as image_file:
+                                    s3_filename = Path(relative_image_path).name
+                                    default_storage.save(f"public/twine/images/{s3_filename}", image_file)
+                                    self.stdout.write(f"  Uploaded Twine sub-asset: {relative_image_path}")
+                            except Exception as e:
+                                self.stdout.write(self.style.ERROR(f"Referenced twine image: '{relative_image_path}' not found at: {local_image_full_path}. Skipping..."))
+                                continue
+                                
+
+                except FileNotFoundError:
+                    self.stdout.write(self.style.ERROR(f"Twine file not found for regex processing: {twine_path}"))
+                    twine_filename = None # Prevent upload if source is missing
+
+            # Clean defaults of None values unless the field allows it
             model_fields = {f.name: f for f in ActivityModel._meta.get_fields()}
-            defaults = {
-                k: v for k, v in defaults.items()
-                if k in model_fields and (v is not None or getattr(model_fields[k], 'null', False))
-            }
+            defaults = {k: v for k, v in defaults.items() if k in model_fields and (v is not None or getattr(model_fields[k], 'null', False))}
 
             try:
-                if activity_type_str == 'dndmatch':  # intermediate parsing
-                    self.regex_image_upload(defaults.get(
-                        'content', ''), key_prefix="dndmatch/")
-                    
-                if activity_type_str == 'textcontent':
-                    if 'image' in defaults:
-                        self.bucket_url_call(defaults.get('image'), key_prefix="text_content_image/")
-                        defaults['image'] = f"public/text_content_image/{defaults['image']}"
-                    else:
-                        # 10/19/25: Annee's jsons have images embedded in markdown content, as opposed to separate field
-                        images = re.findall(r"!\[.*\]\((.*)\)", str(defaults.get('content', '')))
-                        if images:
-                            self.bucket_url_call(images[0], key_prefix="text_content_image/")
-                            defaults['image'] = f"public/text_content_image/{images[0]}"
-                            defaults['content'] = re.sub(r"!\[.*\]\(.*\)", "", defaults.get('content', ''), count=1).strip() # Remove first image markdown
-                    
-                if activity_type_str == 'video':
-                    self.bucket_url_call(defaults.get(
-                        'video'), key_prefix="video/")
-                    defaults['video'] = f"public/video/{defaults['video']}"
-                    
-                if activity_type_str == 'twine':
-                    print(f"DEBUG: Processing Twine activity with file: {defaults.get('file', '')}")
-                    raw_html = open(self.folder_path / defaults.get('file', ''), 'r', encoding='utf-8').read()
-                    defaults['file'] = raw_html
-                    self.regex_image_upload(raw_html, key_prefix="twine/", subfolder="twine/")
-                      
-                # Use the 'order' from enumerate in update_or_create
                 activity_obj, created = ActivityModel.objects.update_or_create(
                     lesson=lesson,
-                    order=order, # Use the order derived from list position
+                    order=order,
                     defaults=defaults
                 )
                 action = 'Created' if created else 'Updated'
                 self.stdout.write(f"{action} {activity_type_str} (Order: {order}): {activity_obj.title}")
 
-                # --- Handle Child Objects (Questions/PollQuestions) ---
-                # Use the popped data here
-                if activity_type_str == 'quiz' and questions_data: # Check if we popped data earlier
-                     self._create_questions(activity_obj, questions_data)
-                elif activity_type_str == 'poll' and poll_questions_data: # Check if we popped data earlier
-                    self._create_poll_questions(activity_obj, poll_questions_data)
+                # --- Handle FileField/ImageField uploads using default storage ---
+                file_to_upload = None
+                field_name = None
+                if activity_type_str == 'textcontent' and image_filename:
+                    file_to_upload, field_name = image_filename, 'image'
+                elif activity_type_str == 'video' and video_filename:
+                    file_to_upload, field_name = video_filename, 'video'
+                elif activity_type_str == 'twine' and twine_filename:
+                    file_to_upload, field_name = twine_filename, 'file'
+
+                if file_to_upload and field_name:
+                    file_path = self.folder_path / file_to_upload
+                    try:
+                        with open(file_path, 'rb') as f:
+                            getattr(activity_obj, field_name).save(Path(file_to_upload).name, File(f), save=True)
+                            self.stdout.write(f"  Uploaded {ActivityModel} asset: {file_to_upload}")
+                    except FileNotFoundError:
+                        self.stdout.write(self.style.ERROR(f"  File not found: {file_path}"))
+
+                # --- Handle Child Objects ---
+                if activity_type_str == 'quiz' and questions_data:
+                    self._create_questions(activity_obj, questions_data)
+                elif activity_type_str == 'poll' and questions_data:
+                    self._create_poll_questions(activity_obj, questions_data)
                 elif activity_type_str == 'conceptmap' and concepts_data:
-                     self._create_concepts(activity_obj, concepts_data)
+                    self._create_concepts(activity_obj, concepts_data)
 
             except Exception as e:
-                # Include the derived order in the error message
                 self.stdout.write(self.style.ERROR(f"Failed to create/update {activity_type_str} (Order: {order}): {e}"))
                 import traceback
-                traceback.print_exc() # Print full traceback for debugging
-                # Depending on desired behavior. For seeding, maybe log and continue.
-                # raise # Uncomment to stop on first error
+                traceback.print_exc()
                 
     def regex_image_upload(self, content, key_prefix="", subfolder=""):
         images = re.findall(r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))", str(content))
@@ -306,55 +324,55 @@ class Command(BaseCommand):
 
     def _create_concepts(self, concept_map, concepts_data):
         """Creates or updates concepts for a given concept map, deriving order from list position."""
-        self.stdout.write(f"  Processing {len(concepts_data)} concepts for concept map: {concept_map.title}") # Debug print
-        # Use enumerate to get the index (order), starting from 1
+        self.stdout.write(f"  Processing {len(concepts_data)} concepts for concept map: {concept_map.title}")
         for order, concept_data in enumerate(concepts_data, start=1):
-
-            image_filename = concept_data.get('image')
-            print(f"DEBUG: Processing concept with image: {image_filename}")
-            self.bucket_url_call(image_filename)
             
+            # Pop the main image to handle with the ImageField's storage
+            image_filename = concept_data.pop('image', None)
+            
+            # Process images within the 'examples' JSON field using the bucket helper
             examples = concept_data.get('examples', [])
             for example in examples:
                 example_image = example.get('image')
-                print(f"DEBUG: Processing concept example with image: {example_image}")
-                try:
-                    self.bucket_url_call(example_image,key_prefix="concept/")
-                    example['image'] = f"public/concept/{example_image}"
-                except Exception as e:
-                    self.stdout.write(self.style.ERROR(f"    Failed to upload example image '{example_image}' for concept (Order: {order}): {e}"))
-                    example['image'] = None  # Set to None or handle as needed
-                
-            
+                if example_image:
+                    try:
+                        self.bucket_url_call(example_image, key_prefix="concept/")
+                        example['image'] = f"public/concept/{example_image}" # Keep storing the path in JSON
+                    except Exception as e:
+                        self.stdout.write(self.style.ERROR(f"    Failed to upload example image '{example_image}': {e}"))
+                        example['image'] = None
             
             # Prepare defaults for the Concept model
             concept_defaults = {
-                'title': concept_data.get('title', f'Concept {order}'), # Use title from data or default
-                'image': f"public/{image_filename}",
+                'title': concept_data.get('title', f'Concept {order}'),
                 'description': concept_data.get('description', ''),
                 'examples': examples,
-                # Instructions might be on concept_data or inherit from BaseActivity defaults
                 'instructions': concept_data.get('instructions'),
             }
-            # Remove None values unless the field explicitly allows null=True
             model_fields = {f.name: f for f in Concept._meta.get_fields()}
             concept_defaults = {k: v for k, v in concept_defaults.items() if k in model_fields and (v is not None or getattr(model_fields[k], 'null', False))}
 
             try:
-                # Use the 'order' from enumerate in update_or_create
                 concept, c_created = Concept.objects.update_or_create(
-                    concept_map=concept_map, # Link to the parent concept map
-                    lesson=concept_map.lesson, # Link to the same lesson as the map
-                    order=order, # Use the order derived from list position
+                    concept_map=concept_map,
+                    lesson=concept_map.lesson,
+                    order=order,
                     defaults=concept_defaults
                 )
+
+                # After creating the concept, save the image file to its ImageField
+                if image_filename:
+                    image_path = self.folder_path / image_filename
+                    try:
+                        with open(image_path, 'rb') as image_file:
+                            concept.image.save(Path(image_filename).name, File(image_file), save=True)
+                    except FileNotFoundError:
+                        self.stdout.write(self.style.ERROR(f"    Image file not found for concept: {image_path}"))
+
                 c_action = 'Created' if c_created else 'Updated'
                 self.stdout.write(f"    {c_action} concept (Order: {order}): {concept.title[:50]}...")
             except Exception as e:
-                 # Include the derived order in the error message
-                 self.stdout.write(self.style.ERROR(f"    Failed to create/update concept (Order: {order}) for concept map '{concept_map.title}': {e}"))
-
-
+                 self.stdout.write(self.style.ERROR(f"    Failed to create/update concept (Order: {order}) for '{concept_map.title}': {e}"))
     # TODO: Change everything to be stored as a KEY not URL, so it is not hardcoded to some bucket
 
     #Helper method to upload an image file to the bucket

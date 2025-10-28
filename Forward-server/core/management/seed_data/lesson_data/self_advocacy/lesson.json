@@ -297,52 +297,51 @@
     {
       "type": "dndmatch",
       "title": "Identify Your Strengths",
-      "instructions": "Read through the list of strengths below. Drag up to 10 strengths that best describe you into the box labeled 'My Greatest Strengths.' Then, use the space below to write any additional strengths you have that weren't included in the list.",
-      "content": "To determine your strengths you might think about times that family members, friends, or classmates have asked for your help with something. Why did they come to you? What skill did you have that helped them?",
-      "categories": [
+      "instructions": "Read through the list of strengths below. Drag up to 10 strengths that best describe you into the box labeled 'My Greatest Strengths.' Then, use the space below to write any additional strengths you have that weren't included in the list. To determine your strengths you might think about times that family members, friends, or classmates have asked for your help with something. Why did they come to you? What skill did you have that helped them?",
+      "strict": false,
+      "content": [
         {
-          "title": "My Greatest Strengths",
-          "limit": 10
+          "category": "My Greatest Strengths",
+          "matches": [
+            "Analytical",
+            "Approachable",
+            "Caring for myself",
+            "Creative",
+            "Detail-oriented",
+            "Empathetic",
+            "Encouraging",
+            "Flexible",
+            "Focused",
+            "Good listener",
+            "Good memory",
+            "Good teacher",
+            "Honest",
+            "Innovative",
+            "Leadership",
+            "Motivated",
+            "Open-minded",
+            "Organized",
+            "Patient",
+            "Peacemaker",
+            "Persistent",
+            "Persuasive",
+            "Planner",
+            "Positive attitude",
+            "Quick learner",
+            "Resourceful",
+            "Safety-minded",
+            "Self-disciplined",
+            "Team player",
+            "Tech-savvy"
+          ],
+          "_limit": 10
         }
       ],
-      "options": [
-        "Analytical",
-        "Approachable",
-        "Caring for myself",
-        "Creative",
-        "Detail-oriented",
-        "Empathetic",
-        "Encouraging",
-        "Flexible",
-        "Focused",
-        "Good listener",
-        "Good memory",
-        "Good teacher",
-        "Honest",
-        "Innovative",
-        "Leadership",
-        "Motivated",
-        "Open-minded",
-        "Organized",
-        "Patient",
-        "Peacemaker",
-        "Persistent",
-        "Persuasive",
-        "Planner",
-        "Positive attitude",
-        "Quick learner",
-        "Resourceful",
-        "Safety-minded",
-        "Self-disciplined",
-        "Team player",
-        "Tech-savvy"
-      ],
-      "openresponse": {
+      "_openresponse": {
         "prompt": "What other strengths do you have that weren't included here? (Optional)",
         "required": false,
         "limit": null
-      },
-      "image": null
+      }
     },
     {
       "type": "quiz",

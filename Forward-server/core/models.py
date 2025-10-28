@@ -14,6 +14,8 @@ import copy
 from django_jsonform.models.fields import JSONField
 from martor.models import MartorField
 from django.utils.safestring import mark_safe
+from django.core.files.storage import default_storage
+
 
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
@@ -465,6 +467,7 @@ class Quiz(BaseActivity):
 class Twine(BaseActivity):
     """Model for Twine activities, which are interactive stories or games."""
     file = models.FileField(
+        upload_to="public/twine/",
         validators=[FileExtensionValidator(allowed_extensions=['html'])],
         help_text=mark_safe("""
                             
@@ -486,7 +489,8 @@ class Twine(BaseActivity):
                             
                             
                             
-                            """) # TODO: add html formmated instructions for what to do for twine
+                            """
+        ), blank=False, null=False
     )
 
     class Meta(BaseActivity.Meta):
@@ -494,10 +498,19 @@ class Twine(BaseActivity):
         verbose_name_plural = "Twine Stories"
 
     def to_dict(self):
+        result = None
+        if self.file and self.file.name:
+            with self.file.open('r') as f:
+                result = re.sub(
+                    r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))",
+                    lambda m: f"image:{default_storage.url(f'public/twine/images/{m.group(1)}')} ",
+                    f.read()
+                )
+               
         return {
-            **super().to_dict(),
-            "file": regex_image_sub(self.file, isJson=False),
-        }
+                    **super().to_dict(),
+                    "file": result,
+                }
 
 
 class Question(models.Model):
@@ -507,7 +520,7 @@ class Question(models.Model):
         ('true_false', 'True/False'),
         ('multiple_select', 'Multiple Select'),
     ]
-    # User's generated uuid
+    # User's ge`ne`rated uuid
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -737,6 +750,10 @@ class DndMatch(BaseActivity):
             ["red herring drop", null]
         ]
     """
+    
+    strict = models.BooleanField(default=True,
+                                 help_text="Whether matches must be exact or if any match is allowed",
+                                 null=False, blank=False)
 
     content = JSONField(
         schema={
@@ -744,17 +761,11 @@ class DndMatch(BaseActivity):
             "items": {
                 "type": "object",
                 "properties": {
-                    "category": {"oneOf": [
+                    "category":
                         {
-                                    "title": "Name",
-                                    "type": "string",
-                                },
-                        {
-                                    "title": "Red Herring",
-                                    "type": "object",
-                                    "properties": {}
-                                }
-                        ]},
+                            "title": "Name",
+                            "type": "string",
+                        },
                     "matches": {
                         "type": "array",
                         "items": {
@@ -776,23 +787,14 @@ class DndMatch(BaseActivity):
                                     },
                                     "required": ["image"]
                                 },
-                                {
-                                    "title": "Type: None",
-                                    "type": "object",
-                                    "properties": {}
-                                }
                             ]
                         }
-                    }
+                        },
                 }
             }
         },
         help_text="List of DND match categories and their associated items"
     )
-    
-    strict = models.BooleanField(default=True,
-                                 help_text="Whether matches must be exact or if any match is allowed",
-                                 null=False, blank=False)
 
     class Meta:
         verbose_name = "Drag N' Drop"
@@ -805,9 +807,17 @@ class DndMatch(BaseActivity):
         )
 
     def to_dict(self):
+        content = copy.deepcopy(self.content)
+        for group in content:
+            for match in group['matches']:
+                if isinstance(match, dict) and 'image' in match:
+                    match['key'] = match['image']
+                    match['image'] = default_storage.url(match['image'])
+                    
         return {
             **super().to_dict(),
-            "content": regex_image_sub(self.content, key_prefix="dndmatch/"),
+            "content": content,
+            "strict": self.strict
         }
 
 class FillInTheBlank(BaseActivity):
@@ -936,12 +946,17 @@ class Concept(BaseActivity):
         verbose_name_plural = "Concept Map Concepts"
     
     def to_dict(self):
+        examples = copy.deepcopy(self.examples)
+        for item in examples:
+            if item['image']:
+                item['image'] = default_storage.url(item['image'])
+        
         return {
             **super().to_dict(),
             "id": self.id,
             "image": self.image.url,
             "description": self.description,
-            "examples": self.examples,
+            "examples": examples,
         }
         
 # Helper method to generate presigned urls
@@ -1403,16 +1418,61 @@ class DndMatchResponse(BaseResponse):
     ]
     
     """
-    submission = models.JSONField()
+    submission = JSONField(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "category":
+                        {
+                            "title": "Name",
+                            "type": "string",
+                        },
+                    "matches": {
+                        "type": "array",
+                        "items": {
+                            "oneOf": [
+                                {
+                                    "title": "Type: Text",
+                                    "type": "string",
+                                },
+                                {
+                                    "title": "Type: Image",
+                                    "type": "object",
+                                    "properties": {
+                                        "image": {
+                                            "type": "string",
+                                            "format": "file-url",
+                                            "widget": "fileinput",
+                                            "title": "Image"
+                                        }
+                                    },
+                                    "required": ["image"]
+                                },
+                            ]
+                        }
+                        },
+                }
+            }
+        },
+    )
+    
 
     class Meta:
         verbose_name = "Drag N' Drop Response"
         verbose_name_plural = "Drag N' Drop Responses"
 
     def to_dict(self):
+        content = copy.deepcopy(self.submission)
+        for group in content:
+            for match in group['matches']:
+                if isinstance(match, dict) and 'image' in match:
+                    match['image'] = default_storage.url(match['key'])
+                    
         return {
             **super().to_dict(),
-            "submission": self.submission
+            "submission": content
         }
 
 class FillInTheBlankResponse(BaseResponse):
