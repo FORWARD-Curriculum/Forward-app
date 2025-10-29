@@ -20,7 +20,11 @@ export const useAuth = () => {
    * @param {User} user - The constructed User object from the backend
    */
   const login = (user: User) => {
-    dispatch(setUser(user))
+    dispatch(setUser(user));
+    // dispatch(resetResponseState());  // test
+    // dispatch(resetInitialLessonState());
+    window.location.reload();
+    window.location.href = "/dashboard"; // this may have worked
   };
 
   /**
@@ -55,6 +59,7 @@ export const useAuth = () => {
       dispatch(resetInitialLessonState());
       
       window.location.reload();
+      window.location.href = "/";
       
     } catch (error: any) {
       console.error(error.message || "Logout failed. Please try again.");
