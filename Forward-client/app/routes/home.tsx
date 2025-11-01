@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, Target, Users } from "lucide-react";
+import { ArrowRight, BookOpen, Target } from "lucide-react";
 import type { Route } from "./+types/home";
 import { Link } from "react-router";
 

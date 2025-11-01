@@ -192,6 +192,8 @@ class CurriculumView(APIView):
         lesson_data = []
         for i in lessons:
             data = i.to_dict()
+            
+            # In case an individual accessing the lesson is a guest
             if request.user.is_authenticated:
                 data["completion"] = LessonService.get_lesson_completion(request.user, i)
             else:
@@ -238,7 +240,7 @@ class LessonView(APIView):
 
 
 class LessonContentView(APIView):
-    # permission_classes = [IsAuthenticated]
+    # Any Allowed for guest user access
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
