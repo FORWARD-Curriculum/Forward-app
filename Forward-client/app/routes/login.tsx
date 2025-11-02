@@ -94,7 +94,13 @@ export default function Login() {
           <Link prefetch="intent" to="/register" className="text-blue-500 underline">
             Sign Up
           </Link>{" "}
-          instead
+          instead.
+        </p>
+        <p className="text-muted-foreground text-center">
+          Explore as a&nbsp;
+          <Link prefetch="intent" to="/dashboard" className="text-blue-500 underline">
+            guest.
+          </Link>
         </p>
       </div>
     </div>

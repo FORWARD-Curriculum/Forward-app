@@ -31,7 +31,7 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
           <Link 
             prefetch="intent" 
-            to={"/dashboard"} 
+            to={"/login"} 
             className="group bg-accent hover:brightness-85 text-primary-foreground px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2"
           >
             Start Here
