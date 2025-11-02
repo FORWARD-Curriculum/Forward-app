@@ -386,80 +386,6 @@ class ResponseView(APIView):
             return Response({"detail": "An internal error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class QuizResponseView(APIView):
-    """
-    API endpoint for submitting and retrieving quiz responses.
-
-    POST: Submit a quiz response
-    GET: Retrieve a user's quiz responses
-    """
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, *args, **kwargs):
-        """Submit a quiz response"""
-        serializer = QuizSubmissionSerializer(data=request.data)
-        if (serializer.is_valid()):
-            result = QuizResponseService.submit_quiz_response(
-                user=request.user,
-                data=serializer.validated_data
-            )
-
-            quiz_response = result['quiz_response']
-            feedback = result['feedback']
-
-            return json_go_brrr(
-                message="Quiz response submitted successfully",
-                data={
-                    "quiz_response": quiz_response.to_dict(),
-                    "feedback": feedback
-                },
-                status=status.HTTP_201_CREATED
-            )
-
-        return json_go_brrr(
-            message="Failed to submit quiz response",
-            data=serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    def get(self, request, *args, **kwargs):
-        """Retrieve a user's quiz responses, optionally filtered by quiz_id"""
-        quiz_id = request.query_params.get('quiz_id')
-        responses = QuizResponseService.get_user_quiz_responses(
-            request.user, quiz_id)
-
-        return json_go_brrr(
-            message="Quiz responses retrieved successfully",
-            data={'quiz_responses': [response.to_dict()
-                                     for response in responses]},
-            status=status.HTTP_200_OK
-        )
-
-
-class QuizResponseDetailView(APIView):
-    """
-    API endpoint for retrieving a specific quiz response
-
-    GET: Retrieve details of a specific quiz response
-    """
-
-    def get(self, request, response_id, *args, **kwargs):
-        try:
-            response = QuizResponseService.get_quiz_response_details(
-                request.user, response_id)
-
-            return json_go_brrr(
-                message="Quiz response details retrieved successfully",
-                data={'quiz_response': response.to_dict()},
-                status=status.HTTP_200_OK
-            )
-        except Exception as e:
-            return json_go_brrr(
-                message=str(e),
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-
 class QuizResponseStatusView(APIView):
     """
     API endpoint for tracking quiz status within a lesson.
@@ -515,40 +441,7 @@ class QuizResponseStatusView(APIView):
                 message="Quiz not found",
                 status=status.HTTP_404_NOT_FOUND
             )
-        
-# class QuestionResponseView(APIView):
-#     """Handle individual question responses within a quiz, god i hate this, so now questions wil be embedded and more coupled to quizes"""
-#     permission_classes = [IsAuthenticated]
     
-#     def post(self, request, quiz_id, question_id):
-#         """Submit answer to a specific question"""
-#         try:
-#             question = Question.objects.get(id=question_id, quiz_id=quiz_id)
-#             quiz = Quiz.objects.get(id=quiz_id)
-            
-#             # Prepare data for service
-#             validated_data = {
-#                 'associated_activity': question,
-#                 'quiz_id': quiz_id,
-#                 'lesson_id': quiz.lesson,
-#                 'response_data': request.data.get('response_data', {}),
-#                 'time_spent': request.data.get('time_spent', 0)
-#             }
-            
-#             question_response = QuestionResponseService.submit_question_response(
-#                 validated_data, request
-#             )
-            
-#             return json_go_brrr(
-#                 message="Question response submitted successfully",
-#                 data=question_response.to_dict(),
-#                 status=status.HTTP_200_OK
-#             )
-#         except Exception as e:
-#             return json_go_brrr(
-#                 message=str(e),
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
             
 class OnboardView(APIView):
     def get(self, request):
