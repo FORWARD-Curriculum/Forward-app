@@ -37,7 +37,7 @@ export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
             className="flex w-full grow flex-col items-center gap-6"
           >
             <Popover>
-              <PopoverTrigger asChild className="cursor-pointer">
+              <PopoverTrigger asChild className={`${concept.examples.length>0 ?"cursor-pointer":" pointer-events-none cursor-default"}`}>
                 {concept.image ? (
                   <div
                     className={
@@ -51,7 +51,7 @@ export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
                       src={concept.image}
                       className="aspect-square w-full rounded-3xl shadow-md"
                     />
-                    {client.isMobile ?
+                    {concept.examples.length<1 ? "":client.isMobile ?
                     <Pointer
                       className="absolute bottom-3 left-3 text-white drop-shadow-[0px_0px_2px_rgba(0,0,0,1)] filter"
                       color="white"
@@ -62,6 +62,7 @@ export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
                   <Skeleton className="aspect-square w-full" />
                 )}
               </PopoverTrigger>
+              {concept.examples.length>0 &&
               <PopoverContent
                 side="top"
                 align="center"
@@ -92,7 +93,7 @@ export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
                   <CarouselPrevious className="absolute left-1" />
                   <CarouselNext className="absolute right-1" />
                 </Carousel>
-              </PopoverContent>
+              </PopoverContent>}
             </Popover>
             <MarkdownTTS controlsClassName="flex gap-2" className=" [&_h1]:font-semibold [&_h1]:text-lg">{`:::center\n # ${concept.title}\n:::\n\n${concept.description}`}
             </MarkdownTTS>

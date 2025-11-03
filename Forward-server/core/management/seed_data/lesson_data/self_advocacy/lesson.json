@@ -16,99 +16,182 @@
       "type": "textcontent",
       "title": "What Is Self-Advocacy?",
       "instructions": null,
-      "content": "Self-advocacy means understanding your needs, knowing your rights, and speaking up for yourself in a respectful way. It's about making sure your voice is heard when decisions are being made about your life--whether that's in school, at work, or in your personal life. Everyone has the right to share their opinions and ask for support, and self-advocacy is the skill that helps you do that.\n\nWhen you practice self-advocacy, you're building confidence and independence. It can look like asking a teacher for extra help on an assignment, telling an employer when you need clear instructions, or letting people know what goals you're working toward. It doesn't mean you have to do everything alone--it means you take an active role in shaping your future.\n\nLearning to self-advocate helps you prepare for life after school or treatment programs. The more you practice, the stronger you'll get at identifying what matters to you and finding the words to share it. Over time, this skill can help you build better relationships, stay on track with your goals, and make sure your needs are respected.",
-      "image": "couple laughing.jpg"
+      "content": "Self-advocacy means understanding your needs, knowing your rights, and speaking up for yourself in a respectful way. It's about making sure your voice is heard when decisions are being made about your life--whether that's in school, at work, or in your personal life. Everyone has the right to share their opinions and ask for support, and self-advocacy is the skill that helps you do that.\n\nWhen you practice self-advocacy, you're building confidence and independence. It can look like asking a teacher for extra help on an assignment, telling an employer when you need clear instructions, or letting people know what goals you're working toward. It doesn't mean you have to do everything alone--it means you take an active role in shaping your future.\n\nLearning to self-advocate helps you prepare for life after school or treatment programs. The more you practice, the stronger you'll get at identifying what matters to you and finding the words to share it. Over time, this skill can help you build better relationships, stay on track with your goals, and make sure your needs are respected.\n\n![Couple Laughing](couple laughing.jpg)"
     },
     {
       "type": "quiz",
       "title": "Recognizing Self-Advocacy",
       "instructions": "Read each scenario and decide whether the individual is practicing self-advocacy or not.",
-      "content": [
+      "passing_score": 6,
+      "feedback_config": {},
+      "questions": [
         {
-          "question": "Danny tells his sister that he's had a long day and asks her to take over his chores. He doesn't explain why it's important or offer to switch with her another time.",
-          "options": [
-            "Yes, this is self-advocacy",
-            "**No, this is not self-advocacy**"
-          ]
+          "question_text": "Danny tells his sister that he's had a long day and asks her to take over his chores. He doesn't explain why it's important or offer to switch with her another time.",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "Yes, this is self-advocacy",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "No, this is not self-advocacy",
+                "is_correct": true
+              }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
         },
         {
-          "question": "Ricardo notices he was placed in an art class he doesn't enjoy and meets with his counselor to talk about switching to a different elective. He explains what interests him more and asks if there are options available.",
-          "options": [
-            "**Yes, this is self-advocacy**",
-            "No, this is not self-advocacy"
-          ]
+          "question_text": "Ricardo notices he was placed in an art class he doesn't enjoy and meets with his counselor to talk about switching to a different elective. He explains what interests him more and asks if there are options available.",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "Yes, this is self-advocacy",
+                "is_correct": true
+              },
+              {
+                "id": 2,
+                "text": "No, this is not self-advocacy",
+                "is_correct": false
+              }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
         },
         {
-          "question": "Mikayla asks her boss to allow her to have breaks throughout the day to check her blood sugar. She explains why it is important for her health and makes a clear request.",
-          "options": [
-            "**Yes, this is self-advocacy**",
-            "No, this is not self-advocacy"
-          ]
+          "question_text": "Mikayla asks her boss to allow her to have breaks throughout the day to check her blood sugar. She explains why it is important for her health and makes a clear request.",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "Yes, this is self-advocacy",
+                "is_correct": true
+              },
+              {
+                "id": 2,
+                "text": "No, this is not self-advocacy",
+                "is_correct": false
+              }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
         },
         {
-          "question": "Jaime's dad tells the event organizer that Jaime will be helping at the farmer's market booth this weekend. Jaime stays quiet and goes along with what their dad wants them to do because it's easier that way.",
-          "options": [
-            "Yes, this is self-advocacy",
-            "**No, this is not self-advocacy**"
-          ]
+          "question_text": "Jaime's dad tells the event organizer that Jaime will be helping at the farmer's market booth this weekend. Jaime stays quiet and goes along with what their dad wants them to do because it's easier that way.",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "Yes, this is self-advocacy",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "No, this is not self-advocacy",
+                "is_correct": true
+              }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
         },
         {
-          "question": "Larissa signs up to help with the school's anti-drug assembly after her teacher mentions the opportunity in class. She participates by handing out flyers and setting up chairs.",
-          "options": [
-            "Yes, this is self-advocacy",
-            "**No, this is not self-advocacy**"
-          ]
+          "question_text": "Larissa signs up to help with the school's anti-drug assembly after her teacher mentions the opportunity in class. She participates by handing out flyers and setting up chairs.",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "Yes, this is self-advocacy",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "No, this is not self-advocacy",
+                "is_correct": true
+              }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
         },
         {
-          "question": "Draven asks his probation officer if he can adjust his curfew for one night to attend a family celebration. He explains why the event is important and offers to check in early the next day.",
-          "options": [
-            "**Yes, this is self-advocacy**",
-            "No, this is not self-advocacy"
-          ]
+          "question_text": "Draven asks his probation officer if he can adjust his curfew for one night to attend a family celebration. He explains why the event is important and offers to check in early the next day.",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "Yes, this is self-advocacy",
+                "is_correct": true
+              },
+              {
+                "id": 2,
+                "text": "No, this is not self-advocacy",
+                "is_correct": false
+              }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
         }
-      ],
-      "image": "students_discussion.jpg",
-      "comments_to_tech": "Convert bolded options into correct answers. Display one question at a time or as a scrollable list. Ensure feedback or highlighting for correct responses after selection."
+      ]
     },
     {
       "type": "slideshow",
-      "title": "Self-Advocacy Examples in Everyday Life",
-      "instructions": "Read through these examples to see how self-advocacy sounds in different situations. Notice the use of clear, polite, and direct language with specific requests.",
+      "title": "Self-Advocacy Examples",
+      "instructions": "Read these examples of self-advocacy in different settings.",
       "slides": [
         {
-          "content": "**Talking to a Teacher.** \"I got lost today when you explained the instructions for our assignment. Can you answer some questions to help me understand what I'm supposed to do?\"",
-          "image": "teacher explain.jpg"
+          "content": "### Talking to a Teacher\n\n\"I got lost today when you explained the instructions for our assignment. Can you answer some questions to help me understand what I'm supposed to do?\"",
+          "image": "teacher_explain.jpg"
         },
         {
-          "content": "**At Work.** \"I have a special family event next weekend. Can I trade shifts so that I can have that time off?\"",
+          "content": "### At Work\n\n\"I have a special family event next weekend. Can I trade shifts so that I can have that time off?\"",
           "image": "warehousejob.jpg"
         },
         {
-          "content": "**At the Doctor.** \"Even though this new medication is helping, I don't like the way it makes me feel. I'd like to try a different medication, please.\"",
+          "content": "### At the Doctor\n\n\"Even though this new medication is helping, I don't like the way it makes me feel. I'd like to try a different medication, please.\"",
           "image": "talkingtodoctor.jpg"
         },
         {
-          "content": "**In a Relationship.** \"Because I'm feeling upset, I'm having a difficult time expressing myself in this conversation. I'd like to take a break. Can we talk about this more another time?\"",
+          "content": "### In a Relationship\n\n\"Because I'm feeling upset, I'm having a difficult time expressing myself in this conversation. I'd like to take a break. Can we talk about this more another time?\"",
           "image": "relationshipcommunication.jpg"
         },
         {
-          "content": "**At a Restaurant.** \"I think there may have been a misunderstanding. My order was supposed to be without onions and this appears to have extra onions. Can I get a new dish, this time without onions?\"",
+          "content": "### At a Restaurant\n\n\"I think there may have been a misunderstanding. My order was supposed to be without onions and this appears to have extra onions. Can I get a new dish, this time without onions?\"",
           "image": "restaurant.jpg"
         },
         {
-          "content": "**With Your Parents.** \"I feel really exposed when you talk about my struggles in school with other people. Can you please ask me before you share information like that about me?\"",
+          "content": "### With Your Parents\n\n\"I feel really exposed when you talk about my struggles in school with other people. Can you please ask me before you share information like that about me?\"",
           "image": "teenandparent.jpg"
         },
         {
-          "content": "**With a Child.** \"No, we can't go to the park today. I know you were hoping to do something fun so let's use our imaginations and play at home.\"",
+          "content": "### With a Child\n\n\"No, we can't go to the park today. I know you were hoping to do something fun so let's use our imaginations and play at home.\"",
           "image": "imaginativeplay.jpg"
         },
         {
-          "content": "**At a Store.** \"I believe I may have been overcharged for this item that was on sale. Would you be able to look at the receipt and check the price for me, please?\"",
+          "content": "### At a Store\n\n\"I believe I may have been overcharged for this item that was on sale. Would you be able to look at the receipt and check the price for me, please?\"",
           "image": "clothingstore.jpg"
         },
         {
-          "content": "**With a Roommate.** \"Lately when I've gone to cook a meal, there have been a lot of dirty dishes that get in the way. Can you please make sure you are doing your dishes regularly?\"",
+          "content": "### With a Roommate\n\n\"Lately when I've gone to cook a meal, there have been a lot of dirty dishes that get in the way. Can you please make sure you are doing your dishes regularly?\"",
           "image": "roommate.jpg"
         }
       ]
@@ -120,9 +203,9 @@
       "content": "Everyone has strengths--skills, qualities, or ways of thinking that help them succeed in different areas of life. Strengths can show up in many forms, such as being a good listener, staying organized, working well with others, or finding creative solutions to problems. Sometimes strengths are easy to spot, but other times they are harder to see in ourselves until we take time to reflect.\n\nRecognizing your strengths is an important step in self-advocacy. When you know what you are good at, you can use those strengths to support your goals and speak up for yourself. For example, if you are good at organizing, you might ask your employer to consider you when they are assigning tasks related to organization. If you know you learn best with step-by-step instructions, you can advocate for yourself by asking a teacher or supervisor to explain tasks in that way.\n\nExplore the map below to learn more about Personal, <def def='Working and getting along with other people, like listening, talking, helping, or being part of a team.'>Interpersonal</def>, and <def def='Thinking and learning processes, like remembering, paying attention, solving problems, or making choices.'>Cognitive</def> strengths.",
       "examples": [
         {
-          "title": "Personal",
+          "title": "Personal Strengths",
           "image": "self care.jpg",
-          "description": "Strengths related to managing yourself, your emotions, and your personal responsibilities.",
+          "description": "Strengths related to caring for yourself and managing your personal qualities.",
           "examples": [
             {
               "name": "Caring for myself",
@@ -177,9 +260,9 @@
           ]
         },
         {
-          "title": "Interpersonal",
+          "title": "Interpersonal Strengths",
           "image": "approach.jpg",
-          "description": "Working and getting along with other people, like listening, talking, helping, or being part of a team.",
+          "description": "Strengths related to interacting and communicating effectively with other people.",
           "examples": [
             {
               "name": "Approachable",
@@ -234,9 +317,9 @@
           ]
         },
         {
-          "title": "Cognitive",
+          "title": "Cognitive Strengths",
           "image": "chart.jpg",
-          "description": "Thinking and learning processes, like remembering, paying attention, solving problems, or making choices.",
+          "description": "Strengths related to thinking, learning, and problem-solving.",
           "examples": [
             {
               "name": "Analytical",
@@ -296,7 +379,6 @@
       "type": "dndmatch",
       "title": "Identify Your Strengths",
       "instructions": "Read through the list of strengths below. Drag up to 10 strengths that best describe you into the box labeled 'My Greatest Strengths.' Then, use the space below to write any additional strengths you have that weren't included in the list. To determine your strengths you might think about times that family members, friends, or classmates have asked for your help with something. Why did they come to you? What skill did you have that helped them?",
-      "strict": false,
       "content": [
         {
           "category": "My Greatest Strengths",
@@ -331,144 +413,242 @@
             "Self-disciplined",
             "Team player",
             "Tech-savvy"
-          ],
-          "_limit": 10
+          ]
         }
-      ],
-      "_openresponse": {
-        "prompt": "What other strengths do you have that weren't included here? (Optional)",
-        "required": false,
-        "limit": null
-      }
+      ]
+    },
+    {
+      "type": "writing",
+      "title": "Free Write: Your Challenges",
+      "instructions": "Take some time to consider these questions and answer them completely. Let this be a space where you can reflect on your worries, anxieties, and barriers related to any challenges you face. Try not to be discouraged by your barriers as you identify them -- this is a lesson to help you overcome them, but you first have to know what they are!",
+      "prompts": [
+        "What challenges are you facing related to college/more school?",
+        "What challenges are you facing related to a job/career?",
+        "What challenges are you facing related to living on your own?"
+      ]
     },
     {
       "type": "quiz",
-      "title": "Recognizing Your Challenges",
-      "instructions": "For this activity, you get to choose whether you want to free write about your challenges or select challenges through a multiple choice activity.",
-      "content": "Everyone faces challenges and barriers that can get in the way of goals and daily living. Sometimes, these challenges are short term and other times they are long term. Many challenges come unexpectedly and are not brought on by choices you have made. Other challenges may be a result of choices you or others have made.\n\nIn addition to your strengths, it is important to recognize what challenges you face when you are preparing to self-advocate. When you understand your challenges, you can be better prepared to work through them and advocate for what help you might need to get through them.",
-      "optionsets": [
+      "title": "Select Your Challenges",
+      "instructions": "Take some time to consider these questions and answer them completely. Read all of the options and consider which ones apply to you. Try not to be discouraged by your barriers as you identify them -- this is a lesson to help you overcome them, but you first have to know what they are!",
+      "passing_score": 0,
+      "feedback_config": {},
+      "questions": [
         {
-          "optionType": "openresponse",
-          "title": "Free Write: Your Challenges",
-          "instructions": "Take some time to consider these questions and answer them completely. Let this be a space where you can reflect on your worries, anxieties, and barriers related to any challenges you face. Try not to be discouraged by your barriers as you identify them -- this is a lesson to help you overcome them, but you first have to know what they are!",
-          "questions": [
-            {
-              "prompt": "What challenges are you facing related to college/more school?",
-              "required": false,
-              "minlength": 20,
-              "maxlength": null
-            },
-            {
-              "prompt": "What challenges are you facing related to a job/career?",
-              "required": false,
-              "minlength": 20,
-              "maxlength": null
-            },
-            {
-              "prompt": "What challenges are you facing related to living on your own?",
-              "required": false,
-              "minlength": 20,
-              "maxlength": null
-            }
-          ]
+          "question_text": "What challenges are you facing related to college/more school? Select all that apply.",
+          "question_type": "multiple_select",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "I worry that my juvenile record may affect educational opportunities",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "I don't know how to apply to college, trade school, or a GED program",
+                "is_correct": false
+              },
+              {
+                "id": 3,
+                "text": "I have transportation barriers when it comes to school",
+                "is_correct": false
+              },
+              {
+                "id": 4,
+                "text": "I do not have reliable internet or computer access for assignments",
+                "is_correct": false
+              },
+              {
+                "id": 5,
+                "text": "I need more practice or support with reading skills",
+                "is_correct": false
+              },
+              {
+                "id": 6,
+                "text": "I need more practice or support with math skills",
+                "is_correct": false
+              },
+              {
+                "id": 7,
+                "text": "I don't know what college or trade school coursework is like",
+                "is_correct": false
+              },
+              {
+                "id": 8,
+                "text": "I don't know if I can pass the classes I would take",
+                "is_correct": false
+              },
+              {
+                "id": 9,
+                "text": "I am not motivated when it comes to school",
+                "is_correct": false
+              },
+              {
+                "id": 10,
+                "text": "I don't feel safe at school",
+                "is_correct": false
+              },
+              { "id": 11, "text": "Other", "is_correct": false }
+            ]
+          },
+          "is_required": false,
+          "feedback_config": {}
         },
         {
-          "optionType": "multiplechoice",
-          "title": "Select Challenges",
-          "instructions": "Take some time to consider these questions and answer them completely. Read all of the options and consider which ones apply to you. Try not to be discouraged by your barriers as you identify them -- this is a lesson to help you overcome them, but you first have to know what they are!",
-          "questions": [
-            {
-              "question": "What challenges are you facing related to college/more school? Select all that apply.",
-              "options": [
-                "I worry that my juvenile record may affect educational opportunities",
-                "I don't know how to apply to college, trade school, or a GED program",
-                "I have transportation barriers when it comes to school",
-                "I do not have reliable internet or computer access for assignments",
-                "I need more practice or support with reading skills",
-                "I need more practice or support with math skills",
-                "I don't know what college or trade school coursework is like",
-                "I don't know if I can pass the classes I would take",
-                "I am not motivated when it comes to school",
-                "I don't feel safe at school",
-                "Other: _____"
-              ],
-              "multiple": true
-            },
-            {
-              "question": "What challenges are you facing related to a job/career? Select all that apply.",
-              "options": [
-                "I don't know how to apply for a job",
-                "I am missing documents (example: ID) that I might need to be hired",
-                "I don't have a completed resume",
-                "I don't know how to answer interview questions",
-                "I don't have appropriate clothes for a job interview/work",
-                "I worry about sharing my criminal record with an employer",
-                "I worry about working with others",
-                "I lack the skills I need for the job I want",
-                "I have transportation barriers when it comes to work",
-                "I worry about how to balance a job with school or other responsibilities",
-                "Other: _____"
-              ],
-              "multiple": true
-            },
-            {
-              "question": "What challenges are you facing related to living on your own? Select all that apply.",
-              "options": [
-                "I don't know how to find a place to live",
-                "I am not confident in taking care of my own living space",
-                "I don't know how to get around or use transportation on my own",
-                "I worry about keeping up with bills or important paperwork",
-                "I don't know how to take care of myself if I get sick",
-                "I am not in good health",
-                "I don't know how to cook basic meals",
-                "I have trouble with managing my personal finances",
-                "I am not comfortable in social situations",
-                "I don't know how to get involved in my community",
-                "Other: _____"
-              ],
-              "multiple": true
-            },
-            {
-              "question": "What other challenges are you facing that were not included on these lists?",
-              "options": [],
-              "multiple": false,
-              "openresponse": true
-            }
-          ]
+          "question_text": "What challenges are you facing related to a job/career? Select all that apply.",
+          "question_type": "multiple_select",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "I don't know how to apply for a job",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "I am missing documents (example: ID) that I might need to be hired",
+                "is_correct": false
+              },
+              {
+                "id": 3,
+                "text": "I don't have a completed resume",
+                "is_correct": false
+              },
+              {
+                "id": 4,
+                "text": "I don't know how to answer interview questions",
+                "is_correct": false
+              },
+              {
+                "id": 5,
+                "text": "I don't have appropriate clothes for a job interview/work",
+                "is_correct": false
+              },
+              {
+                "id": 6,
+                "text": "I worry about sharing my criminal record with an employer",
+                "is_correct": false
+              },
+              {
+                "id": 7,
+                "text": "I worry about working with others",
+                "is_correct": false
+              },
+              {
+                "id": 8,
+                "text": "I lack the skills I need for the job I want",
+                "is_correct": false
+              },
+              {
+                "id": 9,
+                "text": "I have transportation barriers when it comes to work",
+                "is_correct": false
+              },
+              {
+                "id": 10,
+                "text": "I worry about how to balance a job with school or other responsibilities",
+                "is_correct": false
+              },
+              { "id": 11, "text": "Other", "is_correct": false }
+            ]
+          },
+          "is_required": false,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "What challenges are you facing related to living on your own? Select all that apply.",
+          "question_type": "multiple_select",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "I don't know how to find a place to live",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "I am not confident in taking care of my own living space",
+                "is_correct": false
+              },
+              {
+                "id": 3,
+                "text": "I don't know how to get around or use transportation on my own",
+                "is_correct": false
+              },
+              {
+                "id": 4,
+                "text": "I worry about keeping up with bills or important paperwork",
+                "is_correct": false
+              },
+              {
+                "id": 5,
+                "text": "I don't know how to take care of myself if I get sick",
+                "is_correct": false
+              },
+              {
+                "id": 6,
+                "text": "I am not in good health",
+                "is_correct": false
+              },
+              {
+                "id": 7,
+                "text": "I don't know how to cook basic meals",
+                "is_correct": false
+              },
+              {
+                "id": 8,
+                "text": "I have trouble with managing my personal finances",
+                "is_correct": false
+              },
+              {
+                "id": 9,
+                "text": "I am not comfortable in social situations",
+                "is_correct": false
+              },
+              {
+                "id": 10,
+                "text": "I don't know how to get involved in my community",
+                "is_correct": false
+              },
+              { "id": 11, "text": "Other", "is_correct": false }
+            ]
+          },
+          "is_required": false,
+          "feedback_config": {}
         }
-      ],
-      "image": null
+      ]
     },
     {
       "type": "fillintheblank",
       "title": "Who Can Help You Self-Advocate?",
-      "instructions": "Now that you have identified both your strengths and your challenges, you may be able to see how these connect. Self-advocacy is all about building on your strengths and working around your challenges to address specific problems. For example, if one challenge you face is not having reliable transportation to work or school, you can self-advocate to solve this, and you might use strengths such as being a planner or being creative to help you.\n\nAnother thing to learn about self-advocacy is *who* to talk to when you are addressing a problem or asking for a need to be met. Though some people may be able to offer good advice in a situation, only some people will be in the correct position to help. For example, a coworker might be a great listener about a problem at work, but if you need a work accommodation it would be best to speak to a supervisor.",
+      "instructions": "Now that you have identified both your strengths and your challenges, you may be able to see how these connect. Self-advocacy is all about building on your strengths and working around your challenges to address specific problems. For example, if one challenge you face is not having reliable transportation to work or school, you can self-advocate to solve this, and you might use strengths such as being a planner or being creative to help you.\n\nAnother thing to learn about self-advocacy is *who* to talk to when you are addressing a problem or asking for a need to be met. Though some people may be able to offer good advice in a situation, only some people will be in the correct position to help. For example, a coworker might be a great listener about a problem at work, but if you need a work accommodation it would be best to speak to a supervisor.\n\nWith each question below, fill in the blank with someone who you would talk to in order to advocate for yourself in the scenario.",
       "content": [
-        "You were up all night because of a family emergency and couldn't stay awake during a history quiz in class the next day, resulting in a failing grade. You could talk to <options keyword=\"true\">teacher, history teacher, instructor, professor</options> about your failing grade.",
-        "You're at the doctor and your mom has asked them to give you a seasonal flu shot but you aren't sure you want it. In this situation, you could talk to <options keyword=\"true\">doctor, physician, nurse practitioner, NP, provider</options>.",
-        "You and your coworker asked for Friday off and your boss gave your coworker the day off but not you. In this situation, you could talk to <options keyword=\"true\">boss, manager, supervisor</options>."
-      ],
-      "image": "emergency.jpg"
+        "You were up all night because of a family emergency and couldn't stay awake during a history quiz in class the next day, resulting in a failing grade. You could talk to <options></options> about your failing grade.",
+        "You're at the doctor and your mom has asked them to give you a seasonal flu shot but you aren't sure you want it. In this situation, you could talk to <options></options>.",
+        "You and your coworker asked for Friday off and your boss gave your coworker the day off but not you. In this situation, you could talk to <options></options>."
+      ]
     },
     {
       "type": "textcontent",
       "title": "Understanding Rights in Self-Advocacy",
       "instructions": null,
-      "content": "Along with knowing who to talk to when advocating for yourself, it is important to know what your <def def='Rules that protect your personal choices and ensure you are respected by others and the law.'>rights</def> are in different situations. Each of the situations on the previous page offered examples of when you might advocate for yourself, but that doesn't mean the other people in the situation have to give you what you want.\n\n**For example...**\n\n![Hospital](Hospital.jpg)\n*If you were up all night because of a family emergency and couldn't stay awake during a history quiz in class the next day, resulting in a failing grade...* Your teacher doesn't have to give you an opportunity to try again on the quiz. Even though the family emergency was out of your control, you may only get one try, and it is the teacher's right to decide.\n\n![Shot](Shot.jpg)\n*If you're at the doctor and your mom has asked them to give you a seasonal flu shot but you aren't sure you want it...* If you are under age 18, your parent or guardian gets to make medical decisions for you, even if you disagree. When you are 18 and older, you will have the legal right to make medical decisions for yourself.\n\n![Floral employee](Floralemployee.jpg)\n*If you and your coworker asked for Friday off and your boss gave your coworker the day off but not you...* You can make requests but your boss has the right to schedule you and others the way that they want. The exception to this is if the schedule <def def='To stop something from happening the way it should'>interferes</def> with legal workplace <def def='A support or change that ensures laws protecting fairness and equal treatment are followed'>accommodations</def>.",
-      "image": null
+      "content": "Along with knowing who to talk to when advocating for yourself, it is important to know what your <def def='Rules that protect your personal choices and ensure you are respected by others and the law.'>rights</def> are in different situations. Each of the situations on the previous page offered examples of when you might advocate for yourself, but that doesn't mean the other people in the situation have to give you what you want.\n\n**For example...**\n\n![Hospital](Hospital.jpg)\n*If you were up all night because of a family emergency and couldn't stay awake during a history quiz in class the next day, resulting in a failing grade...* Your teacher doesn't have to give you an opportunity to try again on the quiz. Even though the family emergency was out of your control, you may only get one try, and it is the teacher's right to decide.\n\n![Shot](Shot.jpg)\n*If you're at the doctor and your mom has asked them to give you a seasonal flu shot but you aren't sure you want it...* If you are under age 18, your parent or guardian gets to make medical decisions for you, even if you disagree. When you are 18 and older, you will have the legal right to make medical decisions for yourself.\n\n![Floral employee](Floralemployee.jpg)\n*If you and your coworker asked for Friday off and your boss gave your coworker the day off but not you...* You can make requests but your boss has the right to schedule you and others the way that they want. The exception to this is if the schedule <def def='To stop something from happening the way it should'>interferes</def> with legal workplace <def def='A support or change that ensures laws protecting fairness and equal treatment are followed'>accommodations</def>."
     },
     {
       "type": "video",
       "title": "Understanding Rights and Discrimination",
-      "instructions": "Watch the video to learn more about protected rights.",
-      "content": "Your <def def='Rules that protect your personal choices and ensure you are respected by others and the law.'>rights</def> are especially important when it comes to applying for jobs, working, and going to school. There are legal rights that protect you and others from <def def='To treat someone differently or poorly based on a characteristic'>discrimination</def>. One form of discrimination is <def def='Any unwelcome treatment based on a protected characteristic'>harassment</def>.\n\n**It is your responsibility to report discrimination and not discriminate against others.**",
-      "video": "Protected Rights.mp4",
-      "image": null
+      "instructions": "Your <def def='Rules that protect your personal choices and ensure you are respected by others and the law.'>rights</def> are especially important when it comes to applying for jobs, working, and going to school. There are legal rights that protect you and others from <def def='To treat someone differently or poorly based on a characteristic'>discrimination</def>. One form of discrimination is <def def='Any unwelcome treatment based on a protected characteristic'>harassment</def>.\n\n**It is your responsibility to report discrimination and not discriminate against others.**\n\nWatch the video to learn more about protected rights.",
+      "video": "protected_rights.mp4",
+      "scrubbable": false
     },
     {
       "type": "slideshow",
       "title": "Steps to Self-Advocacy",
-      "instructions": "**Speak Clearly and Directly** So how do you actually advocate for yourself? It starts with knowing your strengths, what you're asking for, who you need to talk to, and what your rights are. Once you have that clear in your mind, you're ready to speak up. On the next few pages you will learn the steps in advocating for yourself.",
+      "instructions": "So how do you actually advocate for yourself? It starts with knowing your strengths, what you're asking for, who you need to talk to, and what your rights are. Once you have that clear in your mind, you're ready to speak up. On the next few pages you will learn the steps in advocating for yourself.",
       "slides": [
         {
           "content": "**Speak clearly and directly.** Self-advocacy doesn't mean being loud or demanding--it means explaining your needs in a confident way. Using \"I\" statements like, *\"I need more time to finish this assignment\"* or *\"I learn best when I can see an example\"* keeps the focus on your needs, not on blaming anyone else.",
@@ -499,74 +679,28 @@
     {
       "type": "twine",
       "title": "Self-Advocacy in Action",
-      "link": "Self-Advocacy in Action.html"
+      "file": "Self-Advocacy in Action.html"
     },
     {
-      "type": "quiz",
+      "type": "writing",
       "title": "Create Your Self-Advocacy Plan",
-      "instructions": null,
-      "content": "Learning about self-advocacy is only the first step toward making change in your life--the next step is making a plan for how you will use it. A plan helps you think ahead about what you need, who you need to talk to, and what words you might use. By writing down your plan, you can practice in a safe way before you face a real situation. Planning also makes it easier to stay calm and confident when the time comes to speak up.\n\nTake a moment to think about any areas of your life where you might be able to practice self-advocacy soon. Answer the questions below to start your plan and then finish by writing a summary of your plan.",
-      "questions": [
-        {
-          "question": "Where can you practice self-advocacy in the next week? Pick just one for now.",
-          "type": "multiplechoice",
-          "options": [
-            "In one of my classes",
-            "On my unit",
-            "At work",
-            "In a meeting for school",
-            "At counseling",
-            "At home",
-            "In a medical appointment",
-            "Other: _____"
-          ],
-          "multiple": false
-        },
-        {
-          "question": "Who will you talk to when you self-advocate? In other words, who has the ability to give you what you need/want?",
-          "type": "multiplechoice",
-          "options": [
-            "A teacher",
-            "An administrator",
-            "Group living staff",
-            "My parent/guardian",
-            "A medical provider",
-            "My counselor",
-            "My case manager",
-            "Other: _____"
-          ],
-          "multiple": false
-        },
-        {
-          "question": "What challenge are you facing?",
-          "type": "shortanswer",
-          "minlength": 10,
-          "maxlength": 150
-        },
-        {
-          "question": "What strengths do you have that can help you in this situation?",
-          "type": "shortanswer",
-          "minlength": 10,
-          "maxlength": 150
-        },
-        {
-          "question": "Who has rights in this situation? What are those rights? For example, a teacher might have the right to ask you to do a presentation AND you might have an accommodation at school that gives you the right to do your presentation without the class as an audience.",
-          "type": "shortanswer",
-          "minlength": 10,
-          "maxlength": 300
-        },
-        {
-          "question": "Write a summary of your self-advocacy plan. What will you ask for? How will you approach the situation? What will you do if you don't get what you want?",
-          "type": "openresponse",
-          "minlength": 20
-        }
+      "instructions": "Learning about self-advocacy is only the first step toward making change in your life--the next step is making a plan for how you will use it. A plan helps you think ahead about what you need, who you need to talk to, and what words you might use. By writing down your plan, you can practice in a safe way before you face a real situation. Planning also makes it easier to stay calm and confident when the time comes to speak up.\n\nTake a moment to think about any areas of your life where you might be able to practice self-advocacy soon. Answer the questions below to start your plan and then finish by writing a summary of your plan.",
+      "prompts": [
+        "Where can you practice self-advocacy in the next week? Pick just one for now. (Options: In one of my classes, On my unit, At work, In a meeting for school, At counseling, At home, In a medical appointment, Other)",
+        "Who will you talk to when you self-advocate? In other words, who has the ability to give you what you need/want? (Options: A teacher, An administrator, Group living staff, My parent/guardian, A medical provider, My counselor, My case manager, Other)",
+        "What challenge are you facing?",
+        "What strengths do you have that can help you in this situation?",
+        "Who has rights in this situation? What are those rights? For example, a teacher might have the right to ask you to do a presentation AND you might have an accommodation at school that gives you the right to do your presentation without the class as an audience.",
+        "Write a summary of your self-advocacy plan. What will you ask for? How will you approach the situation? What will you do if you don't get what you want?"
       ]
     },
     {
       "type": "writing",
       "title": "Self-Advocacy Reflection",
-      "content": "You've just finished this lesson on Self-Advocacy. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else.",
-      "image": "Tips for self-advocate.pdf"
+      "instructions": null,
+      "prompts": [
+        "You've just finished this lesson on Self-Advocacy. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else."
+      ]
     }
   ]
 }
