@@ -152,6 +152,25 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='BugReport',
+            fields=[
+                ('id', models.UUIDField(default=uuid.uuid4, editable=False, help_text='the uuid of the database item', primary_key=True, serialize=False)),
+                ('description', models.TextField(help_text='A detailed description of the bug')),
+                ('steps_to_reproduce', models.TextField(help_text='Steps to reproduce the bug')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('recent_window_locations', models.JSONField(default=list, help_text='List of recent window locations leading up to the bug report')),
+                ('app_state', models.JSONField(default=dict, help_text='Snapshot of the application state at the time of the bug report')),
+                ('device_info', models.JSONField(default=dict, help_text="Information about the user's device and environment")),
+                ('app_version', models.CharField(help_text='Version of the application', max_length=100)),
+                ('user', models.ForeignKey(help_text='The user who reported the bug', on_delete=django.db.models.deletion.CASCADE, related_name='bug_reports', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': 'Bug Report',
+                'verbose_name_plural': 'Bug Reports',
+                'ordering': ['-created_at'],
+            },
+        ),
+        migrations.CreateModel(
             name='Lesson',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, help_text='the uuid of the database item', primary_key=True, serialize=False)),

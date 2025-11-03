@@ -25,7 +25,8 @@ import {
 import { PopoverClose } from "@radix-ui/react-popover";
 import { useSpeech } from "react-text-to-speech";
 import { useVoices } from "react-text-to-speech";
-import { resetResponseState } from "@/features/curriculum/slices/userLessonDataSlice";
+import { resetResponseState, } from "@/features/curriculum/slices/userLessonDataSlice";
+import { resetInitialLessonState } from "@/features/curriculum/slices/lessonSlice";
 
 
 function ThemeOption({
@@ -218,6 +219,7 @@ export default function account() {
 
       //clear redux state
       dispatch(resetResponseState());
+      dispatch(resetInitialLessonState());
 
     }
     catch (err: any){

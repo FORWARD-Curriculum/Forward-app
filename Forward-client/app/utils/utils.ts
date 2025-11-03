@@ -1,3 +1,5 @@
+import { addError } from "@/features/logging/slices/loggingSlice";
+import store from "@/store";
 import { clsx, type ClassValue } from "clsx";
 import { useEffect } from "react";
 import { twMerge } from "tailwind-merge";
@@ -142,7 +144,31 @@ export function useTitle(
   ...deps: React.DependencyList
 ): void {
   useEffect(() => {
-    console.log(titleOrFn);
+    // console.log(titleOrFn);
     document.title = typeof titleOrFn === "function" ? titleOrFn() : titleOrFn;
   }, [...deps]);
 }
+
+function getCallerStack(skipLines = 2) {
+  const err = new Error();
+  const raw = err.stack || "";
+  const lines = raw.split(/\r?\n/);
+  return lines.slice(skipLines).join("\n");
+}
+
+const originalConsoleError = console.error.bind(console);
+
+console.error = (...args: any[]) => {
+  const stack = getCallerStack(2);
+  originalConsoleError(...args);
+
+  store.dispatch(
+    addError(
+      {
+        args,
+        stack,
+        time: Date.now(),
+      }
+    )
+  );
+};

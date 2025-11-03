@@ -3,7 +3,7 @@ from .views import (
     QuizResponseStatusView, UserRegistrationView, SessionView, CurrentUserView, QuizView,
     LessonView, LessonContentView, TextContentView, WritingView,
     PollView, QuizResponseView, QuizResponseDetailView, GetLessonIds,
-    CurriculumView, ResponseView, OnboardView, ResetStudentProgressView
+    CurriculumView, ResponseView, OnboardView, BugReportView, ResetStudentProgressView
     # , QuestionResponseView
 )
 
@@ -30,5 +30,8 @@ urlpatterns = [
 
     path('responses/<str:activitytype>', ResponseView.as_view(), name='general-response'),
     
-    path('survey', OnboardView.as_view(), name='surveying')
+    path('survey', OnboardView.as_view(), name='surveying'),
+
+    #logging
+    path('bugreport', BugReportView.as_view(), name='bug-report'),
 ]
