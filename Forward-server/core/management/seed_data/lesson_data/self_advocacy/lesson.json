@@ -71,67 +71,47 @@
       "comments_to_tech": "Convert bolded options into correct answers. Display one question at a time or as a scrollable list. Ensure feedback or highlighting for correct responses after selection."
     },
     {
-      "type": "textcontent",
-      "title": "Self-Advocacy Example -- Talking to a Teacher",
-      "instructions": "Read this example of self-advocacy in a school setting.",
-      "content": "\"I got lost today when you explained the instructions for our assignment. Can you answer some questions to help me understand what I'm supposed to do?\"",
-      "image": "teacher explain.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Self-Advocacy Example -- At Work",
-      "instructions": "Read this example of asking for a schedule change at work.",
-      "content": "\"I have a special family event next weekend. Can I trade shifts so that I can have that time off?\"",
-      "image": "warehousejob.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Self-Advocacy Example -- At the Doctor",
-      "instructions": "Read this example of communicating health needs.",
-      "content": "\"Even though this new medication is helping, I don't like the way it makes me feel. I'd like to try a different medication, please.\"",
-      "image": "talkingtodoctor.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Self-Advocacy Example -- In a Relationship",
-      "instructions": "Read this example of setting boundaries during a difficult conversation.",
-      "content": "\"Because I'm feeling upset, I'm having a difficult time expressing myself in this conversation. I'd like to take a break. Can we talk about this more another time?\"",
-      "image": "relationshipcommunication.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Self-Advocacy Example -- At a Restaurant",
-      "instructions": "Read this example of politely correcting an order.",
-      "content": "\"I think there may have been a misunderstanding. My order was supposed to be without onions and this appears to have extra onions. Can I get a new dish, this time without onions?\"",
-      "image": "restaurant.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Self-Advocacy Example -- With Your Parents",
-      "instructions": "Read this example of asking for privacy and consent.",
-      "content": "\"I feel really exposed when you talk about my struggles in school with other people. Can you please ask me before you share information like that about me?\"",
-      "image": "teenandparent.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Self-Advocacy Example -- With a Child",
-      "instructions": "Read this example of setting limits while offering an alternative.",
-      "content": "\"No, we can't go to the park today. I know you were hoping to do something fun so let's use our imaginations and play at home.\"",
-      "image": "imaginativeplay.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Self-Advocacy Example -- At a Store",
-      "instructions": "Read this example of requesting a price check.",
-      "content": "\"I believe I may have been overcharged for this item that was on sale. Would you be able to look at the receipt and check the price for me, please?\"",
-      "image": "clothingstore.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Self-Advocacy Example -- With a Roommate",
-      "instructions": "Read this example of addressing shared-space responsibilities.",
-      "content": "\"Lately when I've gone to cook a meal, there have been a lot of dirty dishes that get in the way. Can you please make sure you are doing your dishes regularly?\"",
-      "image": "roommate.jpg"
+      "type": "slideshow",
+      "title": "Self-Advocacy Examples in Everyday Life",
+      "instructions": "Read through these examples to see how self-advocacy sounds in different situations. Notice the use of clear, polite, and direct language with specific requests.",
+      "slides": [
+        {
+          "content": "**Talking to a Teacher.** \"I got lost today when you explained the instructions for our assignment. Can you answer some questions to help me understand what I'm supposed to do?\"",
+          "image": "teacher explain.jpg"
+        },
+        {
+          "content": "**At Work.** \"I have a special family event next weekend. Can I trade shifts so that I can have that time off?\"",
+          "image": "warehousejob.jpg"
+        },
+        {
+          "content": "**At the Doctor.** \"Even though this new medication is helping, I don't like the way it makes me feel. I'd like to try a different medication, please.\"",
+          "image": "talkingtodoctor.jpg"
+        },
+        {
+          "content": "**In a Relationship.** \"Because I'm feeling upset, I'm having a difficult time expressing myself in this conversation. I'd like to take a break. Can we talk about this more another time?\"",
+          "image": "relationshipcommunication.jpg"
+        },
+        {
+          "content": "**At a Restaurant.** \"I think there may have been a misunderstanding. My order was supposed to be without onions and this appears to have extra onions. Can I get a new dish, this time without onions?\"",
+          "image": "restaurant.jpg"
+        },
+        {
+          "content": "**With Your Parents.** \"I feel really exposed when you talk about my struggles in school with other people. Can you please ask me before you share information like that about me?\"",
+          "image": "teenandparent.jpg"
+        },
+        {
+          "content": "**With a Child.** \"No, we can't go to the park today. I know you were hoping to do something fun so let's use our imaginations and play at home.\"",
+          "image": "imaginativeplay.jpg"
+        },
+        {
+          "content": "**At a Store.** \"I believe I may have been overcharged for this item that was on sale. Would you be able to look at the receipt and check the price for me, please?\"",
+          "image": "clothingstore.jpg"
+        },
+        {
+          "content": "**With a Roommate.** \"Lately when I've gone to cook a meal, there have been a lot of dirty dishes that get in the way. Can you please make sure you are doing your dishes regularly?\"",
+          "image": "roommate.jpg"
+        }
+      ]
     },
     {
       "type": "conceptmap",
@@ -140,159 +120,177 @@
       "content": "Everyone has strengths--skills, qualities, or ways of thinking that help them succeed in different areas of life. Strengths can show up in many forms, such as being a good listener, staying organized, working well with others, or finding creative solutions to problems. Sometimes strengths are easy to spot, but other times they are harder to see in ourselves until we take time to reflect.\n\nRecognizing your strengths is an important step in self-advocacy. When you know what you are good at, you can use those strengths to support your goals and speak up for yourself. For example, if you are good at organizing, you might ask your employer to consider you when they are assigning tasks related to organization. If you know you learn best with step-by-step instructions, you can advocate for yourself by asking a teacher or supervisor to explain tasks in that way.\n\nExplore the map below to learn more about Personal, <def def='Working and getting along with other people, like listening, talking, helping, or being part of a team.'>Interpersonal</def>, and <def def='Thinking and learning processes, like remembering, paying attention, solving problems, or making choices.'>Cognitive</def> strengths.",
       "examples": [
         {
-          "title": "Personal -- Caring for myself",
+          "title": "Personal",
           "image": "self care.jpg",
-          "description": "Taking care of your mental, physical, and emotional needs."
+          "description": "Strengths related to managing yourself, your emotions, and your personal responsibilities.",
+          "examples": [
+            {
+              "name": "Caring for myself",
+              "image": "self care.jpg",
+              "description": "Taking care of your mental, physical, and emotional needs."
+            },
+            {
+              "name": "Flexible",
+              "image": "flexible.jpg",
+              "description": "Being able to handle changes easily and go with the flow."
+            },
+            {
+              "name": "Honest",
+              "image": "honest.jpg",
+              "description": "Telling the truth and not lying or cheating."
+            },
+            {
+              "name": "Motivated",
+              "image": "motivated.jpg",
+              "description": "To take action and work hard."
+            },
+            {
+              "name": "Organized",
+              "image": "organized.jpg",
+              "description": "Keeping things tidy and in places they belong."
+            },
+            {
+              "name": "Patient",
+              "image": "patience.jpg",
+              "description": "Staying calm and waiting without getting upset."
+            },
+            {
+              "name": "Persistent",
+              "image": "persistent.jpg",
+              "description": "Not giving up, even when something is tough."
+            },
+            {
+              "name": "Positive attitude",
+              "image": "positive.jpg",
+              "description": "Staying hopeful and looking on the bright side."
+            },
+            {
+              "name": "Safety-minded",
+              "image": "safety.jpg",
+              "description": "Paying attention to what keeps yourself and others safe."
+            },
+            {
+              "name": "Self-disciplined",
+              "image": "focus.jpg",
+              "description": "Keeping oneself on task and focused."
+            }
+          ]
         },
         {
-          "title": "Personal -- Flexible",
-          "image": "flexible.jpg",
-          "description": "Being able to handle changes easily and go with the flow."
-        },
-        {
-          "title": "Personal -- Honest",
-          "image": "honest.jpg",
-          "description": "Telling the truth and not lying or cheating."
-        },
-        {
-          "title": "Personal -- Motivated",
-          "image": "motivated.jpg",
-          "description": "To take action and work hard."
-        },
-        {
-          "title": "Personal -- Organized",
-          "image": "organized.jpg",
-          "description": "Keeping things tidy and in places they belong."
-        },
-        {
-          "title": "Personal -- Patient",
-          "image": "patience.jpg",
-          "description": "Staying calm and waiting without getting upset."
-        },
-        {
-          "title": "Personal -- Persistent",
-          "image": "persistent.jpg",
-          "description": "Not giving up, even when something is tough."
-        },
-        {
-          "title": "Personal -- Positive attitude",
-          "image": "positive.jpg",
-          "description": "Staying hopeful and looking on the bright side."
-        },
-        {
-          "title": "Personal -- Safety-minded",
-          "image": "safety.jpg",
-          "description": "Paying attention to what keeps yourself and others safe."
-        },
-        {
-          "title": "Personal -- Self-disciplined",
-          "image": "focus.jpg",
-          "description": "Keeping oneself on task and focused."
-        },
-
-        {
-          "title": "Interpersonal -- Approachable",
+          "title": "Interpersonal",
           "image": "approach.jpg",
-          "description": "Being friendly and easy for others to talk to."
+          "description": "Working and getting along with other people, like listening, talking, helping, or being part of a team.",
+          "examples": [
+            {
+              "name": "Approachable",
+              "image": "approach.jpg",
+              "description": "Being friendly and easy for others to talk to."
+            },
+            {
+              "name": "Encouraging",
+              "image": "encourage.jpg",
+              "description": "Helping others feel confident and supported."
+            },
+            {
+              "name": "Empathetic",
+              "image": "empathetic.jpg",
+              "description": "Understanding and caring about others' feelings."
+            },
+            {
+              "name": "Good listener",
+              "image": "listener.jpg",
+              "description": "Paying close attention when others speak."
+            },
+            {
+              "name": "Good teacher",
+              "image": "good teacher.jpg",
+              "description": "Able to explain or show things to help others learn easily."
+            },
+            {
+              "name": "Leadership",
+              "image": "boss.jpg",
+              "description": "Able to take charge and guide others."
+            },
+            {
+              "name": "Open-minded",
+              "image": "open mind.jpg",
+              "description": "Willing to consider different ideas or opinions."
+            },
+            {
+              "name": "Peacemaker",
+              "image": "peace.jpg",
+              "description": "Able to resolve conflicts between people easily."
+            },
+            {
+              "name": "Persuasive",
+              "image": "explain.jpg",
+              "description": "Explaining ideas in a way that tries to convince others of something."
+            },
+            {
+              "name": "Team player",
+              "image": "group.jpg",
+              "description": "Working well with others."
+            }
+          ]
         },
         {
-          "title": "Interpersonal -- Encouraging",
-          "image": "encourage.jpg",
-          "description": "Helping others feel confident and supported."
-        },
-        {
-          "title": "Interpersonal -- Empathetic",
-          "image": "empathetic.jpg",
-          "description": "Understanding and caring about others' feelings."
-        },
-        {
-          "title": "Interpersonal -- Good listener",
-          "image": "listener.jpg",
-          "description": "Paying close attention when others speak."
-        },
-        {
-          "title": "Interpersonal -- Good teacher",
-          "image": "good teacher.jpg",
-          "description": "Able to explain or show things to help others learn easily."
-        },
-        {
-          "title": "Interpersonal -- Leadership",
-          "image": "boss.jpg",
-          "description": "Able to take charge and guide others."
-        },
-        {
-          "title": "Interpersonal -- Open-minded",
-          "image": "open mind.jpg",
-          "description": "Willing to consider different ideas or opinions."
-        },
-        {
-          "title": "Interpersonal -- Peacemaker",
-          "image": "peace.jpg",
-          "description": "Able to resolve conflicts between people easily."
-        },
-        {
-          "title": "Interpersonal -- Persuasive",
-          "image": "explain.jpg",
-          "description": "Explaining ideas in a way that tries to convince others of something."
-        },
-        {
-          "title": "Interpersonal -- Team player",
-          "image": "group.jpg",
-          "description": "Working well with others."
-        },
-
-        {
-          "title": "Cognitive -- Analytical",
+          "title": "Cognitive",
           "image": "chart.jpg",
-          "description": "Breaking down information to understand it better."
-        },
-        {
-          "title": "Cognitive -- Creative",
-          "image": "art.jpg",
-          "description": "Good at creating things, including new ideas and ways of doing things."
-        },
-        {
-          "title": "Cognitive -- Detail-oriented",
-          "image": "details.jpg",
-          "description": "Noticing and focusing on small details that others may miss."
-        },
-        {
-          "title": "Cognitive -- Focused",
-          "image": "checklist.jpg",
-          "description": "Staying on task and not getting distracted."
-        },
-        {
-          "title": "Cognitive -- Good memory",
-          "image": "memory.jpg",
-          "description": "Able to recall details and information."
-        },
-        {
-          "title": "Cognitive -- Innovative",
-          "image": "ideas.jpg",
-          "description": "Coming up with new approaches or methods to do things."
-        },
-        {
-          "title": "Cognitive -- Planner",
-          "image": "planner.jpg",
-          "description": "Mapping out clear steps or times to accomplish something."
-        },
-        {
-          "title": "Cognitive -- Quick learner",
-          "image": "learn.jpg",
-          "description": "Picking up new skills or knowledge quickly."
-        },
-        {
-          "title": "Cognitive -- Resourceful",
-          "image": "resource.jpg",
-          "description": "Finding ways to solve problems with what you already have access to."
-        },
-        {
-          "title": "Cognitive -- Tech-savvy",
-          "image": "tech savvy.jpg",
-          "description": "Skilled at using phones, computers, or technology."
+          "description": "Thinking and learning processes, like remembering, paying attention, solving problems, or making choices.",
+          "examples": [
+            {
+              "name": "Analytical",
+              "image": "chart.jpg",
+              "description": "Breaking down information to understand it better."
+            },
+            {
+              "name": "Creative",
+              "image": "art.jpg",
+              "description": "Good at creating things, including new ideas and ways of doing things."
+            },
+            {
+              "name": "Detail-oriented",
+              "image": "details.jpg",
+              "description": "Noticing and focusing on small details that others may miss."
+            },
+            {
+              "name": "Focused",
+              "image": "checklist.jpg",
+              "description": "Staying on task and not getting distracted."
+            },
+            {
+              "name": "Good memory",
+              "image": "memory.jpg",
+              "description": "Able to recall details and information."
+            },
+            {
+              "name": "Innovative",
+              "image": "ideas.jpg",
+              "description": "Coming up with new approaches or methods to do things."
+            },
+            {
+              "name": "Planner",
+              "image": "planner.jpg",
+              "description": "Mapping out clear steps or times to accomplish something."
+            },
+            {
+              "name": "Quick learner",
+              "image": "learn.jpg",
+              "description": "Picking up new skills or knowledge quickly."
+            },
+            {
+              "name": "Resourceful",
+              "image": "resource.jpg",
+              "description": "Finding ways to solve problems with what you already have access to."
+            },
+            {
+              "name": "Tech-savvy",
+              "image": "tech savvy.jpg",
+              "description": "Skilled at using phones, computers, or technology."
+            }
+          ]
         }
-      ],
-      "comments_to_tech": "Display each strength as an interactive flip card within a concept map layout. Use three labeled sections for Personal, Interpersonal, and Cognitive strengths."
+      ]
     },
     {
       "type": "dndmatch",
@@ -444,30 +442,11 @@
     {
       "type": "fillintheblank",
       "title": "Who Can Help You Self-Advocate?",
-      "instructions": "With each question below, fill in the blank with someone who you would talk to in order to advocate for yourself in the scenario.",
-      "content": "Now that you have identified both your strengths and your challenges, you may be able to see how these connect. Self-advocacy is all about building on your strengths and working around your challenges to address specific problems. For example, if one challenge you face is not having reliable transportation to work or school, you can self-advocate to solve this, and you might use strengths such as being a planner or being creative to help you.\n\nAnother thing to learn about self-advocacy is *who* to talk to when you are addressing a problem or asking for a need to be met. Though some people may be able to offer good advice in a situation, only some people will be in the correct position to help. For example, a coworker might be a great listener about a problem at work, but if you need a work accommodation it would be best to speak to a supervisor.",
-      "questions": [
-        {
-          "prompt": "You were up all night because of a family emergency and couldn't stay awake during a history quiz in class the next day, resulting in a failing grade. You could talk to ________ about your failing grade.",
-          "answer": null,
-          "required": true,
-          "minlength": 1,
-          "maxlength": 30
-        },
-        {
-          "prompt": "You're at the doctor and your mom has asked them to give you a seasonal flu shot but you aren't sure you want it. In this situation, you could talk to ________.",
-          "answer": null,
-          "required": true,
-          "minlength": 1,
-          "maxlength": 30
-        },
-        {
-          "prompt": "You and your coworker asked for Friday off and your boss gave your coworker the day off but not you. In this situation, you could talk to ________.",
-          "answer": null,
-          "required": true,
-          "minlength": 5,
-          "maxlength": 30
-        }
+      "instructions": "Now that you have identified both your strengths and your challenges, you may be able to see how these connect. Self-advocacy is all about building on your strengths and working around your challenges to address specific problems. For example, if one challenge you face is not having reliable transportation to work or school, you can self-advocate to solve this, and you might use strengths such as being a planner or being creative to help you.\n\nAnother thing to learn about self-advocacy is *who* to talk to when you are addressing a problem or asking for a need to be met. Though some people may be able to offer good advice in a situation, only some people will be in the correct position to help. For example, a coworker might be a great listener about a problem at work, but if you need a work accommodation it would be best to speak to a supervisor.",
+      "content": [
+        "You were up all night because of a family emergency and couldn't stay awake during a history quiz in class the next day, resulting in a failing grade. You could talk to <options keyword=\"true\">teacher, history teacher, instructor, professor</options> about your failing grade.",
+        "You're at the doctor and your mom has asked them to give you a seasonal flu shot but you aren't sure you want it. In this situation, you could talk to <options keyword=\"true\">doctor, physician, nurse practitioner, NP, provider</options>.",
+        "You and your coworker asked for Friday off and your boss gave your coworker the day off but not you. In this situation, you could talk to <options keyword=\"true\">boss, manager, supervisor</options>."
       ],
       "image": "emergency.jpg"
     },
@@ -487,45 +466,35 @@
       "image": null
     },
     {
-      "type": "textcontent",
-      "title": "Steps to Self-Advocacy: Speak Clearly and Directly",
-      "instructions": null,
-      "content": "So how do you actually advocate for yourself? It starts with knowing your strengths, what you're asking for, who you need to talk to, and what your rights are. Once you have that clear in your mind, you're ready to speak up. On the next few pages you will learn the steps in advocating for yourself.\n\n![Speak clearly and directly](Speakclear.jpg)\n\n**Speak clearly and directly.** Self-advocacy doesn't mean being loud or demanding--it means explaining your needs in a confident way. Using \"I\" statements like, *\"I need more time to finish this assignment\"* or *\"I learn best when I can see an example\"* keeps the focus on your needs, not on blaming anyone else."
-    },
-    {
-      "type": "textcontent",
-      "title": "Steps to Self-Advocacy: Be Polite but Firm",
-      "instructions": null,
-      "content": "**Be polite but firm.** Speaking clearly also means choosing words that are respectful. You can be polite while still standing your ground. For example, *\"I understand the rule, but can we talk about how it applies to my situation?\"* shows respect while still making your point.",
-      "image": "Relationshipadvocate.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Steps to Self-Advocacy: Ask Questions",
-      "instructions": null,
-      "content": "**Ask questions.** Advocacy is not only about saying what you need but also about making sure you have the right information. Asking questions helps you understand what options are available and shows that you are serious about your goals.",
-      "image": "Hospital.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Steps to Self-Advocacy: Don't Be Afraid to Ask for Clarity",
-      "instructions": null,
-      "content": "**Don't be afraid to ask for clarity.** Sometimes rules, instructions, or choices can feel confusing. It's okay to say, *\"I don't understand. Can you explain that again in a different way?\"* Getting clarity helps you make better decisions and avoids mistakes.",
-      "image": "Questions.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Steps to Self-Advocacy: Keep Practicing",
-      "instructions": null,
-      "content": "**Keep practicing.** The more you practice self-advocacy, the easier it gets. Each time you speak up, you gain more confidence in yourself and your ability to handle tough situations.",
-      "image": "Practice.jpg"
-    },
-    {
-      "type": "textcontent",
-      "title": "Steps to Self-Advocacy: Remember, It's a Process",
-      "instructions": null,
-      "content": "**Remember, it's a process.** Things might not always go exactly the way you hoped, but every step you take makes you stronger and more prepared for challenges at school, at work, and in life.",
-      "image": "Handshakesmile.jpg"
+      "type": "slideshow",
+      "title": "Steps to Self-Advocacy",
+      "instructions": "**Speak Clearly and Directly** So how do you actually advocate for yourself? It starts with knowing your strengths, what you're asking for, who you need to talk to, and what your rights are. Once you have that clear in your mind, you're ready to speak up. On the next few pages you will learn the steps in advocating for yourself.",
+      "slides": [
+        {
+          "content": "**Speak clearly and directly.** Self-advocacy doesn't mean being loud or demanding--it means explaining your needs in a confident way. Using \"I\" statements like, *\"I need more time to finish this assignment\"* or *\"I learn best when I can see an example\"* keeps the focus on your needs, not on blaming anyone else.",
+          "image": "Speakclear.jpg"
+        },
+        {
+          "content": "**Be polite but firm.** Speaking clearly also means choosing words that are respectful. You can be polite while still standing your ground. For example, *\"I understand the rule, but can we talk about how it applies to my situation?\"* shows respect while still making your point.",
+          "image": "Relationshipadvocate.jpg"
+        },
+        {
+          "content": "**Ask questions.** Advocacy is not only about saying what you need but also about making sure you have the right information. Asking questions helps you understand what options are available and shows that you are serious about your goals.",
+          "image": "Hospital.jpg"
+        },
+        {
+          "content": "**Don't be afraid to ask for clarity.** Sometimes rules, instructions, or choices can feel confusing. It's okay to say, *\"I don't understand. Can you explain that again in a different way?\"* Getting clarity helps you make better decisions and avoids mistakes.",
+          "image": "Questions.jpg"
+        },
+        {
+          "content": "**Keep practicing.** The more you practice self-advocacy, the easier it gets. Each time you speak up, you gain more confidence in yourself and your ability to handle tough situations.",
+          "image": "Practice.jpg"
+        },
+        {
+          "content": "**Remember, it's a process.** Things might not always go exactly the way you hoped, but every step you take makes you stronger and more prepared for challenges at school, at work, and in life.",
+          "image": "Handshakesmile.jpg"
+        }
+      ]
     },
     {
       "type": "twine",

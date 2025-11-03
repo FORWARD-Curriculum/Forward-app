@@ -170,6 +170,9 @@ class Lesson(models.Model):
         validators=[MinLengthValidator(3)],
         help_text="The title of the lesson"
     )
+    
+    active = models.BooleanField(default=False, help_text="Wether or not the lesson is shown to students. Keep this unchecked until you\
+        are ready for students to start taking this lesson.")
 
     description = models.TextField(
         help_text="A detailed description of what the lesson covers"
@@ -469,8 +472,7 @@ class Twine(BaseActivity):
     file = models.FileField(
         upload_to="public/twine/",
         validators=[FileExtensionValidator(allowed_extensions=['html'])],
-        help_text=mark_safe("""
-                            
+        help_text=mark_safe("""  
                             An exported twine file with the extension ".html"<br>
                             <br>
                             The Twine story format must be "SugarCube", and in order to inform the
@@ -484,11 +486,7 @@ class Twine(BaseActivity):
                             </code><br>
                             
                             All images in the twine file should be prefixed with <code>image:&lt;filename&gt;</code>
-                            where the filename does not have any spaces (reccomended replace with underscores)
-                            
-                            
-                            
-                            
+                            where the filename does not have any spaces (reccomended replace with underscores)    
                             """
         ), blank=False, null=False
     )
@@ -835,6 +833,8 @@ class FillInTheBlank(BaseActivity):
     class Meta:
         verbose_name = "Fill in the Blank"
         verbose_name_plural = "Fill in the Blanks"
+    
+    image = models.ImageField(upload_to='public/fillintheblank/images/', blank=True, null=True)
 
     content = JSONField(
         schema={
@@ -843,7 +843,47 @@ class FillInTheBlank(BaseActivity):
                 "type": "string"
             }
         },
-        help_text= "Array of sentences with <options> markup for blanks"
+        help_text= mark_safe("""
+                               <p>This is an array of strings, where each string can contain special <code>&lt;options&gt;</code> tags to define an interactive element. There are three distinct ways to use these tags:</p>
+
+  <h3>1. Dropdown Menu</h3>
+  <p>This use case is for when you want users to select the correct answer from a predefined list.</p>
+
+  <ul>
+    <li>
+      <strong>Syntax</strong>: The <code>&lt;options&gt;</code> tag contains a comma-separated list of choices. The correct answer is prefixed with an asterisk (<code>*</code>).
+    </li>
+    <li>
+      <strong>Example</strong>: To create a dropdown with "an animal", "a bird", and "a fish" as options, where "an animal" is the correct answer, you would write:
+      <pre><code>"Cats are &lt;options&gt;*an animal, a bird, a fish&lt;/options&gt;."</code></pre>
+    </li>
+  </ul>
+
+  <h3>2. Keyword-Based Text Input</h3>
+  <p>This is used for a text input field where multiple different answers could be considered correct.</p>
+
+  <ul>
+    <li>
+      <strong>Syntax</strong>: The <code>&lt;options&gt;</code> tag includes the <code>keyword="true"</code> attribute and contains a comma-separated list of acceptable answers. The user's input will be marked correct if it matches any of these keywords.
+    </li>
+    <li>
+      <strong>Example</strong>: To create a text field where "blue", "clear", or "bright" are all correct answers, you would write:
+      <pre><code>"The sky is &lt;options keyword=\"true\"&gt;blue, clear, bright&lt;/options&gt;."</code></pre>
+    </li>
+  </ul>
+
+  <h3>3. Free Text Input</h3>
+  <p>This is used for an open-ended text input where any non-empty answer is considered correct.</p>
+
+  <ul>
+    <li>
+      <strong>Syntax</strong>: The <code>&lt;options&gt;</code> tag is left empty.
+    </li>
+    <li>
+      <strong>Example</strong>: To create a simple text input field for a user's favorite color, you would write:
+      <pre><code>"My favorite color is &lt;options&gt;&lt;/options&gt;."</code></pre>
+    </li>
+  </ul>""")
     )
 
     def incorrect_fills(self):
@@ -1057,6 +1097,43 @@ class LikertScale(BaseActivity):
             **super().to_dict(),
             "content": self.content
         }
+        
+class Slideshow(BaseActivity):
+    
+    def get_num_slides(self):
+        return Slide.objects.filter(slideshow=self).count()
+    
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "slides": [s.to_dict() for s in Slide.objects.filter(slideshow=self).order_by('order')]
+        }
+    
+class Slide(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+    
+    slideshow = models.ForeignKey(to=Slideshow,on_delete=models.CASCADE, related_name='slides')
+    content = MartorField(default="")
+    image = models.ImageField(upload_to='public/slideshow/slides/images', blank=True, null=True)
+    order = models.PositiveIntegerField(
+        default=0,
+        blank=False,
+        null=False,)
+    
+    class Meta:
+        ordering = ("order",)
+    
+    
+    def to_dict(self):
+        return {
+            "content": self.content,
+            "image": self.image.url if self.image else None
+        }
 
 class BaseResponse(models.Model):
     """
@@ -1114,6 +1191,23 @@ class BaseResponse(models.Model):
     
 # TODO: Make quiz and question response inherit from BaseResponse, or make
 # them adhere to the contract enforced by BaseResponse
+
+class SlideshowResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        Slideshow,
+        on_delete=models.CASCADE,
+        related_name='slideshow_responses',
+        help_text='The slideshow this response is for'
+    )
+    
+    class Meta:
+        verbose_name = "Slideshow Response"
+        verbose_name_plural = "Slideshow Responses"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
 
 class UserQuizResponse(BaseResponse):
     """
@@ -1772,6 +1866,7 @@ class ActivityManager():
                               "watched_percentage": ["watched_percentage", 0.0]
                               })
         self.registerActivity(Twine, TwineResponse)
+        self.registerActivity(Slideshow, SlideshowResponse)
 
 
 # Register on launch

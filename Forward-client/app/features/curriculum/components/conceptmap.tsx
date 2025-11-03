@@ -26,7 +26,7 @@ export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
   const client = useClient();
 
   return (
-    <div className="concept-map">
+    <div>
       <MarkdownTTS controlsClassName="flex gap-2">
         {conceptmap.content}
       </MarkdownTTS>

@@ -1,4 +1,4 @@
-from core.models import (Lesson, ActivityManager, BaseActivity, Twine, TextContent, Quiz, Question, Poll, PollQuestion, Writing, Embed, DndMatch, Concept, ConceptMap, Video, LikertScale, FillInTheBlank, Identification)
+from core.models import (Lesson, ActivityManager, BaseActivity, Twine, TextContent, Quiz, Question, Poll, PollQuestion, Writing, Embed, DndMatch, Concept, ConceptMap, Video, LikertScale, FillInTheBlank, Identification, Slideshow, Slide)
 from django import forms
 from .admin import custom_admin_site
 from django.utils.html import format_html
@@ -8,6 +8,7 @@ from pathlib import Path
 from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils.text import capfirst
+from adminsortable2.admin import SortableTabularInline, SortableAdminMixin
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -66,12 +67,12 @@ def save_file(uploaded_file, key_prefix: str) -> str:
 @admin.register(Lesson, site=custom_admin_site)
 class LessonAdmin(admin.ModelAdmin):
     grouping = "Curriculum"
-    list_display = ("title", "order", "created_at", "updated_at")
+    list_display = ("title", "order","active", "created_at", "updated_at")
     search_fields = ("title", "description")
     ordering = ("order",)
     list_editable = ("order",)
     
-    fields = ("title", "order", "objectives", "tags", "image", "image_preview", "sorted_activities")
+    fields = ("title","active", "order", "objectives", "tags", "image", "image_preview", "sorted_activities")
     readonly_fields = ("image_preview", "sorted_activities")
 
     def sorted_activities(self, obj: Lesson):
@@ -187,6 +188,21 @@ class QuizAdmin(BaseActivityAdmin):
     grouping = "Activities"
     inlines = [QuestionInline]
     list_display = ("title", "lesson", "order", "passing_score")
+
+class SlideInline(SortableTabularInline):
+    model=Slide
+    readonly_fields = ("image_preview",)
+
+    def image_preview(self, obj):
+        return _image_tag(obj.image.url)
+
+    image_preview.short_description = "Image Preview"
+
+@admin.register(Slideshow, site=custom_admin_site)
+class SlideshowAdmin(SortableAdminMixin, BaseActivityAdmin):
+    grouping = "Activities"
+    inlines = [SlideInline]
+    list_display = ("title", "lesson", "order")
 
 
 class ConceptInline(admin.StackedInline):

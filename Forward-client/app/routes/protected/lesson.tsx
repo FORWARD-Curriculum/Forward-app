@@ -20,6 +20,7 @@ import Embed from "@/features/curriculum/components/embed";
 import ConceptMap from "@/features/curriculum/components/conceptmap";
 import DndMatch from "@/features/curriculum/components/dndmatch";
 import FillInTheBlank from "@/features/curriculum/components/fillintheblank";
+import Slideshow from "@/features/curriculum/components/slideshow";
 import { useClient } from "@/hooks/useClient";
 import {
   Accordion,
@@ -145,6 +146,10 @@ export function Activity({ activity }: { activity: BaseActivity }) {
       return (
         <Twine key={key} twine={activity as ActivityManager["Twine"][0]} />
       );
+    case "Slideshow":
+      return (
+        <Slideshow key={key} slideshow={activity as ActivityManager["Slideshow"][0]}/>
+      );
     // No default case needed, as all types are handled
     default:
       return <p>Out of bounds</p>;
@@ -198,7 +203,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   }, [loaderData]);
 
   return (
-    <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:mt-7 lg:flex-row lg:items-start lg:gap-8">
+    <div className="m-4 mr-8 lg:ml-24 lg:mb-12 lg:mt-7 flex w-full flex-col items-center gap-4 lg:gap-8 lg:flex-row lg:items-start max-w-screen">
       <div className="flex flex-col lg:h-full">
         <Accordion
           type="single"
@@ -298,7 +303,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         )}
       </div>
 
-      <div className="bg-secondary border-secondary-border text-secondary-foreground flex min-h-min w-full flex-col rounded-3xl border-1 p-4">
+      <div className="bg-secondary border-secondary-border text-secondary-foreground flex min-h-min w-full flex-col min-w-0 rounded-3xl border-1 p-4">
         <h1 className="text-2xl font-bold">
           <span className="text-accent">
             {ActivityTypeDisplayNames[activity?.type || "Default"]}:{" "}
@@ -309,6 +314,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
           <MarkdownTTS
             className="mb-6 font-light italic"
             controlsClassName="flex flex-row-reverse justify-between"
+            controlsOrientation="horizontal"
           >
             {activity.instructions}
           </MarkdownTTS>

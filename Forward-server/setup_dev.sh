@@ -8,8 +8,8 @@ set -x
 
 echo "Setting up Django development environment..."
 
-rm -rf core/migrations/*
-touch core/migrations/__init__.py
+# rm -rf core/migrations/*
+# touch core/migrations/__init__.py
 
 # Run migrations
 python manage.py makemigrations
@@ -21,7 +21,7 @@ python manage.py collectstatic --noinput
 
 # Seed database with test data
 
-# python manage.py seed_defaults --reset defaults.json
+python manage.py seed_defaults --reset defaults.json
 python manage.py seed_lessons_data --reset z_example/example.json
 python manage.py seed_lessons_data --reset personal_finance_management/lesson.json
 python manage.py seed_lessons_data --reset self_advocacy/lesson.json

@@ -89,6 +89,29 @@
       "instructions": "Identifications are activities where you need to find specific information in a text.",
       "content": ":::center\n # In the documentation\n:::\n\n## I explain how to use the custom\n\n::::columns\n:::col\ncentering and\n:::\n:::col\ncolumning notation\n:::\n::::\n\n### for specific formatting\n use the <correct></correct> tags around a section that will count to the correct answers."
     },
+        {
+      "type": "slideshow",
+      "title": "Slideshow Example",
+      "instructions": "Read the following and think on the contents",
+      "slides": [
+        {
+          "content": "An example slide with **markdown formatting**",
+          "image": "electrician.jpeg"
+        },
+        {
+          "content": "An example slide with **markdown formatting**",
+          "image": "papers.png"
+        },
+        {
+          "content": "An example slide with **markdown formatting**",
+          "image": "trade.png"
+        },
+        {
+          "content": "An example slide with **markdown formatting**",
+          "image": "welder.webp"
+        }
+      ]
+    },
     {
       "type": "likertscale",
       "title": "Likert Scale Example",

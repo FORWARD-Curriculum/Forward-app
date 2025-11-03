@@ -13,7 +13,7 @@ from django.core.files import File
 from core.models import (
     Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
     Identification, Embed, ActivityManager, UserQuizResponse, UserQuestionResponse,
-    Concept, ConceptMap, BaseActivity
+    Concept, ConceptMap, BaseActivity, Slideshow, Slide
 )
 
 # Mapping for deletion order (reverse dependency)
@@ -126,6 +126,7 @@ class Command(BaseCommand):
         # Create or update the lesson with all non-file data first.
         lesson, created = Lesson.objects.update_or_create(
             title=lesson_data.get('title'),
+            active=True,
             defaults=lesson_data # The rest of the data serves as defaults
         )
         
@@ -162,6 +163,7 @@ class Command(BaseCommand):
             # Pop child data and file data before preparing defaults
             questions_data = current_activity_data.pop('questions', None) if activity_type_str in ['quiz', 'poll'] else None
             concepts_data = current_activity_data.pop('examples', None) if activity_type_str == 'conceptmap' else None
+            slides_data = current_activity_data.pop('slides', None) if activity_type_str == 'slideshow' else None
 
             # Base defaults for the activity model
             defaults = {
@@ -171,7 +173,7 @@ class Command(BaseCommand):
             }
             
             # --- Pop file field data to be handled after object creation ---
-            image_filename = defaults.pop('image', None) if activity_type_str == 'textcontent' else None
+            image_filename = defaults.pop('image', None) if activity_type_str in {'textcontent', 'fillintheblank'} else None
             video_filename = defaults.pop('video', None) if activity_type_str == 'video' else None
             twine_filename = defaults.pop('file', None) if activity_type_str == 'twine' else None
 
@@ -232,7 +234,7 @@ class Command(BaseCommand):
                 # --- Handle FileField/ImageField uploads using default storage ---
                 file_to_upload = None
                 field_name = None
-                if activity_type_str == 'textcontent' and image_filename:
+                if activity_type_str in {'textcontent', 'fillintheblank'} and image_filename:
                     file_to_upload, field_name = image_filename, 'image'
                 elif activity_type_str == 'video' and video_filename:
                     file_to_upload, field_name = video_filename, 'video'
@@ -255,6 +257,8 @@ class Command(BaseCommand):
                     self._create_poll_questions(activity_obj, questions_data)
                 elif activity_type_str == 'conceptmap' and concepts_data:
                     self._create_concepts(activity_obj, concepts_data)
+                elif activity_type_str == 'slideshow' and slides_data:
+                    self._create_slides(activity_obj, slides_data)
 
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"Failed to create/update {activity_type_str} (Order: {order}): {e}"))
@@ -294,7 +298,25 @@ class Command(BaseCommand):
                  # Include the derived order in the error message
                  self.stdout.write(self.style.ERROR(f"    Failed to create/update question (Order: {order}) for quiz '{quiz.title}': {e}"))
 
-
+    def _create_slides(self, slideshow: Slideshow, slides: list[dict]):
+        self.stdout.write(f"  Processing {len(slides)} questions for poll: {slideshow.title}")
+        for order, slide_data in enumerate(slides):
+            image_filename = slide_data.pop('image', None)
+            slide = Slide.objects.create(
+                slideshow=slideshow,
+                order=order,
+                content=slide_data.get('content', None)
+            )
+            
+            if image_filename:
+                image_path = self.folder_path / image_filename
+                try:
+                    with open(image_path, 'rb') as image_file:
+                        slide.image.save(Path(image_filename).name, File(image_file), save=True)
+                except FileNotFoundError:
+                    self.stdout.write(self.style.ERROR(f"    Image file not found for slide: {image_path}"))
+                
+    
     def _create_poll_questions(self, poll, questions_data):
         """Creates or updates questions for a given poll, deriving order from list position."""
         self.stdout.write(f"  Processing {len(questions_data)} questions for poll: {poll.title}") # Debug print

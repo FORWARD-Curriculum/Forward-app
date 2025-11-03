@@ -49,7 +49,8 @@ export type ActivityManager = {
   LikertScale: [LikertScale, LikertScaleResponse, false];
   Video: [Video, VideoResponse, false];
   Twine: [Twine, TwineResponse, false];
-  FillInTheBlank: [FillInTheBlank, FillInTheBlankResponse, false]
+  FillInTheBlank: [FillInTheBlank, FillInTheBlankResponse, false];
+  Slideshow: [Slideshow,SlideshowResponse,false];
 };
 
 /**
@@ -73,7 +74,8 @@ export const ActivityTypeDisplayNames: Record<
   LikertScale: "Likert Scale",
   Video: "Video",
   Twine: "Twine",
-  FillInTheBlank: "Fill In The Blank"
+  FillInTheBlank: "Fill In The Blank",
+  Slideshow: "Slideshow"
 };
 
 // #region -------------------------- Activities ---------------------------
@@ -211,7 +213,11 @@ export interface LikertScale extends BaseActivity {
 
 export interface Twine extends BaseActivity {
   file: string; 
-  }
+}
+
+export interface Slideshow extends BaseActivity {
+  slides: {content: string; image: string | null}[]
+}
 
 // #endregion -------------------------- Activities ---------------------------
 
@@ -283,6 +289,7 @@ export interface WritingResponse extends BaseResponse {
 }
 
 export interface TextContentResponse extends BaseResponse {}
+export interface SlideshowResponse extends BaseResponse {}
 export interface ConceptMapResponse extends BaseResponse {}
 export interface IdentificationResponse extends BaseResponse {}
 export interface PollResponse extends BaseResponse {}

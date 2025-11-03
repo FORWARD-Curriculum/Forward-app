@@ -261,7 +261,7 @@ class CurriculumView(APIView):
         '''
         gets all lessons
         '''
-        lessons = Lesson.objects.all()
+        lessons = Lesson.objects.filter(active=True)
 
         if not lessons:
             return Response({"detail": "cannot find any lessons"}, status=status.HTTP_404_NOT_FOUND)
