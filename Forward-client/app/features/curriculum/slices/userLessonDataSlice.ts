@@ -53,8 +53,15 @@ export const saveUserResponseThunk = createAsyncThunk(
       }
     | undefined
   > => {
-    // compute timeSpent
+    
     const state = thunkAPI.getState() as RootState;
+
+    // If no user logged in, return, no actions performed
+    if (!state.user.user){
+      return undefined
+    }
+
+    // compute timeSpent
     const lastTime = state.response.time_spent;
     data.response = {
       ...data.response,
