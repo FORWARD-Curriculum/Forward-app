@@ -10,13 +10,60 @@ from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUp
 from core.services import UserService, LessonService, QuizResponseService, ResponseService
 # , QuestionResponseService
 from .utils import json_go_brrr, messages
-from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, User
+from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, User, BugReport
 from rest_framework import serializers, request
 import logging
 
 logger = logging.getLogger(__name__)
 
 
+class BugReportView(APIView):
+    """
+    API endpoint for submitting bug reports.
+
+    POST: Submit a bug report
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        """Submit a bug report"""
+        # Extract bug report details from the request data
+        description = request.data.get('description')
+        steps_to_reproduce = request.data.get('steps_to_reproduce')
+        recent_window_locations = request.data.get('recent_window_locations')
+        app_state = request.data.get('app_state')
+        device_info = request.data.get('device_info')
+        app_version = request.data.get('app_version')
+        
+        if not description:
+            return json_go_brrr(
+                message="Description is required for a bug report",
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        br = BugReport.objects.create(
+            user=request.user,
+            description=description,
+            steps_to_reproduce=steps_to_reproduce,
+            recent_window_locations=recent_window_locations,
+            app_state=app_state,
+            device_info=device_info,
+            app_version=app_version
+        )
+        
+        if not br:
+            return json_go_brrr(
+                message="Failed to submit bug report",
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )     
+
+        return json_go_brrr(
+            message="Bug report submitted successfully",
+            data={
+                "id": br.id,
+            },
+            status=status.HTTP_201_CREATED
+        )
 
 class UserRegistrationView(generics.CreateAPIView):
     """
@@ -142,6 +189,35 @@ class CurrentUserView(APIView):
             data=serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+
+class ResetStudentProgressView(APIView):
+
+    permission_classes=[IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        """Delete all lesson response data for teh current user"""
+
+        user = request.user
+
+        #failsafe on teh chance of frontend manipulation
+        if user.username not in ['student1', 'student2']:
+            return Response(
+                {"error": "Unauthorized: only test acounts can reset progress"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        manager = ActivityManager()
+        for activity_name, (ActivityClass, ResponseClass, _, __, ___) in manager.registered_activities.items(): # syntax for unpacking tuple / activity manager
+            if ResponseClass:  # some activities have no response (like Concept)
+                ResponseClass.objects.filter(user=user).delete()
+
+
+        return json_go_brrr(
+            message="All lesson progress reset successfully",
+            status=status.HTTP_200_OK
+        )
+      
 
 
 class QuizView(APIView):
@@ -441,8 +517,7 @@ class QuizResponseStatusView(APIView):
                 message="Quiz not found",
                 status=status.HTTP_404_NOT_FOUND
             )
-    
-            
+           
 class OnboardView(APIView):
     def get(self, request):
         user: User = request.user

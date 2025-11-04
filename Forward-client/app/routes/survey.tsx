@@ -27,7 +27,7 @@ export default function Onboard({ loaderData }: Route.ComponentProps) {
 
   useEffect(() => {
     const surveyEnd: (this: Window, ev: MessageEvent<any>) => any = (e) => {
-      if (e.origin.includes("qualtrics.com") ) console.log(e)
+      // if (e.origin.includes("qualtrics.com") ) console.log(e)
       if (
         e.origin.includes("qualtrics.com") &&
         e.data == "endOfSurvey"

@@ -19,7 +19,7 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   const resp = await res.json();
   const user =
     (resp as { detail?: string; data?: { user: User } })?.data?.user ?? null;
-  console.log("clientLoader user", user);
+  // console.log("clientLoader user", user);
   return user;
 }
 

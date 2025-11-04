@@ -10,6 +10,7 @@ from django.conf import settings
 from botocore.exceptions import ClientError
 import re
 import json
+import copy
 
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
@@ -1589,3 +1590,87 @@ class ActivityManager():
 
 # Register on launch
 ActivityManager()
+
+class BugReport(models.Model):
+    """
+    Model for reporting bugs within the platform
+    """
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+    
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='bug_reports',
+        help_text='The user who reported the bug'
+    )
+
+    description = models.TextField(
+        help_text="A detailed description of the bug"
+    )
+
+    steps_to_reproduce = models.TextField(
+        help_text="Steps to reproduce the bug"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    recent_window_locations = models.JSONField(
+        default=list,
+        help_text="List of recent window locations leading up to the bug report"
+    )
+
+    app_state = models.JSONField(
+        default=dict,
+        help_text="Snapshot of the application state at the time of the bug report"
+    )
+    
+    device_info = models.JSONField(
+        default=dict,
+        help_text="Information about the user's device and environment"
+    )
+    
+    app_version = models.CharField(
+        max_length=100,
+        help_text="Version of the application"
+    )
+    
+    def recent_dispatches(self):
+        """Returns a list of recent redux dispatches leading up to the bug report"""
+        return self.app_state.get("logging", {}).get("dispatches", [])
+    
+    def recent_errors(self):
+        """Returns a list of recent redux dispatches leading up to the bug report"""
+        return self.app_state.get("logging", {}).get("errors", [])
+
+    def app_state_short(self):
+        """Returns a version of appstate sans the info from logging for clarity"""
+        app_state_copy = copy.deepcopy(self.app_state)
+        if "logging" in app_state_copy:
+            del app_state_copy["logging"]
+        return app_state_copy
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Bug Report"
+        verbose_name_plural = "Bug Reports"
+
+    def __str__(self):
+        return f"Bug Report by {self.user.username} at {self.created_at}"
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user": self.user.username,
+            "description": self.description,
+            "steps_to_reproduce": self.steps_to_reproduce,
+            "created_at": self.created_at.isoformat(),
+            "recent_errors": self.recent_errors,
+            "recent_window_locations": self.recent_window_locations,
+            "recent_redux_dispatches": self.recent_redux_dispatches,
+            "app_state": self.app_state,
+        }

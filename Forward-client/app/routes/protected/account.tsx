@@ -1,7 +1,7 @@
 import type { User } from "@/features/account/types";
-import React, { useEffect, useRef } from "react";
-import type { RootState } from "@/store";
-import { useSelector } from "react-redux";
+import React, { useDeferredValue, useEffect, useRef } from "react";
+import type { AppDispatch, RootState } from "@/store";
+import { useSelector, useDispatch } from "react-redux";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,9 @@ import {
 import { PopoverClose } from "@radix-ui/react-popover";
 import { useSpeech } from "react-text-to-speech";
 import { useVoices } from "react-text-to-speech";
+import { resetResponseState, } from "@/features/curriculum/slices/userLessonDataSlice";
+import { resetInitialLessonState } from "@/features/curriculum/slices/lessonSlice";
+
 
 function ThemeOption({
   themeName,
@@ -108,6 +111,7 @@ export function sortEngFirst(voices: SpeechSynthesisVoice[]) {
 export default function account() {
   const updateUser = useAuth().update;
   const user = useSelector((s: RootState) => s.user.user) as User;
+  const dispatch = useDispatch<AppDispatch>();
 
   //TTS Customs
   const { voices } = useVoices();
@@ -201,6 +205,29 @@ export default function account() {
     }
   };
 
+  const clearLessonData = async () => {
+    try {
+      const response = await apiFetch(`/users/me/responses`, {
+        method: "DELETE"
+      });
+
+      const result = await response.json();
+
+      if (!response.ok){
+        throw new Error(result.detail || "Reset Failed");
+      }
+
+      //clear redux state
+      dispatch(resetResponseState());
+      dispatch(resetInitialLessonState());
+
+    }
+    catch (err: any){
+      //add error toast here
+      toast.error(err.message || "Failed to resest progress")
+    }
+  }
+
   return (
     <div className="flex w-screen grow items-center justify-center">
       <form
@@ -288,6 +315,13 @@ export default function account() {
                 >
                   Remove Picture
                 </button>
+                {['student1', 'student2'].includes(user.username) && (
+                  <Button
+                    onClick={clearLessonData}
+                  >
+                    Clear Lesson Progress
+                  </Button>
+                )}
               </div>
             </div>
           </div>

@@ -2,14 +2,16 @@ from django.urls import path
 from .views import (
     QuizResponseStatusView, UserRegistrationView, SessionView, CurrentUserView, QuizView,
     LessonView, LessonContentView, TextContentView, WritingView,
-    PollView, GetLessonIds,
-    CurriculumView, ResponseView, OnboardView
+    PollView, GetLessonIds, CurriculumView, ResponseView, OnboardView, BugReportView, ResetStudentProgressView
+    # , QuestionResponseView
 )
 
 urlpatterns = [
     path('users', UserRegistrationView.as_view(), name='user-register'),
     path('users/me', CurrentUserView.as_view(), name='current-user'),
     path('sessions', SessionView.as_view(), name='sessions'),
+
+    path('users/me/responses', ResetStudentProgressView.as_view(), name="reset-progress"),
 
     path('lesson/ids', GetLessonIds.as_view(), name='lesson-ids'),
     path('lessons', CurriculumView.as_view(), name='curriculum'),
@@ -25,5 +27,8 @@ urlpatterns = [
 
     path('responses/<str:activitytype>', ResponseView.as_view(), name='general-response'),
     
-    path('survey', OnboardView.as_view(), name='surveying')
+    path('survey', OnboardView.as_view(), name='surveying'),
+
+    #logging
+    path('bugreport', BugReportView.as_view(), name='bug-report'),
 ]
