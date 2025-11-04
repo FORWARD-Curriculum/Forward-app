@@ -1,4 +1,4 @@
-import type { Slideshow, SlideshowResponse } from "@/features/curriculum/types";
+import type { Slideshow as SlideshowType, SlideshowResponse } from "@/features/curriculum/types";
 import {
   Carousel,
   CarouselContent,
@@ -12,75 +12,77 @@ import { useEffect, useState } from "react";
 import { Circle } from "lucide-react";
 import { useResponse } from "../hooks";
 
-export default function Slideshow({ slideshow }: { slideshow: Slideshow }) {
+export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
 
-  useResponse<SlideshowResponse, Slideshow>({
+  useResponse<SlideshowResponse, SlideshowType>({
     activity: slideshow,
     type: "Slideshow",
     trackTime: true,
-    initialFields:{
-        partial_response: false
-    }
-  })
+    initialFields: {
+      partial_response: false,
+    },
+  });
 
   useEffect(() => {
-    if (!api) {
-      return;
-    }
+    if (!api) return;
+
     setCount(api.scrollSnapList().length);
     setCurrent(api.selectedScrollSnap() + 1);
+
     api.on("select", () => {
       setCurrent(api.selectedScrollSnap() + 1);
     });
   }, [api]);
+
   return (
-    <div
-      className="flex flex-col-reverse lg:flex-col lg:items-end items-center"
-    >
-      <div className="lg:flex hidden">
+    <div className="flex w-full flex-col-reverse items-center lg:flex-col mt-4">
+            <Carousel setApi={setApi} className="w-full max-w-4xl lg:aspect-video">
+        <CarouselContent>
+          {slideshow.slides.map((example, index) => (
+            <CarouselItem
+              key={index}
+              className="flex flex-col items-center justify-center gap-4"
+            >
+              {example.image && (
+                <img
+                  src={example.image}
+                  alt=""
+                  className="max-h-100 w-auto rounded-3xl shadow-md"
+                />
+              )}
+
+              <MarkdownTTS controlsClassName="flex flex-row-reverse gap-2">
+                {`# ${example.content}`}
+              </MarkdownTTS>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious  />
+        <CarouselNext />
+      </Carousel>
+      {/* Dots (desktop only) */}
+      <div className="hidden lg:flex">
         {Array.from({ length: count }, (_, index) => (
           <button
+            key={index}
             onClick={() => api?.scrollTo(index)}
             className="cursor-pointer"
+            aria-label={`Go to slide ${index + 1}`}
           >
             <Circle
               fill={
-                index + 1 != current
+                index + 1 !== current
                   ? "var(--secondary-foreground)"
                   : "var(--background)"
               }
-            //   stroke="transparent"
               strokeWidth={1}
             />
           </button>
         ))}
       </div>
-      <Carousel
-        setApi={setApi}
-        className="flex lg:aspect-video lg:!max-h-min items-center lg:px-12"
-      >
-        <CarouselContent className="lg:aspect-video">
-          {slideshow.slides.map((example, index) => (
-            <CarouselItem className="flex flex-col items-center lg:justify-center gap-4">
-              {example.image && (
-                <img
-                  src={example.image}
-                  className="lg:max-h-3/4 lg:max-w-auto rounded-3xl shadow-md"
-                />
-              )}
-
-              <MarkdownTTS controlsClassName="flex flex-row-reverse gap-2">
-                {`:::center\n # ${example.content}\n:::`}
-              </MarkdownTTS>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious className="absolute left-1 lg:top-[inherit] top-105" />
-        <CarouselNext className="absolute right-1 lg:top-[inherit] top-105" />
-      </Carousel>
     </div>
   );
 }

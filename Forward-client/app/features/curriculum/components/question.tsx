@@ -32,7 +32,7 @@ export default function Question({
   const isAnswered =
     selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
   // Check if the answer is correct
-  const isCorrect = isMultipleSelect
+  const isCorrect = !question.has_correct_answer || isMultipleSelect
     ? areArraysEqual(
         selectedAnswers.slice().sort(),
         correctAnswers?.map((c) => c.id).sort(),

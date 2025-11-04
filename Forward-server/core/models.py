@@ -383,7 +383,7 @@ class Video(BaseActivity):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "video": self.video.url,
+            "video": self.video.url if self.video else None,
         }
 
 
@@ -988,13 +988,13 @@ class Concept(BaseActivity):
     def to_dict(self):
         examples = copy.deepcopy(self.examples)
         for item in examples:
-            if item['image']:
+            if item.get('image'):
                 item['image'] = default_storage.url(item['image'])
         
         return {
             **super().to_dict(),
             "id": self.id,
-            "image": self.image.url,
+            "image": self.image.url if self.image else None,
             "description": self.description,
             "examples": examples,
         }

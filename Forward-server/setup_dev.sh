@@ -18,16 +18,16 @@ python manage.py makemigrations
 python manage.py migrate
 
 python manage.py collectstatic --noinput
-w
+
 # Seed database with test data
 
 python manage.py seed_defaults --reset defaults.json
 # python manage.py seed_lessons_data --reset z_example/example.json
 # python manage.py seed_lessons_data --reset personal_finance_management/lesson.json
-python manage.py seed_lessons_data --reset self_advocacy/lesson.json
-# python manage.py seed_lessons_data --reset going_to_college/lesson.json
-python manage.py seed_lessons_data --reset disclosure_and_appropriate_communication/lesson.json
-# python manage.py seed_lessons_data --reset soft_skills_development/lesson.json
+# python manage.py seed_lessons_data --reset self_advocacy/lesson.json
+python manage.py seed_lessons_data --reset going_to_college/lesson.json
+# python manage.py seed_lessons_data --reset disclosure_and_appropriate_communication/lesson.json
+# python manage.py seed_lessons_data --reset soft_skills/lesson.json
 # python manage.py seed_lessons_data --reset lesson2/lesson2.json
 
 

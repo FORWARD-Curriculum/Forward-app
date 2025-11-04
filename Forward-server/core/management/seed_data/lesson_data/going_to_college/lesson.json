@@ -9,14 +9,17 @@
       "Understand basic vocabulary and terms around college and independent living."
     ],
     "order": 1,
-    "tags": ["college", "lesson"]
+    "tags": [
+      "college",
+      "lesson"
+    ]
   },
   "activities": [
     {
       "type": "quiz",
       "title": "Intro: Are You Planning on Going to College?",
       "instructions": null,
-      "passing_score": 0,
+      "passing_score": null,
       "feedback_config": {
         "default": "Thanks for sharing your answer!"
       },
@@ -30,21 +33,22 @@
               {
                 "id": 1,
                 "text": "Yes!",
-                "feedback": "That's great that you already know you want to go to college! There's lot to learn about going to college. This lesson should give you the basics."
+                "is_correct": true
               },
               {
                 "id": 2,
                 "text": "I'm still deciding...",
-                "feedback": "College is a big decision! This lesson will teach you what you need to know if you decide to go and may even help you make some decisions."
+                "is_correct": true
               },
               {
                 "id": 3,
                 "text": "No, it's not for me.",
-                "feedback": "College definitely is not for everybody! This lesson will still provide you with some basic knowledge to make college less daunting if you change your mind. This lesson can also give you knowledge to share with friends and family and help you prepare for other aspects of adulthood."
+                "is_correct": true
               }
             ]
           },
-          "is_required": true
+          "is_required": true,
+          "feedback_config": {}
         }
       ]
     },
@@ -197,20 +201,17 @@
     {
       "type": "quiz",
       "title": "Checking Your Understanding: Types of Colleges",
-      "content": "Did some of those schools look familiar? Hopefully you were able to recognize some or think of other colleges that might fit into those categories. You should now understand some of the differences between types of colleges.",
       "instructions": "Let's check and make sure things are making sense so far. There may be more than one correct answer to the questions since there can be more than one pathway to a career.",
-      "multi_select": true,
       "questions": [
         {
           "question_text": "Which type of college might you choose to attend to become a doctor?",
-          "image": "doctor.jpg",
-          "question_type": "multiple_choice",
+          "question_type": "multiple_select",
           "has_correct_answer": true,
           "choices": {
             "options": [
               { "id": 1, "text": "Trade school", "is_correct": false },
               { "id": 2, "text": "Community college", "is_correct": false },
-              { "id": 3, "text": "4-year college", "is_correct": false },
+              { "id": 3, "text": "4-year college", "is_correct": true },
               { "id": 4, "text": "University", "is_correct": true }
             ]
           },
@@ -220,8 +221,7 @@
         },
         {
           "question_text": "Which type of college might you choose to attend to become a welder?",
-          "image": "welder.jpg",
-          "question_type": "multiple_choice",
+          "question_type": "multiple_select",
           "has_correct_answer": true,
           "choices": {
             "options": [
@@ -237,8 +237,7 @@
         },
         {
           "question_text": "Which type of college might you choose to attend to become an elementary school teacher?",
-          "image": "teacher.jpg",
-          "question_type": "multiple_choice",
+          "question_type": "multiple_select",
           "has_correct_answer": true,
           "choices": {
             "options": [
@@ -254,7 +253,6 @@
         },
         {
           "question_text": "Which type of college might you choose to attend to become a professor?",
-          "image": "professor.jpg",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "choices": {
@@ -271,8 +269,7 @@
         },
         {
           "question_text": "Which type of college might you choose to attend to become a chef?",
-          "image": "chef.jpg",
-          "question_type": "multiple_choice",
+          "question_type": "multiple_select",
           "has_correct_answer": true,
           "choices": {
             "options": [
@@ -289,27 +286,10 @@
       ]
     },
     {
-      "type": "pdf",
+      "type": "identification",
       "title": "Identifying Education Levels in Job Listings",
       "instructions": "Look at each job listing below and click where you see the required minimum education level and the preferred education level. Once you've identified both, you'll receive feedback. You can try all three job listings for extra practice.",
-      "content": "Choosing what type of college to attend depends on a lot of factors such as location, cost, the type of experience you are seeking, and importantly, the type of job you want to have. Different jobs require different levels of experience.\n\nFor this activity, look at a job listing and see if you can find (1) the required minimum education level and (2) the preferred education level. You will need to click on the job listing in those two places to continue. If you want a challenge, you can try out each job listing.\n\nNice work identifying both the minimum and preferred education levels! These are important areas of job listings to pay attention to which can help you determine whether or not to apply for that job.",
-      "files": [
-        {
-          "title": "Customer Service Representative",
-          "file": "job_listing_1_customer_service_rep.pdf",
-          "highlighted_file": "job_listing_1_customer_service_rep_highlights.pdf"
-        },
-        {
-          "title": "Seeking Highly Qualified Applicant!",
-          "file": "job_listing_2_marketing_specialist.pdf",
-          "highlighted_file": "job_listing_2_marketing_specialist_highlights.pdf"
-        },
-        {
-          "title": "Looking for Skilled Employees at Start-up Company",
-          "file": "job_listing_3_software_development_manager.pdf",
-          "highlighted_file": "job_listing_3_software_development_manager_highlights.pdf"
-        }
-      ]
+      "content": "Choosing what type of college to attend depends on a lot of factors such as location, cost, the type of experience you are seeking, and importantly, the type of job you want to have. Different jobs require different levels of experience.\n\nFor this activity, look at a job listing and see if you can find (1) the required minimum education level and (2) the preferred education level. You will need to click on the job listing in those two places to continue. If you want a challenge, you can try out each job listing.\n\nNice work identifying both the minimum and preferred education levels! These are important areas of job listings to pay attention to which can help you determine whether or not to apply for that job."
     },
     {
       "type": "quiz",
@@ -319,57 +299,67 @@
         {
           "question_text": "Which degree may require the GRE or GMAT test before applying?",
           "question_type": "multiple_choice",
+          "has_correct_answer": true,
           "choices": {
             "options": [
               { "id": 1, "text": "Associate degree", "is_correct": false },
               { "id": 2, "text": "Bachelor's degree", "is_correct": false },
               { "id": 3, "text": "Master's degree", "is_correct": true }
             ]
-          }
+          },
+          "feedback_config": {}
         },
         {
           "question_text": "Which degree has the highest median salary?",
           "question_type": "multiple_choice",
+          "has_correct_answer": true,
           "choices": {
             "options": [
               { "id": 1, "text": "Master's degree", "is_correct": false },
               { "id": 2, "text": "Professional degree", "is_correct": true },
               { "id": 3, "text": "Doctoral degree", "is_correct": false }
             ]
-          }
+          },
+          "feedback_config": {}
         },
         {
           "question_text": "Which degree focuses on general subjects AND an in-depth study in a chosen field?",
           "question_type": "multiple_choice",
+          "has_correct_answer": true,
           "choices": {
             "options": [
               { "id": 1, "text": "Associate degree", "is_correct": false },
               { "id": 2, "text": "Bachelor's degree", "is_correct": true },
               { "id": 3, "text": "Master's degree", "is_correct": false }
             ]
-          }
+          },
+          "feedback_config": {}
         },
         {
           "question_text": "Which degree type do you need to become a dentist?",
           "question_type": "multiple_choice",
+          "has_correct_answer": true,
           "choices": {
             "options": [
               { "id": 1, "text": "Bachelor's degree", "is_correct": false },
               { "id": 2, "text": "Professional degree", "is_correct": true },
               { "id": 3, "text": "Doctoral degree", "is_correct": false }
             ]
-          }
+          },
+          "feedback_config": {}
         },
         {
           "question_text": "Which degree type are \"MS\" and \"MEd\" examples of?",
           "question_type": "multiple_choice",
+          "has_correct_answer": true,
           "choices": {
             "options": [
               { "id": 1, "text": "Medical degrees", "is_correct": false },
               { "id": 2, "text": "Professional degrees", "is_correct": false },
               { "id": 3, "text": "Master's degrees", "is_correct": true }
             ]
-          }
+          },
+          "feedback_config": {}
         }
       ]
     },
@@ -377,7 +367,6 @@
       "type": "writing",
       "title": "Your Education Plans",
       "instructions": "Write about your plans for your education and incorporate what you learned about types of degrees. Try to write at least one paragraph.",
-      "is_required": true,
       "prompts": [
         "What type of degree would you like to get and what will you need to do to apply for and complete this degree?",
         "What are the benefits of the type of degree you are seeking?",
@@ -391,175 +380,191 @@
       "content": "***Finances and college***  \nWhat you've heard is true--college is expensive. Here we'll go over some of the cost and share strategies for making college affordable. With the right plan and resources, it's possible to avoid debt, or at least keep your costs lower when attending college.\n\n#### **College Costs Include:**\n\n* **Tuition and Fees**: The amount colleges charge for classes, which can vary widely between community colleges, in-state public universities, and private colleges. Other fees may also be incorporated to cover the cost of services like technology and labs.  \n* **Room and Board**: Housing, which can cost as much as tuition in some cases. Living off-campus or at home can reduce this.  \n* **Meal Plans**: Meal plans allow you to dine on campus. Different colleges will offer different types of meal plans and you can usually opt out if you prefer to cook your own meals to keep costs down.  \n* **Books and Supplies**: Textbooks and other materials can add up, but there are ways to save (like renting or buying used).  \n* **Health Insurance**: Many colleges require students to have health insurance through the college or privately.  \n* **Transportation**: Costs for getting to and from college, whether it's gas, a bus pass, or plane tickets.  \n* **Personal Expenses**: Everyday needs like toiletries, laundry, or entertainment.\n\n#### **Factors That Change Costs:**\n\n* **Type of College**: Community colleges tend to be the least expensive, while private universities cost more.  \n* **In-State vs. Out-of-State**: Public universities usually charge less for in-state students.  \n* **Scholarships and Financial Aid**: These can significantly reduce costs, so students should always apply for aid.  \n* **Living Situation**: Living at home, on-campus, or off-campus changes the overall cost."
     },
     {
+      "type": "textcontent",
+      "title": "College Cost Calculator",
+      "instructions": null,
+      "content": "Try out the college cost calculator to better understand how different options can impact the cost of college. Pay attention to whether you are looking at the costs by semester, academic year, or for a full 4-year degree.\n[College cost calculator]"
+    },
+    {
       "type": "video",
       "title": "Understanding the FAFSA",
       "instructions": "Watch the video to learn more about the FAFSA.",
-      "content": "The FASFA, or Free Application for Federal Student Aid, is a form available online that identifies financial aid sources you are eligible for with colleges you consider attending. Watch the video to learn more about the FAFSA.",
-      "video": "Financial Aid for College.mp4",
-      "_comment": "Try out the college cost calculator to better understand how different options can impact the cost of college. Pay attention to whether you are looking at the costs by semester, academic year, or for a full 4-year degree. [College cost calculator] Create a college cost calculator that allows users to estimate their total education costs by selecting options across multiple categories. These categories include tuition and fees (in-state vs. out-of-state, public vs. private universities), room and board (on-campus dorms, off-campus housing, or living at home), meal plans (self-cooking, campus meal plans, or a mix of both), books and supplies (new, used, or rented materials), health insurance (private vs. university-provided), transportation (daily commutes and breaks—car, bus, rideshare, or plane), and personal expenses (toiletries, laundry, entertainment). The calculator should include sliders or dynamic inputs for customizable cost ranges, with hover-based tooltips providing guidance for typical expenses (e.g., $5,000–$15,000 for in-state tuition). Users can toggle between viewing costs per semester, per academic year, or for a 4-year degree, and totals should adjust dynamically based on these options. The design should prioritize a clear layout, grouping each expense category for easy navigation, and offer an intuitive, visually engaging interface for users."
+      "video": "Financial Aid for College.mp4"
     },
     {
       "type": "textcontent",
       "title": "Understanding Grants",
       "instructions": null,
-      "content": "One type of financial support the FAFSA can offer you is <def def='Free money given to a student for school that does not have to be paid back.'>grants</def>. Grants are financial support that does not typically have to be repaid. These funds will be either given to you directly or applied to your school financial account. When either happens, the grant should be applied first to your tuition and other academic fees, and secondly to your housing. Additional money can go toward other school fees and costs such as textbooks and health insurance.\n\n![Piggy bank](piggy bank.jpg)"
+      "image":"piggy_bank.jpg",
+      "content": "One type of financial support the FAFSA can offer you is <def def='Free money given to a student for school that does not have to be paid back.'>grants</def>. Grants are financial support that does not typically have to be repaid. These funds will be either given to you directly or applied to your school financial account. When either happens, the grant should be applied first to your tuition and other academic fees, and secondly to your housing. Additional money can go toward other school fees and costs such as textbooks and health insurance."
     },
     {
       "type": "textcontent",
       "title": "Understanding Loans",
       "instructions": null,
-      "content": "FAFSA can also offer you <def def='Money borrowed for school that must be paid back, usually with extra money called interest.'>loans</def>, which you will be required to pay back after your degree. Depending on the type of loan, these may begin collecting <def def='Extra money paid when borrowing money or earned when saving money.'>interest</def> during or after your degree. If you take a loan and don't finish your degree, you still have to pay for the money you have borrowed! Loans are applied like grants to tuition and fees, then housing and other costs.\n\n![Loan application](loan application.jpg)"
+      "image": "loan_application.png",
+      "content": "FAFSA can also offer you <def def='Money borrowed for school that must be paid back, usually with extra money called interest.'>loans</def>, which you will be required to pay back after your degree. Depending on the type of loan, these may begin collecting <def def='Extra money paid when borrowing money or earned when saving money.'>interest</def> during or after your degree. If you take a loan and don't finish your degree, you still have to pay for the money you have borrowed! Loans are applied like grants to tuition and fees, then housing and other costs."
     },
     {
       "type": "textcontent",
       "title": "Understanding Work-Study",
       "instructions": null,
-      "content": "<def def='A program where students work part-time jobs to help pay for college.'>Work-study</def> is a form of financial aid that allows you to earn money by working part-time while attending school. The jobs are often on-campus or related to your field of study, making it easier to balance work and academics. Work-study earnings can help cover expenses like books, transportation, and personal costs. This aid is need-based and awarded through FAFSA, so if you're interested, make sure to indicate your preference for work-study when completing your application.\n\n![Work study](work study.jpg)"
+      "image": "work_study.jpg",
+      "content": "<def def='A program where students work part-time jobs to help pay for college.'>Work-study</def> is a form of financial aid that allows you to earn money by working part-time while attending school. The jobs are often on-campus or related to your field of study, making it easier to balance work and academics. Work-study earnings can help cover expenses like books, transportation, and personal costs. This aid is need-based and awarded through FAFSA, so if you're interested, make sure to indicate your preference for work-study when completing your application."
     },
     {
       "type": "textcontent",
       "title": "Western Undergraduate Exchange (WUE)",
       "instructions": null,
       "image": "wiche.png",
-      "content": "The Western Undergraduate Exchange (WUE) is a program offered by the Western Interstate Commission for Higher Education (WICHE) that helps students save on tuition costs by allowing them to pay reduced out-of-state tuition at participating schools. Through WUE, students pay no more than 150% of in-state tuition, which can significantly lower the cost of attending college outside their home state. The program includes students from the following 16 western states and territories: Alaska, Arizona, California, Colorado, Hawaii, Idaho, Montana, Nevada, New Mexico, North Dakota, Oregon, South Dakota, Utah, Washington, Wyoming, and the Commonwealth of the Northern Mariana Islands. To take advantage of WUE, check your eligibility and apply early as some schools have limited spots for WUE students or require separate applications.\n\n"
+      "content": "The Western Undergraduate Exchange (WUE) is a program offered by the Western Interstate Commission for Higher Education (WICHE) that helps students save on tuition costs by allowing them to pay reduced out-of-state tuition at participating schools. Through WUE, students pay no more than 150% of in-state tuition, which can significantly lower the cost of attending college outside their home state. The program includes students from the following 16 western states and territories: Alaska, Arizona, California, Colorado, Hawaii, Idaho, Montana, Nevada, New Mexico, North Dakota, Oregon, South Dakota, Utah, Washington, Wyoming, and the Commonwealth of the Northern Mariana Islands. To take advantage of WUE, check your eligibility and apply early as some schools have limited spots for WUE students or require separate applications."
     },
     {
       "type": "textcontent",
       "title": "Understanding Scholarships",
       "instructions": null,
       "image": "scholarships.jpg",
-      "content": "<def def='Free money given for school, usually for good grades, sports, or other achievements.'>Scholarships</def> are another form of financial support that can help you pay for your education. Unlike loans, scholarships do not need to be repaid. They are often awarded based on academic achievements, extracurricular activities, or financial need, and some are specifically for students in certain fields or with unique qualifications. Scholarships do not come from the FAFSA but may come from your school, private organizations, or community groups and can be applied to tuition, housing, or other academic expenses. There are many ways to find scholarships online and your college may have a specific page for available scholarships. Some scholarships may require you to submit a resume, an essay, or other work to be considered.\n\n"
+      "content": "<def def='Free money given for school, usually for good grades, sports, or other achievements.'>Scholarships</def> are another form of financial support that can help you pay for your education. Unlike loans, scholarships do not need to be repaid. They are often awarded based on academic achievements, extracurricular activities, or financial need, and some are specifically for students in certain fields or with unique qualifications. Scholarships do not come from the FAFSA but may come from your school, private organizations, or community groups and can be applied to tuition, housing, or other academic expenses. There are many ways to find scholarships online and your college may have a specific page for available scholarships. Some scholarships may require you to submit a resume, an essay, or other work to be considered."
     },
     {
       "type": "quiz",
       "title": "Scholarship Applications",
-      "instructions": "Answer the questions below to see if you are currently eligible for the Gabe Jenks Memorial Scholarship.",
-      "passing_score": 2,
-      "feedback_config": {
-        "default": "Thank you for completing the eligibility quiz.",
-        "ranges": [
-          {
-            "min": 0,
-            "max": 1,
-            "feedback": "Based on your answers, you are not currently eligible for this scholarship. You can still review the scholarship details for future opportunities."
-          },
-          {
-            "min": 2,
-            "max": 2,
-            "feedback": "Great! Based on your answers, you are eligible to apply for this scholarship."
-          }
-        ]
-      },
+      "instructions": "Answer the questions below to see if you are currently eligible for the Gabe Jenks Memorial Scholarship and find out which activity you should complete next.",
+      "content": "Drug Rehab Services (DRS) annually offers the Gabe Jenks Memorial Scholarship to help those affected by substance use. This scholarship awards $1,000 to the winner through your school's financial aid services. While the topic for this scholarship changes a little each year, the topic is always related to individuals affected by substance abuse -- whether that's you or someone you know. With the current prevalence of drugs in society, just about anyone can apply for this scholarship.",
       "questions": [
         {
-          "question_text": "Are you at least 18 years old, or will you be 18 by July 1st?",
+          "question_text": "Are you at least 18 years old?",
           "question_type": "multiple_choice",
-          "has_correct_answer": true,
+          "has_correct_answer": false,
           "choices": {
             "options": [
-              {
-                "id": 1,
-                "text": "Yes",
-                "is_correct": true
-              },
-              {
-                "id": 2,
-                "text": "No",
-                "is_correct": false
-              }
+              { "id": 1, "text": "Yes", "is_correct": false },
+              { "id": 2, "text": "No", "is_correct": false }
             ]
           },
-          "is_required": true,
-          "feedback_config": {
-            "correct_feedback": "Perfect! You meet the age requirement.",
-            "incorrect_feedback": "This scholarship requires applicants to be 18 years of age or older by July 1st."
-          }
+          "feedback_config": {}
+        },
+        {
+          "question_text": "Will you be 18 years old by July 1st?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Yes", "is_correct": false },
+              { "id": 2, "text": "No", "is_correct": false }
+            ]
+          },
+          "feedback_config": {}
         },
         {
           "question_text": "Will you be enrolled full-time at a college or university in the Fall semester?",
           "question_type": "multiple_choice",
-          "has_correct_answer": true,
+          "has_correct_answer": false,
           "choices": {
             "options": [
-              {
-                "id": 1,
-                "text": "Yes",
-                "is_correct": true
-              },
-              {
-                "id": 2,
-                "text": "No",
-                "is_correct": false
-              }
+              { "id": 1, "text": "Yes", "is_correct": false },
+              { "id": 2, "text": "No", "is_correct": false }
             ]
           },
-          "is_required": true,
-          "feedback_config": {
-            "correct_feedback": "Excellent! You meet the enrollment requirement.",
-            "incorrect_feedback": "This scholarship is for students who will be enrolled full-time at a college or university."
-          }
+          "feedback_config": {}
         }
+      ],
+      "TODO:":"Descision tree activity type."
+    },
+    {
+      "type": "writing",
+      "title": "Scholarship Essay Activity",
+      "instructions": "Read through this year's scholarship essay prompt. Then, write an essay that you could submit for this scholarship.",
+      "prompts": ["**Scholarship Details:**  \"The DRS Scholarship is an essay submission format. Individuals submit an essay in adherence to the guidelines below. The DRS Team will review these essays, and the scholarship will be awarded to the best essay that meets all submission guidelines. This scholarship will be awarded annually with a different essay topic each year.\"\n\n\n**Scholarship Essay Contest Details:** \"This year's Scholarship essay will focus on personal experience and encourage individuals to share their stories about how drug and alcohol use has affected their lives. It will also call on applicants to share their viewpoints on why substance use has become so prevalent in the United States and what can be done to improve it.\"\n\n\n**Essay Guidelines:**\n\n\n* It must be an original essay. This means you cannot submit something someone else wrote, you borrowed from somewhere else, or that you wrote for another class.  \n* Essay length should be between 1000-1500 words. This is about two and a half single spaced pages.  \n* \"The essay must include personal experience, individual viewpoints on our nation's drug epidemic, and one's **own** ideas on how to make things better.\"\n\n\n**Judgement Criteria:**\n\n* Originality  \n* Creativity   \n* Relevancy  \n* Completeness  \n* Overall Quality\n\n\n**Essay Topic: Explain in as much detail as you are comfortable with how drug and alcohol use has affected your life. Substance use is far-reaching, so this is not solely for individuals who have struggled with drugs and alcohol personally. You may also explain how the substance use of those close to you has impacted your life. Conclude your essay with your personal viewpoints on how drug and alcohol use has become so prevalent in the United States, and share what you think should be done to improve it.**\n\n\n**Submission Guidelines**:\n\n\n* Review your essay for any spelling or grammatical errors. You may want to have a teacher or peer help you review as well!  \n* Download your essay as a PDF or Word document from this page  \n* Use your college/university email address to submit your essay to scholarship@addicted.org with your name and the college/university you attend  \n* Submit by July 1st!"
       ]
     },
     {
-      "type": "textcontent",
+      "type": "quiz",
+      "title": "Scholarship Winners Review",
+      "instructions": "Pick one of the previous scholarship essay winners below. Read the essay and then answer the questions.",
+      "content": "Even if you aren't eligible for this scholarship or don't plan to attend college, it can still be helpful to see what makes a strong scholarship essay. Understanding how applicants effectively share their experiences, goals, and challenges can improve your writing skills for future opportunities.",
+      "questions": [
+        {
+          "question_text": "What was the main message of the essay? Summarize the key points in your own words.",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": { "options": [] },
+          "is_required": true
+        },
+        {
+          "question_text": "What did the author do well in their essay?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": { "options": [] },
+          "is_required": true
+        },
+        {
+          "question_text": "Did the essay clearly explain the author's challenges? How did they demonstrate personal growth?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": { "options": [] },
+          "is_required": true
+        },
+        {
+          "question_text": "If you had to write a scholarship essay about your own experiences, what would you focus on? Brainstorm a topic or personal story that you think would make a strong application.",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": { "options": [] },
+          "is_required": true
+        }
+      ],
+      "TODO:": "ADD EMBEDS"
+    },
+    {
+      "type": "slideshow",
       "title": "College Majors",
       "instructions": null,
-      "content": "A major is the subject someone chooses to study in-depth while attending college, and it ultimately determines the type of career someone will be qualified to have. Majors also determine which classes are required in college to complete a degree.\n\n![Chemistry class](chemistry class.jpg)"
-    },
-    {
-      "type": "textcontent",
-      "title": "Exploring Interests",
-      "instructions": null,
-      "content": "**Take introductory classes in several subjects that you think you might be interested in.** Introductory classes are a great way to try out different classes and can help you get to know faculty and students.\n\n![Professor](professor.jpg)"
-    },
-    {
-      "type": "textcontent",
-      "title": "Talking to Departments",
-      "instructions": null,
-      "content": "**Talk to faculty and students from departments you are interested in.** Sometimes departments hold workshops and socials you can attend, and interacting with other students and faculty can help you figure out if the department is the right fit for you.\n\n![Dance department](dancedepartment.jpg)"
-    },
-    {
-      "type": "textcontent",
-      "title": "Career Opportunities",
-      "instructions": null,
-      "content": "**Learn about careers that are available with a major.** Different majors lead to different career opportunities. If you have a specific career in mind, you'll want a major that works toward that career. If that career falls through, are you open to the other career opportunities?\n\n![Business](business.jpg)"
-    },
-    {
-      "type": "textcontent",
-      "title": "Job Availability",
-      "instructions": null,
-      "content": "**Consider the availability of careers with a given major.** Are there lots of jobs available or will you have to compete for the job you want? Is the field growing or becoming more limited? For example, while poetry might be a hobby with lots to learn, the jobs related to poetry are often very limited.\n\n![Trouble finding a job](trouble finding a job.jpg)"
-    },
-    {
-      "type": "textcontent",
-      "title": "Academic Strengths",
-      "instructions": null,
-      "content": "Classes in a particular subject can get harder as you progress in your degree. **You will want to consider what academic strengths you have and see if you can align your major with those strengths.**\n\n![Academic strengths](academic strengths.jpg)"
-    },
-    {
-      "type": "textcontent",
-      "title": "Program Requirements",
-      "instructions": null,
-      "content": "Different majors and programs may have different requirements for completing your degree, such as completing an internship or thesis. **Learn about these requirements before committing to a major and determine if they are right for you.**\n\n![Graduation](graduation.jpg)"
-    },
-    {
-      "type": "textcontent",
-      "title": "Level of Education",
-      "instructions": null,
-      "content": "**To get the career you want, what level of education will you need?** Some careers may require a higher level of education. Before committing to a major, it's wise to have a good idea of all that it might require.\n\n![Graduating looking up](graduating looking up.jpg)"
+      "slides": [
+        {
+          "content": "A major is the subject someone chooses to study in-depth while attending college, and it ultimately determines the type of career someone will be qualified to have. Majors also determine which classes are required in college to complete a degree."
+          ,"image": "chemistry_class.jpg"
+        },
+        {
+          "content": "**Take introductory classes in several subjects that you think you might be interested in.** Introductory classes are a great way to try out different classes and can help you get to know faculty and students."
+          ,"image": "professor.jpg"
+        },
+        {
+          "content": "**Talk to faculty and students from departments you are interested in.** Sometimes departments hold workshops and socials you can attend, and interacting with other students and faculty can help you figure out if the department is the right fit for you."
+          ,"image": "dancedepartment.jpg"
+        },
+        {
+          "content": "**Learn about careers that are available with a major.** Different majors lead to different career opportunities. If you have a specific career in mind, you'll want a major that works toward that career. If that career falls through, are you open to the other career opportunities?"
+          ,"image": "business.jpg"
+        },
+        {
+          "content": "**Consider the availability of careers with a given major.** Are there lots of jobs available or will you have to compete for the job you want? Is the field growing or becoming more limited? For example, while poetry might be a hobby with lots to learn, the jobs related to poetry are often very limited."
+          ,"image": "trouble_finding_a_job.jpg"
+        },
+        {
+          "content": "Classes in a particular subject can get harder as you progress in your degree. **You will want to consider what academic strengths you have and see if you can align your major with those strengths.**"
+          ,"image": "academic_strengths.jpg"
+        },
+        {
+          "content": "Different majors and programs may have different requirements for completing your degree, such as completing an internship or thesis. **Learn about these requirements before committing to a major and determine if they are right for you.**"
+          ,"image": "graduation.jpg"
+        },
+        {
+          "content": "**To get the career you want, what level of education will you need?** Some careers may require a higher level of education. Before committing to a major, it's wise to have a good idea of all that it might require."
+          ,"image": "graduating_looking_up.jpg"
+        }
+      ]
     },
     {
       "type": "twine",
       "title": "Choosing a Major: Case Study",
       "instructions": "In this activity, you'll go through a case study story of a new college student who is choosing a major and determining if it it right for them.As you do, think about your own interests and academic strengths and what you might do in this situation.",
-      "file": "Choosing a Major.html"
+      "file": "choosing_a_major.html"
     },
     {
       "type": "quiz",
       "title": "Exploring Majors",
       "instructions": null,
-      "content": "What kind of major would you be interested in? This activity will help you explore different majors and think about the path you might like to take. If you already know what kind of major you are interested in, this activity will help you understand what some of the basic requirements might be.\n\nAs you explore majors, keep in mind that the catalog of majors you will be looking at is from *one community college.* Other colleges and universities will have different options for majors as well as different requirements. This activity will familiarize you with the process of looking at majors.\n\nTo begin, answer a few questions that will help you narrow down which majors to look at.\n\n![Majors](major.jpg)\n\nOn the next page, you should think about the suggestions you were given here. However, you may find that other categories and majors draw your attention too! Feel free to read and explore as many majors as you would like.",
+      "content": "What kind of major would you be interested in? This activity will help you explore different majors and think about the path you might like to take. If you already know what kind of major you are interested in, this activity will help you understand what some of the basic requirements might be.\n\nAs you explore majors, keep in mind that the catalog of majors you will be looking at is from *one community college.* Other colleges and universities will have different options for majors as well as different requirements. This activity will familiarize you with the process of looking at majors.\n\nTo begin, answer a few questions that will help you narrow down which majors to look at.\n\nRemember what answer you received for the next page. . However, you may find that other categories and majors draw your attention too! Feel free to read and explore as many majors as you would like.",
       "questions": [
         {
           "question_text": "1. Which subject areas interest you the most? (Choose one or more)",
@@ -567,26 +572,10 @@
           "has_correct_answer": false,
           "choices": {
             "options": [
-              {
-                "id": 1,
-                "text": "Science, Technology, Engineering, or Math  \n*Students who select this option should be taken to question 2*",
-                "is_correct": false
-              },
-              {
-                "id": 2,
-                "text": "Business, Management, or Money  \n*Based on your interest in Business, Management, or Money, you should look at majors in the category of \"Business Entrepreneurialism & Management\"*",
-                "is_correct": false
-              },
-              {
-                "id": 3,
-                "text": "Helping People, Law, or Education  \n*Students who select this option should be taken to question 3*",
-                "is_correct": false
-              },
-              {
-                "id": 4,
-                "text": "Art, Writing, or Culture  \n*Based on your interest in Art, Writing, or Culture you should look at majors in the category of \"Visual & Performing Arts or Culture & Society\"*",
-                "is_correct": false
-              }
+              { "id": 1, "text": "Science, Technology, Engineering, or Math", "is_correct": false },
+              { "id": 2, "text": "Business, Management, or Money", "is_correct": false },
+              { "id": 3, "text": "Helping People, Law, or Education", "is_correct": false },
+              { "id": 4, "text": "Art, Writing, or Culture", "is_correct": false }
             ]
           },
           "is_required": false,
@@ -598,26 +587,10 @@
           "has_correct_answer": false,
           "choices": {
             "options": [
-              {
-                "id": 1,
-                "text": "Working with your hands  \n*Based on your interest on working with your hands, you should look at majors in the category of \"Applied Technology\"*",
-                "is_correct": false
-              },
-              {
-                "id": 2,
-                "text": "Working with computers and digital systems  \n*Based on your interest on working with computers and digital systems, you should look at majors in the category of \"Computer Information Technology\"*",
-                "is_correct": false
-              },
-              {
-                "id": 3,
-                "text": "Working to help people through science  \n*Based on your interest on working to help people through science, you should look at majors in the category of \"Health Sciences\"*",
-                "is_correct": false
-              },
-              {
-                "id": 4,
-                "text": "Working with problem solving and reasoning  \n*Based on your interest on working with problem solving and reasoning, you should look at majors in the category of \"Science, Technology, Engineering, and Math or STEM\"*",
-                "is_correct": false
-              }
+              { "id": 1, "text": "Working with your hands", "is_correct": false },
+              { "id": 2, "text": "Working with computers and digital systems", "is_correct": false },
+              { "id": 3, "text": "Working to help people through science", "is_correct": false },
+              { "id": 4, "text": "Working with problem solving and reasoning", "is_correct": false }
             ]
           },
           "is_required": false,
@@ -629,16 +602,8 @@
           "has_correct_answer": false,
           "choices": {
             "options": [
-              {
-                "id": 1,
-                "text": "Working with children  \n*Based on your interest on working with children, you should look at majors in the category of \"Education\"*",
-                "is_correct": false
-              },
-              {
-                "id": 2,
-                "text": "Working to help people in public services or the justice system  \n*Based on your interest on working to help people in public services or the justice system, you should look at majors in the category of \"Behavioral Science & Human Services\"*",
-                "is_correct": false
-              }
+              { "id": 1, "text": "Working with children", "is_correct": false },
+              { "id": 2, "text": "Working to help people in public services or the justice system", "is_correct": false }
             ]
           },
           "is_required": false,
@@ -650,7 +615,7 @@
       "type": "writing",
       "title": "Exploring Majors Reflection",
       "instructions": "When you are done exploring, write down at least one major that you are interested in. You can also write down notes of things you learned about the major--this space is for you!",
-      "content": "As a reminder, here are your suggestions from the previous page.\n\n*(Feedback from previous page should be shown here)*\n\nBefore you look at majors, review the image below to see what the major catalog will include and what the different components are. When you are ready, open the course catalog and explore. The majors are listed in several ways. To find the categories suggested to you, scroll down to the yellow highlighted categories.\n\n![Course Catalog Example](Course Catalog Example.jpg)\n\n**Catalog PDF:** Chandler-Gilbert Community College Catalog and Student Handbook 2023-2024.pdf",
+      "instructions_image": "course_catalog_example.jpg",
       "prompts": [
         "Write down at least one major that interests you and any notes about what you learned."
       ]
@@ -659,88 +624,70 @@
       "type": "video",
       "title": "Applying for College",
       "instructions": "Watch this video to learn the basics of what you need to know about applying for college.",
-      "content": "Applying for college is an exciting step toward your future, but it can feel overwhelming if you're not sure where to start. Don't worry--we've got you covered! In this section, we'll walk you through the key steps of the application process, help you gather everything you'll need, and share strategies for overcoming challenges along the way.",
-      "video": "Applying to College.mp4",
+      "video": "applying_to_college.mp4",
       "scrubbable": false
     },
     {
-      "type": "textcontent",
-      "title": "College Application Requirements: Overview",
-      "instructions": null,
-      "content": "College applications can take quite a bit of time to complete and you may be surprised by everything they ask for you to submit. Being prepared with documents ahead of time and creating checklists of what each school needs can help you stay organized. Click through the pages to learn about some of the things an application may require."
-    },
-    {
-      "type": "textcontent",
-      "title": "College Application Requirements: Application Fees",
-      "instructions": null,
-      "content": "Many colleges charge an application fee, which can range from $20 to $100. If the fee is a problem, you can request a fee waiver. For students not currently in school, you can ask the college admissions office directly or check their website for a fee waiver form--many schools have options for students facing financial hardship.\n\n![Fee waiver](feewaiver.jpg)"
-    },
-    {
-      "type": "textcontent",
-      "title": "College Application Requirements:Transcripts",
-      "instructions": null,
-      "content": "A transcript is a record of your high school classes and grades. If you've changed schools or are not currently enrolled, contact your most recent school district to request a copy. If you're unsure where to start, a case manager or teacher may be able to help you locate the correct school or district office.\n\n![Transcripts](transcripts.png)"
-    },
-    {
-      "type": "textcontent",
-      "title": "College Application Requirements: High School Diploma or GED",
-      "instructions": null,
-      "content": "Most colleges need proof that you've graduated high school or earned a GED. If you're still working on earning your diploma or GED, focus on completing it, as this is usually the first step for applying to college. If you already earned it but lost the paperwork, you can contact the school or testing center where you graduated or took your GED to request a copy.\n\n![High school graduation](highschool graduation.png)"
-    },
-    {
-      "type": "textcontent",
-      "title": "College Application Requirements: Standardized Test Scores",
-      "instructions": null,
-      "content": "Some colleges require scores from tests like the SAT or ACT, but many schools are now test-optional. If you've taken one of these tests before but don't have your scores, you can request them from the test organization (College Board for SAT or ACT.org). If you haven't taken these tests, look for test-optional schools or ask your facility staff if testing is available.\n\n![Standardized tests](standardizedtests.png)"
-    },
-    {
-      "type": "textcontent",
-      "title": "College Application Requirements: Resume",
-      "instructions": null,
-      "content": "College applications may ask for a resume which shows your activities, jobs, volunteer work, and accomplishments. Even if you don't have a long list of activities, focus on what you have done--like learning skills, working in groups, or setting goals.\n\n![First job cashier](firstjobcashier.png)"
-    },
-    {
-      "type": "textcontent",
-      "title": "College Application Requirements: IEP or 504 Documentation",
-      "instructions": null,
-      "content": "If you used an IEP or 504 Plan in high school, these documents can help you get support in college. If you don't have the paperwork, ask someone at your facility, a past school district, or your caseworker for help. Colleges have disability services offices to guide you through requesting accommodations.\n\n![IEP or 504 Documentation](IEP504.png)"
-    },
-    {
-      "type": "textcontent",
-      "title": "College Application Requirements: FAFSA",
-      "instructions": null,
-      "content": "The FAFSA helps you access financial aid like grants, loans, or work-study. Even if you don't think you'll qualify, it's worth completing--it's free and can open up opportunities for funding. The FAFSA is covered in this lesson when we talk about finances and college.\n\n![Eating cereal](eating cereal.png)"
-    },
-    {
-      "type": "textcontent",
-      "title": "College Application Requirements: Placement Testing",
-      "instructions": null,
-      "content": "Some colleges may ask you to take placement tests to decide the best level for your classes. If you don't know your skill level in math or English, don't worry--these tests help you start where you're most comfortable. Placement testing can sometimes be arranged online or through your college after you've been accepted.\n\n![International student](internationalstudent.jpg)"
-    },
-    {
-      "type": "textcontent",
-      "title": "College Application Requirements: Essays or Personal Statements",
-      "instructions": null,
-      "content": "Many colleges ask for a short essay or personal statement to learn more about you. If you're not sure what to write about, think about challenges you've overcome, your goals, or a moment that shaped you. Keep it honest and focus on your story--there's no wrong answer. And don't forget to proofread!\n\n![Essay](essay.jpg)"
-    },
-    {
-      "type": "textcontent",
-      "title": "College Application Requirements: References",
-      "instructions": null,
-      "content": "References are people who can write letters or talk about your strengths. If you don't have teachers or counselors to ask, think about other adults who know you well--like a caseworker, volunteer supervisor, or mentor. Be sure to ask early and explain what the college is looking for.\n\n![References](references.jpg)"
-    },
-    {
-      "type": "textcontent",
-      "title": "College Application Requirements: Double-Check Requirements",
-      "instructions": null,
-      "content": "Each college is different, so check their website to make sure you've included everything they need. Some may ask for extra materials, like portfolios or interviews. Stay organized by making a list for each school.\n\n![Checklist](checklist.jpg)"
+      "type": "slideshow",
+      "title": "College Application Requirements",
+      "instructions": "Click through the pages to learn about some of the things an application may require.",
+      "slides": [
+        {
+          "content": "College applications can take quite a bit of time to complete and you may be surprised by everything they ask for you to submit. Being prepared with documents ahead of time and creating checklists of what each school needs can help you stay organized."
+        },
+        {
+          "content": "Many colleges charge an application fee, which can range from $20 to $100. If the fee is a problem, you can request a fee waiver. For students not currently in school, you can ask the college admissions office directly or check their website for a fee waiver form--many schools have options for students facing financial hardship."
+          ,"image": "feewaiver.jpg"
+        },
+        {
+          "content": "A transcript is a record of your high school classes and grades. If you've changed schools or are not currently enrolled, contact your most recent school district to request a copy. If you're unsure where to start, a case manager or teacher may be able to help you locate the correct school or district office."
+          ,"image": "transcripts.png"
+        },
+        {
+          "content": "Most colleges need proof that you've graduated high school or earned a GED. If you're still working on earning your diploma or GED, focus on completing it, as this is usually the first step for applying to college. If you already earned it but lost the paperwork, you can contact the school or testing center where you graduated or took your GED to request a copy."
+          ,"image": "highschool_graduation.png"
+        },
+        {
+          "content": "Some colleges require scores from tests like the SAT or ACT, but many schools are now test-optional. If you've taken one of these tests before but don't have your scores, you can request them from the test organization (College Board for SAT or ACT.org). If you haven't taken these tests, look for test-optional schools or ask your facility staff if testing is available."
+          ,"image": "standardizedtests.png"
+        },
+        {
+          "content": "College applications may ask for a resume which shows your activities, jobs, volunteer work, and accomplishments. Even if you don't have a long list of activities, focus on what you have done--like learning skills, working in groups, or setting goals."
+          ,"image": "firstjobcashier.png"
+        },
+        {
+          "content": "If you used an IEP or 504 Plan in high school, these documents can help you get support in college. If you don't have the paperwork, ask someone at your facility, a past school district, or your caseworker for help. Colleges have disability services offices to guide you through requesting accommodations."
+          ,"image": "IEP504.png"
+        },
+        {
+          "content": "The FAFSA helps you access financial aid like grants, loans, or work-study. Even if you don't think you'll qualify, it's worth completing--it's free and can open up opportunities for funding. The FAFSA is covered in this lesson when we talk about finances and college."
+          ,"image": "eating_cereal.png"
+        },
+        {
+          "content": "Some colleges may ask you to take placement tests to decide the best level for your classes. If you don't know your skill level in math or English, don't worry--these tests help you start where you're most comfortable. Placement testing can sometimes be arranged online or through your college after you've been accepted."
+          ,"image": "internationalstudent.jpg"
+        },
+        {
+          "content": "Many colleges ask for a short essay or personal statement to learn more about you. If you're not sure what to write about, think about challenges you've overcome, your goals, or a moment that shaped you. Keep it honest and focus on your story--there's no wrong answer. And don't forget to proofread!"
+          ,"image": "essay.jpg"
+        },
+        {
+          "content": "References are people who can write letters or talk about your strengths. If you don't have teachers or counselors to ask, think about other adults who know you well--like a caseworker, volunteer supervisor, or mentor. Be sure to ask early and explain what the college is looking for."
+          ,"image": "references.jpg"
+        },
+        {
+          "content": "Each college is different, so check their website to make sure you've included everything they need. Some may ask for extra materials, like portfolios or interviews. Stay organized by making a list for each school."
+          ,"image": "checklist.jpg"
+        }
+      ]
     },
     {
       "type": "writing",
       "title": "Going to College Reflection",
       "instructions": "Use this space to write anything you'd like -- things to remember, what you learned from this lesson, questions you still have, or something else.",
-      "content": "You've just finished this lesson on Going to College. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\n![College photo](collegepic.jpg)",
-      "prompts": ["Write your thoughts or notes here."]
+      "prompts": [
+        "Write your thoughts or notes here."
+      ]
     }
   ]
 }
