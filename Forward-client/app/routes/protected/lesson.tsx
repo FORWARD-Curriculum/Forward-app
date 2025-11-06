@@ -9,7 +9,7 @@ import type { Route } from "./+types/lesson";
 import { apiFetch } from "@/utils/utils";
 import { useSelector, useDispatch } from "react-redux";
 import store, { type RootState } from "@/store";
-import { act, useEffect } from "react";
+import { act, useEffect, useCallback } from "react";
 import TextContent from "@/features/curriculum/components/textcontent";
 import Poll from "@/features/curriculum/components/poll";
 import Quiz from "@/features/curriculum/components/quiz";
@@ -187,7 +187,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
     }
   }, [loaderData]);
 
-  const handleLessonComplete = () => {
+  const handleLessonComplete = useCallback(() => {
 
     setShowComplete(true);
     confetti({
@@ -201,15 +201,15 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
 
     setTimeout(() =>{
       confetti({
-        particleCount: 250,
+        particleCount: 350,
         angle: 60,
         spread: 90,
-        origin: { x: 0, y: 0.7},
+        origin: { x: 0.2, y: 0.7},
         startVelocity: 30,
         scalar: 0.8
       });
       confetti({
-        particleCount: 250,
+        particleCount: 350,
         angle: 120,
         spread: 90,
         origin: { x: 1.1, y: 0.7},
@@ -218,7 +218,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
       });
 
     }, 150)
-  }
+  }, []);
 
   return (
     <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:mt-14 lg:flex-row lg:items-start lg:gap-8">
@@ -302,7 +302,9 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
               }
               else{
                 dispatch(nextActivity());
-                dispatch(incrementHighestActivity());
+                if(lesson.current_activity === response.highest_activity){
+                  dispatch(incrementHighestActivity());
+                }
                 history.replaceState(
                     null,
                     "",
