@@ -156,6 +156,19 @@ function getCallerStack(skipLines = 2) {
   return lines.slice(skipLines).join("\n");
 }
 
+
+
+declare global {
+  interface String {
+    trunc(n: number): string;
+  }
+}
+
+String.prototype.trunc = 
+      function(n){
+          return this.substr(0,n-1)+(this.length>n?'...':'');
+      };
+
 const originalConsoleError = console.error.bind(console);
 
 console.error = (...args: any[]) => {

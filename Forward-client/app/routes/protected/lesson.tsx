@@ -20,6 +20,7 @@ import Embed from "@/features/curriculum/components/embed";
 import ConceptMap from "@/features/curriculum/components/conceptmap";
 import DndMatch from "@/features/curriculum/components/dndmatch";
 import FillInTheBlank from "@/features/curriculum/components/fillintheblank";
+import Slideshow from "@/features/curriculum/components/slideshow";
 import { useClient } from "@/hooks/useClient";
 import {
   Accordion,
@@ -27,7 +28,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ArrowRightIcon, ArrowUpIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  ArrowUpIcon,
+  ChevronsDownUp,
+  ChevronsUpDown,
+} from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "react-router";
 import {
@@ -49,6 +55,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import MarkdownTTS from "@/components/ui/markdown-tts";
+
 
 export async function clientLoader({
   params,
@@ -126,13 +134,31 @@ export function Activity({ activity }: { activity: BaseActivity }) {
         />
       );
     case "DndMatch":
-      return <DndMatch key={key} dndmatch={activity as ActivityManager["DndMatch"][0]}/>
+      return (
+        <DndMatch
+          key={key}
+          dndmatch={activity as ActivityManager["DndMatch"][0]}
+        />
+      );
     case "FillInTheBlank":
-      return <FillInTheBlank key={key} fillInTheBlank={activity as ActivityManager["FillInTheBlank"][0]}/>
+      return (
+        <FillInTheBlank
+          key={key}
+          fillInTheBlank={activity as ActivityManager["FillInTheBlank"][0]}
+        />
+      );
     case "Video":
-      return <Video key={key} video={activity as ActivityManager["Video"][0]} />;
+      return (
+        <Video key={key} video={activity as ActivityManager["Video"][0]} />
+      );
     case "Twine":
-      return <Twine key={key} twine={activity as ActivityManager["Twine"][0]} />;
+      return (
+        <Twine key={key} twine={activity as ActivityManager["Twine"][0]} />
+      );
+    case "Slideshow":
+      return (
+        <Slideshow key={key} slideshow={activity as ActivityManager["Slideshow"][0]}/>
+      );
     // No default case needed, as all types are handled
     default:
       return <p>Out of bounds</p>;
@@ -150,6 +176,8 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   const length = lesson.lesson?.activities.length;
   const [showsScrolBtn, setShowScrolBtn] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
+  const [showFullToc, setShowFullToc] = useState(false);
+
 
   // Mount/Unmount
   useEffect(() => {
@@ -221,7 +249,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   }, []);
 
   return (
-    <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:mt-14 lg:flex-row lg:items-start lg:gap-8">
+    <div className="m-4 mr-8 lg:ml-24 lg:mb-12 lg:mt-7 flex w-full flex-col items-center gap-4 lg:gap-8 lg:flex-row lg:items-start max-w-screen">
       <div className="flex flex-col lg:h-full">
         <Accordion
           type="single"
@@ -230,21 +258,44 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
             client.windowDimensions.width >= 1024 ? "horizontal" : "vertical"
           }
         >
-          <AccordionItem value="1">
-            <AccordionTrigger className="bg-secondary border-secondary-border text-secondary-foreground data-[state=open]:border-b-muted-foreground/50 rounded-t-3xl border-1 p-4 duration-50 data-[state=closed]:rounded-3xl data-[state=closed]:delay-300 data-[state=open]:rounded-b-none data-[state=open]:border-b-1">
-              <h1 className="text-lg font-bold text-nowrap">
+          <AccordionItem value="1" className="transition-transform duration-100 ease-in-out data-[state=open]:lg:translate-x-0 data-[state=open]:translate-x-6.5">
+            <AccordionTrigger className="bg-secondary border-secondary-border text-secondary-foreground data-[state=open]:border-b-muted-foreground/50 relative rounded-t-3xl border-1 p-4 duration-50 data-[state=closed]:rounded-3xl data-[state=closed]:delay-300 data-[state=open]:rounded-b-none data-[state=open]:border-b-1">
+              <button
+                className={`bg-foreground absolute top-2.75 -left-15 rounded-full border-secondary-border p-2 border-1 transition-transform duration-100 ease-in-out group-data-[state=closed]:scale-0 hover:scale-110 hover:duration-75`}
+                onClick={(e) => {
+                  e.stopPropagation(), setShowFullToc(!showFullToc);
+                }}
+                title="Toggle full Table of Contents"
+              >
+                {showFullToc ? <ChevronsDownUp /> : <ChevronsUpDown />}
+              </button>
+              <h1
+                title={`${lesson.lesson?.title}: Table of Contents`}
+                className="lg:w-[30ch] w-[20ch] overflow-hidden text-lg font-bold text-nowrap overflow-ellipsis hover:underline"
+              >
                 {lesson.lesson?.title}: Table of Contents
               </h1>
             </AccordionTrigger>
             <AccordionContent className="bg-secondary text-secondary-foreground border-secondary-border overflow-hidden rounded-b-3xl border-1 border-t-0 pb-0 text-nowrap">
-              <div className="flex flex-col">
-                {lesson.lesson?.activities.map((activityIndex) => {
+              <div className="flex flex-col overflow-y-auto ">
+                {(showFullToc
+                  ? lesson.lesson?.activities || []
+                  : [...(lesson.lesson?.activities || [])].splice(
+                      lesson.current_activity < 6
+                        ? 0
+                        : lesson.current_activity + 6 > lesson.lesson!.activities.length
+                        ? lesson.lesson!.activities.length - 12
+                        : lesson.current_activity - 6,
+                      12,
+                    )
+                ).map((activityIndex) => {
                   return (
                     <button
-                      // FIXME for now, we are not using the response to disable the button
+                      // FIXME: for now, we are not using the response to disable the button
+                      title={`${activityIndex.order}. ${activityIndex.title}`}
                       disabled={user ? (activityIndex.order > response.highest_activity) : false}
                       key={activityIndex.order}
-                      className={`${activityIndex.order === lesson.current_activity ? "bg-accent/40" : ""} disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
+                      className={`${activityIndex.order === lesson.current_activity ? "bg-accent/40" : ""} group disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                       onClick={() => {
                         dispatch(setActivity(activityIndex.order));
                         history.replaceState(
@@ -255,7 +306,22 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                       }}
                     >
                       <p>{activityIndex.order}.</p>
-                      <p>{activityIndex.title}</p>
+                      <span className="ml-auto lg:w-[35ch] w-[20ch]  overflow-hidden **:text-right">
+                        <p
+                          className={
+                            activityIndex.title.length > 45
+                              ? "group-hover:hidden"
+                              : ""
+                          }
+                        >
+                          {activityIndex.title.trunc(45)}
+                        </p>
+                        {activityIndex.title.length > 45 && (
+                          <p className="group-hover:animate-marquee hidden items-center whitespace-nowrap group-hover:block">
+                            {activityIndex.title} {activityIndex.title}
+                          </p>
+                        )}
+                      </span>
                     </button>
                   );
                 })}
@@ -283,14 +349,25 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         )}
       </div>
 
-      <div className="bg-secondary border-secondary-border text-secondary-foreground flex min-h-min w-full flex-col rounded-3xl border-1 p-4">
+      <div className="bg-secondary border-secondary-border text-secondary-foreground flex min-h-min w-full flex-col min-w-0 rounded-3xl border-1 p-4">
         <h1 className="text-2xl font-bold">
           <span className="text-accent">
             {ActivityTypeDisplayNames[activity?.type || "Default"]}:{" "}
           </span>
           {activity?.title}
         </h1>
-        {activity?.instructions && <p className="mb-6 font-light italic">{activity.instructions}</p>}
+        {activity?.instructions && (
+          <MarkdownTTS
+            className="mb-6 font-light italic"
+            controlsClassName="flex flex-row-reverse justify-between"
+            controlsOrientation="horizontal"
+          >
+            {activity.instructions}
+          </MarkdownTTS>
+        )}
+        {activity?.instructions_image && (
+          <img className="h-auto w-auto max-w-full max-h-100 object-contain rounded-xl mb-4" src={activity.instructions_image} alt=""></img>
+        )}
         {activity && <Activity activity={activity} />}
         <div className="mt-auto flex">
           <button

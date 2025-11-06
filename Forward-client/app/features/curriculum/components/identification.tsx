@@ -50,7 +50,7 @@ export default function Identification({
         customComponents={{ correct: Correct}}
         controlsOrientation="horizontal"
         controlsClassName="flex flex-col"
-        className="remark **:max-w-[100ch] !p-16 !pt-10"
+        className="remark mdFont **:max-w-[100ch] !p-16 !pt-10"
       >
         {identification.content}
       </MarkdownTTS>

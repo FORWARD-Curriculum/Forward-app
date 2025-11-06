@@ -23,7 +23,7 @@ export default function Question({
   // question configuration
   const [isChecked, setIsChecked] = useState(false);
   const isMultipleSelect = question.question_type === "multiple_select";
-  const correctAnswers = question.choices.options.filter(
+  const correctAnswers = question.choices.options?.filter(
     (option) => option.is_correct,
   );
   const selectedAnswers = answer?.response_data?.selected || [];
@@ -32,12 +32,12 @@ export default function Question({
   const isAnswered =
     selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
   // Check if the answer is correct
-  const isCorrect = isMultipleSelect
+  const isCorrect = !question.has_correct_answer || isMultipleSelect
     ? areArraysEqual(
         selectedAnswers.slice().sort(),
-        correctAnswers.map((c) => c.id).sort(),
+        correctAnswers?.map((c) => c.id).sort(),
       )
-    : correctAnswers.map((c) => c.id).includes(selectedAnswers[0]);
+    : correctAnswers?.map((c) => c.id).includes(selectedAnswers[0]);
   /**
    * Handles when a user selects or deselects an option
    */
@@ -68,7 +68,7 @@ export default function Question({
             </MarkdownTTS>
 
             <div className="space-y-2">
-              {question.choices.options.map((option) => (
+              {question.choices.options?.map((option) => (
                 <label
                   key={option.id}
                   htmlFor={`question-${questionNumber}:option-${option.id}`}

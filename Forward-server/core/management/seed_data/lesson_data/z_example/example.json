@@ -1,0 +1,239 @@
+{
+  "lesson": {
+    "title": "Example Lesson For All Activities",
+    "description": "A lesson containing example versions of all activity types available at the moment.",
+    "objectives": [
+    ],
+    "order": 2,
+    "tags": ["test", "example", "all activities"],
+    "image": "papers.png"
+  },
+  "activities": [
+        {
+      "type": "conceptmap",
+      "title": "Concept Map Example",
+      "instructions": null,
+      "content": "This is an example concept map activity. You can explore different categories and their examples below.",
+      "examples": [
+      {
+        "title": "Category A",
+        "image": "trade.png",
+        "description": "This is an example description for Category A, showing how concept maps can organize information with examples and details.",
+        "examples": [
+        {
+          "name": "Example A1",
+          "image": "trade.png",
+          "description": "This is the first example of Category A."
+        },
+        {
+          "name": "Example A2",
+          "image": "trade.png",
+          "description": "This is the second example of Category A."
+        }
+        ]
+      },
+      {
+        "title": "Category B",
+        "image": "trade.png",
+        "description": "This is an example description for Category B, demonstrating how to include definitions using <def def='This is a sample definition'>defined terms</def>.",
+        "examples": [
+        {
+          "name": "Example B1",
+          "image": "trade.png", 
+          "description": "This is the first example of Category B."
+        },
+        {
+          "name": "Example B2",
+          "image": "trade.png",
+          "description": "This is the second example of Category B."
+        }
+        ]
+      }
+      ]
+    },
+    {
+      "type": "dndmatch",
+      "title": "DnD Match Test",
+      "instructions": "Match items from the <source> to the correct (category/description/definition)",
+      "_comment": "This is a test activity for the DnD Match type.",
+      "content": [
+        {
+          "category": "Trade School",
+          "matches": [
+            { "image": "welder.webp" },
+            { "image": "electrician.jpeg" }
+          ]
+        },
+        { "category": "University", "matches": ["programmer", "ecologist"] },
+        {
+          "category": "Typically offers associate level programs for 2 years of study.",
+          "matches": ["Community College"]
+        }
+      ]
+    },
+        {
+      "type": "fillintheblank",
+      "title": "Fill in the Blank Example",
+      "instructions": "Fill in the blank with your best guess as the the empty fields. Variations include any key words accepted, keyword recognition, and drop-down menu for sleecting options",
+      "content": [  
+                  "Cats are <options>*an animal, a bird, a fish</options> that often are found in <options>*homes, outdoor spaces</options>!", 
+                  "The sky is <options keyword=\"true\">blue, clear, bright</options>",
+                  "My favorite color is <options></options> and I like to eat <options></options> for breakfast."
+                ]
+
+    },
+    {
+      "type": "identification",
+      "title": "Identification Example",
+      "minimum_correct": 2,
+      "instructions": "Identifications are activities where you need to find specific information in a text.",
+      "content": ":::center\n # In the documentation\n:::\n\n## I explain how to use the custom\n\n::::columns\n:::col\ncentering and\n:::\n:::col\ncolumning notation\n:::\n::::\n\n### for specific formatting\n use the <correct></correct> tags around a section that will count to the correct answers."
+    },
+        {
+      "type": "slideshow",
+      "title": "Slideshow Example",
+      "instructions": "Read the following and think on the contents",
+      "slides": [
+        {
+          "content": "An example slide with **markdown formatting**",
+          "image": "electrician.jpeg"
+        },
+        {
+          "content": "An example slide with **markdown formatting**",
+          "image": "papers.png"
+        },
+        {
+          "content": "An example slide with **markdown formatting**",
+          "image": "trade.png"
+        },
+        {
+          "content": "An example slide with **markdown formatting**",
+          "image": "welder.webp"
+        }
+      ]
+    },
+    {
+      "type": "likertscale",
+      "title": "Likert Scale Example",
+      "instructions": "Use the slider to indicate how much you agree with the following statements.",
+      "content": [
+        {
+          "statement": "I know what type of college I want to attend.",
+          "scale": [0,1,2,3,4,5]
+        },
+        {
+          "statement": "I know what type of degree I want to pursue.",
+          "scale": [0,1,2,3,4,5]
+        },
+        {
+          "continuous": true,
+          "statement": "I amconfident in my ability to apply for college.",
+          "scale": ["0%", "100%"]
+        },
+        {
+          "statement": "I am likely to apply for financial aid for college.",
+          "scale": ["Not at all likely", "Slightly likely", "Somewhat likely", "Moderately likely", "Very likely", "Extremely likely"]
+        }
+      ]
+    },
+        {
+      "type": "quiz",
+      "title": "Quiz Example",
+      "instructions": "Answer these example questions to test the quiz activity type.",
+      "passing_score": 2,
+      "feedback_config": {
+      "default": "Thanks for trying this example quiz!",
+      "ranges": [
+        {
+        "min": 0,
+        "max": 1,
+        "feedback": "You might want to review the example materials."
+        },
+        {
+        "min": 2,
+        "max": 3,
+        "feedback": "Great job! You understand how quiz activities work."
+        }
+      ]
+      },
+      "questions": [
+      {
+        "question_text": "What type of activity allows markdown formatting?",
+        "question_type": "multiple_choice",
+        "has_correct_answer": true,
+        "choices": {
+        "options": [
+          { "id": 1, "text": "Quiz activity", "is_correct": false },
+          { "id": 2, "text": "TextContent activity", "is_correct": true },
+          { "id": 3, "text": "Video activity", "is_correct": false }
+        ]
+        },
+        "is_required": true,
+        "feedback_config": {}
+      },
+      {
+        "question_text": "Which activity type allows matching items from one list to another?",
+        "question_type": "multiple_choice",
+        "has_correct_answer": true,
+        "choices": {
+        "options": [
+          { "id": 1, "text": "Concept Map", "is_correct": false },
+          { "id": 2, "text": "DnD Match", "is_correct": true },
+          { "id": 3, "text": "Identification", "is_correct": false }
+        ]
+        },
+        "is_required": true,
+        "feedback_config": {}
+      },
+      {
+        "question_text": "Which activity type uses a slider for responses?",
+        "question_type": "multiple_choice",
+        "has_correct_answer": true,
+        "choices": {
+        "options": [
+          { "id": 1, "text": "Video", "is_correct": false },
+          { "id": 2, "text": "Quiz", "is_correct": false },
+          { "id": 3, "text": "Likert Scale", "is_correct": true }
+        ]
+        },
+        "is_required": true,
+        "feedback_config": {}
+      }
+      ]
+    },
+    {
+      "type": "textcontent",
+      "title": "Reading Example (TextContent)",
+      "instructions": null,
+      "content": "TextContents/Readings can contain any markdown (https://www.markdownguide.org/basic-syntax/) formatting, including **bold**, _italic_, and [links](https://forwardinc.org). You can also include images like this:\n\n![Example Image](example_image.png)\n\nAnd you can include lists:\n\n- Item 1\n- Item 2\n- Item 3\n\nOr numbered lists:\n\n1. First item\n2. Second item\n3. Third item. \n\n Headers are also supported:\n\n# Header 1\n## Header 2\n### Header 3\n#### Header 4\n##### Header 5\n###### Header 6. \n\nNew lines are specified by two `\\n\\n` at the end of a line.  \n\nYou can also include blockquotes:\n\n> This is a blockquote.\n\nAnd code blocks:\n\n```\nfunction example() {\n  console.log(\"This is an example code block.\");\n}\n```"
+    },
+        {
+      "type": "twine",
+      "title": "Twine Example",
+      "file": "choosing_a_major.html"
+    },
+    {
+      "type": "video",
+      "title": "Video Example",
+      "instructions": "Allows students to watch a video as part of the lesson. Set scrubbable to true to allow students to skip ahead in the video.",
+      "video": "financial_aid_for_college.mp4",
+      "scrubbable": false
+    },
+    {
+      "type": "embed",
+      "title": "Embed Example",
+      "link": "https://google.com",
+      "code": "could be null" 
+    },
+    {
+      "type": "writing",
+      "title": "Writing Example",
+      "instructions": "This is an example writing activity. Write a short response to the prompts below.",
+      "prompts": [
+        "What are your goals for attending college?",
+        "Describe a challenge you have faced and how you overcame it.",
+        "What are you most excited about in your college journey?"
+      ]
+    }
+  ]
+}

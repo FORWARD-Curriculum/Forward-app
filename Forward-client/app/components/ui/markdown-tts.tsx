@@ -172,7 +172,7 @@ export function MarkdownTTSControls({
     <div
       className={cn(
         className,
-        `bg-background flex h-fit w-fit gap-2 rounded-full ${orientation == "vertical" ? "flex-col px-1 py-2" : "flex-row px-2 py-1"}`,
+        `remark bg-background flex h-fit w-fit gap-2 rounded-full ${orientation == "vertical" ? "flex-col px-1 py-2" : "flex-row px-2 py-1"}`,
       )}
     >
       <FileVolume />

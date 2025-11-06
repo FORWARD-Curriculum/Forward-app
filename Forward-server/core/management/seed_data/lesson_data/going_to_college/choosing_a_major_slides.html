@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Choosing a Major: Slideshow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --maxw: 920px; --g: 16px; --dot: 10px; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:#fff; }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 16px; }
+
+    /* Sticky header for dots + counter */
+    .meta-top { position: sticky; top: 0; z-index: 50; background: #fff; padding: 10px 0; margin-bottom: 8px; border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .meta-grid { display: grid; grid-template-columns: auto 1fr; gap: var(--g); align-items: center; }
+    .count { font-size: 1rem; font-weight: 700; letter-spacing: .2px; }
+    .dots { display: flex; align-items: center; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+    .dot { width: var(--dot); height: var(--dot); border-radius: 50%; background: #cbd5e1; border: 0; cursor: pointer; }
+    .dot[aria-current="true"] { background: #111827; }
+    .dot:focus-visible { outline: 3px solid rgba(0,120,255,.6); }
+
+    .slider { position: relative; overflow: hidden; width: 100%; border-radius: 12px; }
+    .track { display: flex; transition: transform 300ms ease; will-change: transform; }
+    .slide { flex: 0 0 100%; padding: 8px 0 var(--g); display: grid; gap: var(--g); align-content: start; }
+
+    /* Consistent image area preserving aspect ratio */
+    .img-frame { width: 100%; display: flex; justify-content: center; align-items: center; background: #f8fafc; border-radius: 12px; overflow: hidden; }
+    .slide-img { max-height: 420px; width: auto; height: auto; object-fit: contain; display: block; }
+
+    .caption { margin: 0; line-height: 1.85; font-size: 1.22rem; }
+    .caption strong { font-weight: 800; }
+
+    .navBtn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,.65); color: #fff; border: 0; border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+    .prev { left: 8px; }
+    .next { right: 8px; }
+    .navBtn:focus-visible { outline: 3px solid rgba(0,120,255,.6); }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (prefers-reduced-motion: reduce) { .track { transition-duration: 1ms; } }
+  </style>
+</head>
+<body>
+  <div class="wrap" role="region" aria-roledescription="carousel" aria-label="Choosing a Major slideshow">
+    <!-- Live SR announcer -->
+    <div id="live" class="sr-only" aria-live="polite">Slide 1 of 8</div>
+
+    <!-- TOP META (sticky) -->
+    <div class="meta-top">
+      <div class="meta-grid">
+        <div class="count" id="count">Slide 1 of 8</div>
+        <div class="dots" id="dots" aria-label="Slide dots"></div>
+      </div>
+    </div>
+
+    <!-- Slider -->
+    <div class="slider" id="slider">
+      <div class="track" id="track">
+        <!-- 1 -->
+        <section class="slide" role="group" aria-label="Slide 1 of 8: You can change your major">
+          <div class="img-frame"><img class="slide-img" src="chemistry class.jpg" alt="Students in a college chemistry class listening to an instructor." /></div>
+          <p class="caption">Lots of people start college with one major and decide to change later. <strong>You can always change your major!</strong> Try to get a good feel for it early by taking classes in the subject. Completing your degree may take longer if you change your major repeatedly or after too long.</p>
+        </section>
+
+        <!-- 2 -->
+        <section class="slide" role="group" aria-label="Slide 2 of 8: Try introductory classes">
+          <div class="img-frame"><img class="slide-img" src="professor.jpg" alt="Professor speaking with students in a classroom." /></div>
+          <p class="caption"><strong>Take introductory classes in several subjects that you think you might be interested in.</strong> Introductory classes are a great way to try out different classes and can help you get to know faculty and students.</p>
+        </section>
+
+        <!-- 3 -->
+        <section class="slide" role="group" aria-label="Slide 3 of 8: Talk to departments">
+          <div class="img-frame"><img class="slide-img" src="dancedepartment.jpg" alt="Students and faculty interacting at a department event." /></div>
+          <p class="caption"><strong>Talk to faculty and students from departments you are interested in.</strong> Sometimes departments hold workshops and socials you can attend, and interacting with other students and faculty can help you figure out if the department is the right fit for you.</p>
+        </section>
+
+        <!-- 4 -->
+        <section class="slide" role="group" aria-label="Slide 4 of 8: Explore career paths">
+          <div class="img-frame"><img class="slide-img" src="business.jpg" alt="Student exploring career information on a laptop." /></div>
+          <p class="caption"><strong>Learn about careers that are available with a major.</strong> Different majors lead to different career opportunities. If you have a specific career in mind, you’ll want a major that works toward that career. If that career falls through, are you open to the other career opportunities?</p>
+        </section>
+
+        <!-- 5 -->
+        <section class="slide" role="group" aria-label="Slide 5 of 8: Job availability matters">
+          <div class="img-frame"><img class="slide-img" src="trouble finding a job.jpg" alt="Person looking at a job board with few postings." /></div>
+          <p class="caption"><strong>Consider the availability of careers with a given major.</strong> Are there lots of jobs available or will you have to compete for the job you want? Is the field growing or becoming more limited? For example, while poetry might be a hobby with lots to learn, the jobs related to poetry are often very limited.</p>
+        </section>
+
+        <!-- 6 -->
+        <section class="slide" role="group" aria-label="Slide 6 of 8: Align with your strengths">
+          <div class="img-frame"><img class="slide-img" src="academic strengths.jpg" alt="Student studying with textbooks and a laptop." /></div>
+          <p class="caption">Classes in a particular subject can get harder as you progress in your degree. <strong>You will want to consider what academic strengths you have and see if you can align your major with those strengths.</strong></p>
+        </section>
+
+        <!-- 7 -->
+        <section class="slide" role="group" aria-label="Slide 7 of 8: Know program requirements">
+          <div class="img-frame"><img class="slide-img" src="graduation.jpg" alt="Graduates wearing caps and gowns walking together." /></div>
+          <p class="caption">Different majors and programs may have different requirements for completing your degree, such as completing an internship or thesis. <strong>Learn about these requirements before committing to a major and determine if they are right for you.</strong></p>
+        </section>
+
+        <!-- 8 -->
+        <section class="slide" role="group" aria-label="Slide 8 of 8: Education level needed">
+          <div class="img-frame"><img class="slide-img" src="graduating looking up.jpg" alt="Graduate looking up while holding a diploma." /></div>
+          <p class="caption"><strong>To get the career you want, what level of education will you need?</strong> Some careers may require a higher level of education. Before committing to a major, it’s wise to have a good idea of all that it might require.</p>
+        </section>
+      </div>
+
+      <button class="navBtn prev" id="prev" type="button" aria-label="Previous slide">&#10094;</button>
+      <button class="navBtn next" id="next" type="button" aria-label="Next slide">&#10095;</button>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const track = document.getElementById('track');
+      const slides = Array.from(track.children);
+      const prev = document.getElementById('prev');
+      const next = document.getElementById('next');
+      const count = document.getElementById('count');
+      const live  = document.getElementById('live');
+      const dotsEl= document.getElementById('dots');
+      const total = slides.length;
+      let index = 0;
+
+      slides.forEach((_, i) => {
+        const b = document.createElement('button');
+        b.className = 'dot';
+        b.type = 'button';
+        b.setAttribute('aria-label', `Go to slide ${i+1}`);
+        b.addEventListener('click', () => go(i));
+        dotsEl.appendChild(b);
+      });
+
+      function update() {
+        track.style.transform = `translateX(${index * -100}%)`;
+        count.textContent = `Slide ${index+1} of ${total}`;
+        live.textContent  = `Slide ${index+1} of ${total}`;
+        Array.from(dotsEl.children).forEach((d, i) => d.setAttribute('aria-current', i===index ? 'true' : 'false'));
+        window.parent?.postMessage({ type: 'slideshow-progress', slide: index+1 }, '*');
+      }
+
+      function go(i){ index = Math.max(0, Math.min(total-1, i)); update(); }
+      function nextSlide(){ go(index+1); }
+      function prevSlide(){ go(index-1); }
+
+      prev.addEventListener('click', prevSlide);
+      next.addEventListener('click', nextSlide);
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') nextSlide();
+        if (e.key === 'ArrowLeft'  || e.key === 'PageUp')   prevSlide();
+        if (e.key === 'Home') go(0);
+        if (e.key === 'End')  go(total-1);
+      });
+
+      let startX = null;
+      track.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, {passive:true});
+      track.addEventListener('touchend', (e) => {
+        if (startX===null) return;
+        const dx = e.changedTouches[0].clientX - startX; startX = null;
+        if (dx < -40) nextSlide();
+        if (dx >  40) prevSlide();
+      }, {passive:true});
+
+      update();
+    })();
+  </script>
+</body>
+</html>

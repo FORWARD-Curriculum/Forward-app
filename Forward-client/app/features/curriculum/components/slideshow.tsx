@@ -1,0 +1,88 @@
+import type { Slideshow as SlideshowType, SlideshowResponse } from "@/features/curriculum/types";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import MarkdownTTS from "@/components/ui/markdown-tts";
+import { useEffect, useState } from "react";
+import { Circle } from "lucide-react";
+import { useResponse } from "../hooks";
+
+export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+
+  useResponse<SlideshowResponse, SlideshowType>({
+    activity: slideshow,
+    type: "Slideshow",
+    trackTime: true,
+    initialFields: {
+      partial_response: false,
+    },
+  });
+
+  useEffect(() => {
+    if (!api) return;
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
+
+  return (
+    <div className="flex w-full flex-col-reverse items-center lg:flex-col mt-4 gap-2">
+            <Carousel setApi={setApi} className="w-full max-w-4xl lg:aspect-video">
+        <CarouselContent>
+          {slideshow.slides.map((example, index) => (
+            <CarouselItem
+              key={index}
+              className="flex flex-col items-center justify-center gap-4"
+            >
+              {example.image && (
+                <img
+                  src={example.image}
+                  alt=""
+                  className="max-h-100 w-auto rounded-3xl shadow-md"
+                />
+              )}
+
+              <MarkdownTTS controlsClassName="flex flex-row-reverse gap-2">
+                {example.content}
+              </MarkdownTTS>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious  />
+        <CarouselNext />
+      </Carousel>
+      {/* Dots (desktop only) */}
+      <div className="hidden lg:flex">
+        {Array.from({ length: count }, (_, index) => (
+          <button
+            key={index}
+            onClick={() => api?.scrollTo(index)}
+            className="cursor-pointer"
+            aria-label={`Go to slide ${index + 1}`}
+          >
+            <Circle
+              fill={
+                index + 1 !== current
+                  ? "var(--secondary-foreground)"
+                  : "var(--background)"
+              }
+              strokeWidth={1}
+            />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
