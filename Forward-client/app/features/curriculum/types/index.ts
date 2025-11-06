@@ -91,6 +91,7 @@ export interface BaseActivity {
   }[keyof ActivityManager];
   title: string;
   instructions: string | null;
+  instructions_image: string | null;
   order: number;
 }
 

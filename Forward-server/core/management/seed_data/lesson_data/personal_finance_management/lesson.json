@@ -17,7 +17,7 @@
       "title": "Wants and Needs",
       "instructions": null,
       "image": "intro.jpg",
-      "content": "In the wise words of Mr. Eugene Krabs from *Spongebob*, \"Counting me money. Money sweeter than honey. Money money this, money money that. Profit will make me wallet fat!\"\n\nWe live in a society that relies heavily on <def def='A type of money used in a particular location, such as dollars in the United States and pesos in Mexico.'>currency</def> to operate. This lesson focuses on finance topics and may cover topics you are already familiar with, as well as some you may not know as much about; these topics will prepare you for being <def def='The ability to take care of one\\'s own responsibilities and self rather than relying on others'>self-reliant</def> as you personally manage your finances.\n\nTo begin, let's think about the difference between wants and needs when it comes to finances."
+      "content": "In the wise words of Mr. Eugene Krabs from *Spongebob*, \"Counting me money. Money sweeter than honey. Money money this, money money that. Profit will make me wallet fat!\"\n\nWe live in a society that relies heavily on <def def='A type of money used in a particular location, such as dollars in the United States and pesos in Mexico.'>currency</def> to operate. This lesson focuses on finance topics and may cover topics you are already familiar with, as well as some you may not know as much about; these topics will prepare you for being <def def=\"The ability to take care of one's own responsibilities and self rather than relying on others\">self-reliant</def> as you personally manage your finances.\n\nTo begin, let's think about the difference between wants and needs when it comes to finances."
     },
     {
       "type": "quiz",
@@ -30,11 +30,31 @@
           "has_correct_answer": false,
           "choices": {
             "options": [
-              { "id": 1, "text": "A purchase that enhances your quality of life but is not necessary for survival.", "is_correct": false },
-              { "id": 2, "text": "Something you desire but could live without.", "is_correct": false },
-              { "id": 3, "text": "A non-essential expense, such as entertainment, dining out, or luxury items.", "is_correct": false },
-              { "id": 4, "text": "An item or service that provides enjoyment or convenience but is not critical to daily living.", "is_correct": false },
-              { "id": 5, "text": "A financial choice that adds comfort or pleasure but is not required for basic functioning.", "is_correct": false },
+              {
+                "id": 1,
+                "text": "A purchase that enhances your quality of life but is not necessary for survival.",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "Something you desire but could live without.",
+                "is_correct": false
+              },
+              {
+                "id": 3,
+                "text": "A non-essential expense, such as entertainment, dining out, or luxury items.",
+                "is_correct": false
+              },
+              {
+                "id": 4,
+                "text": "An item or service that provides enjoyment or convenience but is not critical to daily living.",
+                "is_correct": false
+              },
+              {
+                "id": 5,
+                "text": "A financial choice that adds comfort or pleasure but is not required for basic functioning.",
+                "is_correct": false
+              },
               { "id": 6, "text": "Other: ______", "is_correct": false }
             ]
           },
@@ -54,11 +74,31 @@
           "has_correct_answer": false,
           "choices": {
             "options": [
-              { "id": 1, "text": "An expense required for survival, such as food, shelter, or clothing.", "is_correct": false },
-              { "id": 2, "text": "A financial obligation necessary to maintain your health or safety, like medical care or insurance.", "is_correct": false },
-              { "id": 3, "text": "A basic utility or service essential for daily living, such as electricity, water, or transportation to work or school.", "is_correct": false },
-              { "id": 4, "text": "An item or service that supports your ability to earn income, like a uniform or work-related equipment.", "is_correct": false },
-              { "id": 5, "text": "A financial priority that must be addressed to sustain your livelihood or well-being.", "is_correct": false },
+              {
+                "id": 1,
+                "text": "An expense required for survival, such as food, shelter, or clothing.",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "A financial obligation necessary to maintain your health or safety, like medical care or insurance.",
+                "is_correct": false
+              },
+              {
+                "id": 3,
+                "text": "A basic utility or service essential for daily living, such as electricity, water, or transportation to work or school.",
+                "is_correct": false
+              },
+              {
+                "id": 4,
+                "text": "An item or service that supports your ability to earn income, like a uniform or work-related equipment.",
+                "is_correct": false
+              },
+              {
+                "id": 5,
+                "text": "A financial priority that must be addressed to sustain your livelihood or well-being.",
+                "is_correct": false
+              },
               { "id": 6, "text": "Other: ______", "is_correct": false }
             ]
           },
@@ -79,26 +119,47 @@
     {
       "type": "dndmatch",
       "title": "Sorting Wants and Needs",
-      "instructions": "![Sorting Needs](needs.jpg)\n\nSort the list of <def def='Money spent on items or services.'>expenses</def> into '<strong>Wants</strong>', '<strong>Needs</strong>', or 'Not <def def='Something that fits or makes sense for a certain situation.'>Applicable</def> to Me.' Identifying the difference between wants and needs becomes important when you are trying to manage your finances. This will help later when you start to build a <def def='A plan for managing income and spending over a period of time.'>budget</def> and determine how to <def def='Distribute or set aside money for specific purposes.'>allocate</def> money. There are no right or wrong answers--just sort based on your opinion.",
+      "instructions": "Sort the list of <def def='Money spent on items or services.'>expenses</def> into '<strong>Wants</strong>', '<strong>Needs</strong>', or 'Not <def def='Something that fits or makes sense for a certain situation.'>Applicable</def> to Me.' Identifying the difference between wants and needs becomes important when you are trying to manage your finances. This will help later when you start to build a <def def='A plan for managing income and spending over a period of time.'>budget</def> and determine how to <def def='Distribute or set aside money for specific purposes.'>allocate</def> money. There are no right or wrong answers--just sort based on your opinion.",
+      "instructions_image": "needs.jpg",
       "content": [
         { "category": "Wants", "matches": [] },
         { "category": "Needs", "matches": [] },
-        { "category": "Not Applicable to Me", "matches": [] },
-        {
-          "category": null,
-          "matches": [
-            "Housing", "Fashionable clothes", "Monthly haircuts", "Childcare", "Car insurance", "Gas for car",
-            "Other transportation costs", "Streaming services (example: Netflix, Hulu)", "Monthly mobile phone plan",
-            "Health insurance", "Gym membership", "Groceries", "Donations to charity or religious organization",
-            "Clothes", "Air conditioning/heating", "Electricity", "Running water", "Pet expenses", "Video games",
-            "Concert/event tickets", "Personal vehicle upgrades (example: custom paint jobs)", "School supplies",
-            "Medical costs (example: prescriptions)", "Hygiene products (example: toothpaste, shampoo)", "Eating out",
-            "Vacation", "Internet subscription", "Books or ebooks", "Gifts for friends and family",
-            "Clothes for special events", "Savings"
-          ]
-        }
-      ],
-      "feedback_config": {
+        { "category": "Not Applicable to Me", "matches": [
+          "Housing",
+            "Fashionable clothes",
+            "Monthly haircuts",
+            "Childcare",
+            "Car insurance",
+            "Gas for car",
+            "Other transportation costs",
+            "Streaming services (example: Netflix, Hulu)",
+            "Monthly mobile phone plan",
+            "Health insurance",
+            "Gym membership",
+            "Groceries",
+            "Donations to charity or religious organization",
+            "Clothes",
+            "Air conditioning/heating",
+            "Electricity",
+            "Running water",
+            "Pet expenses",
+            "Video games",
+            "Concert/event tickets",
+            "Personal vehicle upgrades (example: custom paint jobs)",
+            "School supplies",
+            "Medical costs (example: prescriptions)",
+            "Hygiene products (example: toothpaste, shampoo)",
+            "Eating out",
+            "Vacation",
+            "Internet subscription",
+            "Books or ebooks",
+            "Gifts for friends and family",
+            "Clothes for special events",
+            "Savings"
+        ] }
+        
+      ],"strict": false,
+      "_TODO: add a limit to category?": {
         "condition": "if more than 15 items are placed in any single category",
         "message": "Hold up! Are you sure that all of these items belong in this box? Which ones could you move to other boxes?"
       }
@@ -120,11 +181,47 @@
     {
       "type": "identification",
       "title": "Reading a W-2 Form",
-      "instructions": "Here is a sample W-2 form. Take some time to become familiar with the document. As you do, look for the total wages earned and the federal income tax withheld. You will need to click on the W-2 in those two places and answer the multiple choice questions to continue.\n\n*The W2 with highlights are included for tech to know where the right answers are. Students should click in the specified areas, which should highlight when students correctly click in that area and stay highlighted. The highlighted areas should be slightly larger than the text to increase accessibility. After students click in both highlighted areas, they should get the following feedback:* Nice work locating the wages and withheld tax! Tax forms can be pretty tricky but it is important to learn how to read them to prepare for filing taxes.",
-      "content": "![W-2 Form](w2blank.jpg)\n\n### Question 1\n**How much federal tax was withheld?**\n\n- **$2057**\n- $1275\n- $1018\n\n### Question 2\n**How much state tax was withheld?**\n\n- $2057\n- $1275\n- **$1018**",
-      "feedback_config": {
+      "instructions": "Here is a sample W-2 form. Take some time to become familiar with the document. As you do, look for the total wages earned and the federal income tax withheld. You will need to click on the W-2 in those two places and answer the multiple choice questions to continue.",
+      "content": "![W-2 Form](w2blank.jpg)",
+      "_TODO: THIS ^": {
         "default": "Nice work locating the wages and withheld tax! Tax forms can be pretty tricky but it is important to learn how to read them to prepare for filing taxes."
-      }
+      },
+      "_comment": "The W2 with highlights are included for tech to know where the right answers are. Students should click in the specified areas, which should highlight when students correctly click in that area and stay highlighted. The highlighted areas should be slightly larger than the text to increase accessibility. After students click in both highlighted areas, they should get the following feedback:* Nice work locating the wages and withheld tax! Tax forms can be pretty tricky but it is important to learn how to read them to prepare for filing taxes."
+    },
+    {
+      "type": "quiz",
+      "title": "Reading a W-2 Form Quiz",
+      "instructions": "Select the option that best matches your personal definition of a need. There is no correct answer.",
+      "questions": [
+        {
+          "question_text": "How much federal tax was withheld?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "$2,057", "is_correct": true },
+              { "id": 2, "text": "$1,275", "is_correct": false },
+              { "id": 3, "text": "$1,018", "is_correct": false }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "How much state tax was withheld?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "$2,057", "is_correct": false },
+              { "id": 2, "text": "$1,275", "is_correct": false },
+              { "id": 3, "text": "$1,018", "is_correct": true }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        }
+      ]
     },
     {
       "type": "textcontent",
@@ -137,83 +234,73 @@
       "type": "identification",
       "title": "Reading a 1040 Form",
       "instructions": "This document is a 1040 and is what you fill out to submit your individual taxes to the Internal Revenue Service (IRS). Each year, you will need to file taxes between January (when you receive all W2 forms) and April 15th.\n\nTake some time to become familiar with the document. If you file your taxes online, you will go step by step and will not see the whole document at one time.\n\nAs you look through the 1040, look for the total income from the W-2 form and the amount of taxes owed. You will need to click on the 1040 in those two places and answer the multiple choice questions to continue.\n\nAfter you correctly identify both, you will see this feedback:\n\n*Nice work identifying the total income and amount owed! Understanding these forms helps you know how much you've paid and whether you'll owe or get a refund next time you file.*",
-      "content": "![1040 Page 1](1040_Page_1.jpg)\n![1040 Page 2](1040_Page_2.jpg)\n\n### Question 1\n**What was the filing status of Moises?**\n\n- **Single**\n- Married filing jointly\n- Married filing separately\n\n### Question 2\n**How much did Moises pay in taxes?**\n\n- $1,740\n- **$3,500**\n- $0\n\n### Question 3\n**Which is TRUE about Moises's taxes?**\n\n- Moises underpaid in taxes and owes more money\n- **Moises overpaid in taxes and will receive a refund**\n- Moises paid exactly the right amount in taxes",
+      "content": "![1040 Page 1](1040_Page_1.jpg)\n![1040 Page 2](1040_Page_2.jpg)",
       "feedback_config": {
         "default": "Nice work identifying the total income and amount owed! Understanding these forms helps you know how much you've paid and whether you'll owe or get a refund next time you file."
       }
     },
     {
       "type": "quiz",
-      "title": "Roxy's First Paycheck",
-      "instructions": "![Roxy's Paycheck](Moneyendoflesson.jpg)\n\nMeet Roxy! Roxy recently started her first job at a movie theater and just received her first paycheck. She was surprised to find that her paycheck was for less money than she'd expected. Review her paycheck to identify Roxy's net income, gross income, and what deductions were taken out. Then, answer the questions.\n\n![Movie Theater Pay Stub](Movie Theater Pay Stub(1).jpg)",
-      "passing_score": 3,
-      "feedback_config": {
-        "default": "Nice work reviewing Roxy's pay stub! Understanding gross pay, net pay, and deductions will help you plan and manage your own finances.",
-        "ranges": [
-          {
-            "min": 0,
-            "max": 2,
-            "feedback": "Take another look at Roxy's pay stub -- double-check the deductions and totals before trying again!"
-          },
-          {
-            "min": 3,
-            "max": 4,
-            "feedback": "Great job! You understand how to read a paycheck and identify gross and net income."
-          }
-        ]
-      },
+      "title": "Reading a 1040 Form Quiz",
+      "instructions": "Based on what you identified before, choose the correct statement below.",
       "questions": [
         {
-          "question_text": "How much money will go into Roxy's bank account from this paycheck?",
+          "question_text": "What was the filing status of Moises?",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "choices": {
             "options": [
-              { "id": 1, "text": "$563.49", "is_correct": true },
-              { "id": 2, "text": "$574.00", "is_correct": false },
-              { "id": 3, "text": "$649.36", "is_correct": false }
+              { "id": 1, "text": "Single", "is_correct": true },
+              {
+                "id": 2,
+                "text": "Married filing jointly",
+                "is_correct": false
+              },
+              {
+                "id": 3,
+                "text": "Married filing separately",
+                "is_correct": false
+              }
             ]
           },
           "is_required": true,
           "feedback_config": {}
         },
         {
-          "question_text": "What amount was taken out of Roxy's paycheck for AZ state taxes?",
+          "question_text": "How much did Moises pay in taxes? ",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "choices": {
             "options": [
-              { "id": 1, "text": "$14.35", "is_correct": false },
-              { "id": 2, "text": "$28.95", "is_correct": true },
-              { "id": 3, "text": "$40.25", "is_correct": false }
+              { "id": 1, "text": "$1,740", "is_correct": false },
+              { "id": 2, "text": "$3,500", "is_correct": true },
+              { "id": 3, "text": "$0", "is_correct": false }
             ]
           },
           "is_required": true,
           "feedback_config": {}
         },
         {
-          "question_text": "How much money does Roxy earn for each hour of overtime?",
+          "question_text": "Which is TRUE about Moises’s taxes?",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "choices": {
             "options": [
-              { "id": 1, "text": "$14.35", "is_correct": false },
-              { "id": 2, "text": "$21.53", "is_correct": true },
-              { "id": 3, "text": "$28.95", "is_correct": false }
-            ]
-          },
-          "is_required": true,
-          "feedback_config": {}
-        },
-        {
-          "question_text": "What was Roxy's gross income?",
-          "question_type": "multiple_choice",
-          "has_correct_answer": true,
-          "choices": {
-            "options": [
-              { "id": 1, "text": "$563.49", "is_correct": false },
-              { "id": 2, "text": "$75.36", "is_correct": false },
-              { "id": 3, "text": "$649.36", "is_correct": true }
+              {
+                "id": 1,
+                "text": "Moises underpaid in taxes and owes more money",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "Moises overpaid in taxes and will receive a refund",
+                "is_correct": true
+              },
+              {
+                "id": 3,
+                "text": "Moises paid exactly the right amount in taxes",
+                "is_correct": false
+              }
             ]
           },
           "is_required": true,
@@ -222,11 +309,67 @@
       ]
     },
     {
+      "type": "textcontent",
+      "content": "Meet Roxy! Roxy recently started her first job at a movie theater and just received her first paycheck. She was surprised to find that her paycheck was for less money than she'd expected",
+      "image": "Moneyendoflesson.jpg"
+    },
+    {
+      "type": "quiz",
+      "title": "Roxy's First Paycheck Quiz",
+      "instructions": "Review Roxy's paycheck to identify her net income, gross income, and what deductions were taken out. Then, answer the questions.",
+      "image": "movie_theater_pay_stub.jpg",
+      "questions": [
+        {
+          "question_text": "How much money will go into Roxy's bank account from this paycheck?",
+          "question_type": "multiple_choice",
+          "choices": {
+            "options": [
+              { "id": 1, "text": "$563.49", "is_correct": true },
+              { "id": 2, "text": "$574.00", "is_correct": false },
+              { "id": 3, "text": "$649.36", "is_correct": false }
+            ]
+          }
+        },
+        {
+          "question_text": "What amount was taken out of Roxy's paycheck for AZ state taxes?",
+          "question_type": "multiple_choice",
+          "choices": {
+            "options": [
+              { "id": 1, "text": "$14.35", "is_correct": false },
+              { "id": 2, "text": "$28.95", "is_correct": true },
+              { "id": 3, "text": "$40.25", "is_correct": false }
+            ]
+          }
+        },
+        {
+          "question_text": "How much money does Roxy earn for each hour of overtime?",
+          "question_type": "multiple_choice",
+          "choices": {
+            "options": [
+              { "id": 1, "text": "$14.35", "is_correct": false },
+              { "id": 2, "text": "$21.53", "is_correct": true },
+              { "id": 3, "text": "$28.95", "is_correct": false }
+            ]
+          }
+        },
+        {
+          "question_text": "What was Roxy's gross income?",
+          "question_type": "multiple_choice",
+          "choices": {
+            "options": [
+              { "id": 1, "text": "$563.49", "is_correct": false },
+              { "id": 2, "text": "$75.36", "is_correct": false },
+              { "id": 3, "text": "$649.36", "is_correct": true }
+            ]
+          }
+        }
+      ]
+    },
+    {
       "type": "video",
       "title": "Types of Pay",
-      "content": "Not everyone earns money the same way--there are different types of pay depending on the job. Some people are paid wages, which means they earn money for each hour they work. Others receive a salary, getting a fixed amount each pay period no matter how many hours they work. Then there's commission, where people earn money based on how much they sell or produce. Understanding how your pay works helps you know what to expect on payday--and how to plan for what's next.",
-      "instructions": "Watch the video to hear some examples of different types of pay different jobs use.",
-      "video": "Types of Pay.mp4",
+      "instructions": "Not everyone earns money the same way--there are different types of pay depending on the job. Some people are paid wages, which means they earn money for each hour they work. Others receive a salary, getting a fixed amount each pay period no matter how many hours they work. Then there's commission, where people earn money based on how much they sell or produce. Understanding how your pay works helps you know what to expect on payday--and how to plan for what's next. Watch the video to hear some examples of different types of pay different jobs use.",
+      "video": "types_of_pay.mp4",
       "scrubbable": false
     },
     {
@@ -235,47 +378,47 @@
       "instructions": "Click through the slides to learn about checking accounts, debit, credit, and building a good credit score.",
       "slides": [
         {
-          "content": "### Understanding Paychecks\n\nAfter you get paid, your money has to go somewhere--and there are a couple of ways that can happen. Some people get their paycheck through direct deposit, which means the money goes straight into their bank account. Others get a paper paycheck they can take to a bank or cash at a check-cashing place.",
+          "content": "After you get paid, your money has to go somewhere--and there are a couple of ways that can happen. Some people get their paycheck through direct deposit, which means the money goes straight into their bank account. Others get a paper paycheck they can take to a bank or cash at a check-cashing place.",
           "image": "atm cash checking.jpg"
         },
         {
-          "content": "### Checking Accounts\n\nIt's a good idea to have a checking account, which helps you keep your money safe and makes it easy to pay for things using a debit card.",
+          "content": "It's a good idea to have a checking account, which helps you keep your money safe and makes it easy to pay for things using a debit card.",
           "image": "online banking.jpg"
         },
         {
-          "content": "### What Is Debit?\n\nNow let's talk about debit. A debit is money taken out of your bank account to pay for something. When you use a debit card, the money comes out right away. It's money you already earned. If you don't keep track of how much you spend, you might run out before your next paycheck--and that can cause problems like <def def='a banking fee that occurs if you spend more money than you have available'>overdraft fees</def> or missed payments.",
-          "image": "pexels-woodysmedia-2858691-4395057.jpg"
+          "content": "Now let's talk about debit. A debit is money taken out of your bank account to pay for something. When you use a debit card, the money comes out right away. It's money you already earned. If you don't keep track of how much you spend, you might run out before your next paycheck--and that can cause problems like <def def='a banking fee that occurs if you spend more money than you have available'>overdraft fees</def> or missed payments.",
+          "image": "debit card.jpg"
         },
         {
-          "content": "### Budgeting Tip\n\nTip: Always know how much money is coming in and how much is going out. That's how you stay in control of your money.",
+          "content": "Tip: Always know how much money is coming in and how much is going out. That's how you stay in control of your money.",
           "image": "budgeting.jpg"
         },
         {
-          "content": "### What Is Credit?\n\nSome people use credit cards to pay for things instead of using money they already have. When you use a credit card, you're borrowing money from a bank or company--and you promise to pay it back later.",
+          "content": "Some people use credit cards to pay for things instead of using money they already have. When you use a credit card, you're borrowing money from a bank or company--and you promise to pay it back later.",
           "image": "cool man credit card.jpg"
         },
         {
-          "content": "### Credit and Interest\n\nUnlike debit cards, the money doesn't come out of your account right away. But if you don't pay it back on time, you can be charged <def def='extra money charged when borrowing money or earned when saving money'>interest</def>, which means you'll owe even more than you spent.",
+          "content": "Unlike debit cards, the money doesn't come out of your account right away. But if you don't pay it back on time, you can be charged <def def='extra money charged when borrowing money or earned when saving money'>interest</def>, which means you'll owe even more than you spent.",
           "image": "empty wallet.jpg"
         },
         {
-          "content": "### Credit Limits\n\nMost credit cards come with a credit limit, which is the maximum amount you're allowed to borrow. If you go over that amount, your card might be declined or you might get charged extra fees.",
+          "content": "Most credit cards come with a credit limit, which is the maximum amount you're allowed to borrow. If you go over that amount, your card might be declined or you might get charged extra fees.",
           "image": "declined payment.jpg"
         },
         {
-          "content": "### Applying for a Credit Card\n\nTo get a credit card, you usually need to apply through a bank or credit union, and they'll check things like your income or credit history to decide if you qualify.",
+          "content": "To get a credit card, you usually need to apply through a bank or credit union, and they'll check things like your income or credit history to decide if you qualify.",
           "image": "bank application.jpg"
         },
         {
-          "content": "### Building Credit\n\nUsing credit can help you build a credit score, which shows how good you are at paying back money. A good credit score can help you in the future if you want to rent an apartment, buy a car, or even get some jobs. But using credit the wrong way--like spending more than you can pay back--can hurt your score and make it harder to borrow money later.",
+          "content": "Using credit can help you build a credit score, which shows how good you are at paying back money. A good credit score can help you in the future if you want to rent an apartment, buy a car, or even get some jobs. But using credit the wrong way--like spending more than you can pay back--can hurt your score and make it harder to borrow money later.",
           "image": "first home.jpg"
         },
         {
-          "content": "### Credit Score Range\n\nA credit score is usually a number between 300 and 850--the higher the number, the better. A score of 670 or higher is generally considered good and can help you get approved for loans, credit cards, and lower interest rates.",
+          "content": "A credit score is usually a number between 300 and 850--the higher the number, the better. A score of 670 or higher is generally considered good and can help you get approved for loans, credit cards, and lower interest rates.",
           "image": "thumbs up.jpg"
         },
         {
-          "content": "### Credit Tip\n\nTip: Only use credit when you know you can pay it back--and try to pay off the full amount each month. That way, you avoid extra fees and build a strong credit history.",
+          "content": "Tip: Only use credit when you know you can pay it back--and try to pay off the full amount each month. That way, you avoid extra fees and build a strong credit history.",
           "image": "chase bank.jpg"
         }
       ]
@@ -287,22 +430,19 @@
     },
     {
       "type": "writing",
-      "title": "Spend or Save Reflection - Open Response",
-      "instructions": "![Reflection](bicycle.jpg)\n\nThink about the activity you just completed and what you learned from the decisions you made. Select one of the questions below and write your response.",
+      "title": "Spend or Save Reflection",
+      "instructions": "Think about the activity you just completed and what you learned from the decisions you made. Select one of the questions below and write your response.",
+      "instructions_image": "bicycle.jpg",
       "prompts": [
         "What kinds of money choices did you make? Write about what you decided and why.",
         "What kind of money decisions do you make in real life?"
-      ],
-      "minimum_characters": 30
+      ]
     },
     {
       "type": "quiz",
-      "title": "Spend or Save Reflection - Multiple Choice",
-      "instructions": "![Reflection](bicycle.jpg)\n\nAnswer each question to reflect on the activity you just completed. There are no correct answers--this is a chance to think about what you learned and how you make money decisions.",
-      "passing_score": 0,
-      "feedback_config": {
-        "default": "Thanks for reflecting! Remember, every financial decision helps you learn more about managing your money."
-      },
+      "title": "Spend or Save Reflection 2",
+      "instructions": "Answer each question to reflect on the activity you just completed. There are no correct answers--this is a chance to think about what you learned and how you make money decisions.",
+      "image": "bicycle.jpg",
       "questions": [
         {
           "question_text": "What kind of decisions did you make during the activity?",
@@ -314,9 +454,7 @@
               { "id": 2, "text": "Spent on fun things" },
               { "id": 3, "text": "Tried to balance saving and spending" }
             ]
-          },
-          "is_required": true,
-          "feedback_config": {}
+          }
         },
         {
           "question_text": "How did your story turn out in the end?",
@@ -328,9 +466,7 @@
               { "id": 2, "text": "Overall negative" },
               { "id": 3, "text": "An even mix of negative and positive" }
             ]
-          },
-          "is_required": true,
-          "feedback_config": {}
+          }
         },
         {
           "question_text": "What would you do differently if you played again?",
@@ -343,9 +479,7 @@
               { "id": 3, "text": "Take more risks" },
               { "id": 4, "text": "Make the same choices again" }
             ]
-          },
-          "is_required": true,
-          "feedback_config": {}
+          }
         },
         {
           "question_text": "How have you handled your money in real life?",
@@ -354,12 +488,13 @@
           "choices": {
             "options": [
               { "id": 1, "text": "Saving as much as I can" },
-              { "id": 2, "text": "Freely spending money on things I want and need" },
+              {
+                "id": 2,
+                "text": "Freely spending money on things I want and need"
+              },
               { "id": 3, "text": "A mix of saving and spending" }
             ]
-          },
-          "is_required": true,
-          "feedback_config": {}
+          }
         }
       ]
     },
@@ -401,36 +536,97 @@
       "instructions": "Watch the video about saving money or read the transcript. As you do, consider what you will prioritize when saving money.",
       "video": "things to save money for.mp4",
       "scrubbable": true,
-      "content": "**Transcript:**\n\n**Emergency funds:** It's a good idea to prepare for emergencies or unexpected costs by putting money into savings. Experts usually recommend a 3-6 month emergency fund that is equal to your expenses for that time. That way, if something happens like losing your job, you are prepared financially while you look for something new.\n\n**Large purchases:** If you are planning on making large purchases, such as buying furniture, electronics, or appliances, it's a good idea to set aside money for at least a few months in preparation. The amount you save will probably depend on how much the item costs, but it's a good rule to wait to buy something until you can afford to buy it twice without going into debt. With purchases like this, you may want to use your credit card and then pay off your credit card with your savings in the next month--this can help build your credit.\n\n**Events and travel:** Special events in your own life, like a wedding or having a baby, are certainly things that you should prepare for by saving money. Events such as these often have many unexpected costs or may be more expensive than expected. Vacations and travel also require some planning and are something you should prepare for financially in advance. Don't forget that with each of these, you will likely be taking time off of work, which may mean that not only are you spending more money, but you are also making less money than you typically would.\n\n**Down payments:** A down payment is money that is needed when you take out a loan for a large purchase, like with a car or a house. This is money you will put toward the purchase right away before you receive the loan. A down payment should be around 10% of the cost, but the more you are able to put down, the better. Putting down more money will mean a lower monthly payment and possibly a better interest rate."
+      "_TODO: add transcript to video?": "**Transcript:**\n\n**Emergency funds:** It's a good idea to prepare for emergencies or unexpected costs by putting money into savings. Experts usually recommend a 3-6 month emergency fund that is equal to your expenses for that time. That way, if something happens like losing your job, you are prepared financially while you look for something new.\n\n**Large purchases:** If you are planning on making large purchases, such as buying furniture, electronics, or appliances, it's a good idea to set aside money for at least a few months in preparation. The amount you save will probably depend on how much the item costs, but it's a good rule to wait to buy something until you can afford to buy it twice without going into debt. With purchases like this, you may want to use your credit card and then pay off your credit card with your savings in the next month--this can help build your credit.\n\n**Events and travel:** Special events in your own life, like a wedding or having a baby, are certainly things that you should prepare for by saving money. Events such as these often have many unexpected costs or may be more expensive than expected. Vacations and travel also require some planning and are something you should prepare for financially in advance. Don't forget that with each of these, you will likely be taking time off of work, which may mean that not only are you spending more money, but you are also making less money than you typically would.\n\n**Down payments:** A down payment is money that is needed when you take out a loan for a large purchase, like with a car or a house. This is money you will put toward the purchase right away before you receive the loan. A down payment should be around 10% of the cost, but the more you are able to put down, the better. Putting down more money will mean a lower monthly payment and possibly a better interest rate."
     },
     {
       "type": "likertscale",
       "title": "Savings Goals Sliders",
-      "instructions": "Think about what you learned about savings on the previous page. The same categories of spending are listed here along with specific items in that category.\n\nFor each item, think about how much money you would like to work toward saving right now. If an item isn't applicable right now, you might leave the slider at $0. Try to be realistic in your answers, thinking about how much money you will really need for each item.\n\nCategories:\n\n**Emergency funds**\n- 1 month emergency fund\n- 3-6 month emergency fund\n- Medical expenses\n\n**Large purchases**\n- Furniture\n- Appliances (fridge, dishwasher, etc.)\n- Electronics (cell phone, laptop, etc.)\n- Jewelry\n\n**Special events and travel**\n- Wedding and marriage\n- Baby/children\n- Vacation/travel\n- Concert/events\n\n**Down payments**\n- Car/vehicle\n- House/apartment\n\n**Other things to save for**\n- Education (college or trade school)\n- Pets",
+      "instructions": "Think about what you learned about savings on the previous page. The same categories of spending are listed here along with specific items in that category.\n\nFor each item, think about how much money you would like to work toward saving right now. If an item isn't applicable right now, you might leave the slider at $0. Try to be realistic in your answers, thinking about how much money you will really need for each item.",
       "content": [
-        { "continuous": true, "statement": "1 month emergency fund", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "3-6 month emergency fund", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "Medical expenses", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "Furniture", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "Appliances (fridge, dishwasher, etc.)", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "Electronics (cell phone, laptop, etc.)", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "Jewelry", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "Wedding and marriage", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "Baby/children", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "Vacation/travel", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "Concert/events", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "Car/vehicle (down payment)", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "House/apartment (down payment)", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "Education (college or trade school)", "scale": ["$0", "$5000"] },
-        { "continuous": true, "statement": "Pets", "scale": ["$0", "$5000"] }
-      ]
+        {
+          "continuous": true,
+          "statement": "Emergency Fund: 1 Month",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Emergency Fund: 3-6 Months",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Emergency Fund: Medical Expenses",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Large Purchases: Furniture",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Large Purchases: Appliances (fridge, dishwasher, etc.)",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Large Purchases: Electronics (cell phone, laptop, etc.)",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Large Purchases: Jewelry",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Special Events/Travel: Wedding and Marriage",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Special Events/Travel: Baby/Children",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Special Events/Travel: Vacation",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Special Events/Travel: Concerts/Events",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Down Payments: Car/Vehicle",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Down Payments: House/Apartment",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Other: Education (college or trade school)",
+          "scale": ["$0", "$5000"]
+        },
+        {
+          "continuous": true,
+          "statement": "Other: Pets",
+          "scale": ["$0", "$5000"]
+        }
+      ],
+      "_TODO: Categories": "\n\nCategories:\n\n**Emergency funds**\n- 1 month emergency fund\n- 3-6 month emergency fund\n- Medical expenses\n\n**Large purchases**\n- Furniture\n- Appliances (fridge, dishwasher, etc.)\n- Electronics (cell phone, laptop, etc.)\n- Jewelry\n\n**Special events and travel**\n- Wedding and marriage\n- Baby/children\n- Vacation/travel\n- Concert/events\n\n**Down payments**\n- Car/vehicle\n- House/apartment\n\n**Other things to save for**\n- Education (college or trade school)\n- Pets"
     },
     {
       "type": "textcontent",
       "title": "Understanding Budgets",
-      "instructions": "A budget is a plan for how you use your money. By learning how to budget, you can cover your needs, save for future goals, and still enjoy some wants. There are different ways to budget, and this infographic will show you what a budget is, why it matters, how to make one, and strategies you can try to find the method that works best for you.",
+      "instructions": null,
       "image": "Budget infographic.jpg",
-      "content": ""
+      "content": "A budget is a plan for how you use your money. By learning how to budget, you can cover your needs, save for future goals, and still enjoy some wants. There are different ways to budget, and this infographic will show you what a budget is, why it matters, how to make one, and strategies you can try to find the method that works best for you."
     },
     {
       "type": "quiz",
@@ -444,10 +640,22 @@
           "has_correct_answer": false,
           "choices": {
             "options": [
-              { "id": 1, "text": "Stay with a friend -- $0 total ($0 per night for 3 nights)" },
-              { "id": 2, "text": "Stay in a 2-star motel -- $200 total ($66 per night for 3 nights)" },
-              { "id": 3, "text": "Stay in a 4-star hotel -- $400 total ($133 per night for 3 nights)" },
-              { "id": 4, "text": "Stay at a resort -- $600 total ($200 per night for 3 nights)" }
+              {
+                "id": 1,
+                "text": "Stay with a friend -- $0 total ($0 per night for 3 nights)"
+              },
+              {
+                "id": 2,
+                "text": "Stay in a 2-star motel -- $200 total ($66 per night for 3 nights)"
+              },
+              {
+                "id": 3,
+                "text": "Stay in a 4-star hotel -- $400 total ($133 per night for 3 nights)"
+              },
+              {
+                "id": 4,
+                "text": "Stay at a resort -- $600 total ($200 per night for 3 nights)"
+              }
             ]
           }
         },
@@ -458,8 +666,14 @@
           "choices": {
             "options": [
               { "id": 1, "text": "Travel by bus -- $100 total" },
-              { "id": 2, "text": "Take the family car -- $200 total (includes gas and maintenance)" },
-              { "id": 3, "text": "Take a rental car -- $300 total (includes rental fees and gas)" },
+              {
+                "id": 2,
+                "text": "Take the family car -- $200 total (includes gas and maintenance)"
+              },
+              {
+                "id": 3,
+                "text": "Take a rental car -- $300 total (includes rental fees and gas)"
+              },
               { "id": 4, "text": "Travel by plane -- $400 total" }
             ]
           }
@@ -470,10 +684,22 @@
           "has_correct_answer": false,
           "choices": {
             "options": [
-              { "id": 1, "text": "Buy groceries and cook your own food -- $100 ($25 each day for 4 days)" },
-              { "id": 2, "text": "Eat fast food -- $200 ($50 each day for 4 days)" },
-              { "id": 3, "text": "Mix of groceries, fast food, and restaurants -- $300 ($75 each day for 4 days)" },
-              { "id": 4, "text": "All meals at restaurants -- $400 ($100 each day for 4 days)" }
+              {
+                "id": 1,
+                "text": "Buy groceries and cook your own food -- $100 ($25 each day for 4 days)"
+              },
+              {
+                "id": 2,
+                "text": "Eat fast food -- $200 ($50 each day for 4 days)"
+              },
+              {
+                "id": 3,
+                "text": "Mix of groceries, fast food, and restaurants -- $300 ($75 each day for 4 days)"
+              },
+              {
+                "id": 4,
+                "text": "All meals at restaurants -- $400 ($100 each day for 4 days)"
+              }
             ]
           }
         },
@@ -484,7 +710,10 @@
           "choices": {
             "options": [
               { "id": 1, "text": "Participate in free activities only -- $0" },
-              { "id": 2, "text": "Pick just one activity that you really want to do -- $50" },
+              {
+                "id": 2,
+                "text": "Pick just one activity that you really want to do -- $50"
+              },
               { "id": 3, "text": "Try out a few fun activities -- $100" },
               { "id": 4, "text": "Do anything and everything -- $150" }
             ]
@@ -498,8 +727,14 @@
             "options": [
               { "id": 1, "text": "Just take pictures -- $0" },
               { "id": 2, "text": "Get a couple of things for yourself -- $50" },
-              { "id": 3, "text": "Buy souvenirs for yourself and a few friends -- $100" },
-              { "id": 4, "text": "Splurge on souvenirs for yourself, friends, and family -- $150" }
+              {
+                "id": 3,
+                "text": "Buy souvenirs for yourself and a few friends -- $100"
+              },
+              {
+                "id": 4,
+                "text": "Splurge on souvenirs for yourself, friends, and family -- $150"
+              }
             ]
           }
         },
@@ -510,8 +745,14 @@
           "choices": {
             "options": [
               { "id": 1, "text": "Skip the emergency fund -- $0" },
-              { "id": 2, "text": "Be prepared just in case something minor goes wrong -- $100" },
-              { "id": 3, "text": "Set aside enough for something major -- $200" },
+              {
+                "id": 2,
+                "text": "Be prepared just in case something minor goes wrong -- $100"
+              },
+              {
+                "id": 3,
+                "text": "Set aside enough for something major -- $200"
+              },
               { "id": 4, "text": "Be ready for anything -- $300" }
             ]
           }
@@ -521,20 +762,45 @@
     {
       "type": "dndmatch",
       "title": "Vacation Budgeting Activity Add-On",
-      "instructions": "Great work on budgeting your vacation! You have planned to spend $xxxx and have $zzzz leftover. You have a few options on how to spend or save your remaining money. Since this is a zero-based budget, the goal is to plan for every dollar! Let's see how close to $1200 you can get. Select what else you would like to spend money on for your vacation.\n\nThis part of the activity will not calculate your money for you, so you should use a calculator or a piece of paper to make sure you don't go over budget! Select as many items as you would like that will fit within your budget.",
+      "instructions": "Great work on budgeting your vacation! You have a few options on how to spend or save your remaining money. Since this is a zero-based budget, the goal is to plan for every dollar! Let's see how close to $1200 you can get. Select what else you would like to spend money on for your vacation.\n\nThis part of the activity will not calculate your money for you, so you should use a calculator or a piece of paper to make sure you don't go over budget! Select as many items as you would like that will fit within your budget.",
       "content": [
         {
           "category": "Additional Vacation Purchases",
           "matches": [
-            "Custom postcards $10", "Special dessert $10", "Fitness class $10", "Portable charger $10", "Sunscreen $10",
-            "Guided tour $20", "Scooter rental $20", "First aid kit $20", "Wifi Hotspot $30", "Live sporting event $30",
-            "Food delivery $30", "Reusable water bottle $30", "Memory book of photos $30",
-            "Rideshare to attractions further away $40", "Attend a local play/musical $40", "Art class $40",
-            "Travel backpack $40", "Specialty coffee daily $40", "Packing organizers $40", "_See more_",
-            "Extra snacks $50", "Spa day or massage $50", "Travel gear $50", "Photoshoot $50", "Specialty foods $50",
-            "Water park day pass $60", "Upscale restaurant dinner $70", "Private cabana rental at the beach $70",
-            "Polaroid camera rental $70", "Perfume/cologne $80", "Travel insurance $100", "Extreme sport $130",
-            "Sunset cruise $140", "Shopping spree $150", "Helicopter ride $200"
+            "Custom postcards $10",
+            "Special dessert $10",
+            "Fitness class $10",
+            "Portable charger $10",
+            "Sunscreen $10",
+            "Guided tour $20",
+            "Scooter rental $20",
+            "First aid kit $20",
+            "Wifi Hotspot $30",
+            "Live sporting event $30",
+            "Food delivery $30",
+            "Reusable water bottle $30",
+            "Memory book of photos $30",
+            "Rideshare to attractions further away $40",
+            "Attend a local play/musical $40",
+            "Art class $40",
+            "Travel backpack $40",
+            "Specialty coffee daily $40",
+            "Packing organizers $40",
+            "Extra snacks $50",
+            "Spa day or massage $50",
+            "Travel gear $50",
+            "Photoshoot $50",
+            "Specialty foods $50",
+            "Water park day pass $60",
+            "Upscale restaurant dinner $70",
+            "Private cabana rental at the beach $70",
+            "Polaroid camera rental $70",
+            "Perfume/cologne $80",
+            "Travel insurance $100",
+            "Extreme sport $130",
+            "Sunset cruise $140",
+            "Shopping spree $150",
+            "Helicopter ride $200"
           ]
         }
       ]
@@ -546,7 +812,8 @@
       "content": [
         "For each need listed below, estimate your monthly cost:",
         "<options></options>"
-      ]
+      ],
+      "_comment": "ASK ANNEE^"
     },
     {
       "type": "fillintheblank",
@@ -555,16 +822,18 @@
       "content": [
         "For each want listed below, estimate your monthly cost:",
         "<options></options>"
-      ]
+      ],
+      "_comment": "ASK ANNEE^"
     },
     {
       "type": "writing",
       "title": "Budget Reflection",
-      "instructions": "The total amount you plan to spend on your needs is $xxx and on your wants is $zzz. (These values should be automatically calculated from the student's previous entries.) This means you will need to make at least $yyy each month to break even, where yyy = xxx + zzz.\n\nSelect a question to write a response to for this activity.",
+      "instructions": "Add up how much your needs were, as well as how your wants were on a sheet of paper, then select a question to write a response to for this activity.",
       "prompts": [
         "Which type of budget do you think would work best for you and why?",
         "Is the amount of money you will need to make each month to cover your needs and wants achievable? How will you do it?"
-      ]
+      ],
+      "_comment": "The total amount you plan to spend on your needs is $xxx and on your wants is $zzz. (These values should be automatically calculated from the student's previous entries.) This means you will need to make at least $yyy each month to break even, where yyy = xxx + zzz.\n\n"
     },
     {
       "type": "fillintheblank",
@@ -579,8 +848,8 @@
       "type": "writing",
       "title": "Personal Finance Reflection",
       "instructions": "You've just finished this lesson on Personal Finance. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else.",
-      "image": "paying_money.jpg",
-      "content": ""
+      "instructions_image": "paying_money.jpg",
+      "prompts":[""]
     }
   ]
 }

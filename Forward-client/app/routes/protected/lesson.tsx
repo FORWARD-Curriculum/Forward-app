@@ -319,6 +319,9 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
             {activity.instructions}
           </MarkdownTTS>
         )}
+        {activity?.instructions_image && (
+          <img className="h-auto w-auto max-w-full max-h-100 object-contain rounded-xl mb-4" src={activity.instructions_image} alt=""></img>
+        )}
         {activity && <Activity activity={activity} />}
         <div className="mt-auto flex">
           <button

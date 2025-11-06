@@ -279,6 +279,10 @@ class BaseActivity(models.Model):
         validators=[MinLengthValidator(3)],
         help_text="The title of the activity"
     )
+    
+    order = models.PositiveIntegerField(
+        help_text="Order of the activity within the lesson. When creating a new activity,<br> this value should be 1 + the number of activities in the lesson found above."
+    )
 
     instructions = MartorField(
         verbose_name="Instructions",
@@ -291,10 +295,6 @@ class BaseActivity(models.Model):
         upload_to="public/instructions/",
         blank=True, null=True,
         help_text="An optional helpful image to display alongside the instructions.")
-
-    order = models.PositiveIntegerField(
-        help_text="Order of the activity within the lesson. When creating a new activity,<br> this value should be 1 + the number of activities in the lesson found above."
-    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -316,6 +316,7 @@ class BaseActivity(models.Model):
             "lesson_id": self.lesson_id,
             "type": self.activity_type,
             "title": self.title,
+            "instructions_image": self.instructions_image.url if self.instructions_image else None,
             "instructions": self.instructions,
             "order": self.order
         }
@@ -390,7 +391,7 @@ class Video(BaseActivity):
 class Writing(BaseActivity):
     """Model for writing activities where students provide written responses."""
     prompts = JSONField(
-        schema={"type": "array", "items": {"type": "string"}},
+        schema={"type": "array", "items": {"type": "string", 'widget': 'textarea'}},
         default=list,
         help_text="List of writing prompts for the activity"
     )
@@ -541,8 +542,8 @@ class Question(models.Model):
         schema={
             "type": "object",
             "properties": {
-                "correct": {"type": "string"},
-                "incorrect": {"type": "string"}
+                "correct": {"type": "string",'widget': 'textarea'},
+                "incorrect": {"type": "string",'widget': 'textarea'}
             },
             "required": ["correct", "incorrect"]
         },
@@ -571,7 +572,7 @@ class Question(models.Model):
                         "type": "object",
                         "properties": {
                             "id": {"type": "number"},
-                            "text": {"type": "string"},
+                            "text": {"type": "string", 'widget': 'textarea'},
                             "is_correct": {"type": "boolean"}
                         },
                         "required": ["id", "text", "is_correct"]
@@ -837,13 +838,16 @@ class FillInTheBlank(BaseActivity):
     image = models.ImageField(upload_to='public/fillintheblank/images/', blank=True, null=True)
 
     content = JSONField(
+        verbose_name="Sentences",
         schema={
             "type": "array",
             "items": {
-                "type": "string"
+                "type": "string", "widget": "textarea"
             }
         },
         help_text= mark_safe("""
+                             <details>
+                             <summary>Help with formatting Fill in The Blank sentances.</summary>
                                <p>This is an array of strings, where each string can contain special <code>&lt;options&gt;</code> tags to define an interactive element. There are three distinct ways to use these tags:</p>
 
   <h3>1. Dropdown Menu</h3>
@@ -883,7 +887,7 @@ class FillInTheBlank(BaseActivity):
       <strong>Example</strong>: To create a simple text input field for a user's favorite color, you would write:
       <pre><code>"My favorite color is &lt;options&gt;&lt;/options&gt;."</code></pre>
     </li>
-  </ul>""")
+  </ul></details>""")
     )
 
     def incorrect_fills(self):
@@ -1065,7 +1069,7 @@ class LikertScale(BaseActivity):
         "items": {
             "type": "object",
             "properties": {
-                "statement": {"type": "string"},
+                "statement": {"type": "string", "widget": "textarea"},
                 "scale": {
                     "type": "array",
                     "title": "Scale Markers",

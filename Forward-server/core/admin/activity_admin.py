@@ -27,6 +27,7 @@ class MultipleFileField(forms.FileField):
             return [single_clean(d, initial) for d in data]
         return [single_clean(data, initial)]
 
+# shows formatted json of a field that uses json
 class JsonAdminMixin:
     def formatted_json_field(self, obj, field_name):
         data = getattr(obj, field_name, None)
@@ -178,9 +179,9 @@ class BaseActivityAdmin(admin.ModelAdmin):
     list_editable = ("order",)
     
 
-class QuestionInline(admin.TabularInline):
+class QuestionInline(admin.StackedInline):
     model = Question
-    extra = 1
+    extra = 0
     ordering = ("order",)
 
 @admin.register(Quiz, site=custom_admin_site)
@@ -192,6 +193,7 @@ class QuizAdmin(BaseActivityAdmin):
 class SlideInline(SortableTabularInline):
     model=Slide
     readonly_fields = ("image_preview",)
+    extra = 0
 
     def image_preview(self, obj):
         return _image_tag(obj.image.url)
@@ -207,7 +209,7 @@ class SlideshowAdmin(SortableAdminMixin, BaseActivityAdmin):
 
 class ConceptInline(admin.StackedInline):
     model = Concept
-    extra = 1
+    extra = 0
     ordering = ("order",)
     fields = ("order", "title", "description", "image", "examples")
 
@@ -286,28 +288,28 @@ class TwineAdmin(BaseActivityAdmin):
 
 
 @admin.register(Writing, site=custom_admin_site)
-class WritingAdmin(BaseActivityAdmin, JsonAdminMixin):
+class WritingAdmin(BaseActivityAdmin):
     grouping = "Activities"
-    readonly_fields = ("display_prompts_as_json",)
+    
 
 
 @admin.register(DndMatch, site=custom_admin_site)
-class DndMatchAdmin(BaseActivityAdmin, JsonAdminMixin):
+class DndMatchAdmin(BaseActivityAdmin):
     grouping = "Activities"
-    readonly_fields = ("display_content_as_json",)
+    
 
 
 @admin.register(FillInTheBlank, site=custom_admin_site)
-class FillInTheBlankAdmin(BaseActivityAdmin, JsonAdminMixin):
+class FillInTheBlankAdmin(BaseActivityAdmin):
     grouping = "Activities"
-    readonly_fields = ("display_content_as_json",)
+    
     # TODO: content needs a lengthy desscription of the text formatting
 
 
 @admin.register(LikertScale, site=custom_admin_site)
-class LikertScaleAdmin(BaseActivityAdmin, JsonAdminMixin):
+class LikertScaleAdmin(BaseActivityAdmin):
     grouping = "Activities"
-    readonly_fields = ("display_content_as_json",)
+    
 
 
 @admin.register(Identification, site=custom_admin_site)

@@ -38,7 +38,7 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
   }, [api]);
 
   return (
-    <div className="flex w-full flex-col-reverse items-center lg:flex-col mt-4">
+    <div className="flex w-full flex-col-reverse items-center lg:flex-col mt-4 gap-2">
             <Carousel setApi={setApi} className="w-full max-w-4xl lg:aspect-video">
         <CarouselContent>
           {slideshow.slides.map((example, index) => (
@@ -55,7 +55,7 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
               )}
 
               <MarkdownTTS controlsClassName="flex flex-row-reverse gap-2">
-                {`# ${example.content}`}
+                {example.content}
               </MarkdownTTS>
             </CarouselItem>
           ))}
