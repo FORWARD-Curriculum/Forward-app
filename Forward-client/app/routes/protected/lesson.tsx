@@ -42,6 +42,13 @@ import {
 import LikertScale from "@/features/curriculum/components/likertscale";
 import Video from "@/features/curriculum/components/video";
 import confetti from 'canvas-confetti';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 export async function clientLoader({
   params,
@@ -142,6 +149,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   const activity = lesson.lesson?.activities[lesson.current_activity - 1];
   const length = lesson.lesson?.activities.length;
   const [showsScrolBtn, setShowScrolBtn] = useState(false);
+  const [showComplete, setShowComplete] = useState(false);
 
   // Mount/Unmount
   useEffect(() => {
@@ -180,6 +188,8 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   }, [loaderData]);
 
   const handleLessonComplete = () => {
+
+    setShowComplete(true);
     confetti({
       particleCount: 550,
       spread: 80,
@@ -304,6 +314,16 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
             Save and Continue
             <ArrowRightIcon className="!text-primary-foreground" />
           </button>
+          <Dialog open={showComplete} onOpenChange={setShowComplete}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Lesson Complete</DialogTitle>
+                    <DialogDescription>
+                      Great job! You've finished the lesson.
+                    </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>
