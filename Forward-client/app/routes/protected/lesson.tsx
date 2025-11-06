@@ -41,6 +41,7 @@ import {
 } from "@/features/curriculum/slices/lessonSlice";
 import LikertScale from "@/features/curriculum/components/likertscale";
 import Video from "@/features/curriculum/components/video";
+import confetti from 'canvas-confetti';
 
 export async function clientLoader({
   params,
@@ -139,6 +140,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   const response = useSelector((state: RootState) => state.response);
   const user = useSelector((state: RootState) => state.user.user);
   const activity = lesson.lesson?.activities[lesson.current_activity - 1];
+  const length = lesson.lesson?.activities.length;
   const [showsScrolBtn, setShowScrolBtn] = useState(false);
 
   // Mount/Unmount
@@ -176,6 +178,37 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
       }
     }
   }, [loaderData]);
+
+  const handleLessonComplete = () => {
+    confetti({
+      particleCount: 550,
+      spread: 80,
+      origin: { y: 0.6 }, 
+      startVelocity: 60,    
+      scalar: 1.2,
+      ticks: 200 
+    });
+
+    setTimeout(() =>{
+      confetti({
+        particleCount: 250,
+        angle: 60,
+        spread: 90,
+        origin: { x: 0.2, y: 0.7},
+        startVelocity: 30,
+        scalar: 0.8
+      });
+      confetti({
+        particleCount: 250,
+        angle: 120,
+        spread: 90,
+        origin: { x: 0.8, y: 0.7},
+        startVelocity: 30,
+        scalar: 0.8
+      });
+
+    }, 150)
+  }
 
   return (
     <div className="m-4 flex w-full flex-col items-center gap-4 lg:m-24 lg:mt-14 lg:flex-row lg:items-start lg:gap-8">
@@ -254,13 +287,18 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
             disabled={user ? (response.current_response?.partial_response || undefined) : false}
             className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden"
             onClick={() => {
-              dispatch(nextActivity());
-              dispatch(incrementHighestActivity());
-              history.replaceState(
-                null,
-                "",
-                "#" + (lesson.current_activity + 1),
-              );
+              if (lesson.current_activity === length){
+                handleLessonComplete();
+              }
+              else{
+                dispatch(nextActivity());
+                dispatch(incrementHighestActivity());
+                history.replaceState(
+                    null,
+                    "",
+                    "#" + (lesson.current_activity + 1),
+                  );
+              } 
             }}
           >
             Save and Continue
