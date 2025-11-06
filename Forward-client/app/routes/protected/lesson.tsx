@@ -9,7 +9,7 @@ import type { Route } from "./+types/lesson";
 import { apiFetch } from "@/utils/utils";
 import { useSelector, useDispatch } from "react-redux";
 import store, { type RootState } from "@/store";
-import { act, useEffect } from "react";
+import { act, useEffect, useCallback } from "react";
 import TextContent from "@/features/curriculum/components/textcontent";
 import Poll from "@/features/curriculum/components/poll";
 import Quiz from "@/features/curriculum/components/quiz";
@@ -47,7 +47,16 @@ import {
 } from "@/features/curriculum/slices/lessonSlice";
 import LikertScale from "@/features/curriculum/components/likertscale";
 import Video from "@/features/curriculum/components/video";
+import confetti from 'canvas-confetti';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import MarkdownTTS from "@/components/ui/markdown-tts";
+
 
 export async function clientLoader({
   params,
@@ -162,9 +171,13 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   const { hash } = useLocation();
   const lesson = useSelector((state: RootState) => state.lesson);
   const response = useSelector((state: RootState) => state.response);
+  const user = useSelector((state: RootState) => state.user.user);
   const activity = lesson.lesson?.activities[lesson.current_activity - 1];
+  const length = lesson.lesson?.activities.length;
   const [showsScrolBtn, setShowScrolBtn] = useState(false);
+  const [showComplete, setShowComplete] = useState(false);
   const [showFullToc, setShowFullToc] = useState(false);
+
 
   // Mount/Unmount
   useEffect(() => {
@@ -201,6 +214,39 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
       }
     }
   }, [loaderData]);
+
+  const handleLessonComplete = useCallback(() => {
+
+    setShowComplete(true);
+    confetti({
+      particleCount: 550,
+      spread: 80,
+      origin: { y: 0.6 }, 
+      startVelocity: 60,    
+      scalar: 1.2,
+      ticks: 200 
+    });
+
+    setTimeout(() =>{
+      confetti({
+        particleCount: 350,
+        angle: 60,
+        spread: 90,
+        origin: { x: 0.2, y: 0.7},
+        startVelocity: 30,
+        scalar: 0.8
+      });
+      confetti({
+        particleCount: 350,
+        angle: 120,
+        spread: 90,
+        origin: { x: 1.1, y: 0.7},
+        startVelocity: 30,
+        scalar: 0.8
+      });
+
+    }, 150)
+  }, []);
 
   return (
     <div className="m-4 mr-8 lg:ml-24 lg:mb-12 lg:mt-7 flex w-full flex-col items-center gap-4 lg:gap-8 lg:flex-row lg:items-start max-w-screen">
@@ -247,7 +293,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
                     <button
                       // FIXME: for now, we are not using the response to disable the button
                       title={`${activityIndex.order}. ${activityIndex.title}`}
-                      // disabled={activityIndex.order > response.highest_activity}
+                      disabled={user ? (activityIndex.order > response.highest_activity) : false}
                       key={activityIndex.order}
                       className={`${activityIndex.order === lesson.current_activity ? "bg-accent/40" : ""} group disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                       onClick={() => {
@@ -325,22 +371,56 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         {activity && <Activity activity={activity} />}
         <div className="mt-auto flex">
           <button
-            //FIXME: allows going forward even if activity is incomplete
-            /*disabled={response.current_response?.partial_response || undefined}*/
+            disabled={user ? (response.current_response?.partial_response || undefined) : false}
             className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden"
             onClick={() => {
-              dispatch(nextActivity());
-              dispatch(incrementHighestActivity());
-              history.replaceState(
-                null,
-                "",
-                "#" + (lesson.current_activity + 1),
-              );
+              if (lesson.current_activity === length){
+                handleLessonComplete();
+              }
+              else{
+                dispatch(nextActivity());
+                if(lesson.current_activity === response.highest_activity){
+                  dispatch(incrementHighestActivity());
+                }
+                history.replaceState(
+                    null,
+                    "",
+                    "#" + (lesson.current_activity + 1),
+                  );
+              } 
             }}
           >
             Save and Continue
             <ArrowRightIcon className="!text-primary-foreground" />
           </button>
+          <Dialog open={showComplete} onOpenChange={setShowComplete}>
+            <DialogContent className="bg-secondary border-secondary-border">
+              <DialogHeader>
+                <DialogTitle className="text-center text-2xl">
+                  🎉 Lesson Complete! 🎉
+                </DialogTitle>
+                <DialogDescription className="text-center">
+                  Great job! You've finished the lesson!
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col gap-3 mt-4">
+                <button
+                  className="bg-primary text-primary-foreground w-full rounded-lg p-3"
+                  onClick={() => {
+                    window.location.href = '/dashboard';
+                  }}
+                >
+                  Back to Dashboard
+                </button>
+                <button
+                  className="hover:bg-muted w-full rounded-lg p-2"
+                  onClick={() => setShowComplete(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>

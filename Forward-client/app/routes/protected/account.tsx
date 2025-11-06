@@ -206,6 +206,12 @@ export default function account() {
   };
 
   const clearLessonData = async () => {
+
+    // client side check to avoid api call to rest data on the off chance the student is not one listed
+    if (!['student1', 'student2'].includes(user.username)) {
+      return;
+    }
+
     try {
       const response = await apiFetch(`/users/me/responses`, {
         method: "DELETE"
