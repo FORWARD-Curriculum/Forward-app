@@ -204,7 +204,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         particleCount: 250,
         angle: 60,
         spread: 90,
-        origin: { x: 0.2, y: 0.7},
+        origin: { x: 0, y: 0.7},
         startVelocity: 30,
         scalar: 0.8
       });
@@ -212,7 +212,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         particleCount: 250,
         angle: 120,
         spread: 90,
-        origin: { x: 0.8, y: 0.7},
+        origin: { x: 1.1, y: 0.7},
         startVelocity: 30,
         scalar: 0.8
       });
@@ -315,13 +315,31 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
             <ArrowRightIcon className="!text-primary-foreground" />
           </button>
           <Dialog open={showComplete} onOpenChange={setShowComplete}>
-            <DialogContent>
+            <DialogContent className="bg-secondary border-secondary-border">
               <DialogHeader>
-                <DialogTitle>Lesson Complete</DialogTitle>
-                    <DialogDescription>
-                      Great job! You've finished the lesson.
-                    </DialogDescription>
+                <DialogTitle className="text-center text-2xl">
+                  🎉 Lesson Complete! 🎉
+                </DialogTitle>
+                <DialogDescription className="text-center">
+                  Great job! You've finished the lesson!
+                </DialogDescription>
               </DialogHeader>
+              <div className="flex flex-col gap-3 mt-4">
+                <button
+                  className="bg-primary text-primary-foreground w-full rounded-lg p-3"
+                  onClick={() => {
+                    window.location.href = '/dashboard';
+                  }}
+                >
+                  Back to Dashboard
+                </button>
+                <button
+                  className="hover:bg-muted w-full rounded-lg p-2"
+                  onClick={() => setShowComplete(false)}
+                >
+                  Close
+                </button>
+              </div>
             </DialogContent>
           </Dialog>
         </div>
