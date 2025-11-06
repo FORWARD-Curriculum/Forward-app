@@ -3,7 +3,7 @@
 # Exit on error
 set -e
 
-# Print commands
+# Print command
 set -x
 
 echo "Setting up Django development environment..."

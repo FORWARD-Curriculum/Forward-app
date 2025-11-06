@@ -64,7 +64,7 @@ export default function Header() {
                         />
                       ) : (
                         <p className="text-xl font-light">
-                          {(user.display_name || "   ")
+                          {(user.display_name || "Guest")
                             .substring(0, 2)
                             .toUpperCase()}
                         </p>
@@ -143,7 +143,7 @@ export default function Header() {
                         />
                       ) : (
                         <p className="text-secondary-foreground text-xl font-light">
-                          {(user.display_name || "   ")
+                          {(user.display_name || "Guest")
                             .substring(0, 2)
                             .toUpperCase()}
                         </p>

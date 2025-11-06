@@ -185,25 +185,26 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             <div className="bg-foreground outline-foreground-border flex h-fit w-full items-center gap-3 rounded-3xl p-4 outline-1">
               <div
                 className={`flex h-16 w-16 items-center justify-center overflow-hidden rounded-full ${
-                  user.profile_picture
+                  user?.profile_picture
                     ? ""
                     : "border-secondary-foreground border-1 border-solid"
                 }`}
               >
-                {user.profile_picture ? (
+                {user?.profile_picture ? (
                   <img src={user.profile_picture} className="object-cover" />
                 ) : (
                   <p className="text-secondary-foreground text-2xl font-light">
-                    {(user.display_name || "   ").substring(0, 2).toUpperCase()}
+                    {user?.display_name ? user.display_name.substring(0, 2).toUpperCase()
+                      : "GU" }
                   </p>
                 )}
               </div>
               <div className="text-left">
                 <h3 className="text-secondary-foreground text-lg">
-                  {user.display_name}
+                  {user?.display_name ?? "Guest"}
                 </h3>
                 <p className="text-muted-foreground text-sm">
-                  {user?.username}
+                  {user?.username ?? "Guest"}
                 </p>
               </div>
               <Link

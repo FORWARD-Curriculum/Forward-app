@@ -41,7 +41,9 @@ export default function Login() {
       login({...result.data.user})
 
       // Redirect to the route user attempted to access prior to logging in
-      navigate(from, { replace: true });
+      // removed it; made it so the user when logging in is always redirected to dashboard this is because with the use of guest i need to redirect 
+      // away from a route the guest was in and cause a refresh 
+      // navigate(from, { replace: true });
       toast.success("Successfully Logged In!");
     } catch (err: any) {
       setError(err.message);
@@ -92,7 +94,13 @@ export default function Login() {
           <Link prefetch="intent" to="/register" className="text-blue-500 underline">
             Sign Up
           </Link>{" "}
-          instead
+          instead.
+        </p>
+        <p className="text-muted-foreground text-center">
+          Explore as a&nbsp;
+          <Link prefetch="intent" to="/dashboard" className="text-blue-500 underline">
+            guest.
+          </Link>
         </p>
       </div>
     </div>
