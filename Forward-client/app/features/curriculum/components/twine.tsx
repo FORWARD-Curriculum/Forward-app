@@ -36,7 +36,7 @@ export default function Twine({ twine }: { twine: TwineType }) {
       `);
 
     // Process the twine file content to replace the custom image syntax
-    const processedHtml = twine.file.replace(imageRegex, replacementPattern);
+    const processedHtml = twine.file?.replace(imageRegex, replacementPattern);
 
     // Create the Blob from the processed HTML
     const blob = new Blob([processedHtml], { type: "text/html" });

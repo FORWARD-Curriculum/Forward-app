@@ -1,0 +1,76 @@
+div.martor-preview, .ace-github {
+                background: var(--body-bg) !important;
+                color: var(--body-fg);
+            }
+
+.modal-help-guide, .modal-emoji {
+    display: none;
+}
+
+.main-martor {
+    width: 100%;
+}
+
+.dropdown-menu{
+    display: none;
+}
+.dropdown-menu.show{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    background-color: var(--body-bg);
+    padding: 0.2em;
+    border-radius: 0.2em;
+    filter: drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.5));
+}
+
+.dropdown-item:hover {
+    background-color: var(--hairline-color);
+    cursor: pointer;
+}
+
+.main-martor .nav-tabs, .martor-field {
+    border-bottom: 2px solid var(--hairline-color) !important;
+}
+
+.ace_active-line {
+    background-color: color-mix(in srgb, var(--hairline-color), transparent 60%) !important;
+}
+
+.martor-field {
+    border-right: 2px solid var(--hairline-color) !important;
+    
+}
+html:not([data-theme="light"]) .ace_selection,
+html[data-theme="dark"] .ace_selection {
+    background: color-mix(in srgb, var(--link-selected-fg), transparent 60%) !important;
+}
+
+.ace-github .ace_cursor {
+    color: var(--body-fg) !important;
+}
+
+.btn-group {
+    display: flex;
+}
+
+.markdown-bold {
+    margin-left: auto;
+}
+
+.btn {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.btn:hover, .ace-github .ace_gutter {
+    background-color: var(--hairline-color);
+}
+.ace-github .ace_gutter-active-line {
+    background-color: var(--border-color);
+}
+
+.btn svg {
+    width: 1.5em;
+    height: 1.5em;
+}

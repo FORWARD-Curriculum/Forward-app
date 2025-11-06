@@ -191,9 +191,9 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
                                     if (part.includes('<input')) {
                                         const currentIndex = globalInputIndex++;
                                         return (
-                                            <input 
+                                            <textarea 
                                                 key={partIndex} 
-                                                type="text" 
+                                                // type="text" 
                                                 value={userInputs[currentIndex] || ''}
                                                 onChange={(e) => handleInputChange(currentIndex, e.target.value)}
                                                 disabled={lockedInputs[currentIndex]}
@@ -201,7 +201,8 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
                                                     validationResults[currentIndex] === 'correct' ? 'border-green-500 bg-green-50' : 
                                                     validationResults[currentIndex] === 'incorrect' ? 'border-red-500 bg-red-50' : 
                                                     'border-muted focus:border-primary'
-                                                }`}
+                                                } resize-x h-12 overflow-y-clip whitespace-nowrap overflow-x-hidden field-sizing-content`}
+                                                rows={1}
                                             />
                                         );
                                     }
@@ -229,7 +230,7 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
                                         );
                                     }
                                     else {
-                                        return <span key={partIndex} className="whitespace-nowrap">{part}</span>;
+                                        return <span key={partIndex} className=" break-words">{part}</span>;
                                     }
                                 })}
                             </div>

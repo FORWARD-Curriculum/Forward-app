@@ -17,9 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from core.admin import custom_admin_site
+from api.views import file_handler_view
 
 urlpatterns = [
     path('admin/', custom_admin_site.urls),
     path('api/', include('api.urls')),
     path('martor/', include('martor.urls')),
+    path('json-file-handler/', file_handler_view, name='json_file_handler'),
 ]

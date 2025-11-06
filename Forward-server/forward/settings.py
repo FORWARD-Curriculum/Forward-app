@@ -47,11 +47,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_json_widget',
+    'core',
+    'django_jsonform',
     'martor',
     'rest_framework',
     'corsheaders',
     'api',
-    'core',
+    'adminsortable2',    
 ]
 
 # REST Framework settings
@@ -123,7 +125,7 @@ ROOT_URLCONF = 'forward.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'core' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -208,12 +210,12 @@ if DEBUG: # uses Minio for development
                 "bucket_name": "media-bucket",
                 "access_key": "minioadmin",
                 "secret_key": "minioadmin",
-                "endpoint_url": "http://minio:9000",
-                "custom_domain": "http://localhost:9000", # test
-                "url_protocol": "http:",
-                "default_acl": "public-read",
-                "querystring_auth": False,
-                "use_ssl": False # set to false for local development
+                "endpoint_url": "http://localhost:9000",
+                # "custom_domain": "http://localhost:9000", # test
+                # "url_protocol": "http:",
+                # "default_acl": "public-read",
+                "querystring_auth": True,
+                # "use_ssl": False # set to false for local development
             }
         },
         # Required to satisfy django storages but we do not use static files i believe
@@ -241,32 +243,34 @@ else: # Production with s3 bucket configuration
     }
 
 
-
+# CMS_COLOR_SCHEME = "light"
+MARTOR_ENABLE_LABEL = True
 
 ## MARTOR CONFIG
+MARTOR_THEME = 'bootstrap'
 
+MARTOR_ENABLE_ADMIN_CSS = False
+MARTOR_ALTERNATIVE_CSS_FILE_THEME = 'custom/custom_martor.css'
 
 MARTOR_ENABLE_CONFIGS = {
-    'emoji': 'true',        # to enable/disable emoji icons.
-    'imgur': 'true',        # to enable/disable imgur/custom uploader.
+    # 'emoji': 'true',        # to enable/disable emoji icons.
+    'imgur': 'false',        # to enable/disable imgur/custom uploader.
     'mention': 'false',     # to enable/disable mention
     'jquery': 'true',       # to include/revoke jquery (require for admin default django)
-    'living': 'true',      # to enable/disable live updates in preview
-    'spellcheck': 'true',  # to enable/disable spellcheck in form textareas
-    'hljs': 'true',         # to enable/disable hljs highlighting in preview
+    'living': 'true',       # to enable/disable live updates in preview
+    'spellcheck': 'false',   # to enable/disable spellcheck in form textareas
+    # 'hljs': 'true',         # to enable/disable hljs highlighting in preview
 }
 
 MARTOR_TOOLBAR_BUTTONS = [
     'bold', 'italic', 'horizontal', 'heading', 'pre-code',
     'blockquote', 'unordered-list', 'ordered-list',
-    'link', 'image-upload', 'emoji',
-    'toggle-maximize', 'help'
+    'link', 'image-upload',
+    # 'underline',
 ]
 
-MARTOR_MARKDOWNIFY_FUNCTION = 'martor.utils.markdownify' # default
-MARTOR_MARKDOWNIFY_URL = '/martor/markdownify/' # default
 
-MARTOR_MARKDOWNIFY_TIMEOUT = 0 # update the preview instantly
+MARTOR_MARKDOWNIFY_TIMEOUT = 0
 
 MARTOR_MARKDOWN_EXTENSIONS = [
     'markdown.extensions.extra',
@@ -278,19 +282,9 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     # Custom markdown extensions.
     'martor.extensions.urlize',
     'martor.extensions.del_ins',      # ~~strikethrough~~ and ++underscores++
-    'martor.extensions.emoji',        # to parse markdown emoji
+    # 'martor.extensions.emoji',        # to parse markdown emoji
 ]
 
-ALLOWED_HTML_TAGS = [
-    "a", "abbr", "b", "blockquote", "br", "cite", "code", "command",
-    "dd", "del", "dl", "dt", "em", "fieldset", "h1", "h2", "h3", "h4", "h5", "h6",
-    "hr", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend",
-    "li", "ol", "optgroup", "option", "p", "pre", "small", "span", "strong",
-    "sub", "sup", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "u", "ul", "def", "correct"
-]
-
-ALLOWED_HTML_ATTRIBUTES = [
-    "alt", "class", "color", "colspan", "datetime",  # "data",
-    "height", "href", "id", "name", "reversed", "rowspan",
-    "scope", "src", "style", "title", "type", "width", "def"
-]
+DJANGO_JSONFORM = {
+    'FILE_HANDLER': '/json-file-handler/'
+}

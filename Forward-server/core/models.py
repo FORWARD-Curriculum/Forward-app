@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
 from django.urls import reverse
-from django.contrib.postgres.fields import ArrayField
+from django.core.validators import FileExtensionValidator
 import uuid
 import boto3  # pyright: ignore[reportMissingImports]
 from django.conf import settings
@@ -11,11 +11,15 @@ from botocore.exceptions import ClientError
 import re
 import json
 import copy
+from django_jsonform.models.fields import JSONField
+from martor.models import MartorField
+from django.utils.safestring import mark_safe
+from django.core.files.storage import default_storage
+
 
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
 # while allowing us to add our own custom fields and methods
-
 
 class Facility(models.Model):
     """
@@ -166,13 +170,17 @@ class Lesson(models.Model):
         validators=[MinLengthValidator(3)],
         help_text="The title of the lesson"
     )
+    
+    active = models.BooleanField(default=False, help_text="Wether or not the lesson is shown to students. Keep this unchecked until you\
+        are ready for students to start taking this lesson.")
 
     description = models.TextField(
         help_text="A detailed description of what the lesson covers"
     )
 
-    objectives = models.JSONField(
+    objectives = JSONField(
         default=list,
+        schema={"type": "array", "items": {"type": "string"}},
         help_text="List of learning objectives for this lesson"
     )
 
@@ -187,13 +195,16 @@ class Lesson(models.Model):
         help_text="Optional ordering within a curriculum"
     )
 
-    tags = models.JSONField(
+    tags = JSONField(
+        schema={"type": "array", "items": {"type": "string"}},
         default=list,
         blank=True,
         help_text="Tags for categorizing and searching lessons"
     )
     
-    image = models.CharField(null=True, blank=True, max_length=200, help_text="Optional image to represent the lesson")
+    # image = models.CharField(null=True, blank=True, max_length=200, help_text="Optional image to represent the lesson")
+    image = models.ImageField(upload_to='public/lesson/', null=True, blank=True,
+                              help_text="Optional image to represent the lesson in the dashboard")
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -220,7 +231,7 @@ class Lesson(models.Model):
             if child_class:
                 continue
             total += ActivityClass.objects.filter(lesson_id=self.id).count()
-        return total
+        return total+1
 
     def get_ordered_sections(self):
         """Returns all sections for this lesson in their specified order."""
@@ -234,7 +245,7 @@ class Lesson(models.Model):
             "objectives": self.objectives,
             "order": self.order,
             "tags": self.tags,
-            "image": create_presigned_url(self.image) if self.image else None,
+            "image": self.image.url if self.image else None,
         }
 
 
@@ -257,6 +268,8 @@ class BaseActivity(models.Model):
         Lesson,
         on_delete=models.CASCADE,
         # Will create writing_activities, quiz_activities, poll_activities
+        blank=False,
+        null=False,
         related_name="%(class)s_activities",
         help_text="The lesson this activity belongs to"
     )
@@ -266,16 +279,22 @@ class BaseActivity(models.Model):
         validators=[MinLengthValidator(3)],
         help_text="The title of the activity"
     )
+    
+    order = models.PositiveIntegerField(
+        help_text="Order of the activity within the lesson. When creating a new activity,<br> this value should be 1 + the number of activities in the lesson found above."
+    )
 
-    instructions = models.TextField(
+    instructions = MartorField(
+        verbose_name="Instructions",
         null=True,
         blank=True,
         help_text="Instructions for completing the activity"
     )
-
-    order = models.PositiveIntegerField(
-        help_text="Order within the lesson"
-    )
+    
+    instructions_image = models.ImageField(
+        upload_to="public/instructions/",
+        blank=True, null=True,
+        help_text="An optional helpful image to display alongside the instructions.")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -297,6 +316,7 @@ class BaseActivity(models.Model):
             "lesson_id": self.lesson_id,
             "type": self.activity_type,
             "title": self.title,
+            "instructions_image": self.instructions_image.url if self.instructions_image else None,
             "instructions": self.instructions,
             "order": self.order
         }
@@ -308,14 +328,16 @@ class TextContent(BaseActivity):
     Can contain formatted text, HTML, or markdown content.
     """
     # User's generated uuid
-    content = models.TextField(
+    content = MartorField(
         null=True, blank=True,
         help_text="The main content text, can include HTML/markdown formatting"
-
     )
 
-    image = models.TextField(
-        null=True, blank=True, help_text="Optional image to accompany the text content")
+    # image = models.TextField(
+    #     null=True, blank=True, help_text="Optional image to accompany the text content")
+    
+    image = models.ImageField(upload_to='public/textcontent/', null=True, blank=True, help_text="Optional image to accompany the text content")
+    
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -323,7 +345,7 @@ class TextContent(BaseActivity):
         verbose_name_plural = "Readings"
 
     def __str__(self):
-        return f"Text Content: {self.title}"
+        return self.title
 
     @property
     def activity_type(self):
@@ -333,7 +355,7 @@ class TextContent(BaseActivity):
         return {
             **super().to_dict(),
             "content": self.content,
-            "image": create_presigned_url(self.image) if self.image else None,
+            "image": self.image.url if self.image else None,
         }
 
 
@@ -342,9 +364,9 @@ class Video(BaseActivity):
     Model for video content within a lesson.
     Can be used to embed videos from external sources or local files.
     """
-    video = models.TextField(
-        help_text="URL of the video to be embedded"
-    )
+    video = models.FileField(
+        upload_to="public/video/",
+        validators=[FileExtensionValidator(allowed_extensions=['mp4'])])
 
     scrubbable = models.BooleanField(
         default=False,
@@ -362,13 +384,14 @@ class Video(BaseActivity):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "video": create_presigned_url(self.video),
+            "video": self.video.url if self.video else None,
         }
 
 
 class Writing(BaseActivity):
     """Model for writing activities where students provide written responses."""
-    prompts = models.JSONField(
+    prompts = JSONField(
+        schema={"type": "array", "items": {"type": "string", 'widget': 'textarea'}},
         default=list,
         help_text="List of writing prompts for the activity"
     )
@@ -390,10 +413,10 @@ class Writing(BaseActivity):
 
 class Identification(BaseActivity):
     """Model for students to identify key phrases or concepts in a text."""
-    content = models.CharField(
-        max_length=50000,
-        default="",
+    content = MartorField(
     )
+    
+    # TODO: implement image/pdf coordinate based identification
     
     class Meta:
         verbose_name = "Identification"
@@ -415,12 +438,21 @@ class Identification(BaseActivity):
 class Quiz(BaseActivity):
     """Model for quiz activities that contain multiple questions and track scores."""
     passing_score = models.PositiveIntegerField(
-        help_text="Minimum score required to pass the quiz"
+        help_text="Minimum score required to pass the quiz",
+        default=80
     )
 
-    feedback_config = models.JSONField(
+    feedback_config = JSONField(
+        schema={
+            "type": "object",
+            "properties": {
+                "correct": {"type": "string"},
+                "incorrect": {"type": "string"}
+            },
+            "required": ["correct", "incorrect"]
+        },
         default=dict,
-        help_text="Configuration for feedback based on score ranges"
+        help_text="Configuration for correct/incorrect feedback"
     )
 
     class Meta(BaseActivity.Meta):
@@ -438,8 +470,26 @@ class Quiz(BaseActivity):
 
 class Twine(BaseActivity):
     """Model for Twine activities, which are interactive stories or games."""
-    file = models.TextField(
-        help_text="The Twine story as a built HTML file in string format"
+    file = models.FileField(
+        upload_to="public/twine/",
+        validators=[FileExtensionValidator(allowed_extensions=['html'])],
+        help_text=mark_safe("""  
+                            An exported twine file with the extension ".html"<br>
+                            <br>
+                            The Twine story format must be "SugarCube", and in order to inform the
+                            app that a student has finshed the story, all ending passages must include the
+                            following text somewhere within them:<br>
+                            <br>
+                            <code>
+                                &lt;&lt;script&gt;&gt;<br>
+                                window.parent.postMessage({ type: "twineEnd" }, "*");<br>
+                                &lt;&lt;/script&gt;&gt;<br>
+                            </code><br>
+                            
+                            All images in the twine file should be prefixed with <code>image:&lt;filename&gt;</code>
+                            where the filename does not have any spaces (reccomended replace with underscores)    
+                            """
+        ), blank=False, null=False
     )
 
     class Meta(BaseActivity.Meta):
@@ -447,10 +497,19 @@ class Twine(BaseActivity):
         verbose_name_plural = "Twine Stories"
 
     def to_dict(self):
+        result = None
+        if self.file and self.file.name:
+            with self.file.open('r') as f:
+                result = re.sub(
+                    r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))",
+                    lambda m: f"image:{default_storage.url(f'public/twine/images/{m.group(1)}')} ",
+                    f.read()
+                )
+               
         return {
-            **super().to_dict(),
-            "file": regex_image_sub(self.file, key_prefix="twine/", isJson=False),
-        }
+                    **super().to_dict(),
+                    "file": result,
+                }
 
 
 class Question(models.Model):
@@ -460,7 +519,7 @@ class Question(models.Model):
         ('true_false', 'True/False'),
         ('multiple_select', 'Multiple Select'),
     ]
-    # User's generated uuid
+    # User's ge`ne`rated uuid
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -475,14 +534,21 @@ class Question(models.Model):
         help_text="The quiz this question belongs to"
     )
 
-    question_text = models.TextField(
+    question_text = MartorField(
         help_text="The text of the question"
     )
 
-    feedback_config = models.JSONField(
+    feedback_config = JSONField(
+        schema={
+            "type": "object",
+            "properties": {
+                "correct": {"type": "string",'widget': 'textarea'},
+                "incorrect": {"type": "string",'widget': 'textarea'}
+            },
+            "required": ["correct", "incorrect"]
+        },
         default=dict,
-        blank=True,
-        help_text="Feedback configuration for this question, with options for correct/incorrect responses"
+        help_text="Feedback configuration for correct/incorrect responses"
     )
 
     question_type = models.CharField(
@@ -496,8 +562,26 @@ class Question(models.Model):
         help_text="Whether this question has correct answers"
     )
 
-    choices = models.JSONField(
-        help_text="Available choices and correct answers in JSON format"
+    choices = JSONField(
+        schema={
+            "type": "object",
+            "properties": {
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "number"},
+                            "text": {"type": "string", 'widget': 'textarea'},
+                            "is_correct": {"type": "boolean"}
+                        },
+                        "required": ["id", "text", "is_correct"]
+                    }
+                }
+            },
+            "required": ["options"]
+        },
+        help_text="Available choices and correct answers for the question"
     )
 
     is_required = models.BooleanField(
@@ -529,7 +613,6 @@ class Question(models.Model):
             "order": self.order,
             "feedback_config": self.feedback_config
         }
-
 
 class Poll(BaseActivity):
     """
@@ -666,11 +749,52 @@ class DndMatch(BaseActivity):
             ["red herring drop", null]
         ]
     """
-
-    content = models.JSONField(
-        help_text="List of arrays to match in the format [[drop, drag], ...]"
-    )
     
+    strict = models.BooleanField(default=True,
+                                 help_text="Whether matches must be exact or if any match is allowed",
+                                 null=False, blank=False)
+
+    content = JSONField(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "category":
+                        {
+                            "title": "Name",
+                            "type": "string",
+                        },
+                    "matches": {
+                        "type": "array",
+                        "items": {
+                            "oneOf": [
+                                {
+                                    "title": "Type: Text",
+                                    "type": "string",
+                                },
+                                {
+                                    "title": "Type: Image",
+                                    "type": "object",
+                                    "properties": {
+                                        "image": {
+                                            "type": "string",
+                                            "format": "file-url",
+                                            "widget": "fileinput",
+                                            "title": "Image"
+                                        }
+                                    },
+                                    "required": ["image"]
+                                },
+                            ]
+                        }
+                        },
+                }
+            }
+        },
+        help_text="List of DND match categories and their associated items"
+    )
+
     class Meta:
         verbose_name = "Drag N' Drop"
         verbose_name_plural = "Drag N' Drops"
@@ -682,9 +806,17 @@ class DndMatch(BaseActivity):
         )
 
     def to_dict(self):
+        content = copy.deepcopy(self.content)
+        for group in content:
+            for match in group['matches']:
+                if isinstance(match, dict) and 'image' in match:
+                    match['key'] = match['image']
+                    match['image'] = default_storage.url(match['image'])
+                    
         return {
             **super().to_dict(),
-            "content": regex_image_sub(self.content, key_prefix="dndmatch/"),
+            "content": content,
+            "strict": self.strict
         }
 
 class FillInTheBlank(BaseActivity):
@@ -702,9 +834,60 @@ class FillInTheBlank(BaseActivity):
     class Meta:
         verbose_name = "Fill in the Blank"
         verbose_name_plural = "Fill in the Blanks"
+    
+    image = models.ImageField(upload_to='public/fillintheblank/images/', blank=True, null=True)
 
-    content = models.JSONField(
-        help_text= "Array of sentences with <options> markup for blanks"
+    content = JSONField(
+        verbose_name="Sentences",
+        schema={
+            "type": "array",
+            "items": {
+                "type": "string", "widget": "textarea"
+            }
+        },
+        help_text= mark_safe("""
+                             <details>
+                             <summary>Help with formatting Fill in The Blank sentances.</summary>
+                               <p>This is an array of strings, where each string can contain special <code>&lt;options&gt;</code> tags to define an interactive element. There are three distinct ways to use these tags:</p>
+
+  <h3>1. Dropdown Menu</h3>
+  <p>This use case is for when you want users to select the correct answer from a predefined list.</p>
+
+  <ul>
+    <li>
+      <strong>Syntax</strong>: The <code>&lt;options&gt;</code> tag contains a comma-separated list of choices. The correct answer is prefixed with an asterisk (<code>*</code>).
+    </li>
+    <li>
+      <strong>Example</strong>: To create a dropdown with "an animal", "a bird", and "a fish" as options, where "an animal" is the correct answer, you would write:
+      <pre><code>"Cats are &lt;options&gt;*an animal, a bird, a fish&lt;/options&gt;."</code></pre>
+    </li>
+  </ul>
+
+  <h3>2. Keyword-Based Text Input</h3>
+  <p>This is used for a text input field where multiple different answers could be considered correct.</p>
+
+  <ul>
+    <li>
+      <strong>Syntax</strong>: The <code>&lt;options&gt;</code> tag includes the <code>keyword="true"</code> attribute and contains a comma-separated list of acceptable answers. The user's input will be marked correct if it matches any of these keywords.
+    </li>
+    <li>
+      <strong>Example</strong>: To create a text field where "blue", "clear", or "bright" are all correct answers, you would write:
+      <pre><code>"The sky is &lt;options keyword=\"true\"&gt;blue, clear, bright&lt;/options&gt;."</code></pre>
+    </li>
+  </ul>
+
+  <h3>3. Free Text Input</h3>
+  <p>This is used for an open-ended text input where any non-empty answer is considered correct.</p>
+
+  <ul>
+    <li>
+      <strong>Syntax</strong>: The <code>&lt;options&gt;</code> tag is left empty.
+    </li>
+    <li>
+      <strong>Example</strong>: To create a simple text input field for a user's favorite color, you would write:
+      <pre><code>"My favorite color is &lt;options&gt;&lt;/options&gt;."</code></pre>
+    </li>
+  </ul></details>""")
     )
 
     def incorrect_fills(self):
@@ -727,8 +910,7 @@ class FillInTheBlank(BaseActivity):
     
 class ConceptMap(BaseActivity):
     """Model for mapping concepts to each other"""
-    content = models.CharField(
-        max_length=50000,
+    content = MartorField(
         default="",
     )
     class Meta:
@@ -780,14 +962,26 @@ class Concept(BaseActivity):
         help_text="The concept map this concept belongs to"
     )
 
-    image = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='publiic/concept/', blank=False, null=False, help_text="An image representing the concept.")
 
-    description = models.TextField(
+    description = MartorField(
         help_text="A detailed description of the concept"
     )
 
-    examples = models.JSONField(
-        default=list,
+    examples = JSONField(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "image": {"type": "string", "format": "file-url"},
+                    "description": {"type": "string"}
+                },
+                "required": ["name","description"],
+                "additionalProperties": False
+            }
+        },
         help_text="List of examples for this concept"
     )
     
@@ -796,22 +990,19 @@ class Concept(BaseActivity):
         verbose_name_plural = "Concept Map Concepts"
     
     def to_dict(self):
-        print(f"DEBUG: to_dict() method called for concept ID: {self.id}")
-        
-        try:
-            image_url = create_presigned_url(self.image) if self.image else None
-            print(f"DEBUG: Image URL generated: {image_url}")
-        except Exception as e:
-            print(f"ERROR: Error generating presigned URL: {e}")
-            image_url = None
+        examples = copy.deepcopy(self.examples)
+        for item in examples:
+            if item.get('image'):
+                item['image'] = default_storage.url(item['image'])
         
         return {
             **super().to_dict(),
             "id": self.id,
-            "image": image_url,
+            "image": self.image.url if self.image else None,
             "description": self.description,
-            "examples": self.examples,
+            "examples": examples,
         }
+        
 # Helper method to generate presigned urls
 """
 There might be a better way to do this useing django storages settings setting it to presigned url without creating a client here
@@ -850,6 +1041,7 @@ def create_presigned_url(s3_key):
     if (settings.DEBUG):
         print(f"SUCCESS: Generated presigned URL: {response}")
     return response
+
     
 
 
@@ -872,39 +1064,32 @@ def regex_image_sub(tosub: any, key_prefix="", isJson: bool = True):
 
 
 class LikertScale(BaseActivity):
-    """"
-    "type": "array",
-    "items": {
-    "type": "object",
-    "properties": {
-      "explain": {
-        "type": "boolean",
-        "description": "Indicates whether an explanation is required for the statement."
-      },
-      "statement": {
-        "type": "string",
-        "description": "The statement or question being presented."
-      },
-      "map": {
+    LIKERT_CONTENT_SCHEMA = {
         "type": "array",
-        "description": "Possible answer options or numeric scale values.",
         "items": {
-          "anyOf": [
-            {
-              "type": "integer",
-              "description": "Numeric scale value (e.g., 0–5)."
+            "type": "object",
+            "properties": {
+                "statement": {"type": "string", "widget": "textarea"},
+                "scale": {
+                    "type": "array",
+                    "title": "Scale Markers",
+                    "items": {
+                        "anyOf": [
+                            {"type": "number", "title": "Type: number"},
+                            {"type": "string", "title": "Type: text"}
+                        ]
+                    },
+                    "minItems": 2
+                    },
+                "continuous": {"type": "boolean"}
             },
-            {
-              "type": "string",
-              "description": "Textual option (e.g., Likert scale labels)."
-            }
-          ]
-        }
-      }
-    },
-    """
-    content = models.JSONField(
-
+            "required": ["statement", "scale", "continuous"],
+            "additionalProperties": False
+            }}
+    
+    content = JSONField(
+        schema=LIKERT_CONTENT_SCHEMA,
+        help_text="Content for the Likert scale activity"
     )
 
     class Meta:
@@ -915,6 +1100,43 @@ class LikertScale(BaseActivity):
         return {
             **super().to_dict(),
             "content": self.content
+        }
+        
+class Slideshow(BaseActivity):
+    
+    def get_num_slides(self):
+        return Slide.objects.filter(slideshow=self).count()
+    
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "slides": [s.to_dict() for s in Slide.objects.filter(slideshow=self).order_by('order')]
+        }
+    
+class Slide(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+    
+    slideshow = models.ForeignKey(to=Slideshow,on_delete=models.CASCADE, related_name='slides')
+    content = MartorField(default="")
+    image = models.ImageField(upload_to='public/slideshow/slides/images', blank=True, null=True)
+    order = models.PositiveIntegerField(
+        default=0,
+        blank=False,
+        null=False,)
+    
+    class Meta:
+        ordering = ("order",)
+    
+    
+    def to_dict(self):
+        return {
+            "content": self.content,
+            "image": self.image.url if self.image else None
         }
 
 class BaseResponse(models.Model):
@@ -973,6 +1195,23 @@ class BaseResponse(models.Model):
     
 # TODO: Make quiz and question response inherit from BaseResponse, or make
 # them adhere to the contract enforced by BaseResponse
+
+class SlideshowResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        Slideshow,
+        on_delete=models.CASCADE,
+        related_name='slideshow_responses',
+        help_text='The slideshow this response is for'
+    )
+    
+    class Meta:
+        verbose_name = "Slideshow Response"
+        verbose_name_plural = "Slideshow Responses"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
 
 class UserQuizResponse(BaseResponse):
     """
@@ -1277,16 +1516,61 @@ class DndMatchResponse(BaseResponse):
     ]
     
     """
-    submission = models.JSONField()
+    submission = JSONField(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "category":
+                        {
+                            "title": "Name",
+                            "type": "string",
+                        },
+                    "matches": {
+                        "type": "array",
+                        "items": {
+                            "oneOf": [
+                                {
+                                    "title": "Type: Text",
+                                    "type": "string",
+                                },
+                                {
+                                    "title": "Type: Image",
+                                    "type": "object",
+                                    "properties": {
+                                        "image": {
+                                            "type": "string",
+                                            "format": "file-url",
+                                            "widget": "fileinput",
+                                            "title": "Image"
+                                        }
+                                    },
+                                    "required": ["image"]
+                                },
+                            ]
+                        }
+                        },
+                }
+            }
+        },
+    )
+    
 
     class Meta:
         verbose_name = "Drag N' Drop Response"
         verbose_name_plural = "Drag N' Drop Responses"
 
     def to_dict(self):
+        content = copy.deepcopy(self.submission)
+        for group in content:
+            for match in group['matches']:
+                if isinstance(match, dict) and 'image' in match:
+                    match['image'] = default_storage.url(match['key'])
+                    
         return {
             **super().to_dict(),
-            "submission": self.submission
+            "submission": content
         }
 
 class FillInTheBlankResponse(BaseResponse):
@@ -1586,6 +1870,7 @@ class ActivityManager():
                               "watched_percentage": ["watched_percentage", 0.0]
                               })
         self.registerActivity(Twine, TwineResponse)
+        self.registerActivity(Slideshow, SlideshowResponse)
 
 
 # Register on launch

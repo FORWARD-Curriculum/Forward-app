@@ -13,10 +13,43 @@ from .utils import json_go_brrr, messages
 from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, User, BugReport
 from rest_framework import serializers, request
 import logging
+from django.contrib.auth.decorators import login_required
+from core.utils import s3_file_upload, s3_file_delete
+from django.http import JsonResponse, HttpResponse
+import uuid
+
 
 logger = logging.getLogger(__name__)
 
+@login_required
+def file_handler_view(request):
+    if request.method == "POST":
+        file = request.FILES.get("file")
+        if not file:
+            return JsonResponse({"error": "file missing"}, status=400)
 
+        model_name = request.POST.get("model_name", "")
+        s3_key = f"public/{model_name.lower()}/{uuid.uuid4()}_{file.name}"
+        url = s3_file_upload(file=file, s3_path=s3_key)
+        
+        return JsonResponse({"value": s3_key})
+
+    elif request.method == "GET":
+        return JsonResponse({"results": []})
+
+    elif request.method == "DELETE":
+        trigger = request.GET.get("trigger")
+        file_names = request.GET.getlist("value")
+
+        if trigger != "delete_button":
+            return HttpResponse(status=200)
+
+        for name in file_names:
+            s3_file_delete(name)
+
+        return HttpResponse(status=200)
+
+      
 class BugReportView(APIView):
     """
     API endpoint for submitting bug reports.
@@ -260,7 +293,7 @@ class CurriculumView(APIView):
         '''
         gets all lessons
         '''
-        lessons = Lesson.objects.all()
+        lessons = Lesson.objects.filter(active=True)
 
         if not lessons:
             return Response({"detail": "cannot find any lessons"}, status=status.HTTP_404_NOT_FOUND)
