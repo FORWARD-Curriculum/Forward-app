@@ -8,6 +8,7 @@ import { useLocation } from "react-router";
 import { useState } from "react";
 import { useResponse } from "@/features/curriculum/hooks";
 import Question from "./question";
+import { Circle } from "lucide-react";
 
 export default function Quiz({ quiz }: { quiz: Quiz }) {
   const { hash } = useLocation();
@@ -93,6 +94,30 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
     
   };
 
+
+  //Used to display different statuses in the bottom circles as they navigate questions
+  const getQuestionStatus = (questionId: string) => {
+    const answer = getAnswerForQuestion(questionId);
+    
+    if (!answer) {
+      return 'unanswered'; // Grey - no attempt yet
+    }
+    
+    if (answer.is_correct === true) {
+      return 'correct'; // Green - correct answer
+    }
+    
+    if (answer.attempts_left === 0 && answer.is_correct === false) {
+      return 'exhausted'; // Red - all attempts used, still wrong
+    }
+    
+    if (answer.is_correct === false) {
+      return 'attempted'; // Blue - attempted but not correct yet
+    }
+    
+    return 'unanswered'; // Grey - fallback
+  };
+
   return (
     <div>
       <div className="flex lg:flex-row flex-col justify-between">
@@ -128,7 +153,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
 
       {/* Navigation buttons */}
       <div className="mx-auto flex w-full justify-center">
-        <div className="grid grid-cols-3 items-center justify-center">
+        <div className="grid grid-cols-3 items-center justify-center gap-4">
           {currentQuestion != 1 && (
             <button
               className="bg-primary text-primary-foreground col-span-1 col-start-1 col-end-1 flex h-full w-16 items-center justify-center rounded-md text-center active:brightness-90"
@@ -144,9 +169,42 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
               Prev
             </button>
           )}
-          <p className="col-start-2 col-end-2 w-full rounded-full p-3 text-center">
-            {currentQuestion}
-          </p>
+          
+          {/* Circle navigation */}
+          <div className="col-start-2 col-end-2 flex gap-2 items-center justify-center">
+            {Array.from({ length: quiz.questions.length }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  history.replaceState(
+                    null,
+                    "",
+                    `#${quiz.order}/${index + 1}`,
+                  );
+                  setCurrentQuestion(index + 1);
+                }}
+                className="cursor-pointer"
+                aria-label={`Go to question ${index + 1}`}
+              >
+                <Circle
+                  fill={
+                    (() => {
+                      const status = getQuestionStatus(quiz.questions[index].id);
+                      //TODO add green into our tailwind
+                      if (status === 'correct') return '#00a63e'; //equivalent to tailwind green-600
+                      if (status === 'exhausted') return 'var(--error)'; 
+                      if (status === 'attempted') return 'var(--accent)'; 
+                      return 'var(--muted-foreground)';
+                    })()
+                  }
+                  stroke={index + 1 === currentQuestion ? 'var(--primary)' : undefined}
+                  strokeWidth={index + 1 === currentQuestion ? 2 : 1}
+                  size={16}
+                />
+              </button>
+            ))}
+          </div>
+          
           {currentQuestion != quiz.questions.length && (
             <button
               className="bg-primary text-primary-foreground col-span-1 col-start-3 col-end-3 flex h-full w-16 items-center justify-center rounded-md text-center active:brightness-90"
