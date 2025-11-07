@@ -1563,11 +1563,14 @@ class UserQuestionResponse(models.Model):
     def evaluate_correctness(self):
         """Determine if the response is correct based on question type and correct answer"""
         if not self.question.has_correct_answer:
-            self.is_correct = None
-            
+            # self.is_correct = None
+            # self.partial_response = False # No correct answer any should be accepted
+            # return None
 
-            self.partial_response = False # No correct answer any should be accepted
-            return None
+            self.is_correct = True
+            feedback_config = self.question.feedback_config or {}
+            self.feedback = self.question.feedback_config.get('correct', '')
+            return True
 
         options = self.question.choices.get('options', [])
         # Get correct answers from the question
@@ -1624,12 +1627,13 @@ class UserQuestionResponse(models.Model):
             "associated_activity": self.question_id,
             "response_data": self.response_data,
             "quiz_id": self.quiz_response.associated_activity.id,
-            # "is_correct": self.is_correct,
             "lesson_id": self.lesson_id,
             "partial_response": self.partial_response,
             "time_spent": self.time_spent,
-            # "feedback": self.feedback,
             "attempts_left": self.attempts_left,
+            # test
+            "is_correct": self.is_correct,
+            "feedback": self.feedback,
         }
 
 class VideoResponse(BaseResponse):
