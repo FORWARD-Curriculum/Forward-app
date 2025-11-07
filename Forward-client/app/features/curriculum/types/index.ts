@@ -276,6 +276,8 @@ export interface QuestionResponse extends BaseResponse {
   response_data: { selected: number[] };
   quiz_id: string;
   lesson_id: string;
+  is_correct?: boolean | null
+  feedback?: string,
 }
 
 /**

@@ -1386,9 +1386,6 @@ class UserQuestionResponse(models.Model):
     def evaluate_correctness(self):
         """Determine if the response is correct based on question type and correct answer"""
         if not self.question.has_correct_answer:
-            # self.is_correct = None
-            # self.partial_response = False # No correct answer any should be accepted
-            # return None
 
             self.is_correct = True
             feedback_config = self.question.feedback_config or {}
