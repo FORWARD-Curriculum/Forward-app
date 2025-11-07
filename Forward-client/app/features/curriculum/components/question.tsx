@@ -31,13 +31,16 @@ export default function Question({
   const isDisabled = disabled || (answer?.attempts_left ?? 3) <= 0;
   const isAnswered =
     selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
-  // Check if the answer is correct
-  const isCorrect = !question.has_correct_answer || isMultipleSelect
+  
+    // Check if the answer is correct
+    // If no correct answer (opinion question) always mark as correct
+  const isCorrect = !question.has_correct_answer ? true : isMultipleSelect
     ? areArraysEqual(
         selectedAnswers.slice().sort(),
         correctAnswers?.map((c) => c.id).sort(),
       )
     : correctAnswers?.map((c) => c.id).includes(selectedAnswers[0]);
+
   /**
    * Handles when a user selects or deselects an option
    */
