@@ -1564,7 +1564,9 @@ class UserQuestionResponse(models.Model):
         """Determine if the response is correct based on question type and correct answer"""
         if not self.question.has_correct_answer:
             self.is_correct = None
-            # self.save()
+            
+
+            self.partial_response = False # No correct answer any should be accepted
             return None
 
         options = self.question.choices.get('options', [])
