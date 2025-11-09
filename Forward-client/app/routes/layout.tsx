@@ -16,16 +16,20 @@ import Fetch from "@/components/layout/fetch";
 // it fetches the current user's data
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   const res = await apiFetch("/users/me", {}, true);
-  const resp = await res.json();
-  const user =
-    (resp as { detail?: string; data?: { user: User } })?.data?.user ?? null;
-  // console.log("clientLoader user", user);
-  return user;
+  if(res.ok){
+    const resp = await res.json();
+    const user =
+      (resp as { detail?: string; data?: { user: User } })?.data?.user ?? null;
+    // console.log("clientLoader user", user);
+    return user;
+  } else {
+    return null
+  }
 }
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
   const { windowDimensions } = useClient();
-  const fetchUser = loaderData as User;
+  const fetchUser = loaderData as User | null;
   const { user, status } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
 

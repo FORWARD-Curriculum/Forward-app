@@ -124,8 +124,10 @@
       "content": [
         { "category": "Wants", "matches": [] },
         { "category": "Needs", "matches": [] },
-        { "category": "Not Applicable to Me", "matches": [
-          "Housing",
+        {
+          "category": "Not Applicable to Me",
+          "matches": [
+            "Housing",
             "Fashionable clothes",
             "Monthly haircuts",
             "Childcare",
@@ -156,9 +158,10 @@
             "Gifts for friends and family",
             "Clothes for special events",
             "Savings"
-        ] }
-        
-      ],"strict": false,
+          ]
+        }
+      ],
+      "strict": false,
       "_TODO: add a limit to category?": {
         "condition": "if more than 15 items are placed in any single category",
         "message": "Hold up! Are you sure that all of these items belong in this box? Which ones could you move to other boxes?"
@@ -181,12 +184,17 @@
     {
       "type": "identification",
       "title": "Reading a W-2 Form",
-      "instructions": "Here is a sample W-2 form. Take some time to become familiar with the document. As you do, look for the total wages earned and the federal income tax withheld. You will need to click on the W-2 in those two places and answer the multiple choice questions to continue.",
-      "content": "![W-2 Form](w2blank.jpg)",
-      "_TODO: THIS ^": {
-        "default": "Nice work locating the wages and withheld tax! Tax forms can be pretty tricky but it is important to learn how to read them to prepare for filing taxes."
-      },
-      "_comment": "The W2 with highlights are included for tech to know where the right answers are. Students should click in the specified areas, which should highlight when students correctly click in that area and stay highlighted. The highlighted areas should be slightly larger than the text to increase accessibility. After students click in both highlighted areas, they should get the following feedback:* Nice work locating the wages and withheld tax! Tax forms can be pretty tricky but it is important to learn how to read them to prepare for filing taxes."
+      "instructions": "Here is a sample W-2 form. Take some time to become familiar with the document. As you do, look for the **total wages earned** and the **federal income tax withheld**. You will need to click on the W-2 in those two places and answer the multiple choice questions to continue.",
+      "feedback": "Nice work locating the wages and withheld tax! Tax forms can be pretty tricky but it is important to learn how to read them to prepare for filing taxes.",
+      "content": [
+        {
+          "areas": [
+            { "x1": 53.6, "y1": 9.8, "x2": 75, "y2": 16 },
+            { "x1": 75.2, "y1": 9.8, "x2": 96.4, "y2": 16 }
+          ],
+          "image": "w2blank.jpg"
+        }
+      ]
     },
     {
       "type": "quiz",
@@ -233,11 +241,18 @@
     {
       "type": "identification",
       "title": "Reading a 1040 Form",
-      "instructions": "This document is a 1040 and is what you fill out to submit your individual taxes to the Internal Revenue Service (IRS). Each year, you will need to file taxes between January (when you receive all W2 forms) and April 15th.\n\nTake some time to become familiar with the document. If you file your taxes online, you will go step by step and will not see the whole document at one time.\n\nAs you look through the 1040, look for the total income from the W-2 form and the amount of taxes owed. You will need to click on the 1040 in those two places and answer the multiple choice questions to continue.\n\nAfter you correctly identify both, you will see this feedback:\n\n*Nice work identifying the total income and amount owed! Understanding these forms helps you know how much you've paid and whether you'll owe or get a refund next time you file.*",
-      "content": "![1040 Page 1](1040_Page_1.jpg)\n![1040 Page 2](1040_Page_2.jpg)",
-      "feedback_config": {
-        "default": "Nice work identifying the total income and amount owed! Understanding these forms helps you know how much you've paid and whether you'll owe or get a refund next time you file."
-      }
+      "instructions": "This document is a 1040 and is what you fill out to submit your individual taxes to the Internal Revenue Service (IRS). Each year, you will need to file taxes between January (when you receive all W2 forms) and April 15th.\n\nTake some time to become familiar with the document. If you file your taxes online, you will go step by step and will not see the whole document at one time.\n\nAs you look through the 1040, look for the total income from the W-2 form and the amount of taxes owed. You will need to click on the 1040 in those two places and answer the multiple choice questions to continue.",
+      "feedback": "Nice work identifying the total income and amount owed! Understanding these forms helps you know how much you've paid and whether you'll owe or get a refund next time you file.",
+      "content": [
+        {
+          "areas": [{ "x1": 82.5, "y1": 53.8, "x2": 94.2, "y2": 55.2 }],
+          "image": "1040_Page_1.jpg"
+        },
+        {
+          "areas": [{ "x1": 82.5, "y1": 4.5, "x2": 94.1, "y2": 6.1 }],
+          "image": "1040_Page_2.jpg"
+        }
+      ]
     },
     {
       "type": "quiz",
@@ -619,8 +634,7 @@
           "statement": "Other: Pets",
           "scale": ["$0", "$5000"]
         }
-      ],
-      "_TODO: Categories": "\n\nCategories:\n\n**Emergency funds**\n- 1 month emergency fund\n- 3-6 month emergency fund\n- Medical expenses\n\n**Large purchases**\n- Furniture\n- Appliances (fridge, dishwasher, etc.)\n- Electronics (cell phone, laptop, etc.)\n- Jewelry\n\n**Special events and travel**\n- Wedding and marriage\n- Baby/children\n- Vacation/travel\n- Concert/events\n\n**Down payments**\n- Car/vehicle\n- House/apartment\n\n**Other things to save for**\n- Education (college or trade school)\n- Pets"
+      ]
     },
     {
       "type": "textcontent",
@@ -850,7 +864,7 @@
       "title": "Personal Finance Reflection",
       "instructions": "You've just finished this lesson on Personal Finance. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else.",
       "instructions_image": "paying_money.jpg",
-      "prompts":[""]
+      "prompts": [""]
     }
   ]
 }

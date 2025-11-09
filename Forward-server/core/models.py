@@ -231,7 +231,7 @@ class Lesson(models.Model):
             if child_class:
                 continue
             total += ActivityClass.objects.filter(lesson_id=self.id).count()
-        return total+1
+        return total
 
     def get_ordered_sections(self):
         """Returns all sections for this lesson in their specified order."""
@@ -413,25 +413,74 @@ class Writing(BaseActivity):
 
 class Identification(BaseActivity):
     """Model for students to identify key phrases or concepts in a text."""
-    content = MartorField(
-    )
-    
+   
     # TODO: implement image/pdf coordinate based identification
     
     class Meta:
         verbose_name = "Identification"
         verbose_name_plural = "Identifications"
 
-    minimum_correct = models.PositiveIntegerField(default=0)
 
-    feedback = models.CharField(max_length=2000, default="")
+    minimum_correct = models.PositiveIntegerField(default=None, null=True, blank=True)
+
+    feedback = models.CharField(max_length=2000, default="", blank=True,null=True)
 
     def to_dict(self):
         return {
             **super().to_dict(),
-            "content": self.content,
+            "content": [i.to_dict() for i in IdentificationItem.objects.filter(identification=self).order_by('order')],
             "minimum_correct": self.minimum_correct,
             "feedback": self.feedback
+        }
+        
+
+class IdentificationItem(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+    order = models.PositiveIntegerField(
+    default=0,
+    blank=False,
+    null=False,)
+
+    identification = models.ForeignKey(
+        to=Identification, on_delete=models.CASCADE, related_name='identItems')
+    hints = models.BooleanField(default=True, help_text=mark_safe(
+        'If true, will show a cursor pointer over unidentified areas to help with selection, just like  <code style="cursor: pointer; color: var(--error-fg)">when you hover over this text</code>.'))
+    areas = JSONField(schema={
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "x1": {"type": "number", "title": "Top Left X (%)", "minimum": 0, "maximum": 100},
+                "y1": {"type": "number", "title": "Top Left Y (%)", "minimum": 0, "maximum": 100},
+                "x2": {"type": "number", "title": "Bottom Right X (%)", "minimum": 0, "maximum": 100},
+                "y2": {"type": "number", "title": "Bottom Right Y (%)", "minimum": 0, "maximum": 100}
+            },
+            "required": ["x1", "y1", "x2", "y2"]
+        },
+        'default': []
+        # 'minItems': 1
+        },
+        help_text="""This field is a list of selectable rectangles on the image. Any rectangles you define in the list will show 
+        up after this Activity has been saved, this means, to see any rectangles you must save at least once.""",
+        verbose_name="Coordinates", blank=True, null=True)
+    image = models.ImageField(
+        upload_to='public/identification/items/images', blank=False, null=False, help_text="""The image below automatically shows
+        percentage values when hovered. If the tooltop at the bottom is not visible, holding still for a bit will show a tooltop
+        with the percentage of the image you are hovered over.""")
+
+    class Meta:
+        ordering = ("order",)
+
+    def to_dict(self):
+        return {
+            "areas": [[area['x1'], area['y1'], area['x2'], area['y2']] for area in self.areas] if self.areas else None,
+            "image": self.image.url if self.image else None,
+            "hints": self.hints
         }
 
 
@@ -1689,6 +1738,8 @@ class IdentificationResponse(BaseResponse):
         related_name='associated_identification',
         help_text='The identification activity associated with this response'
     )
+    
+    identified = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = "Identification Response"
@@ -1697,6 +1748,7 @@ class IdentificationResponse(BaseResponse):
     def to_dict(self):
         return {
             **super().to_dict(),
+            "identified": self.identified
         }
 
 

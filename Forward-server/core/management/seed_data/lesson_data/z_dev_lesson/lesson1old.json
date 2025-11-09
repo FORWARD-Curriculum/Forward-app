@@ -11,7 +11,7 @@
     "order": 1,
     "tags": ["college", "education", "future planning"]
   },
-  "activities": [
+  "_activities": [
     {
       "type": "embed",
       "link": "https://asu.co1.qualtrics.com/jfe/form/SV_9BtOetx46YdBQW2",

@@ -21,7 +21,13 @@ export const useClient = (): {
         height: window.innerHeight,
         isMobile: window.innerWidth <= 1024,
       });
-      setIsMobile(window.innerWidth <= 1024);
+      setIsMobile((prevIsMobile) => {
+        const newIsMobile = window.innerWidth <= 1024;
+        if (prevIsMobile !== newIsMobile) {
+          return newIsMobile;
+        }
+        return prevIsMobile;
+      });
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);

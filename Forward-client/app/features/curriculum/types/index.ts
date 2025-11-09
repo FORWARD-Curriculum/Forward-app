@@ -194,8 +194,12 @@ export interface ConceptMap extends BaseActivity {
  * surrounding the correct phrases for the uset to identify.
  */
 export interface Identification extends BaseActivity {
-  content: string;
-  minimum_correct: number;
+  content: {
+    image: string;
+    areas: [number, number, number, number][]
+    hints: boolean;
+  }[];
+  minimum_correct: number | null;
   feedback: string;
 }
 
@@ -292,7 +296,10 @@ export interface WritingResponse extends BaseResponse {
 export interface TextContentResponse extends BaseResponse {}
 export interface SlideshowResponse extends BaseResponse {}
 export interface ConceptMapResponse extends BaseResponse {}
-export interface IdentificationResponse extends BaseResponse {}
+export interface IdentificationResponse extends BaseResponse {
+  identified: number;
+
+}
 export interface PollResponse extends BaseResponse {}
 export interface EmbedResponse extends BaseResponse {
   inputted_code: string;
