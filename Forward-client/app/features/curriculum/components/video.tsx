@@ -69,7 +69,7 @@ export default function Video({ video }: { video: VideoType }) {
       <div className="flex w-full flex-col items-center gap-4 p-4">
         <video
           ref={videoRef}
-          className="w-auto rounded-lg shadow-lg h-160"
+          className="w-auto rounded-lg shadow-lg max-h-160"
           src={video.video}
           controls
           onTimeUpdate={handleTimeUpdate}

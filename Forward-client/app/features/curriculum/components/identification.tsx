@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/useClient";
-import { CircleX } from "lucide-react";
+import { CircleX, Pointer } from "lucide-react";
 
 /**
  * Converts an area array to a stable string key.
@@ -118,7 +118,7 @@ function IdentificationItem({
 
   return isMobile ? (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger className="relative">
         <Box
           box={box}
           className={className}
@@ -126,6 +126,10 @@ function IdentificationItem({
           dimsMap={dimsMap}
           handleClick={handleClick}
         />
+        <Pointer
+                      className="absolute bottom-3 left-3 text-white drop-shadow-[0px_0px_2px_rgba(0,0,0,1)] filter"
+                      color="white"
+                    />
       </DialogTrigger>
       <DialogContent
         className="h-screen w-screen max-w-none gap-0 p-0"
@@ -217,6 +221,7 @@ export default function Identification({
           isMobile={isMobile}
         />
       ))}
+      <span className=" text-muted-foreground">{response.identified} / {identification.minimum_correct || totalIdents} areas identified</span>
     </div>
   );
 }

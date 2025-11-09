@@ -337,6 +337,7 @@ export function NextActivity() {
   const lessonLength = useSelector(
     (state: RootState) => state.lesson.lesson?.activities.length ?? 0,
   );
+  const isMobile = useIsMobile();
 
   const handleLessonComplete = useCallback(() => {
     setShowComplete(true);
@@ -369,11 +370,17 @@ export function NextActivity() {
     }, 150);
   }, []);
   return (
-    <div className="mt-auto flex">
+    <div className="mt-4 flex lg:mt-auto">
       <button
         disabled={user ? current_partial_response || undefined : false}
         className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden"
         onClick={() => {
+          if (isMobile) {
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+          }
           if (current_activity === lessonLength) {
             handleLessonComplete();
           } else {
@@ -454,7 +461,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   }, [loaderData]);
 
   return (
-    <div className="m-4 mr-8 flex w-full max-w-screen flex-col items-center gap-4 lg:mt-7 lg:mb-12 lg:ml-24 lg:flex-row lg:items-start lg:gap-8">
+    <div className="m-4 lg:mr-8 flex w-full max-w-screen flex-col items-center gap-4 lg:mt-7 lg:mb-12 lg:ml-24 lg:flex-row lg:items-start lg:gap-8">
       <TableOfContents />
       <div className="bg-secondary border-secondary-border text-secondary-foreground flex min-h-min w-full min-w-0 flex-col rounded-3xl border-1 p-4">
         <h1 className="text-2xl font-bold">
@@ -466,7 +473,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         {activity?.instructions && (
           <MarkdownTTS
             className="mb-6 font-light italic"
-            controlsClassName="flex flex-row-reverse justify-between"
+            controlsClassName="flex flex-col mt-2 lg:mt-0 lg:flex-row-reverse justify-between"
             controlsOrientation="horizontal"
           >
             {activity.instructions}

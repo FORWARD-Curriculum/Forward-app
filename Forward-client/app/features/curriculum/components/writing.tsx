@@ -1,6 +1,7 @@
 import type { Writing, WritingResponse } from "@/features/curriculum/types";
 import { useResponse } from "../hooks";
 import MarkdownTTS from "@/components/ui/markdown-tts";
+import { useIsMobile } from "@/hooks/useClient";
 
 const mdPattern = /(\*\*|\n)/m;
 
@@ -13,13 +14,15 @@ export default function Writing({ writing }: { writing: Writing }) {
     },
   });
 
+  const isMobile = useIsMobile();
+
   return (
     <div>
       {writing.prompts.map((prompt, index) => (
         <div key={index} className="mb-4">
           <MarkdownTTS
-            controlsClassName={`${mdPattern.test(prompt) ? "remark" : ""} flex flex-row-reverse grow justify-between`}
-            controlsOrientation="horizontal"
+            controlsClassName={`${mdPattern.test(prompt) ? "remark" : ""} flex flex-col lg:flex-row-reverse grow justify-between`}
+            controlsOrientation={isMobile?"horizontal":"vertical"}
           >
             {prompt}
           </MarkdownTTS>
