@@ -3,7 +3,7 @@ import { Outlet } from "react-router";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/sonner";
-import { useClient } from "@/hooks/useClient";
+import { useIsMobile } from "@/hooks/useClient";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store";
 import type { Route } from "./+types/layout";
@@ -28,7 +28,7 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 }
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
-  const { windowDimensions } = useClient();
+  const isMobile = useIsMobile();
   const fetchUser = loaderData as User | null;
   const { user, status } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
@@ -68,7 +68,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
           <Outlet />
         </div>
         <Footer />
-        <Toaster richColors closeButton={windowDimensions.width > 1024} />
+        <Toaster richColors closeButton={!isMobile} />
       </div>
     </>
   );

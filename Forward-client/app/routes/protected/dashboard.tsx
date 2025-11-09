@@ -153,7 +153,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                     <LessonCard key={e.id} lesson={e}>
                       <Accordion>
                         {e.objectives.length > 0 && (
-                          <p className="ml-4 mb-4">
+                          <div className="ml-4 mb-4">
                             <span className="font-medium">
                               Lesson Objectives:
                             </span>{" "}
@@ -162,7 +162,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                                 <li className="ml-10 list-disc font-light">{o}</li>
                               ))}
                             </ul>
-                          </p>
+                          </div>
                         )}
                         {e.tags && (
                           <div className="flex gap-2 ml-4 italic">

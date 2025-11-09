@@ -12,7 +12,7 @@ import {
   DialogClose,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useClient } from "@/hooks/useClient";
+import { useIsMobile } from "@/hooks/useClient";
 import { CircleX } from "lucide-react";
 
 /**
@@ -145,7 +145,7 @@ function IdentificationItem({
           <CircleX size={60} className="bg-secondary rounded-full active:bg-muted active:shadow-xs shadow-lg" />
         </DialogClose>
         <DialogTitle />
-        <div className="h-full w-full overflow-auto">
+        <div className="h-screen w-screen overflow-auto">
           <Box
             box={box}
             className={className}
@@ -194,7 +194,7 @@ export default function Identification({
     [identification.content],
   );
 
-  const { isMobile } = useClient();
+  const isMobile = useIsMobile(1200);
 
   const incrementIdentified = useCallback(() => {
     const newIdentified = response.identified + 1;

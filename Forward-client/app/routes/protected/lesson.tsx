@@ -21,7 +21,7 @@ import ConceptMap from "@/features/curriculum/components/conceptmap";
 import DndMatch from "@/features/curriculum/components/dndmatch";
 import FillInTheBlank from "@/features/curriculum/components/fillintheblank";
 import Slideshow from "@/features/curriculum/components/slideshow";
-import { useClient } from "@/hooks/useClient";
+import { useIsMobile } from "@/hooks/useClient";
 import {
   Accordion,
   AccordionContent,
@@ -209,7 +209,7 @@ const ScrollToTopButton= memo(()=> {
 
 export function TableOfContents() {
   const dispatch = useDispatch();
-  const { isMobile } = useClient();
+  const isMobile  = useIsMobile();
   const [showFullToc, setShowFullToc] = useState(false);
   const activities = useSelector((state: RootState) => state.lesson.lesson?.activities);
 const current_activity = useSelector((state: RootState) => state.lesson.current_activity);

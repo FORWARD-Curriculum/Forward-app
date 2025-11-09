@@ -1,37 +1,40 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-export const useClient = (): {
-  windowDimensions: { width: number; height: number };
-  isMobile: boolean;
-} => {
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-    isMobile: window.innerWidth <= 1024,
-  });
+const getWindowSize = () => ({
+  width: typeof window !== "undefined" ? window.innerWidth : 0,
+  height: typeof window !== "undefined" ? window.innerHeight : 0,
+});
 
-  const [isMobile, setIsMobile] = useState(
-    window.innerWidth <= 1024
-  );
+export const useWindowDimensions = () => {
+  const [size, setSize] = useState(getWindowSize);
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-        isMobile: window.innerWidth <= 1024,
-      });
-      setIsMobile((prevIsMobile) => {
-        const newIsMobile = window.innerWidth <= 1024;
-        if (prevIsMobile !== newIsMobile) {
-          return newIsMobile;
-        }
-        return prevIsMobile;
-      });
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const onResize = () => setSize(getWindowSize());
+    window.addEventListener("resize", onResize);
+    // Initialize in case of SSR hydration mismatch
+    onResize();
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  return { windowDimensions, isMobile };
+  return size;
 };
+
+export const useIsMobile = (breakpoint: number = 1024) => {
+  const [isMobile, setIsMobile] = useState(getWindowSize().width < breakpoint);
+  useEffect(() => {
+    const onResize = () => {
+      setIsMobile(getWindowSize().width < breakpoint)
+    };
+    window.addEventListener("resize", onResize);
+    onResize();
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return isMobile;
+};
+
+export function useClient() {
+  // compose if you still want a single export
+  const isMobile = useIsMobile();
+  const windowDimensions = useWindowDimensions();
+  return { isMobile, windowDimensions };
+}
