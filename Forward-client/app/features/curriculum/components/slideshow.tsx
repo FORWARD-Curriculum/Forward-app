@@ -40,8 +40,8 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
   }, [api]);
 
   return (
-    <div className="flex w-full flex-col-reverse items-center lg:flex-col mt-5 lg:mt-4 gap-2">
-            <Carousel setApi={setApi} className="w-full max-w-xs md:max-w-2xl lg:max-w-4xl lg:aspect-video">
+    <div className="flex w-full flex-col-reverse items-center lg:flex-col mt-10 lg:mt-4 gap-2">
+            <Carousel setApi={setApi} className="w-full max-w-xs md:max-w-2xl lg:max-w-4xl ">
         <CarouselContent>
           {slideshow.slides.map((example, index) => (
             <CarouselItem

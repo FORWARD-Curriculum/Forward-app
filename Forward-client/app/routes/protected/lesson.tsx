@@ -167,7 +167,7 @@ export function Activity({ activity }: { activity: BaseActivity }) {
   }
 }
 
-const ScrollToTopButton= memo(()=> {
+const ScrollToTopButton = memo(() => {
   const [showsScrollBtn, setShowsScrollBtn] = useState(false);
 
   useEffect(() => {
@@ -205,14 +205,18 @@ const ScrollToTopButton= memo(()=> {
       </p>
     </button>
   );
-})
+});
 
 export function TableOfContents() {
   const dispatch = useDispatch();
-  const isMobile  = useIsMobile();
+  const isMobile = useIsMobile();
   const [showFullToc, setShowFullToc] = useState(false);
-  const activities = useSelector((state: RootState) => state.lesson.lesson?.activities);
-const current_activity = useSelector((state: RootState) => state.lesson.current_activity);
+  const activities = useSelector(
+    (state: RootState) => state.lesson.lesson?.activities,
+  );
+  const current_activity = useSelector(
+    (state: RootState) => state.lesson.current_activity,
+  );
   const lesson_title = useSelector(
     (state: RootState) => state.lesson.lesson?.title,
   );
@@ -238,28 +242,28 @@ const current_activity = useSelector((state: RootState) => state.lesson.current_
         >
           <AccordionTrigger className="bg-secondary border-secondary-border text-secondary-foreground data-[state=open]:border-b-muted-foreground/50 relative rounded-t-3xl border-1 p-4 duration-50 data-[state=closed]:rounded-3xl data-[state=closed]:delay-300 data-[state=open]:rounded-b-none data-[state=open]:border-b-1">
             <span
-    role="button"
-    tabIndex={0}
-    aria-label="Toggle full Table of Contents"
-    className="bg-foreground border-secondary-border absolute top-2.75 -left-15 rounded-full border-1 p-2 transition-transform duration-100 ease-in-out group-data-[state=closed]:scale-0 hover:scale-110 hover:duration-75"
-    onClick={(e) => {
-      e.stopPropagation();
-      setShowFullToc((v) => !v);
-    }}
-    onKeyDown={(e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        e.stopPropagation();
-        setShowFullToc((v) => !v);
-      }
-    }}
-    title="Toggle full Table of Contents"
-  >
-    {showFullToc ? <ChevronsDownUp /> : <ChevronsUpDown />}
-  </span>
+              role="button"
+              tabIndex={0}
+              aria-label="Toggle full Table of Contents"
+              className="bg-foreground border-secondary-border absolute top-2.75 -left-15 rounded-full border-1 p-2 transition-transform duration-100 ease-in-out group-data-[state=closed]:scale-0 hover:scale-110 hover:duration-75"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowFullToc((v) => !v);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowFullToc((v) => !v);
+                }
+              }}
+              title="Toggle full Table of Contents"
+            >
+              {showFullToc ? <ChevronsDownUp /> : <ChevronsUpDown />}
+            </span>
             <h1
               title={`${lesson_title}: Table of Contents`}
-              className="w-[20ch] overflow-hidden text-lg font-bold text-nowrap overflow-ellipsis hover:underline lg:w-[30ch]"
+              className="w-[20ch] overflow-hidden text-lg font-bold lg:text-nowrap lg:overflow-ellipsis hover:underline lg:w-[30ch]"
             >
               {lesson_title}: Table of Contents
             </h1>
@@ -271,8 +275,7 @@ const current_activity = useSelector((state: RootState) => state.lesson.current_
                 : [...(activities || [])].splice(
                     current_activity < 6
                       ? 0
-                      : current_activity + 6 >
-                          activities!.length
+                      : current_activity + 6 > activities!.length
                         ? activities!.length - 12
                         : current_activity - 6,
                     12,
@@ -461,7 +464,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
   }, [loaderData]);
 
   return (
-    <div className="m-4 lg:mr-8 flex w-full max-w-screen flex-col items-center gap-4 lg:mt-7 lg:mb-12 lg:ml-24 lg:flex-row lg:items-start lg:gap-8">
+    <div className="m-4 flex w-full max-w-screen flex-col items-center gap-4 lg:mt-7 lg:mr-8 lg:mb-12 lg:ml-24 lg:flex-row lg:items-start lg:gap-8">
       <TableOfContents />
       <div className="bg-secondary border-secondary-border text-secondary-foreground flex min-h-min w-full min-w-0 flex-col rounded-3xl border-1 p-4">
         <h1 className="text-2xl font-bold">
