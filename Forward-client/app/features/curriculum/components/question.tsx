@@ -8,7 +8,7 @@ export default function Question({
   answer,
   onAnswerChange,
   onCheckAnswer,
-  disabled,
+  // disabled,
 }: {
   question: Question;
   questionNumber: number;
@@ -28,7 +28,9 @@ export default function Question({
   );
   const selectedAnswers = answer?.response_data?.selected || [];
   // question state
-  const isDisabled = disabled || (answer?.attempts_left ?? 3) <= 0;
+  // const isDisabled = disabled || (answer?.attempts_left ?? 3) <= 0;
+  const isDisabled = (answer?.attempts_left ?? 3) <= 0;
+
   const isAnswered =
     selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
   

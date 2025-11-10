@@ -20,6 +20,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
     type: "Quiz",
     activity: quiz,
     trackTime: false,
+    disableAutoSave: true,
     initialFields: { 
       score: null, 
       completion_percentage: 0,
@@ -146,7 +147,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
               answer={getAnswerForQuestion(question.id)}
               onAnswerChange={handleAnswerChange}
               onCheckAnswer={handleCheckAnswer}
-              disabled={!response.partial_response}
+              disabled={!response.partial_response} // We might not need this prop anymore
             />
           );
       })}
@@ -197,7 +198,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
                       return 'var(--muted-foreground)';
                     })()
                   }
-                  stroke={index + 1 === currentQuestion ? 'var(--primary)' : undefined}
+                  stroke={index + 1 === currentQuestion ? 'var(--muted-foreground)' : undefined}
                   strokeWidth={index + 1 === currentQuestion ? 2 : 1}
                   size={16}
                 />

@@ -48,6 +48,7 @@ export const useResponse = <
   trackTime=true,
   initialFields,
   nonRootActivity=false,
+  disableAutoSave = false
 }: {
   type: keyof NonNullable<LessonResponse["response_data"]>;
   activity: E;
@@ -55,6 +56,7 @@ export const useResponse = <
   initialFields?: Omit<T, keyof BaseResponse> &
     Partial<Pick<T, keyof BaseResponse>>;
   nonRootActivity?: boolean;
+  disableAutoSave?: boolean;
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const state = useSelector((state: RootState) =>
@@ -95,9 +97,11 @@ export const useResponse = <
   // Save response to store/server on unmount
   useEffect(() => {
     return () => {
-      void saveResponse();
+      if (!disableAutoSave){
+        void saveResponse();
+      }
     };
-  }, []);
+  }, []); // maybe add to dependency array
 
   /**
    * Dispatch to `saveUserResponseThunk` to save the current response state.
