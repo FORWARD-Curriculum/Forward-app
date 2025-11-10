@@ -1211,7 +1211,7 @@ class CustomActivity(BaseActivity):
             raise ValidationError("The uploaded file is not a valid text file and could not be read.")
         finally:
             file.seek(0)
-        if re.search(r"window\.parent\.postMessage\({\s*type:\s*\"activityEnd\"\s*},\s*\"\*\"\);", content) is None:
+        if re.search(r"window\.parent\.postMessage\({\s*type:\s*\"activityEnd\"\s*},\s*\"\*\"\)", content) is None:
             raise ValidationError(mark_safe(f"""
                 Custom Activity HTML Files must include at least:<br><br>
                     <code>&lt;script&gt;window.parent.postMessage({{ type: \"activityEnd\" }}, \"*\");&lt;/script&gt;</code><br><br>
