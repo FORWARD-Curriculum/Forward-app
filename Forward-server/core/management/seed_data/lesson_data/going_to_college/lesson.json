@@ -423,10 +423,10 @@
       "content": "***Finances and college***  \nWhat you've heard is true--college is expensive. Here we'll go over some of the cost and share strategies for making college affordable. With the right plan and resources, it's possible to avoid debt, or at least keep your costs lower when attending college.\n\n#### **College Costs Include:**\n\n* **Tuition and Fees**: The amount colleges charge for classes, which can vary widely between community colleges, in-state public universities, and private colleges. Other fees may also be incorporated to cover the cost of services like technology and labs.  \n* **Room and Board**: Housing, which can cost as much as tuition in some cases. Living off-campus or at home can reduce this.  \n* **Meal Plans**: Meal plans allow you to dine on campus. Different colleges will offer different types of meal plans and you can usually opt out if you prefer to cook your own meals to keep costs down.  \n* **Books and Supplies**: Textbooks and other materials can add up, but there are ways to save (like renting or buying used).  \n* **Health Insurance**: Many colleges require students to have health insurance through the college or privately.  \n* **Transportation**: Costs for getting to and from college, whether it's gas, a bus pass, or plane tickets.  \n* **Personal Expenses**: Everyday needs like toiletries, laundry, or entertainment.\n\n#### **Factors That Change Costs:**\n\n* **Type of College**: Community colleges tend to be the least expensive, while private universities cost more.  \n* **In-State vs. Out-of-State**: Public universities usually charge less for in-state students.  \n* **Scholarships and Financial Aid**: These can significantly reduce costs, so students should always apply for aid.  \n* **Living Situation**: Living at home, on-campus, or off-campus changes the overall cost."
     },
     {
-      "type": "textcontent",
+      "type": "customactivity",
       "title": "College Cost Calculator",
-      "instructions": null,
-      "content": "Try out the college cost calculator to better understand how different options can impact the cost of college. Pay attention to whether you are looking at the costs by semester, academic year, or for a full 4-year degree.\n[College cost calculator]"
+      "instructions": "Try out the college cost calculator to better understand how different options can impact the cost of college. Pay attention to whether you are looking at the costs by semester, academic year, or for a full 4-year degree.",
+      "document": "cost_calculator.html"
     },
     {
       "type": "video",

@@ -56,6 +56,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import MarkdownTTS from "@/components/ui/markdown-tts";
+import CustomActivity from "@/features/curriculum/components/customactivity";
 
 export async function clientLoader({
   params,
@@ -159,6 +160,13 @@ export function Activity({ activity }: { activity: BaseActivity }) {
         <Slideshow
           key={key}
           slideshow={activity as ActivityManager["Slideshow"][0]}
+        />
+      );
+    case "CustomActivity":
+      return (
+        <CustomActivity
+          key={key}
+          custom_activity={activity as ActivityManager["CustomActivity"][0]}
         />
       );
     // No default case needed, as all types are handled
@@ -399,7 +407,7 @@ export function NextActivity() {
         <ArrowRightIcon className="!text-primary-foreground" />
       </button>
       <Dialog open={showComplete} onOpenChange={setShowComplete}>
-        <DialogContent className="bg-secondary border-secondary-border">
+        <DialogContent className="bg-secondary border-secondary-border max-w-120">
           <DialogHeader>
             <DialogTitle className="text-center text-2xl">
               🎉 Lesson Complete! 🎉

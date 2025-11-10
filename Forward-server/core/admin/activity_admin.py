@@ -1,7 +1,9 @@
-from core.models import (Lesson, ActivityManager, BaseActivity, Twine, TextContent, Quiz, Question, Poll, PollQuestion, Writing, Embed, DndMatch, Concept, ConceptMap, Video, LikertScale, FillInTheBlank, Identification, IdentificationItem, Slideshow, Slide)
+from core.models import (Lesson, ActivityManager, BaseActivity, Twine, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
+                         Embed, DndMatch, Concept, ConceptMap, Video, LikertScale, FillInTheBlank, Identification, IdentificationItem,
+                         Slideshow, Slide, CustomActivity, CustomActivityImageAsset)
 from django import forms
 from .admin import custom_admin_site
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from django.contrib import admin
 from django import core
 import json
@@ -12,7 +14,7 @@ from django.utils.text import capfirst
 from adminsortable2.admin import SortableTabularInline, SortableAdminMixin, SortableStackedInline
 from django.shortcuts import redirect, get_object_or_404
 from django.db import transaction
-
+from django.utils.safestring import mark_safe
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
@@ -168,10 +170,10 @@ def _image_tag(url: str | None, max_h=500, max_w=800):
     if not url:
         return "No Image"
     return format_html(
-        '<img src="{}" style="max-height: {}px; max-width: {}px; width:100%; height: 100%;" />',
+        '<img src="{}" style="max-width:{}px; max-height:{}px; width:auto; height:auto;" />',
         url,
-        max_h,
         max_w,
+        max_h,
     )
 
 class BaseActivityAdmin(admin.ModelAdmin):
@@ -208,6 +210,86 @@ class SlideshowAdmin(SortableAdminMixin, BaseActivityAdmin):
     grouping = "Activities"
     inlines = [SlideInline]
     list_display = ("title", "lesson", "order")
+
+class CustomActivityAssetInline(admin.TabularInline):
+    model=CustomActivityImageAsset
+    readonly_fields = ("image_preview","image_name")
+    extra = 0
+
+    def image_preview(self, obj: CustomActivityImageAsset):
+        return _image_tag(obj.image.url, max_h=100)
+    
+    def image_name(self, obj: CustomActivityImageAsset):
+        return format_html("<p>{}</p>",obj.name)
+
+    image_preview.short_description = "Image Thumbnail"
+    image_name.short_description = "Image Name"
+
+@admin.register(CustomActivity, site=custom_admin_site)
+class CustomActivityAdmin(BaseActivityAdmin):
+    grouping = "Activities"
+    inlines = [CustomActivityAssetInline]
+    list_display = ("title", "lesson", "order")
+    readonly_fields = ("preview","referenced_images")
+    
+    def referenced_images(self, obj: CustomActivity):
+        images = obj.referenced_images()
+        items_html = format_html_join("", "<li>{}</li>", ((img,) for img in images))
+        return format_html("<ul>{}</ul>", items_html)
+    
+    referenced_images.short_description = "Detected Images"
+    
+    def preview(self, obj: CustomActivity):
+        data = obj.to_dict()
+        images_json = json.dumps(data["images"])
+
+        # Read the HTML content from the uploaded file
+        doc_content = ""
+        if obj.document:
+            try:
+                obj.document.seek(0)  # Ensure we read from the start
+                doc_content = obj.document.read().decode('utf-8')
+            except (FileNotFoundError, ValueError):
+                doc_content = "<p>Error: Could not read the document file.</p>"
+        
+        # Use srcdoc to embed the HTML directly, ensuring same-origin
+        return format_html(
+            """
+            <style>
+            .readonly:has(iframe) {{flex-grow: 1;}}
+            </style>
+            <script>
+                function replace_src(event) {{
+                    try {{
+                        const iframe = event.currentTarget;
+                        const images = JSON.parse(iframe.dataset.images);
+                        const imap = new Map(Object.entries(images));
+                        const doc = iframe.contentWindow?.document;
+                        if (!doc) return;
+
+                        const tags = doc.querySelectorAll("img");
+                        tags.forEach((t) => {{
+                            const src = t.getAttribute("src") || t.src;
+                            if (imap.has(src)) {{
+                                t.src = imap.get(src);
+                            }}
+                        }});
+                    }} catch (err) {{
+                        console.error("replace_src error:", err);
+                    }}
+                }}
+            </script>
+            <iframe
+                srcdoc="{doc_content}"
+                onload="replace_src(event)"
+                sandbox="allow-scripts allow-same-origin"
+                data-images='{images_json}'
+                style="width:100%;height:auto;min-height: 1000px;border:1px solid #ccc;">
+            </iframe>
+            """,
+            doc_content=doc_content,
+            images_json=mark_safe(images_json),
+        )
 
 class IdentificationItemInline(admin.StackedInline):
     model=IdentificationItem
