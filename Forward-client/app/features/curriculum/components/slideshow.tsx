@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { Circle } from "lucide-react";
 import { useResponse } from "../hooks";
 import { useIsMobile } from "@/hooks/useClient";
+import { srcsetOf } from "@/utils/utils";
 
 export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
   const [api, setApi] = useState<CarouselApi>();
@@ -50,7 +51,9 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
             >
               {example.image && (
                 <img
-                  src={example.image}
+                  src={example.image.thumbnail}
+                  srcSet={srcsetOf(example.image)}
+                  sizes="(max-width: 1020px) 82vw, 31vw"
                   alt=""
                   className="max-h-100 w-auto rounded-3xl shadow-md"
                 />

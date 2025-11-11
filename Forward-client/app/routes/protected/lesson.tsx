@@ -6,7 +6,7 @@ import {
   ActivityTypeDisplayNames,
 } from "@/features/curriculum/types";
 import type { Route } from "./+types/lesson";
-import { apiFetch } from "@/utils/utils";
+import { apiFetch, srcsetOf } from "@/utils/utils";
 import { useSelector, useDispatch } from "react-redux";
 import store, { type RootState } from "@/store";
 import { act, useEffect, useCallback, memo } from "react";
@@ -493,7 +493,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
         {activity?.instructions_image && (
           <img
             className="mb-4 h-auto max-h-100 w-auto max-w-full rounded-xl object-contain"
-            src={activity.instructions_image}
+            src={activity.instructions_image.thumbnail} srcSet={srcsetOf(activity.instructions_image)}
             alt=""
           ></img>
         )}

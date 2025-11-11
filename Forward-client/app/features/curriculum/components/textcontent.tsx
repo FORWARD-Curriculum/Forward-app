@@ -16,6 +16,7 @@ import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CircleX, Pointer } from "lucide-react";
 import { useIsMobile } from "@/hooks/useClient";
+import { srcsetOf } from "@/utils/utils";
 
 export default function TextContent({
   textContent,
@@ -39,10 +40,12 @@ export default function TextContent({
           <Dialog>
             <DialogTrigger className="relative overflow-clip p-4">
               {!isImageLoaded && (
-                <Skeleton className="h-140 min-h-140 w-full min-w-2xl rounded-xl" />
+                <Skeleton className="min-h-70 lg:h-140 lg:min-h-140 aspect-square w-full lg:min-w-2xl rounded-xl" />
               )}
               <img
-                src={textContent.image}
+                src={textContent.image.thumbnail}
+                srcSet={srcsetOf(textContent.image)}
+                sizes="(max-width: 1020px) 74vw, 43vw"
                 onLoad={() => setIsImageLoaded(true)}
                 className={`max-h-140 w-full cursor-zoom-in rounded-xl shadow-lg ${isImageLoaded ? "block" : "hidden"} `}
               />
@@ -54,6 +57,7 @@ export default function TextContent({
             </DialogTrigger>
             <DialogClose className="sticky" />
             <DialogContent
+              aria-describedby={undefined}
               className={
                 isMobile
                   ? "h-screen w-screen max-w-none gap-0 p-0"
@@ -61,6 +65,7 @@ export default function TextContent({
               }
               hideCloseIcon
             >
+              <DialogTitle/>
               <DialogClose
                 asChild
                 className="fixed right-2.5 z-[99999999999] p-1"
@@ -88,8 +93,8 @@ export default function TextContent({
                   className={
                     isMobile ? "w-fit max-w-[300vw]" : "w-full max-w-none"
                   }
-                  src={textContent.image}
-                ></img>
+                  src={textContent.image.original}
+                />
               </div>
             </DialogContent>
           </Dialog>

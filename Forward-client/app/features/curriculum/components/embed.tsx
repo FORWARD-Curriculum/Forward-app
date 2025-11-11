@@ -28,7 +28,7 @@ export default function Embed({ embed }: { embed: Embed }) {
             }}
           />
           <button className="text-primary-foreground bg-primary rounded-3xl p-2"
-          onClick={saveResponse}>
+            onClick={()=>saveResponse()}>
             Submit code
           </button>
         </div>

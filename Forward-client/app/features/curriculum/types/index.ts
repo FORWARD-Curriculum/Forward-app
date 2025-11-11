@@ -1,5 +1,7 @@
 // Fields should always be snake_case, and class names should always be ProperCase
 
+import type { Image } from "@/utils/utils";
+
 export interface Lesson {
   id: string;
   title: string;
@@ -7,7 +9,7 @@ export interface Lesson {
   objectives: string[];
   order: number;
   tags: string[];
-  image: string | undefined;
+  image: Image;
   activities: BaseActivity[];
   completion: number;
 }
@@ -93,13 +95,13 @@ export interface BaseActivity {
   }[keyof ActivityManager];
   title: string;
   instructions: string | null;
-  instructions_image: string | null;
+  instructions_image: Image | null;
   order: number;
 }
 
 export interface TextContent extends BaseActivity {
   content?: string;
-  image?: string; // Optional image URL to accompany the text content
+  image?: Image; // Optional image URL to accompany the text content
 }
 
 export interface Video extends BaseActivity {
@@ -181,7 +183,7 @@ export interface ConceptMap extends BaseActivity {
   content: string;
   concepts: {
     title: string;
-    image?: string;
+    image?: Image;
     description: string;
     examples: {
       name: string;
@@ -197,7 +199,7 @@ export interface ConceptMap extends BaseActivity {
  */
 export interface Identification extends BaseActivity {
   content: {
-    image: string;
+    image: Image;
     areas: [number, number, number, number][]
     hints: boolean;
   }[];
@@ -223,7 +225,7 @@ export interface Twine extends BaseActivity {
 }
 
 export interface Slideshow extends BaseActivity {
-  slides: {content: string; image: string | null}[]
+  slides: {content: string; image: Image | null}[]
 }
 
 export interface CustomActivity extends BaseActivity {
