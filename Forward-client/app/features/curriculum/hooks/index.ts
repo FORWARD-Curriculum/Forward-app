@@ -122,7 +122,7 @@ export const useResponse = <
         trackTime,
       }),
     );
-    if (saved.meta.requestStatus === "fulfilled")
+    if (saved.meta.requestStatus === "fulfilled" && saved.payload !== undefined)
       setResponse((saved.payload as { response: BaseResponse }).response as T);
   };
 

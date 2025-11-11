@@ -11,11 +11,13 @@ import MarkdownTTS from "@/components/ui/markdown-tts";
 import { useEffect, useState } from "react";
 import { Circle } from "lucide-react";
 import { useResponse } from "../hooks";
+import { useIsMobile } from "@/hooks/useClient";
 
 export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
+  const isMobile = useIsMobile(1610);
 
   useResponse<SlideshowResponse, SlideshowType>({
     activity: slideshow,
@@ -38,8 +40,8 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
   }, [api]);
 
   return (
-    <div className="flex w-full flex-col-reverse items-center lg:flex-col mt-4 gap-2">
-            <Carousel setApi={setApi} className="w-full max-w-4xl lg:aspect-video">
+    <div className="flex w-full flex-col-reverse items-center lg:flex-col mt-10 lg:mt-4 gap-2">
+            <Carousel setApi={setApi} className="w-full max-w-xs md:max-w-2xl lg:max-w-4xl ">
         <CarouselContent>
           {slideshow.slides.map((example, index) => (
             <CarouselItem
@@ -60,8 +62,8 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious  />
-        <CarouselNext />
+        <CarouselPrevious className={isMobile?"-top-5.5 left-16 absolute":""}  />
+        <CarouselNext className={isMobile?"-top-5.5 right-16 absolute":""}/>
       </Carousel>
       {/* Dots (desktop only) */}
       <div className="hidden lg:flex">

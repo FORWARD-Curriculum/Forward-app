@@ -51,6 +51,7 @@ export type ActivityManager = {
   Twine: [Twine, TwineResponse, false];
   FillInTheBlank: [FillInTheBlank, FillInTheBlankResponse, false];
   Slideshow: [Slideshow,SlideshowResponse,false];
+  CustomActivity: [CustomActivity, CustomActivityResponse, false];
 };
 
 /**
@@ -75,7 +76,8 @@ export const ActivityTypeDisplayNames: Record<
   Video: "Video",
   Twine: "Twine",
   FillInTheBlank: "Fill In The Blank",
-  Slideshow: "Slideshow"
+  Slideshow: "Slideshow",
+  CustomActivity: "Activity"
 };
 
 // #region -------------------------- Activities ---------------------------
@@ -196,8 +198,12 @@ export interface ConceptMap extends BaseActivity {
  * surrounding the correct phrases for the uset to identify.
  */
 export interface Identification extends BaseActivity {
-  content: string;
-  minimum_correct: number;
+  content: {
+    image: string;
+    areas: [number, number, number, number][]
+    hints: boolean;
+  }[];
+  minimum_correct: number | null;
   feedback: string;
 }
 
@@ -220,6 +226,11 @@ export interface Twine extends BaseActivity {
 
 export interface Slideshow extends BaseActivity {
   slides: {content: string; image: string | null}[]
+}
+
+export interface CustomActivity extends BaseActivity {
+  document: string;
+  images: {[key: string]: string;}
 }
 
 // #endregion -------------------------- Activities ---------------------------
@@ -295,8 +306,12 @@ export interface WritingResponse extends BaseResponse {
 
 export interface TextContentResponse extends BaseResponse {}
 export interface SlideshowResponse extends BaseResponse {}
+export interface CustomActivityResponse extends BaseResponse {}
 export interface ConceptMapResponse extends BaseResponse {}
-export interface IdentificationResponse extends BaseResponse {}
+export interface IdentificationResponse extends BaseResponse {
+  identified: number;
+
+}
 export interface PollResponse extends BaseResponse {}
 export interface EmbedResponse extends BaseResponse {
   inputted_code: string;

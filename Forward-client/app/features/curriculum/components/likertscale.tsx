@@ -104,7 +104,7 @@ export default function LikertScale({
                 id={`${rangeId}-label`}
                 className="text-fg flex items-center gap-2 text-lg font-semibold tracking-tight"
               >
-                <p className="bg-accent text-secondary flex aspect-square w-8 items-center justify-center rounded-full">
+                <p className="bg-accent text-secondary flex aspect-square w-8 min-w-8 items-center justify-center rounded-full">
                   {index + 1}
                 </p>
                 {item.statement}

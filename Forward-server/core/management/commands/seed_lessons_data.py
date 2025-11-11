@@ -21,6 +21,8 @@ from core.models import (
     Question,
     Slideshow,
     Slide,
+    IdentificationItem,
+    CustomActivityImageAsset
 )
 
 
@@ -168,6 +170,8 @@ class Command(BaseCommand):
             questions = act.pop("questions", None) if act_type in {"quiz", "poll"} else None
             concepts = act.pop("examples", None) if act_type == "conceptmap" else None
             slides = act.pop("slides", None) if act_type == "slideshow" else None
+            idents = act.pop("content", None) if act_type == "identification" else None
+            custom_images = act.pop("images", None) if act_type == "customactivity" else None
 
             # Build defaults
             defaults = {
@@ -184,6 +188,7 @@ class Command(BaseCommand):
             )
             video_name = defaults.pop("video", None) if act_type == "video" else None
             twine_name = defaults.pop("file", None) if act_type == "twine" else None
+            cust_name = defaults.pop("document", None) if act_type == "customactivity" else None
 
             # Special case: TextContent image referenced in content like ![alt](path)
             if act_type == "textcontent" and not image_name:
@@ -256,6 +261,13 @@ class Command(BaseCommand):
                         rel_path=self.folder_path / twine_name,
                         label=f"{ActivityModel.__name__} asset",
                     )
+                elif act_type == "customactivity" and cust_name:
+                    self._save_model_file(
+                        instance=activity,
+                        field_name="document",
+                        rel_path=self.folder_path / cust_name,
+                        label=f"{ActivityModel.__name__} asset",
+                    )
                     
 
                 # Children
@@ -265,8 +277,12 @@ class Command(BaseCommand):
                     self._create_poll_questions(activity, questions)
                 elif act_type == "conceptmap" and concepts:
                     self._create_concepts(activity, concepts)
+                elif act_type == "identification" and idents:
+                    self._create_idents(activity, idents)
                 elif act_type == "slideshow" and slides:
                     self._create_slides(activity, slides)
+                elif act_type == "customactivity" and custom_images:
+                    self._create_cust_assets(activity, custom_images)
             except Exception as e:
                 self._err(
                     f"Failed to create/update {act_type} (Order: {order}): {e}"
@@ -438,6 +454,83 @@ class Command(BaseCommand):
                 self._err(
                     f"    Failed concept (Order: {order}) for "
                     f"'{cmap.title}': {e}"
+                )
+
+    def _create_cust_assets(self, custom_activity, images: List[str]):
+        self._log(
+            f"  Processing {len(images)} idents for custom activity: {custom_activity.title}"
+        )
+        for order, image_name in enumerate(images, start=1):
+            model_fields = {f.name: f for f in CustomActivityImageAsset._meta.get_fields()}
+            defaults = {
+                k: v
+                for k, v in defaults.items()
+                if k in model_fields and (v is not None or getattr(model_fields[k], "null", False))
+            }
+
+            try:
+                obj, created = IdentificationItem.objects.update_or_create(
+                    custom_activity=custom_activity,
+                    order=order,
+                    defaults=defaults,
+                )
+                if image_name:
+                    self._save_model_file(
+                        instance=obj,
+                        field_name="image",
+                        rel_path=self.folder_path / image_name,
+                        label="Custom Activity Image image",
+                    )
+                self._log(
+                    f"    {'Created' if created else 'Updated'} Custom Activity Image "
+                    f"(Order: {order}): ..."
+                )
+            except Exception as e:
+                self._err(
+                    f"    Failed Custom Activity Image (Order: {order}) for "
+                    f"'{custom_activity.title}': {e}"
+                )
+        
+    def _create_idents(self, ident_parent, boxes: List[dict]):
+        self._log(
+            f"  Processing {len(boxes)} idents for identification: {ident_parent.title}"
+        )
+        for order, payload in enumerate(boxes, start=1):
+            payload = payload.copy()
+            image_filename = payload.pop("image", None)
+
+            model_fields = {f.name: f for f in IdentificationItem._meta.get_fields()}
+            defaults = {
+                "hints": payload.get("hints",True),
+                "areas": payload.get("areas"),
+            }
+            defaults = {
+                k: v
+                for k, v in defaults.items()
+                if k in model_fields and (v is not None or getattr(model_fields[k], "null", False))
+            }
+
+            try:
+                obj, created = IdentificationItem.objects.update_or_create(
+                    identification=ident_parent,
+                    order=order,
+                    defaults=defaults,
+                )
+                if image_filename:
+                    self._save_model_file(
+                        instance=obj,
+                        field_name="image",
+                        rel_path=self.folder_path / image_filename,
+                        label="Identification image",
+                    )
+                self._log(
+                    f"    {'Created' if created else 'Updated'} Identification Item "
+                    f"(Order: {order}): ..."
+                )
+            except Exception as e:
+                self._err(
+                    f"    Failed Identification Item (Order: {order}) for "
+                    f"'{ident_parent.title}': {e}"
                 )
 
     def _create_slides(self, slideshow: Slideshow, slides: List[dict]):

@@ -124,7 +124,7 @@ class LessonService:
             [_, Response, _, child_class] = value[:4]
             if not child_class:
                 responses += Response.objects.filter(lesson=lesson,user=user).count()
-        return responses/lesson.total_activities
+        return (responses/lesson.total_activities) if lesson.total_activities != 0 else 0
     
     @staticmethod
     def get_lesson_content(lesson_id):
