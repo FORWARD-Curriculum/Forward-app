@@ -5,14 +5,12 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useAuth } from "@/features/account/hooks";
 import { toast } from "sonner";
-import { apiFetch } from "@/utils/utils";
+import { apiFetch, useTitle } from "@/utils/utils";
 
 export default function Login() {
   const [error, setError] = useState(null);
   const login = useAuth().login;
-  const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from || "/dashboard";
+  useTitle('Login | FORWARD')
 
   const handleSubmit = async (e: any) => {
     e.preventDefault(); // Prevent the default form submission behavior
