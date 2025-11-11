@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/useClient";
 import { CircleX, Pointer } from "lucide-react";
+import { srcsetOf } from "@/utils/utils";
 
 /**
  * Converts an area array to a stable string key.
@@ -41,8 +42,9 @@ function Box({
       className={`relative ${isDialog ? "w-fit" : (className ?? "")} shadow-lg`}
     >
       <img
-        src={(box as any)._image['src']}
-        srcSet={(box as any)._image['srcset']}
+        src={isDialog ? box.image.original : box.image.thumbnail}
+        srcSet={isDialog ? undefined : srcsetOf(box.image)}
+        sizes={isDialog ? "100vw":"76vw"}
         className={`block h-auto ${isDialog ? "max-w-[300vw]" : "w-full"}`}
         alt=""
       />

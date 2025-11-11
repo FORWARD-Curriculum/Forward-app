@@ -21,6 +21,7 @@ import React, {
 import { ArrowRight, Circle, Lock } from "lucide-react";
 import { useResponse } from "../hooks";
 import { useIsMobile } from "@/hooks/useClient";
+import { srcsetOf } from "@/utils/utils";
 import CircularProgress from "@/components/ui/cprogress";
 
 function NextSlide({
@@ -231,7 +232,9 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
             >
               {example.image && (
                 <img
-                  src={example.image}
+                  src={example.image.thumbnail}
+                  srcSet={srcsetOf(example.image)}
+                  sizes="(max-width: 1020px) 82vw, 31vw"
                   alt=""
                   className="max-h-100 w-auto rounded-3xl shadow-md"
                 />

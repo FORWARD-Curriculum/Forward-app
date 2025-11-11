@@ -181,6 +181,8 @@ class Command(BaseCommand):
             }
 
             # File hints from payload (removed from defaults; handled post-create)
+            instructions_image_name = defaults.pop("instructions_image", None)
+            
             image_name = (
                 defaults.pop("image", None)
                 if act_type in {"textcontent", "fillintheblank", "quiz"}
@@ -246,11 +248,11 @@ class Command(BaseCommand):
                     f"{act_type} (Order: {order}): {activity.title}"
                 )
                 
-                if "instructions_image" in act:
+                if instructions_image_name:
                     self._save_model_file(
                         instance=activity,
                         field_name="instructions_image",
-                        rel_path=self.folder_path / act.pop("instructions_image"),
+                        rel_path=self.folder_path / instructions_image_name,
                         label=f"{ActivityModel.__name__} instr_image asset",
                     )
 

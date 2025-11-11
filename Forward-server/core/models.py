@@ -18,6 +18,10 @@ from django_jsonform.models.fields import JSONField
 from martor.models import MartorField
 from django.utils.safestring import mark_safe
 from django.core.files.storage import default_storage
+from imagefield.fields import ImageField
+from .utils import FwdImage
+
+GENERIC_FORWARD_IMAGE = FwdImage()
 
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
@@ -205,8 +209,9 @@ class Lesson(models.Model):
     )
     
     # image = models.CharField(null=True, blank=True, max_length=200, help_text="Optional image to represent the lesson")
-    image = models.ImageField(upload_to='public/lesson/', null=True, blank=True,
-                              help_text="Optional image to represent the lesson in the dashboard")
+    image = ImageField(upload_to='public/lesson/', blank=True,
+                              help_text="Optional image to represent the lesson in the dashboard",
+                              auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -247,7 +252,7 @@ class Lesson(models.Model):
             "objectives": self.objectives,
             "order": self.order,
             "tags": self.tags,
-            "image": self.image.url if self.image else None,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
         }
 
 
@@ -293,10 +298,11 @@ class BaseActivity(models.Model):
         help_text="Instructions for completing the activity"
     )
     
-    instructions_image = models.ImageField(
+    instructions_image = ImageField(
         upload_to="public/instructions/",
-        blank=True, null=True,
-        help_text="An optional helpful image to display alongside the instructions.")
+        blank=True,
+        help_text="An optional helpful image to display alongside the instructions.",
+        auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -319,7 +325,7 @@ class BaseActivity(models.Model):
             "lesson_id": self.lesson_id,
             "type": self.activity_type,
             "title": self.title,
-            "instructions_image": self.instructions_image.url if self.instructions_image else None,
+            "instructions_image": GENERIC_FORWARD_IMAGE.stringify(self.instructions_image) if self.instructions_image else None,
             "instructions": self.instructions,
             "order": self.order
         }
@@ -339,7 +345,8 @@ class TextContent(BaseActivity):
     # image = models.TextField(
     #     null=True, blank=True, help_text="Optional image to accompany the text content")
     
-    image = models.ImageField(upload_to='public/textcontent/', null=True, blank=True, help_text="Optional image to accompany the text content")
+    image = ImageField(upload_to='public/textcontent/', blank=True,
+                       help_text="Optional image to accompany the text content",auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
     
 
     class Meta:
@@ -358,7 +365,7 @@ class TextContent(BaseActivity):
         return {
             **super().to_dict(),
             "content": self.content,
-            "image": self.image.url if self.image else None,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
         }
 
 
@@ -466,13 +473,7 @@ class Identification(BaseActivity):
             "feedback": self.feedback
         }
         
-from imagefield.fields import ImageField
-FORMATS = {
-            "micro":   ["default", ("thumbnail", (240,  240))],
-            "mobile":  ["default", ("thumbnail", (480,  480))],
-            "tablet":  ["default", ("thumbnail", (800,  800))],
-            "desktop": ["default", ("thumbnail", (1500, 1500))],
-        }
+
 
 class IdentificationItem(models.Model):
     id = models.UUIDField(
@@ -512,7 +513,7 @@ class IdentificationItem(models.Model):
     image = ImageField(
         upload_to='public/identification/items/images', blank=False, null=False, help_text="""The image below automatically shows
         percentage values when hovered. If the tooltop at the bottom is not visible, holding still for a bit will show a tooltop
-        with the percentage of the image you are hovered over.""",auto_add_fields=True, formats={**FORMATS},)
+        with the percentage of the image you are hovered over.""",auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
 
     class Meta:
         ordering = ("order",)
@@ -520,9 +521,8 @@ class IdentificationItem(models.Model):
     def to_dict(self):
         return {
             "areas": [[area['x1'], area['y1'], area['x2'], area['y2']] for area in self.areas] if self.areas else None,
-            "image": self.image.url if self.image else None,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
             "hints": self.hints,
-            # "_image": {"srcset": ", ".join([f"{getattr(self.image, key, None)} {FORMATS[key][1][1][0]}w" for key in FORMATS.keys()]), "src": self.image.micro}
         }
 
 
@@ -1225,7 +1225,8 @@ class Slide(models.Model):
     
     slideshow = models.ForeignKey(to=Slideshow,on_delete=models.CASCADE, related_name='slides')
     content = MartorField(default="")
-    image = models.ImageField(upload_to='public/slideshow/slides/images', blank=True, null=True)
+    image = ImageField(upload_to='public/slideshow/slides/images', blank=True,
+                       auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
     order = models.PositiveIntegerField(
         default=0,
         blank=False,
@@ -1238,7 +1239,7 @@ class Slide(models.Model):
     def to_dict(self):
         return {
             "content": self.content,
-            "image": self.image.url if self.image else None
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None
         }
 
 class CustomActivity(BaseActivity):
