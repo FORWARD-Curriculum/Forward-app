@@ -212,41 +212,6 @@ class ResponseService:
 
 class QuizResponseService:
     @staticmethod
-    def __get_feedback_for_score(quiz, score):
-        """
-        (Private method)
-        Get the appropriate feedback based on the quiz score
-
-
-        Args:
-            quiz: The Quiz object
-            score: The user's score
-
-
-        Returns:
-            str: The feedback message
-        """
-        if not quiz.feedback_config or 'ranges' not in quiz.feedback_config:
-            return quiz.feedback_config.get('default', '')
-
-
-        ranges = quiz.feedback_config.get('ranges', [])
-        default_feedback = quiz.feedback_config.get('default', '')
-
-
-        for range_config in ranges:
-            min_score = range_config.get('min', 0)
-            max_score = range_config.get('max', 0)
-
-
-            if min_score <= score <= max_score:
-                return range_config.get('feedback', default_feedback)
-
-
-        return default_feedback
-
-    
-    @staticmethod
     @transaction.atomic
     def submit_quiz_response(validated_data, request):
         """
@@ -328,7 +293,7 @@ class QuizResponseService:
 
                     if not quiz_response.partial_response:
                         quiz_response.calculate_score()
-                        feedback = QuizResponseService.__get_feedback_for_score(quiz, quiz_response.score)
+                        
 
 
                     question_response.save()
@@ -352,7 +317,7 @@ class QuizResponseService:
             # calculate score if not partial
             if not quiz_response.partial_response:
                 quiz_response.calculate_score()
-                feedback = QuizResponseService.__get_feedback_for_score(quiz, quiz_response.score)
+                feedback = ""
                 quiz_response.completion_percentage = 100.0
             else:
                 feedback = ''
@@ -360,6 +325,7 @@ class QuizResponseService:
             quiz_response.save()
             
             # return wrapper with feedback
+            # TODO remove dependencies and connections to this wrapper
             class QuizResponseWrapper:
                 def __init__(self, quiz_response, feedback):
                     self.quiz_response = quiz_response
