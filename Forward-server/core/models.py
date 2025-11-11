@@ -437,6 +437,9 @@ class Identification(BaseActivity):
 
 class Quiz(BaseActivity):
     """Model for quiz activities that contain multiple questions and track scores."""
+
+    image = models.ImageField(upload_to='public/quiz/', null=True, blank=True, help_text="Optional Image to accompany the Quiz")
+
     passing_score = models.PositiveIntegerField(
         help_text="Minimum score required to pass the quiz",
         default=80
@@ -464,7 +467,8 @@ class Quiz(BaseActivity):
             **super().to_dict(),
             "passing_score": self.passing_score,
             "feedback_config": self.feedback_config,
-            "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')]
+            "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')],
+            "image": self.image.url if self.image else None,
         }
 
 
@@ -519,6 +523,9 @@ class Question(models.Model):
         ('true_false', 'True/False'),
         ('multiple_select', 'Multiple Select'),
     ]
+
+    image = models.ImageField(upload_to='public/question/', null=True, blank=True, help_text="Optional image to accompany the Question")
+
     # User's ge`ne`rated uuid
     id = models.UUIDField(
         primary_key=True,
@@ -611,7 +618,8 @@ class Question(models.Model):
             "choices": self.choices,
             "is_required": self.is_required,
             "order": self.order,
-            "feedback_config": self.feedback_config
+            "feedback_config": self.feedback_config,
+            "image": self.image.url if self.image else None
         }
 
 class Poll(BaseActivity):
@@ -962,7 +970,7 @@ class Concept(BaseActivity):
         help_text="The concept map this concept belongs to"
     )
 
-    image = models.ImageField(upload_to='publiic/concept/', blank=False, null=False, help_text="An image representing the concept.")
+    image = models.ImageField(upload_to='public/concept/', blank=False, null=False, help_text="An image representing the concept.")
 
     description = MartorField(
         help_text="A detailed description of the concept"

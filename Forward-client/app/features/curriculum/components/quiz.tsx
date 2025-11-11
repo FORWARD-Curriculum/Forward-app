@@ -101,19 +101,19 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
     const answer = getAnswerForQuestion(questionId);
     
     if (!answer) {
-      return 'unanswered'; // Grey - no attempt yet
+      return 'unanswered'; // White - no attempt yet
     }
     
     if (answer.is_correct === true) {
       return 'correct'; // Green - correct answer
     }
     
-    if (answer.attempts_left === 0 && answer.is_correct === false) {
-      return 'exhausted'; // Red - all attempts used, still wrong
-    }
+    // if (answer.attempts_left === 0 && answer.is_correct === false) {
+    //   return 'exhausted'; // Red - all attempts used, still wrong
+    // }
     
     if (answer.is_correct === false) {
-      return 'attempted'; // Blue - attempted but not correct yet
+      return 'attempted'; // Grey - attempted but not correct yet
     }
     
     return 'unanswered'; // Grey - fallback
@@ -133,6 +133,18 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
       {response.score !== null && (
         <div className="mb-4 text-sm font-medium">
           Score: {response.score} / {quiz.questions.length}
+        </div>
+      )}
+
+      {/* Quiz-level image */}
+      {quiz.image && (
+        <div className="mb-6">
+          <img 
+            src={quiz.image} 
+            alt={quiz.title} 
+            className="w-full max-w-lg mx-auto rounded-lg shadow-sm border border-muted object-cover"
+            style={{ maxHeight: '300px' }}  
+          />
         </div>
       )}
       
@@ -193,12 +205,13 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
                       const status = getQuestionStatus(quiz.questions[index].id);
                       //TODO add green into our tailwind
                       if (status === 'correct') return '#00a63e'; //equivalent to tailwind green-600
-                      if (status === 'exhausted') return 'var(--error)'; 
-                      if (status === 'attempted') return 'var(--accent)'; 
-                      return 'var(--muted-foreground)';
+                      // if (status === 'exhausted') return 'var(--error)'; 
+                      if (status === 'attempted') return 'var(--muted-foreground)'; 
+                      return 'var(--color-white)'; 
                     })()
                   }
-                  stroke={index + 1 === currentQuestion ? 'var(--muted-foreground)' : undefined}
+                  // stroke={index + 1 === currentQuestion ? 'var(--muted-foreground)' : undefined}
+                  stroke="var(--muted-foreground)" 
                   strokeWidth={index + 1 === currentQuestion ? 2 : 1}
                   size={16}
                 />
