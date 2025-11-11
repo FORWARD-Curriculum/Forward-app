@@ -3,19 +3,19 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
 from django.urls import reverse
 from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
 import uuid
 import boto3  # pyright: ignore[reportMissingImports]
 from django.conf import settings
 # pyright: ignore[reportMissingImports]
 from botocore.exceptions import ClientError
-import re
+import re, os
 import json
 import copy
 from django_jsonform.models.fields import JSONField
 from martor.models import MartorField
 from django.utils.safestring import mark_safe
 from django.core.files.storage import default_storage
-
 
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
@@ -1188,6 +1188,104 @@ class Slide(models.Model):
             "image": self.image.url if self.image else None
         }
 
+class CustomActivity(BaseActivity):
+    """
+        Allows html documents to be uploaded for custom activities. Handles images by replacing
+        <img> tags in place via regex. All functionality is expected to be inlined;
+        no external stylesheets/scripts.
+        
+        Completion is notified to FORWARD by firing an "activityEnd" event to window.parent like so:
+        
+        ```html
+        <script>
+            window.parent.postMessage({ type: "activityEnd" }, "*");
+        </script>
+        ```
+    """
+    
+    def validate_passing_script(file):
+        file.seek(0)    
+        try:
+            content = file.read().decode('utf-8')
+        except UnicodeDecodeError:
+            raise ValidationError("The uploaded file is not a valid text file and could not be read.")
+        finally:
+            file.seek(0)
+        if re.search(r"window\.parent\.postMessage\({\s*type:\s*\"activityEnd\"\s*},\s*\"\*\"\)", content) is None:
+            raise ValidationError(mark_safe(f"""
+                Custom Activity HTML Files must include at least:<br><br>
+                    <code>&lt;script&gt;window.parent.postMessage({{ type: \"activityEnd\" }}, \"*\");&lt;/script&gt;</code><br><br>
+                to tell FORWARD the activity is completed, and let students proceede in the lesson."""))
+    
+    document = models.FileField(validators=[FileExtensionValidator(allowed_extensions=[
+                                "html"]),validate_passing_script], null=False, blank=False, help_text=mark_safe("""
+                                    This is an HTML document that has no external dependencies other than image files.<br>
+                                    Once this activity is saved, all detected images in the document will be displayed below.
+                                    Images that are referenced can furthermore be uploaded farther down below BUT must have the
+                                    exact same name as found in the "Detected Images" section for them to work.<br>
+                                    Once those images are saved, the preview should show the expected document as was in your
+                                    editor of choice. This is the same exact view students will have in-app.<br><br>Provided under
+                                    the following dropdown is an AI prompt you can copy and paste at the start of creating a custom activity
+                                    to hopefully ensure you do not get any errors on upload.
+                                    <details><summary>AI Prompt</summary>
+                                    <code>
+                                        SYSTEM:: You are a frontend developer tasked with taking some description of a simple activity and writing
+                                        code to achieve that vision. Functionally, whenever the activity achieves some state of being "complete",
+                                        you must post a message to the window's parent as follows: `window.parent.postMessage({ type: "activityEnd" }}, "*")` 
+                                        this tells the greater app that the activity is finished and the student may proceed. If you are unsure of what
+                                        constitutes a completion state for the activity you will be tasked to implement, please ask the USER for more
+                                        clarification to ensure correct results. If the activity does not have a completion state, you must still post:
+                                        `window.parent.postMessage({ type: "activityEnd" }}, "*")` to the window's parent by default somewhere in the document.
+                                        If you neglect to do so, the student will be stuck on the activity provided and will be unable to proceed.
+                                        Functionality should, if not specified one way or another by the USER, be reactive to student input via callback
+                                        functions. You may not use any external libraries, as this is a single HTML file bundled with images. DO NOT
+                                        reference external stylesheets or scripts, as only referenced images will be bundled in the full production release
+                                        of the app. Please inline all styles and scripts into `style` and `script` tags, while all images must not be in
+                                        any subdirectory, just the same unpathed filename. When you have re-read over this system prompt at least 3 times,
+                                        respond to the user as an assistant with the phrase "Please describe the activity you have in mind:" and await further
+                                        instruction. Thank you. ::SYSTEM
+                                    </details>
+                                """))
+
+    def referenced_images(self):
+        try:
+            with self.document.storage.open(self.document.name, "rb") as f:
+                f.seek(0)
+                content = f.read(self.document.size).decode("utf-8", errors="replace")
+                found = re.findall(r"<img[^>]+src=[\'\"]?([^\'\"]+\.(?:jpe?g|png|gif|bmp|webp|tiff?))[\'\"]?", content)
+                return found
+        except:
+            return []
+        
+    class Meta:
+        verbose_name = "Custom Activity"
+        verbose_name_plural = "Custom Activities"
+
+    def to_dict(self):
+
+        images = {image.name: image.image.url for image in CustomActivityImageAsset.objects.filter(
+            custom_activity=self)}
+
+        return {
+            **super().to_dict(),
+            "document": self.document.url,
+            "images": images,
+        }
+
+
+class CustomActivityImageAsset(models.Model):
+    image = models.ImageField(
+        upload_to='public/custom_activities/images/', null=False, blank=False)
+
+    custom_activity = models.ForeignKey(
+        to=CustomActivity, on_delete=models.CASCADE, related_name='custom_activity_assets')
+
+    @property
+    def name(self):
+        """Returns image name for regex replacement."""
+        return os.path.basename(self.image.name)
+
+
 class BaseResponse(models.Model):
     """
     Abstract base model for responses.
@@ -1244,6 +1342,23 @@ class BaseResponse(models.Model):
     
 # TODO: Make quiz and question response inherit from BaseResponse, or make
 # them adhere to the contract enforced by BaseResponse
+
+class CustomActivityResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        CustomActivity,
+        on_delete=models.CASCADE,
+        related_name='custom_activity_responses',
+        help_text='The custom activity this response is for'
+    )
+    
+    class Meta:
+        verbose_name = "Custom Activity Response"
+        verbose_name_plural = "Custom Activity Responses"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
 
 class SlideshowResponse(BaseResponse):
     associated_activity = models.ForeignKey(
@@ -1923,6 +2038,7 @@ class ActivityManager():
                               })
         self.registerActivity(Twine, TwineResponse)
         self.registerActivity(Slideshow, SlideshowResponse)
+        self.registerActivity(CustomActivity, CustomActivityResponse)
 
 
 # Register on launch

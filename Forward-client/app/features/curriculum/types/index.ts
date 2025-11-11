@@ -51,6 +51,7 @@ export type ActivityManager = {
   Twine: [Twine, TwineResponse, false];
   FillInTheBlank: [FillInTheBlank, FillInTheBlankResponse, false];
   Slideshow: [Slideshow,SlideshowResponse,false];
+  CustomActivity: [CustomActivity, CustomActivityResponse, false];
 };
 
 /**
@@ -75,7 +76,8 @@ export const ActivityTypeDisplayNames: Record<
   Video: "Video",
   Twine: "Twine",
   FillInTheBlank: "Fill In The Blank",
-  Slideshow: "Slideshow"
+  Slideshow: "Slideshow",
+  CustomActivity: "Activity"
 };
 
 // #region -------------------------- Activities ---------------------------
@@ -224,6 +226,11 @@ export interface Slideshow extends BaseActivity {
   slides: {content: string; image: string | null}[]
 }
 
+export interface CustomActivity extends BaseActivity {
+  document: string;
+  images: {[key: string]: string;}
+}
+
 // #endregion -------------------------- Activities ---------------------------
 
 // #region -------------------------- Responses ----------------------------
@@ -295,6 +302,7 @@ export interface WritingResponse extends BaseResponse {
 
 export interface TextContentResponse extends BaseResponse {}
 export interface SlideshowResponse extends BaseResponse {}
+export interface CustomActivityResponse extends BaseResponse {}
 export interface ConceptMapResponse extends BaseResponse {}
 export interface IdentificationResponse extends BaseResponse {
   identified: number;
