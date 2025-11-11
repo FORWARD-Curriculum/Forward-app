@@ -120,6 +120,7 @@ export interface Quiz extends BaseActivity {
     failing: string;
   };
   questions: Question[];
+  image?: string;
 }
 
 export interface Question {
@@ -137,6 +138,7 @@ export interface Question {
       text: string;
       is_correct: boolean;
     }[];
+    image?: string;
   };
   is_required: boolean;
   attempts?: number;
