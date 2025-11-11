@@ -3,7 +3,7 @@
 .postgres_data/
 minio_data/
 .env*
-# *.mp4
+*.mp4
 !Forward-server/.env.development
 !Forward-client/
 !Forward-client/.env.development
