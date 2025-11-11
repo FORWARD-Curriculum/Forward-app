@@ -13,6 +13,7 @@ import re, os
 import json
 import copy
 from abc import abstractmethod
+from abc import abstractmethod
 from django_jsonform.models.fields import JSONField
 from martor.models import MartorField
 from django.utils.safestring import mark_safe
@@ -465,7 +466,13 @@ class Identification(BaseActivity):
             "feedback": self.feedback
         }
         
-
+from imagefield.fields import ImageField
+FORMATS = {
+            "micro":   ["default", ("thumbnail", (240,  240))],
+            "mobile":  ["default", ("thumbnail", (480,  480))],
+            "tablet":  ["default", ("thumbnail", (800,  800))],
+            "desktop": ["default", ("thumbnail", (1500, 1500))],
+        }
 
 class IdentificationItem(models.Model):
     id = models.UUIDField(
@@ -502,10 +509,10 @@ class IdentificationItem(models.Model):
         up after this Activity has been saved, this means, to see any rectangles you must save at least once.""",
         verbose_name="Coordinates", blank=True, null=True)
     
-    image = models.ImageField(
+    image = ImageField(
         upload_to='public/identification/items/images', blank=False, null=False, help_text="""The image below automatically shows
         percentage values when hovered. If the tooltop at the bottom is not visible, holding still for a bit will show a tooltop
-        with the percentage of the image you are hovered over.""")
+        with the percentage of the image you are hovered over.""",auto_add_fields=True, formats={**FORMATS},)
 
     class Meta:
         ordering = ("order",)
