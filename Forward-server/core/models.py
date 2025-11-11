@@ -505,18 +505,18 @@ class Quiz(BaseActivity):
         default=80
     )
 
-    feedback_config = JSONField(
-        schema={
-            "type": "object",
-            "properties": {
-                "correct": {"type": "string"},
-                "incorrect": {"type": "string"}
-            },
-            "required": ["correct", "incorrect"]
-        },
-        default=dict,
-        help_text="Configuration for correct/incorrect feedback"
-    )
+    # feedback_config = JSONField(
+    #     schema={
+    #         "type": "object",
+    #         "properties": {
+    #             "correct": {"type": "string"},
+    #             "incorrect": {"type": "string"}
+    #         },
+    #         "required": ["correct", "incorrect"]
+    #     },
+    #     default=dict,
+    #     help_text="Configuration for correct/incorrect feedback"
+    # )
 
     class Meta(BaseActivity.Meta):
         verbose_name = "Quiz"
@@ -526,7 +526,7 @@ class Quiz(BaseActivity):
         return {
             **super().to_dict(),
             "passing_score": self.passing_score,
-            "feedback_config": self.feedback_config,
+            # "feedback_config": self.feedback_config,
             "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')],
             "image": self.image.url if self.image else None,
         }
