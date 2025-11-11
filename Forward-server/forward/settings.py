@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'api',
-    'adminsortable2',    
+    'adminsortable2',
+    "imagefield",
 ]
 
 # REST Framework settings
