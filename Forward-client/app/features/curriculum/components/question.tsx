@@ -8,7 +8,7 @@ export default function Question({
   answer,
   onAnswerChange,
   onCheckAnswer,
-  disabled,
+  // disabled,
 }: {
   question: Question;
   questionNumber: number;
@@ -28,16 +28,21 @@ export default function Question({
   );
   const selectedAnswers = answer?.response_data?.selected || [];
   // question state
-  const isDisabled = disabled || (answer?.attempts_left ?? 3) <= 0;
-  const isAnswered =
-    selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
-  // Check if the answer is correct
-  const isCorrect = !question.has_correct_answer || isMultipleSelect
+  // const isDisabled = disabled || (answer?.attempts_left ?? 3) <= 0;
+  const isDisabled = (answer?.attempts_left ?? 3) <= 0;
+
+  // const isAnswered = selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
+  const isAnswered = selectedAnswers.length > 0;
+  
+    // Check if the answer is correct
+    // If no correct answer (opinion question) always mark as correct
+  const isCorrect = !question.has_correct_answer ? true : isMultipleSelect
     ? areArraysEqual(
         selectedAnswers.slice().sort(),
         correctAnswers?.map((c) => c.id).sort(),
       )
     : correctAnswers?.map((c) => c.id).includes(selectedAnswers[0]);
+
   /**
    * Handles when a user selects or deselects an option
    */
@@ -54,12 +59,25 @@ export default function Question({
   return (
     <div className="bg-foreground border-muted mx-auto max-w-3xl rounded-lg border p-4 shadow-sm mb-4">
       <div className="space-y-4">
+
+
+        {/* Question-level image */}  
+        {question.image && (
+          <div className="mb-4">
+            <img 
+              src={question.image} 
+              alt="Question illustration" 
+              className="w-full max-w-md mx-auto rounded-md border border-muted object-cover"
+              style={{ maxHeight: '200px' }}  // <- ADD THIS
+            />
+          </div>
+        )}
+
         {question.caption && (
           <p className="text-muted-foreground text-sm italic">
             {question.caption}
           </p>
-        )}
-
+        )}     
         {/* Question Text and Options */}
         <div className="space-y-3">
           <div className="space-y-3">

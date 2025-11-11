@@ -486,23 +486,26 @@ class IdentificationItem(models.Model):
 
 class Quiz(BaseActivity):
     """Model for quiz activities that contain multiple questions and track scores."""
+
+    image = models.ImageField(upload_to='public/quiz/', null=True, blank=True, help_text="Optional Image to accompany the Quiz")
+
     passing_score = models.PositiveIntegerField(
         help_text="Minimum score required to pass the quiz",
         default=80
     )
 
-    feedback_config = JSONField(
-        schema={
-            "type": "object",
-            "properties": {
-                "correct": {"type": "string"},
-                "incorrect": {"type": "string"}
-            },
-            "required": ["correct", "incorrect"]
-        },
-        default=dict,
-        help_text="Configuration for correct/incorrect feedback"
-    )
+    # feedback_config = JSONField(
+    #     schema={
+    #         "type": "object",
+    #         "properties": {
+    #             "correct": {"type": "string"},
+    #             "incorrect": {"type": "string"}
+    #         },
+    #         "required": ["correct", "incorrect"]
+    #     },
+    #     default=dict,
+    #     help_text="Configuration for correct/incorrect feedback"
+    # )
 
     class Meta(BaseActivity.Meta):
         verbose_name = "Quiz"
@@ -512,8 +515,9 @@ class Quiz(BaseActivity):
         return {
             **super().to_dict(),
             "passing_score": self.passing_score,
-            "feedback_config": self.feedback_config,
-            "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')]
+            # "feedback_config": self.feedback_config,
+            "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')],
+            "image": self.image.url if self.image else None,
         }
 
 
@@ -568,6 +572,9 @@ class Question(models.Model):
         ('true_false', 'True/False'),
         ('multiple_select', 'Multiple Select'),
     ]
+
+    image = models.ImageField(upload_to='public/question/', null=True, blank=True, help_text="Optional image to accompany the Question")
+
     # User's ge`ne`rated uuid
     id = models.UUIDField(
         primary_key=True,
@@ -660,7 +667,8 @@ class Question(models.Model):
             "choices": self.choices,
             "is_required": self.is_required,
             "order": self.order,
-            "feedback_config": self.feedback_config
+            "feedback_config": self.feedback_config,
+            "image": self.image.url if self.image else None
         }
 
 class Poll(BaseActivity):
@@ -1011,7 +1019,7 @@ class Concept(BaseActivity):
         help_text="The concept map this concept belongs to"
     )
 
-    image = models.ImageField(upload_to='publiic/concept/', blank=False, null=False, help_text="An image representing the concept.")
+    image = models.ImageField(upload_to='public/concept/', blank=False, null=False, help_text="An image representing the concept.")
 
     description = MartorField(
         help_text="A detailed description of the concept"
@@ -1550,9 +1558,11 @@ class UserQuestionResponse(models.Model):
     def evaluate_correctness(self):
         """Determine if the response is correct based on question type and correct answer"""
         if not self.question.has_correct_answer:
-            self.is_correct = None
-            # self.save()
-            return None
+
+            self.is_correct = True
+            feedback_config = self.question.feedback_config or {}
+            self.feedback = self.question.feedback_config.get('correct', '')
+            return True
 
         options = self.question.choices.get('options', [])
         # Get correct answers from the question
@@ -1609,12 +1619,13 @@ class UserQuestionResponse(models.Model):
             "associated_activity": self.question_id,
             "response_data": self.response_data,
             "quiz_id": self.quiz_response.associated_activity.id,
-            # "is_correct": self.is_correct,
             "lesson_id": self.lesson_id,
             "partial_response": self.partial_response,
             "time_spent": self.time_spent,
-            # "feedback": self.feedback,
             "attempts_left": self.attempts_left,
+            # test
+            "is_correct": self.is_correct,
+            "feedback": self.feedback,
         }
 
 class VideoResponse(BaseResponse):

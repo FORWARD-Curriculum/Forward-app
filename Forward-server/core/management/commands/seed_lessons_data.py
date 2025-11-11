@@ -183,7 +183,7 @@ class Command(BaseCommand):
             # File hints from payload (removed from defaults; handled post-create)
             image_name = (
                 defaults.pop("image", None)
-                if act_type in {"textcontent", "fillintheblank"}
+                if act_type in {"textcontent", "fillintheblank", "quiz"}
                 else None
             )
             video_name = defaults.pop("video", None) if act_type == "video" else None
@@ -240,7 +240,7 @@ class Command(BaseCommand):
                     )
 
                 # Upload primary file fields (if provided)
-                if act_type in {"textcontent", "fillintheblank"} and image_name:
+                if act_type in {"textcontent", "fillintheblank", "quiz"} and image_name:
                     self._save_model_file(
                         instance=activity,
                         field_name="image",
@@ -342,6 +342,9 @@ class Command(BaseCommand):
     def _create_questions(self, quiz, questions: List[dict]):
         self._log(f"  Processing {len(questions)} questions for quiz: {quiz.title}")
         for order, q in enumerate(questions, start=1):
+            q = q.copy()
+            question_image_name = q.pop("image", None)
+
             defaults = {
                 "question_text": q.get("question_text", ""),
                 "question_type": q.get("question_type", "multiple_choice"),
@@ -354,6 +357,15 @@ class Command(BaseCommand):
                 obj, created = Question.objects.update_or_create(
                     quiz=quiz, order=order, defaults=defaults
                 )
+
+                # If optional question image in json upload it
+                if question_image_name:
+                    self._save_model_file(
+                        instance=obj,
+                        field_name="image",
+                        rel_path=self.folder_path / question_image_name,
+                        label=f"Question image",
+                    )
                 self._log(
                     f"    {'Created' if created else 'Updated'} question "
                     f"(Order: {order}): {obj.question_text[:50]}..."
