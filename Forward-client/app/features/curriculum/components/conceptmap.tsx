@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/carousel";
 import MarkdownTTS from "@/components/ui/markdown-tts";
 import { useResponse } from "../hooks";
-import { useClient } from "@/hooks/useClient";
+import { useIsMobile } from "@/hooks/useClient";
 import { MousePointerClick, Pointer } from "lucide-react";
 
 export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
@@ -23,7 +23,7 @@ export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
     activity: conceptmap,
     initialFields: { partial_response: false },
   });
-  const client = useClient();
+  const isMobile = useIsMobile();
 
   return (
     <div>
@@ -42,7 +42,7 @@ export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
                   <div
                     className={
                       "relative active:brightness-95 " +
-                      (client.isMobile
+                      (isMobile
                         ? "active:scale-98"
                         : "")
                     }
@@ -51,7 +51,7 @@ export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
                       src={concept.image}
                       className="aspect-square w-full rounded-3xl shadow-md"
                     />
-                    {concept.examples.length<1 ? "":client.isMobile ?
+                    {concept.examples.length<1 ? "":isMobile ?
                     <Pointer
                       className="absolute bottom-3 left-3 text-white drop-shadow-[0px_0px_2px_rgba(0,0,0,1)] filter"
                       color="white"

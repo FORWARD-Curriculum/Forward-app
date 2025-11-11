@@ -26,7 +26,7 @@ export async function clientLoader({}: Route.ClientLoaderArgs) {
 function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
   return (
     <div className="bg-background rounded-2xl pt-3">
-      <div className="mx-4 flex items-center gap-4 pb-3">
+      <div className="mx-4 flex lg:flex-row flex-col items-center gap-4 pb-3">
         <img
           src={props.lesson?.image || "grad_cap.png"}
           className="h-full max-w-20"
@@ -98,7 +98,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <div className="mx-4 my-12 lg:mx-[15vw]">
-        <div className="text-secondary-foreground mb-4 flex w-full gap-3 text-sm">
+        <div className="text-secondary-foreground mb-4 flex w-full gap-3 text-sm flex-col lg:flex-row">
           <p>Sort By:</p>
           <button
             aria-label="Sort by progress"
@@ -153,21 +153,22 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                     <LessonCard key={e.id} lesson={e}>
                       <Accordion>
                         {e.objectives.length > 0 && (
-                          <p className="ml-4 mb-4">
+                          <div className="ml-4 mb-4">
                             <span className="font-medium">
                               Lesson Objectives:
                             </span>{" "}
                             <ul>
                               {e.objectives.map((o) => (
-                                <li className="ml-10 list-disc font-light">{o}</li>
+                                <li key={o} className="ml-10 list-disc font-light">{o}</li>
                               ))}
                             </ul>
-                          </p>
+                          </div>
                         )}
                         {e.tags && (
-                          <div className="flex gap-2 ml-4 italic">
+                          <div className="flex gap-2 ml-4 italic flex-col lg:flex-row">
                             Tags: {e.tags.map((t) => (
                               <p
+                              key={t}
                                 className={`bg-secondary outline-foreground-border rounded-md px-2 text-center outline-1 drop-shadow-xs`}
                               >
                                 {t}

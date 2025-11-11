@@ -3,7 +3,7 @@ import { useAuth } from "@/features/account/hooks";
 import * as Sheet from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import * as DropdownMenu from "@/components/ui/dropdown-menu";
-import { useClient } from "@/hooks/useClient";
+import { useClient, useIsMobile } from "@/hooks/useClient";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
@@ -11,7 +11,7 @@ import { Link } from "react-router";
 
 export default function Header() {
   const { logout } = useAuth();
-  const { windowDimensions } = useClient();
+  const isMobile = useIsMobile();
   const user = useSelector((state: RootState) => state.user.user);
   const lesson = useSelector((state: RootState) => state.lesson);
 
@@ -31,7 +31,7 @@ export default function Header() {
         {/* This is the mobile menu */}
 
         {/* This is the desktop menu */}
-        {windowDimensions.width > 1024 ? (
+        {!isMobile ? (
           <ul className="ml-auto flex list-none items-center gap-6 font-medium *:hover:underline">
             <li>
               <Link prefetch="intent" to={"/dashboard"}>Dashboard</Link>

@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CircleX, Pointer } from "lucide-react";
+import { useIsMobile } from "@/hooks/useClient";
 
 export default function TextContent({
   textContent,
@@ -28,33 +30,75 @@ export default function TextContent({
 
   // State to track if the image has finished loading
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const isMobile = useIsMobile();
 
   return (
     <div className="markdown">
       <div className="flex w-full flex-col items-center gap-4">
         {textContent.image && (
           <Dialog>
-            <DialogTrigger>
+            <DialogTrigger className="relative overflow-clip p-4">
               {!isImageLoaded && (
                 <Skeleton className="h-140 min-h-140 w-full min-w-2xl rounded-xl" />
               )}
               <img
                 src={textContent.image}
                 onLoad={() => setIsImageLoaded(true)}
-                className={`m-4 max-h-140 cursor-zoom-in rounded-xl shadow-lg ${isImageLoaded ? "block" : "hidden"} `}
+                className={`max-h-140 w-full cursor-zoom-in rounded-xl shadow-lg ${isImageLoaded ? "block" : "hidden"} `}
               />
+              {isMobile &&
+                    <Pointer
+                      className="absolute bottom-6 left-6 text-white drop-shadow-[0px_0px_2px_rgba(0,0,0,1)] filter"
+                      color="white"
+                    />}
             </DialogTrigger>
             <DialogClose className="sticky" />
-            <DialogContent className="h-[90vh] max-h-[90vh] w-[90vw] !max-w-[9999999999999999999px] overflow-y-scroll">
-              <img className="h-full w-full" src={textContent.image}></img>
+            <DialogContent
+              className={
+                isMobile
+                  ? "h-screen w-screen max-w-none gap-0 p-0"
+                  : "h-[90vh] max-h-[90vh] w-[90vw] !max-w-[9999999999999999999px] overflow-auto"
+              }
+              hideCloseIcon
+            >
+              <DialogClose
+                asChild
+                className="fixed right-2.5 z-[99999999999] p-1"
+                style={{
+                  top: isMobile
+                    ? ""
+                    : (CSS?.supports?.("top", "env(safe-area-inset-top)")
+                      ? "calc(env(safe-area-inset-top) + 10px)"
+                      : "10px"),
+                  bottom:
+              isMobile ? (CSS?.supports?.("bottom", "env(safe-area-inset-bottom)")
+                ? "calc(env(safe-area-inset-bottom) + 20px)"
+                : "20px") : "",
+                }}
+              >
+                <CircleX
+                  size={60}
+                  className="bg-secondary active:bg-muted hover:bg-muted cursor-pointer rounded-full shadow-lg active:shadow-xs"
+                />
+              </DialogClose>
+              <div
+                className={isMobile ? "h-screen w-screen overflow-auto flex items-center":"" }
+              >
+                <img
+                  className={
+                    isMobile ? "w-fit max-w-[300vw]" : "w-full max-w-none"
+                  }
+                  src={textContent.image}
+                ></img>
+              </div>
             </DialogContent>
           </Dialog>
         )}
       </div>
       {textContent.content && (
         <MarkdownTTS
-          controlsClassName="flex gap-2"
-          controlsOrientation="vertical"
+          controlsClassName="flex gap-2 lg:flex-row flex-col"
+          controlsOrientation={isMobile?"horizontal":"vertical"}
         >
           {textContent.content}
         </MarkdownTTS>
