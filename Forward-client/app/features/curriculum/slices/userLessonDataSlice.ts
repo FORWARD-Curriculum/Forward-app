@@ -10,7 +10,14 @@ import {
 import { apiFetch } from "../../../utils/utils";
 import type { RootState } from "@/store";
 
-export const initialLessonResponseState: LessonResponse = {
+type ResponseContext = {
+  type: keyof NonNullable<LessonResponse["response_data"]>;
+  trackTime: boolean;
+} | null;
+
+export const initialLessonResponseState: LessonResponse & {
+  current_context: ResponseContext;
+} = {
   lesson_id: null,
   highest_activity: 1,
   time_spent: Date.now(),
@@ -29,8 +36,11 @@ export const initialLessonResponseState: LessonResponse = {
     LikertScale: [],
     Twine: [],
     DndMatch: [],
-    Video: []
+    Video: [],
+    Slideshow: [],
+    CustomActivity: []
   },
+  current_context: null
 };
 
 /**
@@ -90,12 +100,33 @@ export const saveUserResponseThunk = createAsyncThunk(
   },
 );
 
+export const saveCurrentResponseThunk = createAsyncThunk(
+  "response/saveCurrentResponse",
+  async (_, thunkAPI) => {
+    const state = thunkAPI.getState() as RootState;
+    const ctx = state.response.current_context;
+    const resp = state.response.current_response;
+
+    if (!ctx || !resp) return undefined;
+
+    return await thunkAPI
+      .dispatch(
+        saveUserResponseThunk({
+          type: ctx.type,
+          response: resp,
+          trackTime: ctx.trackTime,
+        }),
+      )
+      .unwrap();
+  },
+);
+
 export const userLessonDataSlice = createSlice({
   name: "response",
   initialState: initialLessonResponseState,
   reducers: {
     setResponse: (state, action: PayloadAction<LessonResponse>) => {
-      return action.payload;
+      return {...action.payload, current_context: state.current_context};
     },
     resetResponseState: () => {
       return initialLessonResponseState;
@@ -114,6 +145,12 @@ export const userLessonDataSlice = createSlice({
     },
     setCurrentResponse(state, action: PayloadAction<BaseResponse | null>) {
       state.current_response = action.payload;
+    },
+    setCurrentContext(
+      state,
+      action: PayloadAction<ResponseContext>,
+    ) {
+      state.current_context = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -145,6 +182,7 @@ export const {
   resetTimeSpent,
   setCurrentResponse,
   resetResponseState,
+  setCurrentContext
 } = userLessonDataSlice.actions;
 
 export default userLessonDataSlice.reducer;

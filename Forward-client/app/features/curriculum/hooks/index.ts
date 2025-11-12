@@ -6,10 +6,11 @@ import {
   type Question,
 } from "@/features/curriculum/types";
 import type { AppDispatch, RootState } from "@/store";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   saveUserResponseThunk,
+  setCurrentContext,
   setCurrentResponse,
 } from "@/features/curriculum/slices/userLessonDataSlice";
 
@@ -91,17 +92,20 @@ export const useResponse = <
     responseRef.current = response;
     // TODO: Replace the above ref completely with the currentResponse state from
     // the store, and pull it in the thunk.
-    if (!nonRootActivity) dispatch(setCurrentResponse(response));
+    if (!nonRootActivity) {
+      dispatch(setCurrentResponse(response)),
+      dispatch(setCurrentContext({ type, trackTime }));
+    };
   }, [response]);
 
   // Save response to store/server on unmount
-  useEffect(() => {
-    return () => {
-      if (!disableAutoSave){
-        void saveResponse();
-      }
-    };
-  }, []); // maybe add to dependency array
+  // useEffect(() => {
+  //   return () => {
+  //     if (!disableAutoSave){
+  //       void saveResponse();
+  //     }
+  //   };
+  // }, []); // maybe add to dependency array
 
   /**
    * Dispatch to `saveUserResponseThunk` to save the current response state.
@@ -110,7 +114,7 @@ export const useResponse = <
    * This allows it to override and send a single question as a parameter to be evlauated by the backend 
    * Rather than the all the questions together. 
    */
-  const saveResponse = async (overrideResponse?: Partial<T>) => {
+  const saveResponse = useCallback(async (overrideResponse?: Partial<T>) => {
     const dataToSave = overrideResponse
       ? { ...responseRef.current, ...overrideResponse}
       : responseRef.current
@@ -124,7 +128,7 @@ export const useResponse = <
     );
     if (saved.meta.requestStatus === "fulfilled" && saved.payload !== undefined)
       setResponse((saved.payload as { response: BaseResponse }).response as T);
-  };
+  },[dispatch, trackTime, type]);
 
   return [response, setResponse, saveResponse] as const;
 };

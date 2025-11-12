@@ -8,7 +8,7 @@ import {
 import type { Route } from "./+types/lesson";
 import { apiFetch, srcsetOf } from "@/utils/utils";
 import { useSelector, useDispatch } from "react-redux";
-import store, { type RootState } from "@/store";
+import store, { type AppDispatch, type RootState } from "@/store";
 import { act, useEffect, useCallback, memo } from "react";
 import TextContent from "@/features/curriculum/components/textcontent";
 import Poll from "@/features/curriculum/components/poll";
@@ -38,6 +38,7 @@ import { useState } from "react";
 import { useLocation } from "react-router";
 import {
   incrementHighestActivity,
+  saveCurrentResponseThunk,
   setResponse,
 } from "@/features/curriculum/slices/userLessonDataSlice";
 import {
@@ -57,6 +58,7 @@ import {
 } from "@/components/ui/dialog";
 import MarkdownTTS from "@/components/ui/markdown-tts";
 import CustomActivity from "@/features/curriculum/components/customactivity";
+import { LoadingSpinner } from "./protected";
 
 export async function clientLoader({
   params,
@@ -216,7 +218,7 @@ const ScrollToTopButton = memo(() => {
 });
 
 export function TableOfContents() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const isMobile = useIsMobile();
   const [showFullToc, setShowFullToc] = useState(false);
   const activities = useSelector(
@@ -299,6 +301,7 @@ export function TableOfContents() {
                     key={activityIndex.order}
                     className={`${activityIndex.order === current_activity ? "bg-accent/40" : ""} group disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                     onClick={() => {
+                      dispatch(saveCurrentResponseThunk());
                       dispatch(setActivity(activityIndex.order));
                       history.replaceState(null, "", `#${activityIndex.order}`);
                     }}
@@ -333,7 +336,7 @@ export function TableOfContents() {
 }
 
 export function NextActivity() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [showComplete, setShowComplete] = useState(false);
   const user = useSelector((state: RootState) => state.user.user);
   const current_activity = useSelector(
@@ -348,7 +351,12 @@ export function NextActivity() {
   const lessonLength = useSelector(
     (state: RootState) => state.lesson.lesson?.activities.length ?? 0,
   );
+  const current_context = useSelector(
+    (state: RootState) => state.response.current_context,
+  );
   const isMobile = useIsMobile();
+
+  const [saving, setSaving] = useState(false);
 
   const handleLessonComplete = useCallback(() => {
     setShowComplete(true);
@@ -386,7 +394,12 @@ export function NextActivity() {
         disabled={user ? current_partial_response || undefined : false}
         className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden"
         onClick={() => {
-          if (isMobile) {
+        setSaving(true);
+        dispatch(saveCurrentResponseThunk())
+          .unwrap()
+          .finally(() => {
+            setSaving(false);
+            if (isMobile) {
             window.scrollTo({
               top: 0,
               behavior: "smooth",
@@ -401,9 +414,10 @@ export function NextActivity() {
             }
             history.replaceState(null, "", "#" + (current_activity + 1));
           }
+          });
         }}
       >
-        Save and Continue
+        <span className="min-w-[13ch] flex justify-center">{saving ?<LoadingSpinner/>: "Save and Continue"}</span>
         <ArrowRightIcon className="!text-primary-foreground" />
       </button>
       <Dialog open={showComplete} onOpenChange={setShowComplete}>
@@ -439,7 +453,7 @@ export function NextActivity() {
 }
 
 export default function Lesson({ loaderData }: Route.ComponentProps) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { hash } = useLocation();
   const activity = useSelector(
@@ -470,6 +484,9 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
       }
     }
   }, [loaderData]);
+
+  // Save on nav off
+  useEffect(()=>()=>{dispatch(saveCurrentResponseThunk())},[])
 
   return (
     <div className="m-4 flex w-full max-w-screen flex-col items-center gap-4 lg:mt-7 lg:mr-8 lg:mb-12 lg:ml-24 lg:flex-row lg:items-start lg:gap-8">

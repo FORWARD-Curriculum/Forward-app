@@ -113,7 +113,7 @@
       "instructions": "Thinking about the definitions you chose, describe the differences between wants and needs. Give examples from your own life.",
       "content": null,
       "prompts": [
-        "Write a few sentences explaining how wants and needs differ, with examples from your own experience."
+        {"prompt":"Write a few sentences explaining how wants and needs differ, with examples from your own experience."}
       ]
     },
     {
@@ -450,8 +450,8 @@
       "instructions": "Think about the activity you just completed and what you learned from the decisions you made. Select one of the questions below and write your response.",
       "instructions_image": "bicycle.jpg",
       "prompts": [
-        "What kinds of money choices did you make? Write about what you decided and why.",
-        "What kind of money decisions do you make in real life?"
+        {"prompt":"What kinds of money choices did you make? Write about what you decided and why."},
+        {"prompt":"What kind of money decisions do you make in real life?"}
       ]
     },
     {
@@ -845,8 +845,8 @@
       "title": "Budget Reflection",
       "instructions": "Add up how much your needs were, as well as how your wants were on a sheet of paper, then select a question to write a response to for this activity.",
       "prompts": [
-        "Which type of budget do you think would work best for you and why?",
-        "Is the amount of money you will need to make each month to cover your needs and wants achievable? How will you do it?"
+        {"prompt":"Which type of budget do you think would work best for you and why?"},
+        {"prompt":"Is the amount of money you will need to make each month to cover your needs and wants achievable? How will you do it?"}
       ],
       "_comment": "The total amount you plan to spend on your needs is $xxx and on your wants is $zzz. (These values should be automatically calculated from the student's previous entries.) This means you will need to make at least $yyy each month to break even, where yyy = xxx + zzz.\n\n"
     },
@@ -864,7 +864,7 @@
       "title": "Personal Finance Reflection",
       "instructions": "You've just finished this lesson on Personal Finance. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else.",
       "instructions_image": "paying_money.jpg",
-      "prompts": [""]
+      "prompts": [{"prompt":""}]
     }
   ]
 }

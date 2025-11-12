@@ -199,3 +199,18 @@ console.error = (...args: any[]) => {
     )
   );
 };
+
+export const debounce = <F extends (...args: any[]) => any>(
+  callback: F,
+  wait: number,
+) => {
+  let timeoutId: number | null = null;
+  return (...args: Parameters<F>): void => {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
+    timeoutId = window.setTimeout(() => {
+      callback(...args);
+    }, wait);
+  };
+};

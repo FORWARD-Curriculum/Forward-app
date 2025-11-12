@@ -1,51 +1,150 @@
 import type { Writing, WritingResponse } from "@/features/curriculum/types";
 import { useResponse } from "../hooks";
 import MarkdownTTS from "@/components/ui/markdown-tts";
-import { useIsMobile } from "@/hooks/useClient";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {debounce} from "@/utils/utils"
 
 const mdPattern = /(\*\*|\n)/m;
 
-export default function Writing({ writing }: { writing: Writing }) {
-  const [response, setResponse] = useResponse<WritingResponse, Writing>({
-    type: "Writing",
-    activity: writing,
-    initialFields: {
-      responses: [],
-    },
-  });
+const calcCount = (type: "char" | "word" | undefined, text: string) => {
+  // if char its just str length, else split whitespace
+  return type === "char"
+    ? text.length
+    : text.trim().length === 0
+      ? 0
+      : text.trim().split(/\s+/).length;
+};
 
-  const isMobile = useIsMobile();
+export function PromptArea({
+  promptObj,
+  responseMap,
+  saveResp,
+}: {
+  promptObj: Writing["prompts"][0];
+  responseMap: React.RefObject<
+    Map<string, { resp: string; meets_minimum: boolean }>
+  >;
+  saveResp: () => void;
+}) {
+  const [textResponse, setTextResponse] = useState<string>(
+    responseMap.current.get(promptObj.prompt)?.resp ?? "",
+  );
+  const [count, setCount] = useState<number>(
+    calcCount(promptObj.min_type, textResponse),
+  );
+  const [mdDisplay] = useState(
+    mdPattern.test(promptObj.prompt) ? "remark" : "",
+  );
+
+  const onType = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const text = e.target.value;
+      setTextResponse(text);
+      const cCount = calcCount(promptObj.min_type, text);
+      setCount(cCount);
+      responseMap.current.set(promptObj.prompt, {
+        resp: text,
+        meets_minimum: cCount >= (promptObj.minimum ?? 0),
+      });
+      saveResp();
+    },
+    [setTextResponse, promptObj, responseMap, saveResp],
+  );
 
   return (
     <div>
-      {writing.prompts.map((prompt, index) => (
-        <div key={index} className="mb-4">
-          <MarkdownTTS
-            controlsClassName={`${mdPattern.test(prompt) ? "remark" : ""} flex flex-col lg:flex-row-reverse grow justify-between`}
-            controlsOrientation={isMobile?"horizontal":"vertical"}
-          >
-            {prompt}
-          </MarkdownTTS>
+      <MarkdownTTS
+        controlsClassName={`${mdDisplay} flex flex-col lg:flex-row-reverse grow justify-between`}
+        controlsOrientation={"horizontal"}
+      >
+        {promptObj.prompt}
+      </MarkdownTTS>
+      <textarea
+        className="field-sizing-content min-h-30 w-full max-w-full resize-y overflow-x-hidden rounded border border-gray-300 p-2 font-mono whitespace-pre-wrap"
+        value={textResponse ?? ""}
+        onChange={onType}
+      />
+      <div className="text-muted-foreground flex justify-end">
+        {promptObj.minimum == 0 || promptObj.minimum == undefined ? (
+          <span>Free Write!</span>
+        ) : (
+          <span>
+            {count} / {promptObj?.minimum ?? 0}{" "}
+            {promptObj.min_type === "char" ? "Characters" : "Words"}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
-          <textarea
-            className="resize-y w-full rounded border border-gray-300 p-2 font-mono whitespace-pre-wrap field-sizing-content min-h-30 max-w-full overflow-x-hidden"
-            
-            value={response.responses[index] || ""}
-            onChange={(e) => {
-              const newResponses = [...response.responses];
-              newResponses[index] = e.target.value;
-              setResponse((old) => ({
-                ...old,
-                responses: newResponses,
-              }));
-            }}
-          />
-          <div className="flex justify-end">
-            {response.responses[index]
-              ? response.responses[index].split(/\s+/)?.length - 1
-              : ""}
-          </div>
-        </div>
+export default function Writing({ writing }: { writing: Writing }) {
+  const [realResponse, setRealResponse] = useResponse<WritingResponse, Writing>(
+    {
+      type: "Writing",
+      activity: writing,
+      initialFields: {
+        responses: writing.prompts.map((p) => ({
+          prompt: p.prompt,
+          response: "",
+        })),
+      },
+    },
+  );
+
+  const debouncedSetRealResponse = useMemo(
+    () =>
+      debounce(
+        (
+          newResponses: WritingResponse["responses"],
+          newAllMinsMet: boolean,
+        ) => {
+          setRealResponse((o) => ({
+            ...o,
+            responses: newResponses,
+            partial_response:
+              o.partial_response === false ? false : !newAllMinsMet,
+          }));
+        },
+        500,
+      ),
+    [setRealResponse],
+  );
+
+  let responseMap = useRef(
+    new Map<string, { resp: string; meets_minimum: boolean }>(
+      realResponse.responses.map((o) => [
+        o.prompt,
+        { resp: o.response, meets_minimum: false },
+      ]),
+    ),
+  );
+
+  const saveResp = useCallback(() => {
+    const rArray = Array.from(responseMap.current.entries());
+    const newResponses: WritingResponse["responses"] = rArray.map((o) => ({
+      prompt: o[0],
+      response: o[1].resp,
+    }));
+    const allMinsMet = rArray.every((o) => o[1].meets_minimum);
+    debouncedSetRealResponse(newResponses, allMinsMet);
+  }, [debouncedSetRealResponse]);
+
+  return (
+    <div>
+      {writing.prompts.map((po) => (
+        <PromptArea
+          key={po.prompt}
+          promptObj={po}
+          responseMap={responseMap}
+          saveResp={saveResp}
+        />
       ))}
     </div>
   );

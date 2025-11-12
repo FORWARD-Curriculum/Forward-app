@@ -400,7 +400,36 @@ class Video(BaseActivity):
 class Writing(BaseActivity):
     """Model for writing activities where students provide written responses."""
     prompts = JSONField(
-        schema={"type": "array", "items": {"type": "string", 'widget': 'textarea'}},
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "prompt": {"type": "string", "title": "Prompt", 'widget': 'textarea'},
+                    # https://django-jsonform.readthedocs.io/en/stable/guide/choices.html
+                    "min_type": {
+                        "type": "string",
+                        "choices": [
+                            {'title': 'Words', 'value': 'word'},
+                            {'title': 'Characters', 'value': 'char'}
+                        ],
+                        'title': "Minimum Counting Type",
+                        'widget': 'radio',
+                        'default': 'char'
+                    },
+                    "minimum": {
+                        "type": "integer",
+                        "title": "Minimum Words/Chars",
+                        "minimum": 0,
+                        "default": 0
+                    }
+
+                },
+                "required": ["prompt"]
+            },
+            'default': [],
+            'minItems': 1,
+        },
         default=list,
         help_text="List of writing prompts for the activity"
     )
@@ -408,11 +437,7 @@ class Writing(BaseActivity):
     class Meta(BaseActivity.Meta):
         verbose_name = "Writing"
         verbose_name_plural = "Writings"
-
-    def get_prompts(self):
-        """Returns the list of prompts or an empty list if none set"""
-        return self.prompts or []
-
+        
     def to_dict(self):
         return {
             **super().to_dict(),

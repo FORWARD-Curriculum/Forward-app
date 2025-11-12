@@ -162,7 +162,7 @@ export default function Question({
         <button
           onClick={() => {onCheckAnswer(question.id), setIsChecked(true)}}
           disabled={isDisabled || selectedAnswers.length === 0}
-          className="bg-primary disabled:bg-muted disabled:text-muted-foreground text-primary-foreground rounded-md px-6 py-2 font-medium transition-all hover:brightness-110 active:brightness-90"
+          className="bg-primary disabled:bg-muted disabled:text-muted-foreground disabled:pointer-events-none text-primary-foreground rounded-md px-6 py-2 font-medium transition-all hover:brightness-110 active:brightness-90"
         >
           Check Answer
         </button>
