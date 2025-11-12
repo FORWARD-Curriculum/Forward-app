@@ -108,7 +108,11 @@ export interface Video extends BaseActivity {
 }
 
 export interface Writing extends BaseActivity {
-  prompts: string[];
+  prompts: {
+    "prompt": string,
+    "min_type"?: "word" | "char",
+    "minimum"?: number
+  }[];
 }
 
 export interface Quiz extends BaseActivity {
@@ -301,7 +305,7 @@ export interface PollQuestionResponse extends BaseResponse {
 }
 
 export interface WritingResponse extends BaseResponse {
-  responses: string[];
+  responses: {"prompt": string, "response": string}[];
 }
 
 export interface TextContentResponse extends BaseResponse {}

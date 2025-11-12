@@ -57,7 +57,7 @@
       "title": "Reflect on Communication",
       "instructions": null,
       "prompts": [
-        "What is one thing you could work on improving in your communication?"
+        {"prompt":"What is one thing you could work on improving in your communication?"}
       ]
     },
     {
@@ -124,8 +124,8 @@
       "title": "Verbal and Non-Verbal Communication",
       "instructions": "Verbal communication is the way we use words to talk with others. We use it to share ideas, ask questions, and give information. The words we choose and how clearly we speak can change how well people understand us. At work or school, clear and respectful words help build trust and avoid confusion. With friends, our words help us tell stories, laugh, and share how we feel. No matter the situation, spoken words are one of the easiest ways to communicate.\n\nNon-verbal communication is the way we send messages without using words. This includes our facial expressions, <def def='Hand and body movements that help to communicate. For example, a shrug or pointing.'>gestures</def>, body posture, and even the tone of our voice. These signals can show feelings or add meaning to what we say. In professional settings, good non-verbal communication can show confidence, respect, and attention. With friends, it can make our conversations feel more fun and connected. Paying attention to body language--both ours and others'--can make our communication stronger and clearer.",
       "prompts": [
-        "Think about a conversation you recently had with a peer or teacher. What did the person say with their words? Write about what they said through verbal communication.",
-        "Now shift your thinking. What did the person say with their face, body, tone, and gestures? Write about what they said with non-verbal communication."
+        {"prompt":"Think about a conversation you recently had with a peer or teacher. What did the person say with their words? Write about what they said through verbal communication."},
+        {"prompt":"Now shift your thinking. What did the person say with their face, body, tone, and gestures? Write about what they said with non-verbal communication."}
       ]
     },
     {
@@ -482,7 +482,7 @@
       "title": "Disclosure in the Workplace",
       "instructions": "In the workplace, disclosure can take on a very specific meaning: sharing information about a criminal history with an employer. Just like with other kinds of personal information, the key is balancing what is appropriate for the situation and who you are sharing with. Employers expect honesty. If a background check is part of the hiring process, being upfront about criminal history can show responsibility and build trust. At the same time, not every detail of your past is always relevant or necessary to share.\n\nWhen we talk about criminal history, it's important to understand what that actually means. A criminal history is a record of a person's involvement with the legal system, but not all involvement is the same.\n\nHaving a criminal history does not stop someone from getting a job. However, the type of criminal history may put limits on what type of job someone might get. For example, an employer may not want to hire someone to handle their finances if that person has a history of stealing money from a past employer. Or, someone who has a history of violence might not be allowed to work with children. These limits can be set by the state, or may be the preference of the employer.\n\nHere's a snapshot of what some Arizona employers said when they were asked about hiring someone with a criminal record.\n\nEmployers in Arizona were asked if they would interview someone who had **a non-violent offense.**\n\n![Employers Non-Violent Offense](employers4.png)\n\nEmployers in Arizona were asked if they would interview someone with **a violent offense.**\n\n![Employers Violent Offense](employers5.png)",
       "prompts": [
-        "If you were an employer, would you hire someone with a criminal history? Think about the different circumstances that might lead you to hire or not hire someone with a criminal history and write about your thoughts."
+        {"prompt":"If you were an employer, would you hire someone with a criminal history? Think about the different circumstances that might lead you to hire or not hire someone with a criminal history and write about your thoughts."}
       ]
     },
     {
@@ -686,7 +686,7 @@
       "title": "Disclosure and Appropriate Communication: Reflection",
       "instructions": null,
       "prompts": [
-        "You've just finished this lesson on Disclosure and Appropriate Communication. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else."
+        {"prompt":"You've just finished this lesson on Disclosure and Appropriate Communication. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else."}
       ]
     }
   ]
