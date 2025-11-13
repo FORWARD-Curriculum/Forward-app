@@ -1,18 +1,16 @@
 import {
   type BaseActivity,
   type BaseResponse,
-  type LessonResponse,
-  type PollQuestion,
-  type Question,
 } from "@/features/curriculum/types";
 import type { AppDispatch, RootState } from "@/store";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   saveCurrentResponseThunk,
   setCurrentContext,
   setCurrentResponse,
 } from "@/features/curriculum/slices/userLessonDataSlice";
+import store from "@/store";
 
 /**
  * Returns the outut of a `useState<T>()` to be used on for reactive, managed response
@@ -93,12 +91,17 @@ export const useResponse = <
           ...(initialFields as Partial<T>),
         } as T);
 
-    /* NOTE: this is only here because I want to give the option
-     * to disable trackTime if, for some reason it is needed. If,
-     * there comes a time where we don't need to disable it for sure
-     * we could remove it.
-     */
-    dispatch(setCurrentContext({ type: activity.type, trackTime }));
+    dispatch(
+      setCurrentContext({
+        type: activity.type,
+        trackTime,
+        current_response_saved:
+        // only can be set true if current_context was null or the previous save thunk
+        // dispatch fulfilled
+          store.getState().response.current_context?.current_response_saved ??
+          true,
+      }),
+    );
     dispatch(setCurrentResponse(initialResponse));
 
     isInitialized.current = true;
@@ -114,6 +117,13 @@ export const useResponse = <
       const next =
         typeof v === "function" ? (v as (prev: T) => T)(response) : (v as T);
       dispatch(setCurrentResponse(next));
+      dispatch(
+        setCurrentContext({
+          type: activity.type,
+          trackTime,
+          current_response_saved: false,
+        }),
+      );
     },
     [response],
   );
