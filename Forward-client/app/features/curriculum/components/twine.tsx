@@ -12,7 +12,6 @@ function escapeHTML(str: string) {
 }
 export default function Twine({ twine }: { twine: TwineType }) {
   const [response, setResponse] = useResponse<TwineResponse, TwineType>({
-    type: "Twine",
     activity: twine,
     initialFields: {
       partial_response: true,

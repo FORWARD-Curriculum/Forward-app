@@ -122,7 +122,6 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
 
   const [response, setResponse] =
     useResponse<DndMatchResponse, DndMatch>({
-      type: "DndMatch",
       activity: dndmatch,
       initialFields: {
         submission: dndmatch.content.map((e) => ({

@@ -22,10 +22,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
   );
 
   const [response, setResponse] = useResponse<QuizResponse, Quiz>({
-    type: "Quiz",
     activity: quiz,
-    trackTime: false,
-    disableAutoSave: true,
     initialFields: { 
       score: null, 
       completion_percentage: 0,

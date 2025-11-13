@@ -23,7 +23,6 @@ export default function TextContent({
   textContent: TextContentType;
 }) {
   useResponse<TextContentResponse, TextContentType>({
-    type: "TextContent",
     activity: textContent,
     initialFields: { attempts_left: 0, partial_response: false },
   });

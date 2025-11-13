@@ -7,7 +7,6 @@ import { useRef } from "react";
 
 export default function Video({ video }: { video: VideoType }) {
   const [response, setResponse] = useResponse<VideoResponse, VideoType>({
-    type: "Video",
     activity: video,
     initialFields: {
       partial_response: true,

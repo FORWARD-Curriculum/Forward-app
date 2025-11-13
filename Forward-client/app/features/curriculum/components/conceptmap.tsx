@@ -19,7 +19,6 @@ import { MousePointerClick, Pointer } from "lucide-react";
 
 export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
   useResponse<ConceptMapResponse, ConceptMap>({
-    type: "ConceptMap",
     activity: conceptmap,
     initialFields: { partial_response: false },
   });

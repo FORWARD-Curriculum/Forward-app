@@ -9,18 +9,16 @@ import type { AppDispatch, RootState } from "@/store";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  saveUserResponseThunk,
+  saveCurrentResponseThunk,
   setCurrentContext,
   setCurrentResponse,
 } from "@/features/curriculum/slices/userLessonDataSlice";
-import store from "@/store";
 
 /**
- * Returns a the outut of a `useState<T>()` to be used on for reactive, managed response
- * state. Automatically saves the response data to the Redux Store/Backend when the component
- * is unmounted, or when `saveResponse()` is called.
+ * Returns the outut of a `useState<T>()` to be used on for reactive, managed response
+ * state. State will be saved to the backend when {@link saveCurrentResponseThunk} is called
+ * from anywhere in the app
  *
- * @param type - Type of the activity to know what reponse goes where.
  * @param activity - The activity object to retrieve id from.
  * @param trackTime - Used in Higher Order Activites (Quiz, Poll) to indicate that time
  * should not be tracked as a whole, but instead is the aggregate of the children's times.
@@ -29,15 +27,29 @@ import store from "@/store";
  * @param initialFields - Due to the nature of generics, the only fields we can guarantee on
  * an initialize are those from the LCD response type {@link BaseResponse}, and so to not have
  * undefined fields can populate them on creation.
- * @param nonRootActivity - Used to indicate that this is a non-root activity, and thus, should not
- * be saved as the "current" response, which is used to lock progress on the lesson.
- * @returns `[response, setResponse, saveResponse] as const`
+ * @returns `[response, setResponse] as const`
  *
  * @example
- * ```typescript
- *  const [response, setResponse, saveResponse] = useResponse<QuestionResponse, Question>("Quiz", quiz, false, { highestQuestionReached: 0 });
+ * ```ts
+ *  const [response, setResponse] = useResponse<QuizResponse, Quiz>({
+ *    type: "Quiz",
+ *    activity: quiz,
+ *    trackTime: false,
+ *    disableAutoSave: true,
+ *    initialFields: { 
+ *      score: null, 
+ *      completion_percentage: 0,
+ *      submission: []
+ *    },
+ *  });
  *  //...
- *    onClick={()=>setResponse({...response, highestQuestionReached: response.highestQuestionReached + 1})};
+ *  onClick={()=>setResponse(
+ *    {
+ *      ...response,
+ *      partial_response: !partial_response ?
+ *        false
+ *        : allQuestionsAnswered})
+ *  };
  *  //...
  * ```
  */
@@ -45,30 +57,26 @@ export const useResponse = <
   T extends BaseResponse,
   E extends BaseActivity,
 >({
-  type,
   activity,
   trackTime = true,
   initialFields
 }: {
-  type: keyof NonNullable<LessonResponse["response_data"]>;
   activity: E;
   trackTime?: boolean;
   initialFields?: Omit<T, keyof BaseResponse> &
     Partial<Pick<T, keyof BaseResponse>>;
-  nonRootActivity?: boolean;
-  disableAutoSave?: boolean;
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
   let existingResponse = useSelector((state: RootState) =>
-    state.response.response_data[type]
-      ? state.response.response_data[type].find(
+    state.response.response_data[activity.type]
+      ? state.response.response_data[activity.type].find(
           (s) => s.associated_activity === activity.id,
         )
       : null,
   );
 
-  // Synchronously instantiate current_response, removing old/stale resp
+  // Synchronously instantiate current_response, overwriting old/stale resp
   const isInitialized = useRef(false);
 
   if (!isInitialized.current) {
@@ -85,7 +93,12 @@ export const useResponse = <
           ...(initialFields as Partial<T>),
         } as T);
 
-    dispatch(setCurrentContext({ type, trackTime }));
+    /* NOTE: this is only here because I want to give the option
+     * to disable trackTime if, for some reason it is needed. If,
+     * there comes a time where we don't need to disable it for sure
+     * we could remove it.
+     */
+    dispatch(setCurrentContext({ type: activity.type, trackTime }));
     dispatch(setCurrentResponse(initialResponse));
 
     isInitialized.current = true;
