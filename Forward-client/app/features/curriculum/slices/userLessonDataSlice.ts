@@ -102,22 +102,23 @@ export const saveUserResponseThunk = createAsyncThunk(
 
 export const saveCurrentResponseThunk = createAsyncThunk(
   "response/saveCurrentResponse",
-  async (_, thunkAPI) => {
+  async (
+    overrideResponse: Partial<BaseResponse> | undefined = {} as BaseResponse,
+    thunkAPI,
+  ) => {
     const state = thunkAPI.getState() as RootState;
     const ctx = state.response.current_context;
     const resp = state.response.current_response;
 
     if (!ctx || !resp) return undefined;
 
-    return await thunkAPI
-      .dispatch(
-        saveUserResponseThunk({
-          type: ctx.type,
-          response: resp,
-          trackTime: ctx.trackTime,
-        }),
-      )
-      .unwrap();
+    return await thunkAPI.dispatch(
+      saveUserResponseThunk({
+        type: ctx.type,
+        response: { ...resp, ...overrideResponse },
+        trackTime: ctx.trackTime,
+      }),
+    );
   },
 );
 
@@ -156,6 +157,8 @@ export const userLessonDataSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(saveUserResponseThunk.fulfilled, (state, action) => {
       if (state.response_data && action.payload) {
+        // if (action.payload.response) state.current_response = action.payload.response;
+
         const { type, response } = action.payload;
         const existingResponseIndex = state.response_data[type].findIndex(
           (s) => s.associated_activity === response.associated_activity,

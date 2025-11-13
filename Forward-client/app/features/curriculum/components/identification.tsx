@@ -215,7 +215,9 @@ export default function Identification({
         ...prev,
         identified: newIdentified,
         partial_response:
-          newIdentified < (identification.minimum_correct || totalIdents),
+          prev.partial_response === false ?
+            false :
+            newIdentified < (identification.minimum_correct || totalIdents),
       }));
     }
   }, [response, identification.minimum_correct]);

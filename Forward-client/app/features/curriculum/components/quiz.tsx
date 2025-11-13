@@ -5,18 +5,23 @@ import type {
   QuestionResponse,
 } from "@/features/curriculum/types";
 import { useLocation } from "react-router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useResponse } from "@/features/curriculum/hooks";
 import Question from "./question";
 import { Circle } from "lucide-react";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "@/store";
+import { saveCurrentResponseThunk } from "../slices/userLessonDataSlice";
+import { toast } from "sonner";
 
 export default function Quiz({ quiz }: { quiz: Quiz }) {
   const { hash } = useLocation();
+  const dispatch = useDispatch<AppDispatch>()
   const [currentQuestion, setCurrentQuestion] = useState(
     parseInt(hash.substring(1).split("/").at(1) || "1"),
   );
 
-  const [response, setResponse, saveResponse] = useResponse<QuizResponse, Quiz>({
+  const [response, setResponse] = useResponse<QuizResponse, Quiz>({
     type: "Quiz",
     activity: quiz,
     trackTime: false,
@@ -79,21 +84,36 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
   };
 
   // Handle "Check Answer" button click
-  const handleCheckAnswer = async (questionId: string) => {
-
+  const handleCheckAnswer = useCallback(
+    async (questionId: string) => {
       const questionToCheck = response.submission.find(
-        (item) => item.associated_activity === questionId
+        (item) => item.associated_activity === questionId,
       );
-      
-    
+
       if (questionToCheck) {
         // Only send THIS question's data
-        await saveResponse({ 
-          submission: [questionToCheck] 
-        } as Partial<QuizResponse>);
+        await dispatch(
+          saveCurrentResponseThunk({
+            submission: [questionToCheck],
+          } as Partial<QuizResponse>),
+        )
+          .unwrap()
+          .then((originalPromiseResult) => {
+            const savePayload = originalPromiseResult?.payload;
+            if (!savePayload) throw new Error();
+
+            // We must update the 'local' (redux/global) current_response with the
+            // response from the server, as we are not navingating away so we want to
+            // rerender with the new responded info (checked correct/not)
+            setResponse((savePayload as any).response as QuizResponse);
+          })
+          .catch((rejectedValueOrSerializedError) => {
+            toast.error("Something went wrong saving that question.");
+          });
       }
-    
-  };
+    },
+    [response, dispatch],
+  );
 
 
   //Used to display different statuses in the bottom circles as they navigate questions

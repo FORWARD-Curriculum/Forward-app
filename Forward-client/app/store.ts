@@ -28,7 +28,7 @@ export type RootState = StateFromReducersMapObject<typeof reducer>;
 
 const store = configureStore({
   reducer,
-  devTools: import.meta.env.DEV,
+  devTools: import.meta.env.DEV ? {actionsDenylist: ['logging/addDispatch','response/saveCurrentResponse','response/saveUserResponse']} : false,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({serializableCheck: false}).concat(actionLogMiddleware),
 });
