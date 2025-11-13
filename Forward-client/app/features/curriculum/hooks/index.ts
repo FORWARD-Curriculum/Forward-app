@@ -13,6 +13,7 @@ import {
   setCurrentContext,
   setCurrentResponse,
 } from "@/features/curriculum/slices/userLessonDataSlice";
+import store from "@/store";
 
 /**
  * Returns a the outut of a `useState<T>()` to be used on for reactive, managed response
@@ -42,14 +43,12 @@ import {
  */
 export const useResponse = <
   T extends BaseResponse,
-  E extends BaseActivity | Question | PollQuestion,
+  E extends BaseActivity,
 >({
   type,
   activity,
-  trackTime=true,
-  initialFields,
-  nonRootActivity=false,
-  disableAutoSave = false
+  trackTime = true,
+  initialFields
 }: {
   type: keyof NonNullable<LessonResponse["response_data"]>;
   activity: E;
@@ -60,7 +59,8 @@ export const useResponse = <
   disableAutoSave?: boolean;
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const state = useSelector((state: RootState) =>
+
+  let existingResponse = useSelector((state: RootState) =>
     state.response.response_data[type]
       ? state.response.response_data[type].find(
           (s) => s.associated_activity === activity.id,
@@ -68,10 +68,12 @@ export const useResponse = <
       : null,
   );
 
-  // Create state as before
-  const [response, setResponse] = useState<T>(
-    state
-      ? (state as T)
+  // Synchronously instantiate current_response, removing old/stale resp
+  const isInitialized = useRef(false);
+
+  if (!isInitialized.current) {
+    const initialResponse = existingResponse
+      ? (existingResponse as T)
       : ({
           ...({
             id: null,
@@ -81,54 +83,27 @@ export const useResponse = <
             partial_response: true,
           } satisfies BaseResponse),
           ...(initialFields as Partial<T>),
-        } as T),
+        } as T);
+
+    dispatch(setCurrentContext({ type, trackTime }));
+    dispatch(setCurrentResponse(initialResponse));
+
+    isInitialized.current = true;
+  }
+
+  const response = useSelector(
+    (state: RootState) => state.response.current_response as T,
   );
 
-  // Add a ref to track the latest response
-  const responseRef = useRef<T>(response);
+  // Exposes a setState like function, which actually updates the store
+  const setResponse: React.Dispatch<React.SetStateAction<T>> = useCallback(
+    (v) => {
+      const next =
+        typeof v === "function" ? (v as (prev: T) => T)(response) : (v as T);
+      dispatch(setCurrentResponse(next));
+    },
+    [response],
+  );
 
-  // Update the ref whenever response changes
-  useEffect(() => {
-    responseRef.current = response;
-    // TODO: Replace the above ref completely with the currentResponse state from
-    // the store, and pull it in the thunk.
-    if (!nonRootActivity) {
-      dispatch(setCurrentResponse(response)),
-      dispatch(setCurrentContext({ type, trackTime }));
-    };
-  }, [response]);
-
-  // Save response to store/server on unmount
-  // useEffect(() => {
-  //   return () => {
-  //     if (!disableAutoSave){
-  //       void saveResponse();
-  //     }
-  //   };
-  // }, []); // maybe add to dependency array
-
-  /**
-   * Dispatch to `saveUserResponseThunk` to save the current response state.
-   * 
-   * NOTE : The override currently exists for the quiz component which deal with many questions
-   * This allows it to override and send a single question as a parameter to be evlauated by the backend 
-   * Rather than the all the questions together. 
-   */
-  const saveResponse = useCallback(async (overrideResponse?: Partial<T>) => {
-    const dataToSave = overrideResponse
-      ? { ...responseRef.current, ...overrideResponse}
-      : responseRef.current
-    
-    const saved = await dispatch(
-      saveUserResponseThunk({
-        type,
-        response: dataToSave,
-        trackTime,
-      }),
-    );
-    if (saved.meta.requestStatus === "fulfilled" && saved.payload !== undefined)
-      setResponse((saved.payload as { response: BaseResponse }).response as T);
-  },[dispatch, trackTime, type]);
-
-  return [response, setResponse, saveResponse] as const;
+  return [response, setResponse] as const;
 };

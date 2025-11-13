@@ -1,8 +1,12 @@
+import { useDispatch } from "react-redux";
 import { useResponse } from "../hooks";
 import { type Embed, type EmbedResponse } from "../types";
+import type { AppDispatch } from "@/store";
+import { saveCurrentResponseThunk } from "../slices/userLessonDataSlice";
 
 export default function Embed({ embed }: { embed: Embed }) {
-  const [response, setResponse, saveResponse] = useResponse<
+  const dispatch = useDispatch<AppDispatch>()
+  const [response, setResponse] = useResponse<
     EmbedResponse,
     Embed
   >({
@@ -28,7 +32,7 @@ export default function Embed({ embed }: { embed: Embed }) {
             }}
           />
           <button className="text-primary-foreground bg-primary rounded-3xl p-2"
-          onClick={saveResponse}>
+          onClick={()=>dispatch(saveCurrentResponseThunk())}>
             Submit code
           </button>
         </div>

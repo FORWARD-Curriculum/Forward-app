@@ -4,6 +4,7 @@ import {
   type LessonResponse,
   type ActivityManager,
   ActivityTypeDisplayNames,
+  type BaseResponse,
 } from "@/features/curriculum/types";
 import type { Route } from "./+types/lesson";
 import { apiFetch } from "@/utils/utils";
@@ -39,6 +40,7 @@ import { useLocation } from "react-router";
 import {
   incrementHighestActivity,
   saveCurrentResponseThunk,
+  setCurrentResponse,
   setResponse,
 } from "@/features/curriculum/slices/userLessonDataSlice";
 import {
@@ -59,6 +61,7 @@ import {
 import MarkdownTTS from "@/components/ui/markdown-tts";
 import CustomActivity from "@/features/curriculum/components/customactivity";
 import { LoadingSpinner } from "./protected";
+import { toast } from "sonner";
 
 export async function clientLoader({
   params,
@@ -392,32 +395,46 @@ export function NextActivity() {
     <div className="mt-4 flex lg:mt-auto">
       <button
         disabled={user ? current_partial_response || undefined : false}
-        className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden"
+        className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden active:brightness-85 hover:brightness-105"
         onClick={() => {
-        setSaving(true);
-        dispatch(saveCurrentResponseThunk())
-          .unwrap()
-          .finally(() => {
-            setSaving(false);
-            if (isMobile) {
-            window.scrollTo({
-              top: 0,
-              behavior: "smooth",
-            });
-          }
-          if (current_activity === lessonLength) {
-            handleLessonComplete();
-          } else {
-            dispatch(nextActivity());
-            if (current_activity === highest_activity) {
-              dispatch(incrementHighestActivity());
-            }
-            history.replaceState(null, "", "#" + (current_activity + 1));
-          }
-          });
+          setSaving(true);
+          dispatch(saveCurrentResponseThunk())
+            .unwrap()
+            .then((originalPromiseResult) => {
+              setSaving(false);
+              if (isMobile) {
+                window.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                });
+              }
+              if (current_activity === lessonLength) {
+                handleLessonComplete();
+                // Update the state of the component if we aren't navigating off the page
+                // in this case (modal displayed)
+                if (originalPromiseResult?.payload)
+                  dispatch(
+                    setCurrentResponse(
+                      (originalPromiseResult.payload as any)
+                        .response as BaseResponse,
+                    ),
+                  );
+              } else {
+                dispatch(nextActivity());
+                if (current_activity === highest_activity) {
+                  dispatch(incrementHighestActivity());
+                }
+                history.replaceState(null, "", "#" + (current_activity + 1));
+              }
+            })
+            .catch((_) =>
+              toast.error("Something went wrong saving the activity."),
+            );
         }}
       >
-        <span className="min-w-[13ch] flex justify-center">{saving ?<LoadingSpinner/>: "Save and Continue"}</span>
+        <span className="flex min-w-[13ch] justify-center">
+          {saving ? <LoadingSpinner /> : "Save and Continue"}
+        </span>
         <ArrowRightIcon className="!text-primary-foreground" />
       </button>
       <Dialog open={showComplete} onOpenChange={setShowComplete}>

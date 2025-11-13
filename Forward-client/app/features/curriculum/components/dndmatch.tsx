@@ -18,6 +18,9 @@ import {
   useDndContext,
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "@/store";
+import { saveCurrentResponseThunk } from "../slices/userLessonDataSlice";
 
 type Item = DndMatch["content"][0]["matches"][0];
 
@@ -117,7 +120,7 @@ function DroppableCategory({
 export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
   const [activeItem, setActiveItem] = useState<Item | null>(null);
 
-  const [response, setResponse, saveResponse] =
+  const [response, setResponse] =
     useResponse<DndMatchResponse, DndMatch>({
       type: "DndMatch",
       activity: dndmatch,
@@ -167,7 +170,7 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
       ...prev,
       submission: submissionArray,
     }));
-  }, [submission, setResponse]);
+  }, [submission]);
 
   const [itemValidation, setItemValidation] = useState(
     new Map<UniqueIdentifier, boolean>(),
@@ -278,6 +281,8 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
     [allItems, unmatchedItems, submission],
   );
 
+  const dispatch = useDispatch<AppDispatch>()
+
   const handleCheck = useCallback(() => {
     const { strict } = dndmatch;
     const newItemValidation = new Map<UniqueIdentifier, boolean>();
@@ -336,7 +341,7 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
       partial_response: newPartialResponse,
       attempts_left: newPartialResponse ? prev.attempts_left - 1 : 0,
     })});
-    if (!response.partial_response) saveResponse();
+    if (!response.partial_response) dispatch(saveCurrentResponseThunk());
   }, [
     submission,
     correctAnswers,
@@ -344,7 +349,7 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
     setResponse,
     unmatchedItems.length,
     response.partial_response,
-    saveResponse,
+    dispatch,
   ]);
 
   useEffect(() => {
