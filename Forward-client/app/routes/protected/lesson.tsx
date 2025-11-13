@@ -304,8 +304,10 @@ export function TableOfContents() {
                     key={activityIndex.order}
                     className={`${activityIndex.order === current_activity ? "bg-accent/40" : ""} group disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                     onClick={() => {
-                      dispatch(saveCurrentResponseThunk());
-                      dispatch(setActivity(activityIndex.order));
+                      if(current_activity!=activityIndex.order){
+                        dispatch(saveCurrentResponseThunk());
+                        dispatch(setActivity(activityIndex.order));
+                      }
                       history.replaceState(null, "", `#${activityIndex.order}`);
                     }}
                   >
@@ -501,9 +503,6 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
       }
     }
   }, [loaderData]);
-
-  // Save on nav off
-  useEffect(()=>()=>{dispatch(saveCurrentResponseThunk())},[])
 
   return (
     <div className="m-4 flex w-full max-w-screen flex-col items-center gap-4 lg:mt-7 lg:mr-8 lg:mb-12 lg:ml-24 lg:flex-row lg:items-start lg:gap-8">

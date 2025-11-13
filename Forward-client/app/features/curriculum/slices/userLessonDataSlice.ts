@@ -13,6 +13,7 @@ import type { RootState } from "@/store";
 type ResponseContext = {
   type: keyof NonNullable<LessonResponse["response_data"]>;
   trackTime: boolean;
+  current_response_saved: boolean;
 } | null;
 
 export const initialLessonResponseState: LessonResponse & {
@@ -190,6 +191,7 @@ export const userLessonDataSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(saveUserResponseThunk.fulfilled, (state, action) => {
+      if(state.current_context) state.current_context.current_response_saved = true; // fulfilled = it was actually saved
       if (state.response_data && action.payload) {
         const { type, response } = action.payload;
         const existingResponseIndex = state.response_data[type].findIndex(
