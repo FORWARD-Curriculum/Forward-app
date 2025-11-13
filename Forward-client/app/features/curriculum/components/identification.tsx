@@ -189,7 +189,6 @@ export default function Identification({
     IdentificationResponse,
     Identification
   >({
-    type: "Identification",
     activity: identification,
     initialFields: {
       identified: 0,

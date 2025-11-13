@@ -87,7 +87,6 @@ export function PromptArea({
 export default function Writing({ writing }: { writing: Writing }) {
   const [realResponse, setRealResponse] = useResponse<WritingResponse, Writing>(
     {
-      type: "Writing",
       activity: writing,
       initialFields: {
         responses: writing.prompts.map((p) => ({

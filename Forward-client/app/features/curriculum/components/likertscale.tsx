@@ -12,7 +12,6 @@ export default function LikertScale({
 
   const [response, setResponse] = useResponse<LikertScaleResponse, LikertScale>(
     {
-      type: "LikertScale",
       activity: likertScale,
       initialFields: {
         content: {

@@ -22,8 +22,6 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
 
   useResponse<SlideshowResponse, SlideshowType>({
     activity: slideshow,
-    type: "Slideshow",
-    trackTime: true,
     initialFields: {
       partial_response: false,
     },

@@ -11,7 +11,6 @@ export default function Embed({ embed }: { embed: Embed }) {
     Embed
   >({
     activity: embed,
-    type: "Embed",
     trackTime: true,
     initialFields: { inputted_code: "", partial_response: embed.has_code },
   });

@@ -27,7 +27,6 @@ export const initialLessonResponseState: LessonResponse & {
     PollQuestion: [],
     Writing: [],
     FillInTheBlank: [],
-    // Question: [],
     TextContent: [],
     ConceptMap: [],
     Identification: [],
@@ -100,6 +99,41 @@ export const saveUserResponseThunk = createAsyncThunk(
   },
 );
 
+/**
+ * Provides a function that may be used anywhere in-app to save whatever the current
+ * managed response is in memory. This is useful/different from before, as now, the
+ * high-level lesson component manages saving data to the backend, but allows us to not
+ * proceed in the lesson if the backend fails, contrary to prior, when the student could
+ * happily continue on without saving anything.
+ * 
+ * It is also important to note that current_response in the slice is NOT updated on a
+ * fulfilled request, as the assumption is this being primarily used on a navigation AWAY
+ * from some component expecting current_response to be their own, and not what may have
+ * overrwritten it on hook initialization.
+ * 
+ * If, there is a case where the active activity compnent needs to have up-to-date info
+ * from the backend (see the quiz.tsx compnent) OR saving occurs on a non-unmounting event,
+ * such as the end of a lesson displaying a modal and saving response at the same time,
+ * the pattern I have chosen to adopt is to call the thunk and update current_response as
+ * follows:
+ * 
+ * @example
+ * ```ts
+ * await dispatch(saveCurrentResponseThunk())
+ *   .unwrap()
+ *   .then((save_response_thunk_result) => {
+ *     const user_response_thunk_result = save_response_thunk_result?.payload;
+ *     if (!user_response_thunk_result) throw new Error();
+ *     setCurrentResponse((user_response_thunk_result as any).response as BaseResponse);
+ *   })
+ *   .catch((rejectedValueOrSerializedError) => {
+ *     toast.error("Something went wrong saving that question.");
+ *   });
+ * ```
+ * 
+ * If, dear reader, you wish to make a helper function that auto-toasts or magically handles
+ * this, be my guest, but I prefer the explicit-ness of this right now.
+ */
 export const saveCurrentResponseThunk = createAsyncThunk(
   "response/saveCurrentResponse",
   async (
@@ -157,8 +191,6 @@ export const userLessonDataSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(saveUserResponseThunk.fulfilled, (state, action) => {
       if (state.response_data && action.payload) {
-        // if (action.payload.response) state.current_response = action.payload.response;
-
         const { type, response } = action.payload;
         const existingResponseIndex = state.response_data[type].findIndex(
           (s) => s.associated_activity === response.associated_activity,
