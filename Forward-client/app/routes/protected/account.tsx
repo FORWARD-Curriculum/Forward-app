@@ -14,7 +14,7 @@ import {
   Square,
   Turtle,
 } from "lucide-react";
-import { apiFetch } from "@/utils/utils";
+import { apiFetch, useTitle } from "@/utils/utils";
 import { useAuth } from "@/features/account/hooks";
 import { toast } from "sonner";
 import {
@@ -112,6 +112,7 @@ export default function account() {
   const updateUser = useAuth().update;
   const user = useSelector((s: RootState) => s.user.user) as User;
   const dispatch = useDispatch<AppDispatch>();
+  useTitle("My Account | Forward");
 
   //TTS Customs
   const { voices } = useVoices();
