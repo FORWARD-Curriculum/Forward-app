@@ -12,6 +12,7 @@ from botocore.exceptions import ClientError
 import re, os
 import json
 import copy
+from abc import abstractmethod
 from django_jsonform.models.fields import JSONField
 from martor.models import MartorField
 from django.utils.safestring import mark_safe
@@ -310,6 +311,7 @@ class BaseActivity(models.Model):
     def activity_type(self):
         return self.__class__.__name__
 
+    @abstractmethod
     def to_dict(self):
         return {
             "id": self.id,
@@ -434,6 +436,14 @@ class Identification(BaseActivity):
         }
         
 
+from imagefield.fields import ImageField
+FORMATS = {
+            "micro":   ["default", ("thumbnail", (240,  240))],
+            "mobile":  ["default", ("thumbnail", (480,  480))],
+            "tablet":  ["default", ("thumbnail", (800,  800))],
+            "desktop": ["default", ("thumbnail", (1500, 1500))],
+        }
+
 class IdentificationItem(models.Model):
     id = models.UUIDField(
         primary_key=True,
@@ -468,10 +478,11 @@ class IdentificationItem(models.Model):
         help_text="""This field is a list of selectable rectangles on the image. Any rectangles you define in the list will show 
         up after this Activity has been saved, this means, to see any rectangles you must save at least once.""",
         verbose_name="Coordinates", blank=True, null=True)
-    image = models.ImageField(
+    
+    image = ImageField(
         upload_to='public/identification/items/images', blank=False, null=False, help_text="""The image below automatically shows
         percentage values when hovered. If the tooltop at the bottom is not visible, holding still for a bit will show a tooltop
-        with the percentage of the image you are hovered over.""")
+        with the percentage of the image you are hovered over.""",auto_add_fields=True, formats={**FORMATS},)
 
     class Meta:
         ordering = ("order",)
@@ -480,7 +491,8 @@ class IdentificationItem(models.Model):
         return {
             "areas": [[area['x1'], area['y1'], area['x2'], area['y2']] for area in self.areas] if self.areas else None,
             "image": self.image.url if self.image else None,
-            "hints": self.hints
+            "hints": self.hints,
+            "_image": {"srcset": ", ".join([f"{getattr(self.image, key, None)} {FORMATS[key][1][1][0]}w" for key in FORMATS.keys()]), "src": self.image.micro}
         }
 
 
@@ -1339,6 +1351,7 @@ class BaseResponse(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
+    @abstractmethod
     def to_dict(self):
         return {
             "id": self.id,
