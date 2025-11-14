@@ -479,7 +479,7 @@ class IdentificationItem(models.Model):
         up after this Activity has been saved, this means, to see any rectangles you must save at least once.""",
         verbose_name="Coordinates", blank=True, null=True)
     
-    image = ImageField(
+    image = models.ImageField(
         upload_to='public/identification/items/images', blank=False, null=False, help_text="""The image below automatically shows
         percentage values when hovered. If the tooltop at the bottom is not visible, holding still for a bit will show a tooltop
         with the percentage of the image you are hovered over.""",auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
