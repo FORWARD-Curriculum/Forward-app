@@ -19,35 +19,35 @@
       "instructions": "Click through the pages to learn more about communication as a tool.",
       "slides": [
         {
-          "content": "Communication is one of the most important skills we use every day. It helps us share our thoughts, build connections, and create understanding with others. Strong communication isn't just about talking--it's about listening, being clear, and finding the right balance between honesty and respect. These skills can open doors in school, work, and relationships.\n\n**Communication is one of the most powerful tools we use every day--it shapes relationships, opportunities, and trust. It is a key part of our lives and humanity.**",
+          "content": "Communication is one of the most important skills we use every day. It helps us share our thoughts, build connections, and create understanding with others. Strong communication isn't just about talking--it's about listening, being clear, and finding the right balance between honesty and respect. These skills can open doors in school, work, and relationships.\n\n Communication is one of the most powerful tools we use every day--it shapes relationships, opportunities, and trust. It is a key part of our lives and humanity.\n <br>",
           "image": "youth talking.jpg"
         },
         {
-          "content": "**Good communication helps us connect with others, share our ideas, and work toward our goals.**",
+          "content": "Good communication helps us connect with others, share our ideas, and work toward our goals.",
           "image": "discussion.jpg"
         },
         {
-          "content": "**It's not just about talking--listening and understanding are just as important as expressing yourself. Being a good communicator involves actively listening.**",
+          "content": "It's not just about talking--listening and understanding are just as important as expressing yourself. Being a good communicator involves actively listening.",
           "image": "casualconvo.jpg"
         },
         {
-          "content": "**Clear and respectful communication builds trust with friends, teachers, employers, and family. Lacking good communication skills can lead to misunderstandings, frustration, and hurt feelings.**",
+          "content": "Clear and respectful communication builds trust with friends, teachers, employers, and family. Lacking good communication skills can lead to misunderstandings, frustration, and hurt feelings.",
           "image": "couple talking.jpg"
         },
         {
-          "content": "**One part of being a good communicator is being honest. Being honest doesn't mean sharing everything--it means expressing what you do share in a truthful, respectful way.**",
+          "content": "One part of being a good communicator is being honest. Being honest doesn't mean sharing everything--it means expressing what you do share in a truthful, respectful way.",
           "image": "honest.jpg"
         },
         {
-          "content": "**In addition to the words used when communicating, tone and attitude also matter. It's not just about what you say, but how and when you say it.**",
+          "content": "In addition to the words used when communicating, tone and attitude also matter. It's not just about what you say, but how and when you say it.",
           "image": "crossingtheroad.jpg"
         },
         {
-          "content": "**Body language, tone, and facial expressions can send powerful messages without words. This is called non-verbal communication.**",
+          "content": "Body language, tone, and facial expressions can send powerful messages without words. This is called non-verbal communication.",
           "image": "teenschatting.jpg"
         },
         {
-          "content": "**Every conversation is a chance to practice, learn, and strengthen your skills as a communicator.**",
+          "content": "Every conversation is a chance to practice, learn, and strengthen your skills as a communicator.",
           "image": "groupofteens.jpg"
         }
       ]
@@ -64,7 +64,8 @@
       "type": "textcontent",
       "title": "Professional Communication",
       "instructions": null,
-      "content": "Communication looks different depending on context. In casual situations with friends, we might laugh loudly, use slang, or interrupt playfully without being seen as rude. In more professional settings like school or work, communication is deliberately respectful and intentional. The tone should be clear and calm rather than joking or exaggerated. Body language also matters--professional communication often includes making eye contact, nodding to show understanding, and keeping posture open and attentive.\n\n![Professional communication](professional.jpg)\n\nProfessional communication uses polite and complete language. This might mean speaking in full sentences instead of short phrases, avoiding curses, and choosing words that are respectful. Tone is often steady and polite, rather than sarcastic or overly relaxed. Body language that supports professionalism includes a firm handshake, standing or sitting upright, and not fidgeting while someone else is speaking. These details show that you are serious, reliable, and capable of handling responsibility.\n\n<def def='Doing something on purpose, with thought and intention, instead of by accident.'>Deliberately</def>"
+      "image": "professional.jpg",
+      "content": "Communication looks different depending on context. In casual situations with friends, we might laugh loudly, use slang, or interrupt playfully without being seen as rude. In more professional settings like school or work, communication is deliberately respectful and intentional. The tone should be clear and calm rather than joking or exaggerated. Body language also matters--professional communication often includes making eye contact, nodding to show understanding, and keeping posture open and attentive\n\n <br> Professional communication uses polite and complete language. This might mean speaking in full sentences instead of short phrases, avoiding curses, and choosing words that are respectful. Tone is often steady and polite, rather than sarcastic or overly relaxed. Body language that supports professionalism includes a firm handshake, standing or sitting upright, and not fidgeting while someone else is speaking. These details show that you are serious, reliable, and capable of handling responsibility.\n\n<def def='Doing something on purpose, with thought and intention, instead of by accident.'>Deliberately</def>"
     },
     {
       "type": "dndmatch",
@@ -109,7 +110,7 @@
     {
       "type": "fillintheblank",
       "title": "Practicing Written Communication",
-      "instructions": "Written communication is any message you share through words on paper or screens, such as texts, emails, letters, or notes. It is important because it gives you time to think about what you want to say and allows others to go back and read your words later. Strong written communication means using clear words, correct spelling, and an appropriate tone depending on who will read it. For example, the way you write to a teacher or employer should look more professional than how you text a close friend. Practicing written communication helps you express your thoughts clearly, build stronger relationships, and show responsibility in school, work, and daily life.\n\nImagine you are writing a cover letter to send with a job application for an entry level position at a grocery store. Even though this is an entry level position, you still want to be as professional as possible -- it could mean the difference between being hired or not. Fill in the blank truthfully, and to the best of your ability, while also being professional. This means having proper punctuation, spelling, and grammar; complete sentences; and using appropriate language. If you need help, view the example cover letter to review what kind of things you might say.",
+      "instructions": "Written communication is any message you share through words on paper or screens, such as texts, emails, letters, or notes. It is important because it gives you time to think about what you want to say and allows others to go back and read your words later. Strong written communication means using clear words, correct spelling, and an appropriate tone depending on who will read it. For example, the way you write to a teacher or employer should look more professional than how you text a close friend. Practicing written communication helps you express your thoughts clearly, build stronger relationships, and show responsibility in school, work, and daily life.\n\n <br> Imagine you are writing a cover letter to send with a job application for an entry level position at a grocery store. Even though this is an entry level position, you still want to be as professional as possible -- it could mean the difference between being hired or not. Fill in the blank truthfully, and to the best of your ability, while also being professional. This means having proper punctuation, spelling, and grammar; complete sentences; and using appropriate language. If you need help, view the example cover letter to review what kind of things you might say.",
       "image": "writing.jpg",
       "content": [
         "I am excited to apply for the <options></options> position at Safeway grocery store. I am interested in this job because <options></options>. I believe I can contribute to your store by <options></options>.",
@@ -122,7 +123,7 @@
     {
       "type": "writing",
       "title": "Verbal and Non-Verbal Communication",
-      "instructions": "Verbal communication is the way we use words to talk with others. We use it to share ideas, ask questions, and give information. The words we choose and how clearly we speak can change how well people understand us. At work or school, clear and respectful words help build trust and avoid confusion. With friends, our words help us tell stories, laugh, and share how we feel. No matter the situation, spoken words are one of the easiest ways to communicate.\n\nNon-verbal communication is the way we send messages without using words. This includes our facial expressions, <def def='Hand and body movements that help to communicate. For example, a shrug or pointing.'>gestures</def>, body posture, and even the tone of our voice. These signals can show feelings or add meaning to what we say. In professional settings, good non-verbal communication can show confidence, respect, and attention. With friends, it can make our conversations feel more fun and connected. Paying attention to body language--both ours and others'--can make our communication stronger and clearer.",
+      "instructions": "Verbal communication is the way we use words to talk with others. We use it to share ideas, ask questions, and give information. The words we choose and how clearly we speak can change how well people understand us. At work or school, clear and respectful words help build trust and avoid confusion. With friends, our words help us tell stories, laugh, and share how we feel. No matter the situation, spoken words are one of the easiest ways to communicate.\n\n <br> Non-verbal communication is the way we send messages without using words. This includes our facial expressions, <def def='Hand and body movements that help to communicate. For example, a shrug or pointing.'>gestures</def>, body posture, and even the tone of our voice. These signals can show feelings or add meaning to what we say. In professional settings, good non-verbal communication can show confidence, respect, and attention. With friends, it can make our conversations feel more fun and connected. Paying attention to body language--both ours and others'--can make our communication stronger and clearer.",
       "prompts": [
         {"prompt":"Think about a conversation you recently had with a peer or teacher. What did the person say with their words? Write about what they said through verbal communication."},
         {"prompt":"Now shift your thinking. What did the person say with their face, body, tone, and gestures? Write about what they said with non-verbal communication."}
@@ -131,12 +132,12 @@
     {
       "type": "quiz",
       "title": "Recognizing Non-Verbal Communication",
-      "instructions": "Learning to understand non-verbal communication can help you become a stronger communicator. This activity will help you recognize non-verbal messages shown in each image or video. Keep in mind that many non-verbal communication patterns depend on culture and region. The patterns in this activity are based on common examples from the United States.\n\nIt's important not to assume you always know exactly what someone's body language means, since non-verbal signals can also be influenced by things like being tired, stressed, or distracted. That's why checking in and clarifying with the speaker is important. Practicing with this activity will help you notice common patterns and begin to think more carefully about what non-verbal communication might be saying.\n\nFor each question, select what you think the non-verbal communication is saying. The goal is to practice noticing these signals, not to be perfect.",
+      "instructions": "Learning to understand non-verbal communication can help you become a stronger communicator. This activity will help you recognize non-verbal messages shown in each image or video. Keep in mind that many non-verbal communication patterns depend on culture and region. The patterns in this activity are based on common examples from the United States.\n\n <br> It's important not to assume you always know exactly what someone's body language means, since non-verbal signals can also be influenced by things like being tired, stressed, or distracted. That's why checking in and clarifying with the speaker is important. Practicing with this activity will help you notice common patterns and begin to think more carefully about what non-verbal communication might be saying.\n\n <br> For each question, select what you think the non-verbal communication is saying. The goal is to practice noticing these signals, not to be perfect.",
       "passing_score": 0,
       "feedback_config": {},
       "questions": [
         {
-          "question_text": "![Image](nonverbal1.jpg)\n\nWhat non-verbal message is this person showing?",
+          "question_text": "What non-verbal message is this person showing?",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "is_required": true,
@@ -154,10 +155,11 @@
           "feedback_config": {
             "correct": "That's correct! You can tell this is sadness by how the person's eyes are cast downward and their mouth forms a frown.",
             "incorrect": "Try again!"
-          }
+          },
+          "image": "nonverbal1.jpg"
         },
         {
-          "question_text": "![Image](nonverbal2.jpg)\n\nWhich feeling is being expressed without words here?",
+          "question_text": "Which feeling is being expressed without words here?",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "is_required": true,
@@ -171,10 +173,11 @@
           "feedback_config": {
             "correct": "That's correct! You can tell this is boredom by the person's empty stare, flat mouth, and slouched posture.",
             "incorrect": "Try again!"
-          }
+          },
+          "image": "nonverbal2.jpg"
         },
         {
-          "question_text": "![Image](nonverbal3.jpg)\n\nWhat is the person on the left communicating in this image?",
+          "question_text": "What is the person on the left communicating in this image?",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "is_required": true,
@@ -188,10 +191,11 @@
           "feedback_config": {
             "correct": "That's correct! You can tell this is welcoming by how the person's body leans forward slightly and their posture is open toward the other person.",
             "incorrect": "Try again!"
-          }
+          },
+          "image": "nonverbal3.jpg"
         },
         {
-          "question_text": "![Image](nonverbal4.jpg)\n\nWhat is this person's body language communicating",
+          "question_text": "What is this person's body language communicating",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "is_required": true,
@@ -213,10 +217,11 @@
           "feedback_config": {
             "correct": "That's correct! You can tell they are closed off by their crossed arms and the way their body is turned slightly away.",
             "incorrect": "Try again!"
-          }
+          },
+          "image": "nonverbal4.jpg"
         },
         {
-          "question_text": "![Image](nonverbal5.jpg)\n\nBased on their expression, what is this person saying non-verbally?",
+          "question_text": "Based on their expression, what is this person saying non-verbally?",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "is_required": true,
@@ -230,10 +235,11 @@
           "feedback_config": {
             "correct": "That's correct! You can tell this person is worried by their furrowed brows and tense mouth.",
             "incorrect": "Try again!"
-          }
+          },
+          "image": "nonverbal5.jpg"
         },
         {
-          "question_text": "![Video](nonverbal6.mp4)\n\nWhat do you think this person is showing through their non-verbal cues?",
+          "question_text": "What do you think this person is showing through their non-verbal cues?",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "is_required": true,
@@ -259,10 +265,11 @@
           "feedback_config": {
             "correct": "That's correct! You can tell this person is excited by their big smile and how they pump their fists in the air.",
             "incorrect": "Try again!"
-          }
+          },
+          "video": "nonverbal6.mp4"
         },
         {
-          "question_text": "![Video](nonverbal7.mp4)\n\nBased on their expression and body language, what is the non-verbal message this person is communicating?",
+          "question_text": "Based on their expression and body language, what is the non-verbal message this person is communicating?",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "is_required": true,
@@ -288,10 +295,11 @@
           "feedback_config": {
             "correct": "That's correct! You can tell this person is serious by their straight face, direct eye contact, and eyebrows drawn together.",
             "incorrect": "Try again!"
-          }
+          },
+          "video": "nonverbal7.mp4"
         },
         {
-          "question_text": "![Video](nonverbal8.mp4)\n\nWhat do these people's non-verbal behaviors suggest?",
+          "question_text": "What do these people's non-verbal behaviors suggest?",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "is_required": true,
@@ -309,10 +317,11 @@
           "feedback_config": {
             "correct": "That's correct! You can tell they're in love by their soft smiles, open body language, and how they lean toward each other.",
             "incorrect": "Try again!"
-          }
+          },
+          "video": "nonverbal8.mp4"
         },
         {
-          "question_text": "![Video](nonverbal9.mp4)\n\nWhat is being communicated through this person's actions?",
+          "question_text": "What is being communicated through this person's actions?",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "is_required": true,
@@ -338,10 +347,11 @@
           "feedback_config": {
             "correct": "That's correct! You can tell they're enjoying their work by the way they dance, smile, and move lightly as they complete tasks.",
             "incorrect": "Try again!"
-          }
+          },
+          "video": "nonverbal9.mp4"
         },
         {
-          "question_text": "![Video](nonverbal10.mp4)\n\nWhich feeling or message is being expressed without words here?",
+          "question_text": "Which feeling or message is being expressed without words here?",
           "question_type": "multiple_choice",
           "has_correct_answer": true,
           "is_required": true,
@@ -367,7 +377,8 @@
           "feedback_config": {
             "correct": "That's correct! You can tell this person is focused by their steady gaze, nodding, and slightly furrowed brows while listening.",
             "incorrect": "Try again!"
-          }
+          },
+          "video": "nonverbal10.mp4"
         }
       ]
     },
@@ -375,7 +386,7 @@
       "type": "conceptmap",
       "title": "Adapting Communication for Different Audiences",
       "instructions": "To learn more about how audience changes communication, read about Ava and the time she spilled her lunch in the cafeteria at school. She told a few different people about the incident, but because the audience changed, the information she shared changed too.",
-      "content": "Every time we communicate, we're talking to an audience -- whether that's one person, a group of people, or even ourselves. Our audience shapes the words we choose, the details we share, and even the tone of our voice. Talking to a teacher often looks different than talking to a sibling, and the way we tell a story to a boss may not be the same way we'd share it with a best friend. Being aware of our audience helps us make choices about what to say, how much to share, and how to say it respectfully.\n\nChanging communication for different audiences doesn't mean being fake. Instead, it shows that we understand the situation and the relationship. For example, using casual language with a friend can help us connect, while using more professional language with an employer shows responsibility. Thinking about audience is part of being an effective communicator because it helps our message land in the way we intend.",
+      "content": "Every time we communicate, we're talking to an audience -- whether that's one person, a group of people, or even ourselves. Our audience shapes the words we choose, the details we share, and even the tone of our voice. Talking to a teacher often looks different than talking to a sibling, and the way we tell a story to a boss may not be the same way we'd share it with a best friend. Being aware of our audience helps us make choices about what to say, how much to share, and how to say it respectfully.\n\n <b> Changing communication for different audiences doesn't mean being fake. Instead, it shows that we understand the situation and the relationship. For example, using casual language with a friend can help us connect, while using more professional language with an employer shows responsibility. Thinking about audience is part of being an effective communicator because it helps our message land in the way we intend.",
       "examples": [
         {
           "title": "To her mom",
@@ -406,7 +417,7 @@
     {
       "type": "video",
       "title": "Oversharing",
-      "instructions": "Oversharing happens when someone gives out more personal information than is needed for a situation. For example, telling a friend what you ate for lunch might be fine, but telling a teacher all the details about your crush or relationship probably isn't the right time or place. Oversharing can make other people feel uncomfortable, or it can lead to people knowing things about you that you don't want shared. It's important to think about who your audience is, what your relationship with them is like, and whether the details you want to share are necessary for the conversation.\n\nLearning to recognize and avoid oversharing is a useful skill for both personal and professional situations. On the job, it shows maturity when you can keep conversations friendly but focused without spilling too much private information. With friends and family, it helps you set healthy boundaries and protect your privacy. Remember, you're in control of how much you share about your life, and it's okay to keep some things just for yourself.\n\nWatch the video to learn about Jordan and his experience with oversharing.",
+      "instructions": "Oversharing happens when someone gives out more personal information than is needed for a situation. For example, telling a friend what you ate for lunch might be fine, but telling a teacher all the details about your crush or relationship probably isn't the right time or place. Oversharing can make other people feel uncomfortable, or it can lead to people knowing things about you that you don't want shared. It's important to think about who your audience is, what your relationship with them is like, and whether the details you want to share are necessary for the conversation.\n\n <b> Learning to recognize and avoid oversharing is a useful skill for both personal and professional situations. On the job, it shows maturity when you can keep conversations friendly but focused without spilling too much private information. With friends and family, it helps you set healthy boundaries and protect your privacy. Remember, you're in control of how much you share about your life, and it's okay to keep some things just for yourself.\n\n <b> Watch the video to learn about Jordan and his experience with oversharing.",
       "video": "Oversharing video.mp4",
       "scrubbable": false
     },
@@ -414,12 +425,13 @@
       "type": "textcontent",
       "title": "Understanding Disclosure and Levels of Communication",
       "instructions": "Read the infographic below to learn about levels of communication and what you might consider sharing in different situations.",
-      "content": "Disclosure means sharing information that was not previously known. Anytime you share information with someone that was previously kept secret, you are disclosing information. There are different levels of sharing that are appropriate for different situations, your comfortability, and your audience. Disclosing some details in some situations might be considered oversharing, but in other situations it is necessary to share.\n\n![Levels of Communication](levels_of_communication.png)"
+      "image": "levels_of_communication.png",
+      "content": "Disclosure means sharing information that was not previously known. Anytime you share information with someone that was previously kept secret, you are disclosing information. There are different levels of sharing that are appropriate for different situations, your comfortability, and your audience. Disclosing some details in some situations might be considered oversharing, but in other situations it is necessary to share."
     },
     {
       "type": "likertscale",
       "title": "Is This My Story to Tell?",
-      "instructions": "Another important question is whether the information you're about to share is really yours to share. Sometimes we hold details about friends, family, or classmates that may feel important in the moment, but those details belong to them, not us. Sharing someone else's story without their permission can damage trust and cause harm. When deciding whether to disclose something, pause and ask yourself: *Is this my story to tell?*\n\nIt's also worth remembering that even information about yourself can affect others. For example, if you talk about something that happened at home, it may also reveal things about your family that they might not want shared. Thinking about ownership of information helps us practice respect, protect relationships, and keep communication safe and responsible.\n\n![The Three Gates Poem](The Three Gates Poem.pdf)\n\nFor each item, consider whether or not you would share the information with a friend. Use the scale to show whether you \"Would absolutely NOT share\" or \"Definitely WOULD share\" or somewhere in between.",
+      "instructions": "Another important question is whether the information you're about to share is really yours to share. Sometimes we hold details about friends, family, or classmates that may feel important in the moment, but those details belong to them, not us. Sharing someone else's story without their permission can damage trust and cause harm. When deciding whether to disclose something, pause and ask yourself: *Is this my story to tell?* <b> It's also worth remembering that even information about yourself can affect others. For example, if you talk about something that happened at home, it may also reveal things about your family that they might not want shared. Thinking about ownership of information helps us practice respect, protect relationships, and keep communication safe and responsible.\n\n <b> For each item, consider whether or not you would share the information with a friend. Use the scale to show whether you \"Would absolutely NOT share\" or \"Definitely WOULD share\" or somewhere in between.",
       "content": [
         {
           "statement": "That you got a bad grade on a test.",

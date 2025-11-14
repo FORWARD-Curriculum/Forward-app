@@ -1033,6 +1033,7 @@ class ConceptMap(BaseActivity):
         verbose_name = "Concept Map"
         verbose_name_plural = "Concept Maps"
 
+    #TODO return and configure images for fill in the blank activities
     def to_dict(self):
         return {
             **super().to_dict(),
