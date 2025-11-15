@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Expand, FileVolume } from "lucide-react";
-import Pie from "@/components/ui/cprogress";
+import CircularProgress from "@/components/ui/cprogress";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import type { User } from "@/features/account/types";
@@ -237,11 +237,11 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                       if (e.completion != 0)
                         return (
                           <div className="flex items-center" key={e.id}>
-                            <Pie
+                            <CircularProgress
                               size={120}
                               percentage={e.completion * 100}
                               color=""
-                            />
+                            >{(e.completion * 100).toFixed(0)}%</CircularProgress>
                             <Link
                               prefetch="intent"
                               to={"/lesson/" + e.id}
