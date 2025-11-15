@@ -195,7 +195,7 @@ class QuizAdmin(BaseActivityAdmin):
     inlines = [QuestionInline]
     list_display = ("title", "lesson", "order", "passing_score")
 
-class SlideInline(SortableTabularInline):
+class SlideInline(admin.TabularInline):
     model=Slide
     readonly_fields = ("image_preview",)
     extra = 0
@@ -206,7 +206,7 @@ class SlideInline(SortableTabularInline):
     image_preview.short_description = "Image Preview"
 
 @admin.register(Slideshow, site=custom_admin_site)
-class SlideshowAdmin(SortableAdminMixin, BaseActivityAdmin):
+class SlideshowAdmin(BaseActivityAdmin):
     grouping = "Activities"
     inlines = [SlideInline]
     list_display = ("title", "lesson", "order")

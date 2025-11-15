@@ -15,7 +15,7 @@ const Circle = ({
   color?: string;
   size: number;
 }) => {
-  const r = size * 0.35; // Make radius relative to size
+  const r = size * 0.35;
   const circ = 2 * Math.PI * r;
   if (!percentage) percentage = 0;
   const strokePct = ((100 - percentage) * circ) / 100;
@@ -26,57 +26,48 @@ const Circle = ({
       cy={size / 2}
       fill="transparent"
       stroke={strokePct !== circ ? color || "var(--accent, currentColor)" : ""}
-      strokeWidth={size * 0.1} // Make stroke width relative to size
+      strokeWidth={size * 0.1}
       strokeDasharray={circ}
       strokeDashoffset={percentage ? strokePct : 0}
     ></circle>
   );
 };
 
-const Text = ({
-  percentage,
-  size = 200,
-}: {
-  percentage: number;
-  size: number;
-}) => {
-  return (
-    <text
-      x="50%"
-      y="50%"
-      dominantBaseline="central"
-      textAnchor="middle"
-      fontSize={`${size * 0.15}px`} // Make font size relative to container size
-      fill="var(--text-secondary-foreground, currentColor)"
-    >
-      {percentage.toFixed(0)}%
-    </text>
-  );
-};
-/**
- * A circle who's border represents something's progress
- * @param {number} percentage - 0-100
- * @returns
- */
-const Pie = ({
+export default function CircularProgress({
   percentage,
   color,
   size = 200,
+  children,
+  className,
 }: {
   percentage: number;
   color: string;
   size: number;
-}) => {
+  children?: React.ReactNode;
+  className?: string;
+}) {
   const pct = cleanPercentage(percentage);
   return (
-    <svg width={size} height={size}>
+    <svg width={size} height={size} className={className}>
       <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
         <Circle size={size} color="lightgrey" />
         <Circle size={size} color={color} percentage={pct} />
       </g>
-      <Text percentage={pct} size={size} />
+      {children && (
+        <foreignObject x={0} y={0} width={size} height={size}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            {children}
+          </div>
+        </foreignObject>
+      )}
     </svg>
   );
 };
-
-export default Pie;

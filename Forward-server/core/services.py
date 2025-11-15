@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, Embed, EmbedResponse, Facility
+from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, Embed, EmbedResponse, Facility, BaseResponse
 from rest_framework.request import Request as DRFRequest
 from django.core.exceptions import ValidationError as DjangoValidationError
 
@@ -201,8 +201,10 @@ class ResponseService:
                 out_dict['response_data'][Activity.__name__] = [a.to_dict() for a in list(Response.objects.filter(lesson=lesson,user=user))]
         
         out_dict['highest_activity'] = 1
-        for value in out_dict['response_data'].values():
-            out_dict['highest_activity'] += len(value)
+        for activity_type in out_dict['response_data'].values():
+            response: dict
+            for response in activity_type:
+                out_dict['highest_activity'] += 1 if response.get('partial_response', False) == False else 0
 
 
         return {

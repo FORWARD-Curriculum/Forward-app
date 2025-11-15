@@ -234,6 +234,7 @@ export interface Twine extends BaseActivity {
 
 export interface Slideshow extends BaseActivity {
   slides: {content: string; image: Image | null}[]
+  force_wait: number
 }
 
 export interface CustomActivity extends BaseActivity {
@@ -313,7 +314,9 @@ export interface WritingResponse extends BaseResponse {
 }
 
 export interface TextContentResponse extends BaseResponse {}
-export interface SlideshowResponse extends BaseResponse {}
+export interface SlideshowResponse extends BaseResponse {
+  highest_slide: number;
+}
 export interface CustomActivityResponse extends BaseResponse {}
 export interface ConceptMapResponse extends BaseResponse {}
 export interface IdentificationResponse extends BaseResponse {

@@ -1189,13 +1189,18 @@ class LikertScale(BaseActivity):
         
 class Slideshow(BaseActivity):
     
+    force_wait = models.IntegerField(default=0, help_text="""The amount of time, per-slide, in seconds, a student must wait
+                                     before being able to proceed to the next. A value of 0 (the default) will allow the student
+                                     to navigate freely at their own pace.""")
+    
     def get_num_slides(self):
         return Slide.objects.filter(slideshow=self).count()
     
     def to_dict(self):
         return {
             **super().to_dict(),
-            "slides": [s.to_dict() for s in Slide.objects.filter(slideshow=self).order_by('order')]
+            "slides": [s.to_dict() for s in Slide.objects.filter(slideshow=self).order_by('order')],
+            "force_wait": self.force_wait
         }
     
 class Slide(models.Model):
@@ -1406,6 +1411,8 @@ class SlideshowResponse(BaseResponse):
         help_text='The slideshow this response is for'
     )
     
+    highest_slide = models.IntegerField(default=-1, help_text="highest slide student has gotten to")
+    
     class Meta:
         verbose_name = "Slideshow Response"
         verbose_name_plural = "Slideshow Responses"
@@ -1413,6 +1420,7 @@ class SlideshowResponse(BaseResponse):
     def to_dict(self):
         return {
             **super().to_dict(),
+            "highest_slide": self.highest_slide
         }
 
 class UserQuizResponse(BaseResponse):
@@ -2078,7 +2086,7 @@ class ActivityManager():
                               "watched_percentage": ["watched_percentage", 0.0]
                               })
         self.registerActivity(Twine, TwineResponse)
-        self.registerActivity(Slideshow, SlideshowResponse)
+        self.registerActivity(Slideshow, SlideshowResponse, {"highest_slide": ["highest_slide", -1]})
         self.registerActivity(CustomActivity, CustomActivityResponse)
 
 
