@@ -108,7 +108,6 @@ function NextSlide({
 
 export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
   const [api, setApi] = useState<CarouselApi>();
-  const [count, setCount] = useState(0);
   const isMobile = useIsMobile(1610);
 
   //slide 0 is first
@@ -123,7 +122,7 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
   );
 
   const [highestSlideUnlocked, setHighestSlideUnlocked] = useState(
-    response.highest_slide,
+    response.highest_slide >= 0 ? response.highest_slide : 0,
   );
 
   const [current, setCurrent] = useState(
@@ -134,8 +133,6 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
 
   useEffect(() => {
     if (!api) return;
-
-    setCount(api.scrollSnapList().length);
     setCurrent(api.selectedScrollSnap());
 
     const onSelect = () => {
@@ -186,12 +183,14 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
       <Carousel
         setApi={setApi}
         className="w-full max-w-xs md:max-w-2xl lg:max-w-4xl"
+        // The below disables dragging on force wait, but because we are slicing the slides array to only unlocked slides,
+        // it is not nessecary. Leaving it commented out for now in case we want to revisit this behavior.
         opts={{
-          watchDrag: slideshow.force_wait == 0 || highestSlideUnlocked > slideshow.slides.length - 1,
+          // watchDrag: slideshow.force_wait == 0 || highestSlideUnlocked > slideshow.slides.length - 1,
         }}
       >
         <CarouselContent>
-          {slideshow.slides.map((example, index) => (
+          {(slideshow.force_wait == 0 ? slideshow.slides : slideshow.slides.slice(0,highestSlideUnlocked+1)).map((example, index) => (
             <CarouselItem
               key={index}
               className="flex flex-col items-center justify-center gap-4"
@@ -233,7 +232,7 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
 
       {/* Dots (desktop only) */}
       <div className="hidden lg:flex">
-        {Array.from({ length: count }, (_, index) => (
+        {Array.from({ length: slideshow.slides.length }, (_, index) => (
           <button
             disabled={slideshow.force_wait != 0 && index > highestSlideUnlocked}
             key={index}
