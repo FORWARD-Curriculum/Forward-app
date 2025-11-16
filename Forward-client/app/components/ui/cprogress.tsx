@@ -39,18 +39,20 @@ export default function CircularProgress({
   size = 200,
   children,
   className,
+  showTrack = true,
 }: {
   percentage: number;
   color: string;
   size: number;
   children?: React.ReactNode;
   className?: string;
+  showTrack?: boolean;
 }) {
   const pct = cleanPercentage(percentage);
   return (
     <svg width={size} height={size} className={className}>
       <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
-        <Circle size={size} color="lightgrey" />
+        {showTrack && <Circle size={size} color="lightgrey" />}
         <Circle size={size} color={color} percentage={pct} />
       </g>
       {children && (

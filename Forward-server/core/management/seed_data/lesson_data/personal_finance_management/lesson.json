@@ -392,6 +392,7 @@
       "type": "slideshow",
       "title": "Debit, Credit, and Budgeting",
       "instructions": "Click through the slides to learn about checking accounts, debit, credit, and building a good credit score.",
+      "force_wait": 15,
       "slides": [
         {
           "content": "After you get paid, your money has to go somewhere--and there are a couple of ways that can happen. Some people get their paycheck through direct deposit, which means the money goes straight into their bank account. Others get a paper paycheck they can take to a bank or cash at a check-cashing place.",
