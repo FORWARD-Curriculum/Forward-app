@@ -97,7 +97,8 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
           .unwrap()
           .then((originalPromiseResult) => {
             const savePayload = originalPromiseResult?.payload;
-            if (!savePayload) throw new Error();
+            if (originalPromiseResult === undefined) return; // no user
+            else if(!savePayload) throw new Error("No response from server.");
 
             // We must update the 'local' (redux/global) current_response with the
             // response from the server, as we are not navingating away so we want to
@@ -106,6 +107,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
           })
           .catch((rejectedValueOrSerializedError) => {
             toast.error("Something went wrong saving that question.");
+            throw rejectedValueOrSerializedError;
           });
       }
     },

@@ -3,7 +3,7 @@ import {
   type BaseResponse,
 } from "@/features/curriculum/types";
 import type { AppDispatch, RootState } from "@/store";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   saveCurrentResponseThunk,
@@ -66,19 +66,19 @@ export const useResponse = <
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  let existingResponse = useSelector((state: RootState) =>
-    state.response.response_data[activity.type]
-      ? state.response.response_data[activity.type].find(
-          (s) => s.associated_activity === activity.id,
-        )
-      : null,
+  const existingResponse = useSelector((state: RootState) =>
+    state.response?.response_data?.[activity.type]?.find(
+      (s) => s.associated_activity === activity.id,
+    ) ?? null,
   );
 
-  // Synchronously instantiate current_response, overwriting old/stale resp
-  const isInitialized = useRef(false);
+  const currentResponseFromStore = useSelector(
+    (state: RootState) => state.response?.current_response as T | null,
+  );
 
-  if (!isInitialized.current) {
-    const initialResponse = existingResponse
+  //Synchronously prepare an initial response object as a fallback
+  const initialResponse = useMemo(() => (
+    existingResponse
       ? (existingResponse as T)
       : ({
           ...({
@@ -89,43 +89,49 @@ export const useResponse = <
             partial_response: true,
           } satisfies BaseResponse),
           ...(initialFields as Partial<T>),
-        } as T);
+        } as T)
+  ), [existingResponse, activity.id, initialFields]);
 
-    dispatch(
-      setCurrentContext({
-        type: activity.type,
-        trackTime,
-        current_response_saved:
-        // only can be set true if current_context was null or the previous save thunk
-        // dispatch fulfilled
-          store.getState().response.current_context?.current_response_saved ??
-          true,
-      }),
-    );
-    dispatch(setCurrentResponse(initialResponse));
 
-    isInitialized.current = true;
-  }
+  // only should run on first render/activity change
+  useEffect(() => {
+    // Dispatch only if the response in the store is stale or not set for this activity
+    if (currentResponseFromStore?.associated_activity !== activity.id) {
+        dispatch(
+          setCurrentContext({
+            type: activity.type,
+            trackTime,
+            current_response_saved: store.getState().user.user === null ? true :
+              store.getState().response.current_context?.current_response_saved ??
+              true,
+          }),
+        );
+        dispatch(setCurrentResponse(initialResponse));
+    }
+  }, [activity.id, activity.type, dispatch, trackTime, initialResponse, currentResponseFromStore]);
 
-  const response = useSelector(
-    (state: RootState) => state.response.current_response as T,
-  );
 
-  // Exposes a setState like function, which actually updates the store
+  // On the first render, it will be `initialResponse`. On all renders after, it will be from the store.
+  const response = currentResponseFromStore?.associated_activity === activity.id
+    ? currentResponseFromStore
+    : initialResponse;
+
+
   const setResponse: React.Dispatch<React.SetStateAction<T>> = useCallback(
     (v) => {
+      const latestResponse = store.getState().response.current_response as T;
       const next =
-        typeof v === "function" ? (v as (prev: T) => T)(response) : (v as T);
+        typeof v === "function" ? (v as (prev: T) => T)(latestResponse) : (v as T);
       dispatch(setCurrentResponse(next));
       dispatch(
         setCurrentContext({
           type: activity.type,
           trackTime,
-          current_response_saved: false,
+          current_response_saved: store.getState().user.user === null ? true : false,
         }),
       );
     },
-    [response],
+    [dispatch, activity.type, trackTime],
   );
 
   return [response, setResponse] as const;
