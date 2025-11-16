@@ -41,8 +41,8 @@ function Box({
       className={`relative ${isDialog ? "w-fit" : (className ?? "")} shadow-lg`}
     >
       <img
-        src={(box as any)._image['src']}
-        srcSet={(box as any)._image['srcset']}
+        src={box.image}
+        srcSet={box.image}
         className={`block h-auto ${isDialog ? "max-w-[300vw]" : "w-full"}`}
         alt=""
       />

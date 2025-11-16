@@ -414,7 +414,7 @@ export function NextActivity() {
                 handleLessonComplete();
                 // Update the state of the component if we aren't navigating off the page
                 // in this case (modal displayed)
-                if (originalPromiseResult?.payload)
+                if (originalPromiseResult!== undefined && originalPromiseResult?.payload)
                   dispatch(
                     setCurrentResponse(
                       (originalPromiseResult.payload as any)
@@ -429,8 +429,10 @@ export function NextActivity() {
                 history.replaceState(null, "", "#" + (current_activity + 1));
               }
             })
-            .catch((_) =>
-              toast.error("Something went wrong saving the activity."),
+            .catch((e) =>{
+              toast.error("Something went wrong saving the activity.");
+              throw e;
+            }
             );
         }}
       >

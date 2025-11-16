@@ -146,6 +146,7 @@ export const saveCurrentResponseThunk = createAsyncThunk(
     const resp = state.response.current_response;
 
     if (!ctx || !resp) return undefined;
+    if (!state.user.user) return Promise.resolve(undefined); // no user logged in
 
     return await thunkAPI.dispatch(
       saveUserResponseThunk({

@@ -87,19 +87,25 @@ export default function Login() {
             <p className="text-error-border w-full text-center">{error}</p>
           )}
         </form>
-        <p className="text-muted-foreground text-center">
-          Don't have an account? <br />
-          <Link prefetch="intent" to="/register" className="text-blue-500 underline">
-            Sign Up
-          </Link>{" "}
-          instead.
-        </p>
-        <p className="text-muted-foreground text-center">
-          Explore as a&nbsp;
-          <Link prefetch="intent" to="/dashboard" className="text-blue-500 underline">
-            guest.
-          </Link>
-        </p>
+        <div className="text-muted-foreground flex w-full flex-col items-center">
+          <p>Don't have an account?</p>
+          <div className="flex lg:flex-row flex-col w-full gap-3">
+            <Link
+              prefetch="intent"
+              to="/register"
+              className="text-primary-foreground bg-primary flex grow basis-0 items-center justify-center rounded-xl p-2 active:brightness-90 hover:brightness-110"
+            >
+              Sign Up
+            </Link>{" "}
+            <Link
+              prefetch="intent"
+              to="/dashboard"
+              className="text-primary-foreground bg-accent flex grow basis-0 items-center justify-center rounded-xl p-2  active:brightness-90 hover:brightness-110"
+            >
+              Try as a Guest
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
