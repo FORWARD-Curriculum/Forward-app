@@ -340,7 +340,6 @@ export default function DndMatch({ dndmatch }: { dndmatch: DndMatch }) {
       partial_response: newPartialResponse,
       attempts_left: newPartialResponse ? prev.attempts_left - 1 : 0,
     })});
-    if (!response.partial_response) dispatch(saveCurrentResponseThunk());
   }, [
     submission,
     correctAnswers,
