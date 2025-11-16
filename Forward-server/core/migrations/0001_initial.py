@@ -558,6 +558,7 @@ class Migration(migrations.Migration):
                 ('instructions_image_height', models.PositiveIntegerField(blank=True, editable=False, null=True)),
                 ('instructions_image_ppoi', models.CharField(default='0.5x0.5', max_length=20)),
                 ('image', models.ImageField(blank=True, help_text='Optional Image to accompany the Quiz', null=True, upload_to='public/quiz/')),
+                ('video', models.FileField(blank=True, help_text='Optional video to accompany the Quiz', null=True, upload_to='public/video', validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['mp4'])])),
                 ('passing_score', models.PositiveIntegerField(default=80, help_text='Minimum score required to pass the quiz')),
                 ('lesson', models.ForeignKey(help_text='The lesson this activity belongs to', on_delete=django.db.models.deletion.CASCADE, related_name='%(class)s_activities', to='core.lesson')),
             ],
@@ -572,6 +573,7 @@ class Migration(migrations.Migration):
             name='Question',
             fields=[
                 ('image', models.ImageField(blank=True, help_text='Optional image to accompany the Question', null=True, upload_to='public/question/')),
+                ('video', models.FileField(blank=True, help_text='Optional video to accompany the Question', null=True, upload_to='public/question/', validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['mp4'])])),
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, help_text='the uuid of the database item', primary_key=True, serialize=False)),
                 ('question_text', martor.models.MartorField(help_text='The text of the question')),
                 ('feedback_config', django_jsonform.models.fields.JSONField(default=dict, help_text='Feedback configuration for correct/incorrect responses')),

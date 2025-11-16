@@ -500,23 +500,12 @@ class Quiz(BaseActivity):
 
     image = models.ImageField(upload_to='public/quiz/', null=True, blank=True, help_text="Optional Image to accompany the Quiz")
 
+    video = models.FileField(upload_to='public/video', null=True, blank=True, validators=[FileExtensionValidator(allowed_extensions=['mp4'])], help_text= "Optional video to accompany the Quiz")
+
     passing_score = models.PositiveIntegerField(
         help_text="Minimum score required to pass the quiz",
         default=80
     )
-
-    # feedback_config = JSONField(
-    #     schema={
-    #         "type": "object",
-    #         "properties": {
-    #             "correct": {"type": "string"},
-    #             "incorrect": {"type": "string"}
-    #         },
-    #         "required": ["correct", "incorrect"]
-    #     },
-    #     default=dict,
-    #     help_text="Configuration for correct/incorrect feedback"
-    # )
 
     class Meta(BaseActivity.Meta):
         verbose_name = "Quiz"
@@ -529,6 +518,7 @@ class Quiz(BaseActivity):
             # "feedback_config": self.feedback_config,
             "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')],
             "image": self.image.url if self.image else None,
+            "video": self.video.url if self.video else None
         }
 
 
@@ -585,8 +575,9 @@ class Question(models.Model):
     ]
 
     image = models.ImageField(upload_to='public/question/', null=True, blank=True, help_text="Optional image to accompany the Question")
-
-    # User's ge`ne`rated uuid
+    video = models.FileField( upload_to='public/question/', null=True, blank=True, validators=[FileExtensionValidator(allowed_extensions=['mp4'])], help_text="Optional video to accompany the Question")
+    
+    # User's generated uuid
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -679,7 +670,8 @@ class Question(models.Model):
             "is_required": self.is_required,
             "order": self.order,
             "feedback_config": self.feedback_config,
-            "image": self.image.url if self.image else None
+            "image": self.image.url if self.image else None,
+            "video": self.video.url if self.video else None
         }
 
 class Poll(BaseActivity):

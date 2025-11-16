@@ -121,6 +121,7 @@ export interface Quiz extends BaseActivity {
   };
   questions: Question[];
   image?: string;
+  video?: string;
 }
 
 export interface Question {
@@ -146,6 +147,7 @@ export interface Question {
     correct: string;
     incorrect: string;
   };
+  video?: string;
 }
 
 export interface Poll extends BaseActivity {

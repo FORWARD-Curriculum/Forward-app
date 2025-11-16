@@ -188,7 +188,7 @@ class Command(BaseCommand):
                 if act_type in {"textcontent", "fillintheblank", "quiz"}
                 else None
             )
-            video_name = defaults.pop("video", None) if act_type == "video" else None
+            video_name = defaults.pop("video", None) if act_type in {"video", "quiz"} else None
             twine_name = defaults.pop("file", None) if act_type == "twine" else None
             cust_name = defaults.pop("document", None) if act_type == "customactivity" else None
 
@@ -249,7 +249,7 @@ class Command(BaseCommand):
                         rel_path=self.folder_path / image_name,
                         label=f"{ActivityModel.__name__} asset",
                     )
-                elif act_type == "video" and video_name:
+                elif act_type in {"video", "quiz"} and video_name:
                     self._save_model_file(
                         instance=activity,
                         field_name="video",
@@ -346,6 +346,7 @@ class Command(BaseCommand):
         for order, q in enumerate(questions, start=1):
             q = q.copy()
             question_image_name = q.pop("image", None)
+            question_video_name = q.pop("video", None)
 
             defaults = {
                 "question_text": q.get("question_text", ""),
@@ -367,6 +368,15 @@ class Command(BaseCommand):
                         field_name="image",
                         rel_path=self.folder_path / question_image_name,
                         label=f"Question image",
+                    )
+
+                # same thing but for video
+                if question_video_name:
+                    self._save_model_file(
+                        instance=obj,
+                        field_name="video",
+                        rel_path=self.folder_path / question_video_name,
+                        label=f"Question video"
                     )
                 self._log(
                     f"    {'Created' if created else 'Updated'} question "
