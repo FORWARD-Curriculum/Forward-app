@@ -147,6 +147,20 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
           />
         </div>
       )}
+
+      {/* Quiz level videos */}
+      {quiz.video && (
+        <div className="mb-6">
+          <video 
+            controls 
+            className="w-full max-w-lg mx-auto rounded-lg shadow-sm border border-muted object-cover"
+            style={{ maxHeight: '400px' }}
+          >
+            <source src={quiz.video} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      )}
       
       
       {quiz.questions.map((question: QuestionType, questionNumber) => {
