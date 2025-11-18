@@ -531,28 +531,28 @@
           "question_text": "What was the main message of the essay? Summarize the key points in your own words.",
           "question_type": "multiple_choice",
           "has_correct_answer": false,
-          "choices": { "options": [] },
+          "choices": { "options": [{ "id": 1, "text": "FIXME", "is_correct": true }] },
           "is_required": true
         },
         {
           "question_text": "What did the author do well in their essay?",
           "question_type": "multiple_choice",
           "has_correct_answer": false,
-          "choices": { "options": [] },
+          "choices": { "options": [{ "id": 1, "text": "FIXME", "is_correct": true }] },
           "is_required": true
         },
         {
           "question_text": "Did the essay clearly explain the author's challenges? How did they demonstrate personal growth?",
           "question_type": "multiple_choice",
           "has_correct_answer": false,
-          "choices": { "options": [] },
+          "choices": { "options": [{ "id": 1, "text": "FIXME", "is_correct": true }] },
           "is_required": true
         },
         {
           "question_text": "If you had to write a scholarship essay about your own experiences, what would you focus on? Brainstorm a topic or personal story that you think would make a strong application.",
           "question_type": "multiple_choice",
           "has_correct_answer": false,
-          "choices": { "options": [] },
+          "choices": { "options": [{ "id": 1, "text": "FIXME", "is_correct": true }] },
           "is_required": true
         }
       ],
@@ -562,6 +562,7 @@
       "type": "slideshow",
       "title": "College Majors",
       "instructions": null,
+      "force_wait": 15,
       "slides": [
         {
           "content": "A major is the subject someone chooses to study in-depth while attending college, and it ultimately determines the type of career someone will be qualified to have. Majors also determine which classes are required in college to complete a degree."
@@ -674,6 +675,8 @@
       "type": "slideshow",
       "title": "College Application Requirements",
       "instructions": "Click through the pages to learn about some of the things an application may require.",
+      "force_wait": 5,
+      "autoplay": true,
       "slides": [
         {
           "content": "College applications can take quite a bit of time to complete and you may be surprised by everything they ask for you to submit. Being prepared with documents ahead of time and creating checklists of what each school needs can help you stay organized."

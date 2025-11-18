@@ -652,6 +652,7 @@
       "type": "slideshow",
       "title": "Steps to Self-Advocacy",
       "instructions": "So how do you actually advocate for yourself? It starts with knowing your strengths, what you're asking for, who you need to talk to, and what your rights are. Once you have that clear in your mind, you're ready to speak up. On the next few pages you will learn the steps in advocating for yourself.",
+      "force_wait": 15,
       "slides": [
         {
           "content": "**Speak clearly and directly.** Self-advocacy doesn't mean being loud or demanding--it means explaining your needs in a confident way. Using \"I\" statements like, *\"I need more time to finish this assignment\"* or *\"I learn best when I can see an example\"* keeps the focus on your needs, not on blaming anyone else.",
