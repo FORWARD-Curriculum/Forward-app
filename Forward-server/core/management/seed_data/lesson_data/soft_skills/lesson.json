@@ -40,6 +40,14 @@
       "content": "**Email etiquette is a skill that falls under communication.**  \nIt means knowing how to write emails in a respectful and professional way. Email etiquette is important because it helps you make a good first impression. You'll use it in many situations--like applying for a job, asking about a scholarship, or communicating with teachers, supervisors, and coworkers.\n\n <br> So what does good email etiquette look like?\n\n* **Start with a greeting.** Examples: \"Dear,\" \"Good morning,\" or \"Hello.\"  \n* **Write a clear subject line.** This should say what your email is about. Keep it short and direct.  \n  * Example: If you need to make up a test, write \"Make up test Friday.\" If you are writing about a job interview, write \"Interview for job position.\"  \n* **Keep the main message simple and professional.** Be respectful, avoid slang, and check your spelling and punctuation.  \n* **End with a closing.** Examples: \"Sincerely,\" \"Thank you,\" or \"Best.\""
     },
     {
+      "type": "fillintheblank",
+      "title": "Email Creation",
+      "instructions": "Before you start sending professional emails, you need an address that makes a good impression. In this activity, you’ll go through a checklist to see if your email address is ready for work—or if it needs a quick upgrade. \n \n <br> What is your email address? If you do not have one make one up here. Only include the first part of your email. We will include the @email.com as a generic ending",
+      "content": [
+        "<options></options>"
+      ]
+    },
+    {
       "type": "quiz",
       "title": "Professional Email Address Checklist and Reflection",
       "instructions": "Before you start sending professional emails, you need an address that makes a good impression. In this activity, you'll go through a checklist to see if your email address is ready for work--or if it needs a quick upgrade.",

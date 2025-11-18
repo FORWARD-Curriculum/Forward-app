@@ -492,10 +492,30 @@
     {
       "type": "writing",
       "title": "Disclosure in the Workplace",
-      "instructions": "In the workplace, disclosure can take on a very specific meaning: sharing information about a criminal history with an employer. Just like with other kinds of personal information, the key is balancing what is appropriate for the situation and who you are sharing with. Employers expect honesty. If a background check is part of the hiring process, being upfront about criminal history can show responsibility and build trust. At the same time, not every detail of your past is always relevant or necessary to share.\n\n <br> When we talk about criminal history, it's important to understand what that actually means. A criminal history is a record of a person's involvement with the legal system, but not all involvement is the same.\n\n <br> Having a criminal history does not stop someone from getting a job. However, the type of criminal history may put limits on what type of job someone might get. For example, an employer may not want to hire someone to handle their finances if that person has a history of stealing money from a past employer. Or, someone who has a history of violence might not be allowed to work with children. These limits can be set by the state, or may be the preference of the employer.\n\n <br> Here's a snapshot of what some Arizona employers said when they were asked about hiring someone with a criminal record.",
+      "instructions": "In the workplace, disclosure can take on a very specific meaning: sharing information about a criminal history with an employer. Just like with other kinds of personal information, the key is balancing what is appropriate for the situation and who you are sharing with. Employers expect honesty. If a background check is part of the hiring process, being upfront about criminal history can show responsibility and build trust. At the same time, not every detail of your past is always relevant or necessary to share.\n\n <br> When we talk about criminal history, it's important to understand what that actually means. A criminal history is a record of a person's involvement with the legal system, but not all involvement is the same.\n\n <br> Having a criminal history does not stop someone from getting a job. However, the type of criminal history may put limits on what type of job someone might get. For example, an employer may not want to hire someone to handle their finances if that person has a history of stealing money from a past employer. Or, someone who has a history of violence might not be allowed to work with children. These limits can be set by the state, or may be the preference of the employer.",
       "prompts": [
         {"prompt":"If you were an employer, would you hire someone with a criminal history? Think about the different circumstances that might lead you to hire or not hire someone with a criminal history and write about your thoughts."}
       ]
+    },
+    {
+      "type": "conceptmap",
+      "title": "Workplace Disclosure Statistics",
+      "instructions" : "Here's a snapshot of what some Arizona employers said when they were asked about hiring someone with a criminal record.",
+      "examples" : [
+        {
+          "title": null,
+          "image": "employers4.png",
+          "description": "Employers in Arizona were asked if they would interview someone who had a **non-violent offense.**",
+          "examples": []
+        },
+        {
+          "title": null,
+          "image": "employers5.png",
+          "description": "Employers in Arizona were asked if they would interview someone with **a violent offense.**",
+          "examples": []
+        }
+      ] 
+
     },
     {
       "type": "slideshow",
