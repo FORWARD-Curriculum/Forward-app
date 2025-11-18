@@ -411,9 +411,9 @@
       "title": "Your Education Plans",
       "instructions": "Write about your plans for your education and incorporate what you learned about types of degrees. Try to write at least one paragraph.",
       "prompts": [
-        "What type of degree would you like to get and what will you need to do to apply for and complete this degree?",
-        "What are the benefits of the type of degree you are seeking?",
-        "Compare and contrast the degree you want with other degrees."
+        {"prompt":"What type of degree would you like to get and what will you need to do to apply for and complete this degree?"},
+        {"prompt":"What are the benefits of the type of degree you are seeking?"},
+        {"prompt":"Compare and contrast the degree you want with other degrees."}
       ]
     },
     {
@@ -518,7 +518,7 @@
       "type": "writing",
       "title": "Scholarship Essay Activity",
       "instructions": "Read through this year's scholarship essay prompt. Then, write an essay that you could submit for this scholarship.",
-      "prompts": ["**Scholarship Details:**  \"The DRS Scholarship is an essay submission format. Individuals submit an essay in adherence to the guidelines below. The DRS Team will review these essays, and the scholarship will be awarded to the best essay that meets all submission guidelines. This scholarship will be awarded annually with a different essay topic each year.\"\n\n\n**Scholarship Essay Contest Details:** \"This year's Scholarship essay will focus on personal experience and encourage individuals to share their stories about how drug and alcohol use has affected their lives. It will also call on applicants to share their viewpoints on why substance use has become so prevalent in the United States and what can be done to improve it.\"\n\n\n**Essay Guidelines:**\n\n\n* It must be an original essay. This means you cannot submit something someone else wrote, you borrowed from somewhere else, or that you wrote for another class.  \n* Essay length should be between 1000-1500 words. This is about two and a half single spaced pages.  \n* \"The essay must include personal experience, individual viewpoints on our nation's drug epidemic, and one's **own** ideas on how to make things better.\"\n\n\n**Judgement Criteria:**\n\n* Originality  \n* Creativity   \n* Relevancy  \n* Completeness  \n* Overall Quality\n\n\n**Essay Topic: Explain in as much detail as you are comfortable with how drug and alcohol use has affected your life. Substance use is far-reaching, so this is not solely for individuals who have struggled with drugs and alcohol personally. You may also explain how the substance use of those close to you has impacted your life. Conclude your essay with your personal viewpoints on how drug and alcohol use has become so prevalent in the United States, and share what you think should be done to improve it.**\n\n\n**Submission Guidelines**:\n\n\n* Review your essay for any spelling or grammatical errors. You may want to have a teacher or peer help you review as well!  \n* Download your essay as a PDF or Word document from this page  \n* Use your college/university email address to submit your essay to scholarship at addicted.org with your name and the college/university you attend  \n* Submit by July 1st!"
+      "prompts": [{"prompt":"**Scholarship Details:**  \"The DRS Scholarship is an essay submission format. Individuals submit an essay in adherence to the guidelines below. The DRS Team will review these essays, and the scholarship will be awarded to the best essay that meets all submission guidelines. This scholarship will be awarded annually with a different essay topic each year.\"\n\n\n**Scholarship Essay Contest Details:** \"This year's Scholarship essay will focus on personal experience and encourage individuals to share their stories about how drug and alcohol use has affected their lives. It will also call on applicants to share their viewpoints on why substance use has become so prevalent in the United States and what can be done to improve it.\"\n\n\n**Essay Guidelines:**\n\n\n* It must be an original essay. This means you cannot submit something someone else wrote, you borrowed from somewhere else, or that you wrote for another class.  \n* Essay length should be between 1000-1500 words. This is about two and a half single spaced pages.  \n* \"The essay must include personal experience, individual viewpoints on our nation's drug epidemic, and one's **own** ideas on how to make things better.\"\n\n\n**Judgement Criteria:**\n\n* Originality  \n* Creativity   \n* Relevancy  \n* Completeness  \n* Overall Quality\n\n\n**Essay Topic: Explain in as much detail as you are comfortable with how drug and alcohol use has affected your life. Substance use is far-reaching, so this is not solely for individuals who have struggled with drugs and alcohol personally. You may also explain how the substance use of those close to you has impacted your life. Conclude your essay with your personal viewpoints on how drug and alcohol use has become so prevalent in the United States, and share what you think should be done to improve it.**\n\n\n**Submission Guidelines**:\n\n\n* Review your essay for any spelling or grammatical errors. You may want to have a teacher or peer help you review as well!  \n* Download your essay as a PDF or Word document from this page  \n* Use your college/university email address to submit your essay to scholarship at addicted.org with your name and the college/university you attend  \n* Submit by July 1st!", "minimum": 1000, "min_type": "word"}
       ]
     },
     {
@@ -660,7 +660,7 @@
       "instructions": "When you are done exploring, write down at least one major that you are interested in. You can also write down notes of things you learned about the major--this space is for you!",
       "instructions_image": "course_catalog_example.jpg",
       "prompts": [
-        "Write down at least one major that interests you and any notes about what you learned."
+        {"prompt":"Write down at least one major that interests you and any notes about what you learned."}
       ]
     },
     {
@@ -729,7 +729,7 @@
       "title": "Going to College Reflection",
       "instructions": "Use this space to write anything you'd like -- things to remember, what you learned from this lesson, questions you still have, or something else.",
       "prompts": [
-        "Write your thoughts or notes here."
+        {"prompt":"Write your thoughts or notes here."}
       ]
     }
   ]

@@ -36,7 +36,6 @@ export default function CustomActivity({
     CustomActivityResponse,
     CustomActivityType
   >({
-    type: "CustomActivity",
     activity: custom_activity,
     initialFields: {
       partial_response: true,

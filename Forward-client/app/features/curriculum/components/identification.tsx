@@ -41,8 +41,8 @@ function Box({
       className={`relative ${isDialog ? "w-fit" : (className ?? "")} shadow-lg`}
     >
       <img
-        src={(box as any)._image['src']}
-        srcSet={(box as any)._image['srcset']}
+        src={box.image}
+        srcSet={box.image}
         className={`block h-auto ${isDialog ? "max-w-[300vw]" : "w-full"}`}
         alt=""
       />
@@ -187,7 +187,6 @@ export default function Identification({
     IdentificationResponse,
     Identification
   >({
-    type: "Identification",
     activity: identification,
     initialFields: {
       identified: 0,
@@ -213,7 +212,9 @@ export default function Identification({
         ...prev,
         identified: newIdentified,
         partial_response:
-          newIdentified < (identification.minimum_correct || totalIdents),
+          prev.partial_response === false ?
+            false :
+            newIdentified < (identification.minimum_correct || totalIdents),
       }));
     }
   }, [response, identification.minimum_correct]);
