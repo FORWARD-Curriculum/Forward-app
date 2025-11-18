@@ -57,12 +57,14 @@ export const useResponse = <
 >({
   activity,
   trackTime = true,
-  initialFields
+  initialFields,
+  disableAutoSave = false,
 }: {
   activity: E;
   trackTime?: boolean;
   initialFields?: Omit<T, keyof BaseResponse> &
     Partial<Pick<T, keyof BaseResponse>>;
+  disableAutoSave?: boolean;
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -104,6 +106,7 @@ export const useResponse = <
             current_response_saved: store.getState().user.user === null ? true :
               store.getState().response.current_context?.current_response_saved ??
               true,
+            autosave_disabled: disableAutoSave
           }),
         );
         dispatch(setCurrentResponse(initialResponse));
@@ -128,6 +131,7 @@ export const useResponse = <
           type: activity.type,
           trackTime,
           current_response_saved: store.getState().user.user === null ? true : false,
+          autosave_disabled: disableAutoSave
         }),
       );
     },

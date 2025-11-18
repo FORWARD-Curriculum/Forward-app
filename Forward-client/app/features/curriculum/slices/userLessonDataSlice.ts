@@ -14,6 +14,7 @@ type ResponseContext = {
   type: keyof NonNullable<LessonResponse["response_data"]>;
   trackTime: boolean;
   current_response_saved: boolean;
+  autosave_disabled?: boolean;
 } | null;
 
 export const initialLessonResponseState: LessonResponse & {
@@ -138,15 +139,16 @@ export const saveUserResponseThunk = createAsyncThunk(
 export const saveCurrentResponseThunk = createAsyncThunk(
   "response/saveCurrentResponse",
   async (
-    overrideResponse: Partial<BaseResponse> | undefined = {} as BaseResponse,
-    thunkAPI,
+    payload: { overrideResponse?: Partial<BaseResponse>; manual_save?: boolean } = {},
+    thunkAPI: any,
   ) => {
+    const { overrideResponse = {} as Partial<BaseResponse>, manual_save = false } = payload;
     const state = thunkAPI.getState() as RootState;
     const ctx = state.response.current_context;
     const resp = state.response.current_response;
 
     if (!ctx || !resp) return undefined;
-    if (!state.user.user) return Promise.resolve(undefined); // no user logged in
+    if (!state.user.user || (!manual_save && ctx.autosave_disabled)) return Promise.resolve(undefined); // no user logged in, pr autosave disabled
 
     return await thunkAPI.dispatch(
       saveUserResponseThunk({

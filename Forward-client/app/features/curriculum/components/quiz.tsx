@@ -23,6 +23,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
 
   const [response, setResponse] = useResponse<QuizResponse, Quiz>({
     activity: quiz,
+    disableAutoSave: true,
     initialFields: { 
       score: null, 
       completion_percentage: 0,
@@ -91,9 +92,12 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
         // Only send THIS question's data
         await dispatch(
           saveCurrentResponseThunk({
-            submission: [questionToCheck],
-          } as Partial<QuizResponse>),
-        )
+            overrideResponse:{
+                submission: [questionToCheck],
+              } as Partial<QuizResponse>,
+            manual_save: true
+          }
+        ))
           .unwrap()
           .then((originalPromiseResult) => {
             const savePayload = originalPromiseResult?.payload;
