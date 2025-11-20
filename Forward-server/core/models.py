@@ -1019,6 +1019,7 @@ class FillInTheBlank(BaseActivity):
         return {
             **super().to_dict(),
             "content": self.content,
+            "image": self.image.url if self.image else None
         }
 
 
@@ -1812,6 +1813,7 @@ class DndMatchResponse(BaseResponse):
         }
 
 class FillInTheBlankResponse(BaseResponse):
+
     
     associated_activity = models.ForeignKey(
         FillInTheBlank,
@@ -1831,7 +1833,7 @@ class FillInTheBlankResponse(BaseResponse):
     def to_dict(self):
         return{
             **super().to_dict(),
-            "submission": self.submission
+            "submission": self.submission,
         }
 
 

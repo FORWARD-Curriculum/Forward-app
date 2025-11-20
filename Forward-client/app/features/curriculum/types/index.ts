@@ -186,6 +186,7 @@ export interface DndMatch extends BaseActivity {
 
 export interface FillInTheBlank extends BaseActivity {
   content: string[];
+  image?: string;
 }
 
 export interface ConceptMap extends BaseActivity {
