@@ -233,36 +233,17 @@
       ]
     },
     {
-      "type": "slideshow",
+      "type": "textcontent",
       "title": "Critical Thinking",
       "instructions": "Read the following and think on the contents",
-      "slides": [
-        {
-          "content": "Critical thinking is the process of using your knowledge, experiences, and reasoning to make smart and fair decisions. It means slowing down to look at a situation from different angles, asking questions, and considering the facts before deciding what to do. This skill helps you solve problems, avoid mistakes, and make choices that make sense--not just ones based on emotion or habit.\n\nCritical thinking is closely connected to problem solving--but they're not exactly the same. Critical thinking is about *how* you think, while problem solving is about *what* you do with that thinking.\n\nFor example, if you're stuck on your homework, critical thinking helps you figure out *why*--maybe you missed a key step, don't understand the directions, or need to review your notes.\n\nThen problem solving comes in as you decide *what to do next*, like re-reading the question, finding examples online, asking a classmate, or emailing your teacher. Critical thinking helps you plan your next steps and make decisions that actually move you forward.",
-          "image": "critical_thinking.jpg"
-        },
-        {
-          "content": "To practice attention to detail, read the job listing below and see if you can identify each component below.",
-          "image": "job_listing_1_customer_service_rep.pdf"
-        }
-      ]
-    },
-    {
-      "type": "fillintheblank",
-      "title": "Attention to Detail Practice",
-      "instructions": "Fill in the blanks based on the job listing from the previous slide.",
-      "content": [
-        "The company hiring for this position is called <options></options>.",
-        "The job is located in <options></options>.",
-        "The hourly pay range for this position is <options></options>.",
-        "This role requires at least a <options></options> or <options></options>.",
-        "Employees in this job will handle customer inquiries through <options></options>."
-      ]
+      "image": "critical_thinking.jpg",
+      "content": "Critical thinking is the process of using your knowledge, experiences, and reasoning to make smart and fair decisions. It means slowing down to look at a situation from different angles, asking questions, and considering the facts before deciding what to do. This skill helps you solve problems, avoid mistakes, and make choices that make sense--not just ones based on emotion or habit.\n\n <br> Critical thinking is closely connected to problem solving--but they're not exactly the same. Critical thinking is about *how* you think, while problem solving is about *what* you do with that thinking.\n\n <br> For example, if you're stuck on your homework, critical thinking helps you figure out *why*--maybe you missed a key step, don't understand the directions, or need to review your notes.\n\n <br> Then problem solving comes in as you decide *what to do next*, like re-reading the question, finding examples online, asking a classmate, or emailing your teacher. Critical thinking helps you plan your next steps and make decisions that actually move you forward."
     },
     {
       "type": "dndmatch",
       "title": "Critical Thinking and Problem Solving Practice",
       "instructions": "In this activity, you'll apply what you know about critical thinking and problem solving. You can choose between writing about a problem you have been facing, or sorting items related to a problem in a story.\n\nRead the story below and sort each item into the proper category. Background information is for items that tell you what you need to know about the story. The critical thinking category is for explanations of *why* the problem might be happening. The problem solving category is for *what* might be done to solve the problem.",
+      "image": "waiter.jpg",
       "content": [
         {
           "category": "Background Information",
@@ -298,6 +279,19 @@
         "Background Information - What's happening? Write 2-3 sentences describing the situation. Stick to the facts--what's going on, where, and with who?",
         "Critical Thinking - Why might it be happening? Think about possible reasons behind the problem. These might include habits, distractions, emotions, or outside factors.",
         "Problem Solving - What can you do about it? List at least two or three ideas for how to fix or improve the situation."
+      ]
+    },
+    {
+      "type": "fillintheblank",
+      "title": "Attention to Detail Practice",
+      "instructions": "Fill in the blanks based on the job listing from the previous slide.",
+      "image": "job_listing_1_customer_service_rep.png",
+      "content": [
+        "The company hiring for this position is called <options keyword=\"true\">ConnectCo, connectco</options>.",
+        "The job is located in <options keyword=\"true\">Orlando, FL, Florida, florida</options>.",
+        "The hourly pay range for this position is <options keyword=\"true\">16-18, 16, 17, 18</options>.",
+        "This role requires at least a <options keyword=\"true\">high school diploma</options> or <options keyword=\"true\">GED</options>.",
+        "Employees in this job will handle customer inquiries through <options keyword=\"true\">phone email chat, phone, email, chat</options>."
       ]
     },
     {
@@ -345,59 +339,59 @@
       "content": [
         {
           "statement": "I enjoy learning from people who have different backgrounds or experiences than me. (Diversity)",
-          "scale": ["Strongly Agree", "Agree", "Disagree", "Strongly Disagree"]
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
         },
         {
           "statement": "I try to make sure everyone in a group feels welcome and included. (Inclusivity)",
-          "scale": ["Strongly Agree", "Agree", "Disagree", "Strongly Disagree"]
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
         },
         {
           "statement": "I stay polite and respectful, even when I disagree with someone. (Civility)",
-          "scale": ["Strongly Agree", "Agree", "Disagree", "Strongly Disagree"]
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
         },
         {
           "statement": "When working on a team, I do my fair share of the work. (Teamwork)",
-          "scale": ["Strongly Agree", "Agree", "Disagree", "Strongly Disagree"]
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
         },
         {
           "statement": "I listen to other people's ideas before sharing my own. (Collaboration)",
-          "scale": ["Strongly Agree", "Agree", "Disagree", "Strongly Disagree"]
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
         },
         {
           "statement": "I try to take the lead when the group needs direction or organization. (Leadership)",
-          "scale": ["Strongly Agree", "Agree", "Disagree", "Strongly Disagree"]
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
         },
         {
           "statement": "I speak up when I see someone being treated unfairly or left out. (Inclusivity / Civility)",
-          "scale": ["Strongly Agree", "Agree", "Disagree", "Strongly Disagree"]
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
         },
         {
           "statement": "I stay calm and look for solutions when conflicts happen in a group. (Teamwork / Leadership)",
-          "scale": ["Strongly Agree", "Agree", "Disagree", "Strongly Disagree"]
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
         },
         {
           "statement": "I celebrate other people's achievements and give credit when it's due. (Civility / Collaboration)",
-          "scale": ["Strongly Agree", "Agree", "Disagree", "Strongly Disagree"]
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
         },
         {
           "statement": "I believe working with people who think differently helps us create better results. (Diversity / Teamwork)",
-          "scale": ["Strongly Agree", "Agree", "Disagree", "Strongly Disagree"]
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
         }
       ]
     },
     {
       "type": "fillintheblank",
       "title": "Skill Development",
-      "instructions": "What is one skill related to working with others that you want to work on?",
+      "instructions": "What is one skill related to working with others that you want to work on? Choose and write down one of the following --> Diversity, Inclusivity, Civility, Teamwork, Collaboration, Leadership",
       "content": [
-        "I want to work on <options>*Diversity, Inclusivity, Civility, Teamwork, Collaboration, Leadership</options>."
+        "I want to work on <options keyword=\"true\">Diversity, Inclusivity, Civility, Teamwork, Collaboration, Leadership</options>."
       ]
     },
     {
       "type": "video",
       "title": "Personal Attributes",
-      "instructions": "Watch the video below to learn about three important personal attributes--having a positive attitude, showing honesty and integrity, and being willing to learn--and see how each can help you succeed in school, at work, and in everyday life.",
-      "video": "personal_attributes.mp4",
+      "instructions": "Some soft skills are more about who you are than what you do. These are called personal attributes, and they shape how you think, act, and grow. Watch the video below to learn about three important ones—having a positive attitude, showing honesty and integrity, and being willing to learn—and see how each can help you succeed in school, at work, and in everyday life.",
+      "video": "Personal Attributes.mp4",
       "scrubbable": false
     },
     {
@@ -450,6 +444,7 @@
       "title": "Professional Habits Quiz",
       "instructions": "Answer the questions below to check your understanding of professionalism, appearance, punctuality, and reliability.",
       "passing_score": 4,
+      "image": "barber.jpg",
       "feedback_config": {
         "default": "Thanks for completing this quiz on professional habits!",
         "ranges": [
@@ -541,7 +536,8 @@
     {
       "type": "writing",
       "title": "Soft Skills Reflection",
-      "instructions": "You've just finished this lesson on Soft Skills. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else."
+      "instructions": "You've just finished this lesson on Soft Skills. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else.",
+      "image": "soft_skills.jpg"
     }
   ]
 }

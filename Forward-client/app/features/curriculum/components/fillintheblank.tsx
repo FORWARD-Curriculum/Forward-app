@@ -176,7 +176,18 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
 
     return (
         <div className="max-w-4xl mx-auto p-6">
-            <h2 className="text-2xl font-bold text-center mb-8">{fillInTheBlank.title}</h2>
+
+            
+            {fillInTheBlank.image && (
+                <div className="mb-6">
+                <img 
+                    src={fillInTheBlank.image} 
+                    alt={fillInTheBlank.title} 
+                    className="w-full max-w-lg mx-auto rounded-lg shadow-sm border border-muted object-cover"
+  
+                />
+                </div>
+            )}
             
             <div className="space-y-6">
                 {(() => {
