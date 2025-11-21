@@ -3,6 +3,12 @@ div.martor-preview, .ace-github {
                 color: var(--body-fg);
             }
 
+div.martor-preview h1, div.martor-preview h2, div.martor-preview h3, div.martor-preview h4, div.martor-preview h5, div.martor-preview h6 {
+    color: var(--body-fg) !important;
+    background-color: transparent !important;
+    font-size: revert !important;
+}
+
 .modal-help-guide, .modal-emoji {
     display: none;
 }
@@ -35,6 +41,22 @@ div.martor-preview, .ace-github {
 
 .ace_active-line {
     background-color: color-mix(in srgb, var(--hairline-color), transparent 60%) !important;
+}
+
+div.martor-preview code,div.martor-preview pre {
+    background-color: var(--hairline-color) !important;
+    color: #D14;
+    padding: 0.2em 0.4em !important;
+    border-radius: 0.3em !important;
+    border-width: 0px !important;
+}
+
+div.martor-preview blockquote {
+    border-left: 4px solid var(--default-button-bg) !important;
+    background-color: color-mix(in srgb, var(--hairline-color), transparent 20%) !important;
+    /* padding: 0.2em 0.4em !important; */
+    margin-left: 0px !important;
+    color: var(--body-fg) !important;
 }
 
 .martor-field {
