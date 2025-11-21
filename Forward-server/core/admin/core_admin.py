@@ -199,7 +199,8 @@ class FacilityAdmin(admin.ModelAdmin):
 # Announcement model and admin
 class Announcement(models.Model):
     title = models.CharField(max_length=200)
-    content = models.TextField(verbose_name="Info")
+    content = models.TextField(verbose_name="Info", help_text="""Markdown supported
+        announcement content. Links are automatically detected and formatting like **bold** and _italic_ work here.""")
     
     def __str__(self):
         return self.title
@@ -213,7 +214,20 @@ class AnnouncementAdmin(admin.ModelAdmin):
     }
     
     def content_view(self, obj):
-        return mark_safe(markdownify(obj.content))
+        return format_html("""
+                            {}
+                            <style>
+                            .readonly {{
+                                width: 100%;
+                                flex-grow: 1;
+                            }}
+                            </style>
+                           <div class="martor-preview"
+                           style="border: 1px solid var(--hairline-color); padding: 10px; border-radius: 5px;">
+                            {}
+                           </div>""",
+                           mark_safe("""<link rel="stylesheet" href="/static/custom/custom_martor.css">""")
+                           ,mark_safe(markdownify(obj.content)))
     
     content_view.short_description = "Info"
 
