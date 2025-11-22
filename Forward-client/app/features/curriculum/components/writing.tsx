@@ -59,6 +59,10 @@ export function PromptArea({
 
   return (
     <div>
+
+      {promptObj.image && (
+        <img src={promptObj.image} alt="Prompt visual" />
+      )}
       <MarkdownTTS
         controlsClassName={`${mdDisplay} flex flex-col lg:flex-row-reverse grow justify-between`}
         controlsOrientation={"horizontal"}

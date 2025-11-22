@@ -113,7 +113,8 @@ export interface Writing extends BaseActivity {
   prompts: {
     "prompt": string,
     "min_type"?: "word" | "char",
-    "minimum"?: number
+    "minimum"?: number,
+    "image"?: string,
   }[];
 }
 

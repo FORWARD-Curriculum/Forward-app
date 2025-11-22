@@ -407,6 +407,7 @@ class Writing(BaseActivity):
                 "properties": {
                     "prompt": {"type": "string", "title": "Prompt", 'widget': 'textarea'},
                     # https://django-jsonform.readthedocs.io/en/stable/guide/choices.html
+                    "image": {"type": "string", "format": "file-url"},
                     "min_type": {
                         "type": "string",
                         "choices": [
@@ -439,9 +440,13 @@ class Writing(BaseActivity):
         verbose_name_plural = "Writings"
         
     def to_dict(self):
+        prompts = copy.deepcopy(self.prompts)
+        for item in prompts:
+            if item.get("image"):
+                item["image"] = default_storage.url(item['image'])
         return {
             **super().to_dict(),
-            "prompts": self.prompts
+            "prompts": prompts
         }
 
 
