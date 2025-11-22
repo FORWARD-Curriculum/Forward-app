@@ -411,7 +411,7 @@
       "title": "Your Education Plans",
       "instructions": "Write about your plans for your education and incorporate what you learned about types of degrees. Try to write at least one paragraph.",
       "prompts": [
-        {"prompt":"What type of degree would you like to get and what will you need to do to apply for and complete this degree?"},
+        {"prompt":"What type of degree would you like to get and what will you need to do to apply for and complete this degree?", "image": "4year.png"},
         {"prompt":"What are the benefits of the type of degree you are seeking?"},
         {"prompt":"Compare and contrast the degree you want with other degrees."}
       ]

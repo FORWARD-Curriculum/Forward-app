@@ -205,6 +205,21 @@ class Command(BaseCommand):
                 self._prepare_dndmatch_assets(defaults)
                 self.regex_image_upload(defaults.get("content", ""), key_prefix="dndmatch/")
 
+            # Writing: upload prompt images to bucket and store path in json
+            if act_type == "writing":
+                prompts = defaults.get("prompts", []) or []
+                for prompt_obj in prompts:
+                    img = prompt_obj.get("image")
+                    if not img:
+                        continue
+                    try:
+                        self.bucket_url_call(img, key_prefix="writing/")
+                        prompt_obj["image"] = f"public/writing/{Path(img).name}"
+                    except Exception as e:
+                        self._err(f"     Failed to upload prompt image '{img}': {e}")
+                        prompt_obj["image"] = None
+                defaults["prompts"] = prompts
+
             # Twine: pre-upload in-file referenced images
             if act_type == "twine" and twine_name:
                 twine_path = self.folder_path / twine_name
