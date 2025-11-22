@@ -58,7 +58,14 @@ export function PromptArea({
   );
 
   return (
-    <div>
+    <div className="space-y-4">
+
+      {promptObj.image && (
+        <img 
+          className="w-full max-w-md rounded-lg shadow-md"
+          src={promptObj.image} 
+          alt="Prompt visual" />
+      )}
       <MarkdownTTS
         controlsClassName={`${mdDisplay} flex flex-col lg:flex-row-reverse grow justify-between`}
         controlsOrientation={"horizontal"}
