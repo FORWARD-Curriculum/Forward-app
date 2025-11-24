@@ -1,15 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useAuth } from "@/features/account/hooks";
 import { toast } from "sonner";
 import { Link } from "react-router";
 import { apiFetch } from "@/utils/utils";
+import { Checkbox } from "@radix-ui/react-checkbox";
 
 export default function Login() {
   const [error, setError] = useState(null);
-  const [instructor, setInstructor] = useState(false);
+  const [facilityEntered, setFacilityEntered] = useState(false);
   const login = useAuth().login;
 
   const handleSubmit = async (e: any) => {
@@ -20,16 +21,18 @@ export default function Login() {
     const formData = new FormData(e.target);
     const bm = (formData.get("birth_month")??"00") as string;
     const by = (formData.get("birth_year")?.slice(2,5)??"XX") as string;
-    const username = (formData.get("first_name")?.toString().toLowerCase().slice(0,2)??"")
-                    +(formData.get("last_name")?.toString().toLowerCase().slice(0,2)??"")
+    const username = (formData.get("first_name")?.toString().replaceAll("'","").toLowerCase().slice(0,2)??"")
+                    +(formData.get("last_name")?.toString().replaceAll("'","").toLowerCase().slice(0,2)??"")
                     +bm[0] + by[0] + bm[1] + by[1];
+    const consent = formData.get("consent") === "on" ? true : false;
     const data = {
 
       username,
       display_name: username,
       password: formData.get("password"),
       password_confirm: formData.get("password2"),
-      facility: (formData.get("facility") as string).toLowerCase()
+      facility: (formData.get("facility") as string).toLowerCase(),
+      consent: consent,
 
     };
 
@@ -83,7 +86,7 @@ export default function Login() {
       login({...result.data.user});
 
       // Redirect to the dashboard on success
-      window.location.href = "/dashboard";
+      window.location.href = consent ? "/survey" : "/dashboard";
     } catch (err: any) {
       setError(err.message);
     }
@@ -96,7 +99,9 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="my-6 flex flex-col gap-5">
           <div className="flex gap-2">
             <div>
-              <label htmlFor="first_name">First Name <span className="text-error">*</span></label>
+              <label htmlFor="first_name">
+                First Name <span className="text-error">*</span>
+              </label>
               <Input
                 minLength={2}
                 type="text"
@@ -108,7 +113,9 @@ export default function Login() {
               />
             </div>
             <div>
-              <label htmlFor="last_name">Last Name <span className="text-error">*</span></label>
+              <label htmlFor="last_name">
+                Last Name <span className="text-error">*</span>
+              </label>
               <Input
                 minLength={2}
                 type="text"
@@ -122,14 +129,18 @@ export default function Login() {
           </div>
           <div className="flex gap-2">
             <div className="flex flex-1 flex-col">
-              <label htmlFor="birth-month">Birth Month <span className="text-error">*</span></label>
+              <label htmlFor="birth-month">
+                Birth Month <span className="text-error">*</span>
+              </label>
               <select
                 required
                 id="birth-month"
                 name="birth_month"
                 className="bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-xl border px-3 py-2 text-base"
               >
-                <option value="" disabled selected>Select Birth Month</option>
+                <option value="" disabled selected>
+                  Select Birth Month
+                </option>
                 <option value={"01"}>01 - January</option>
                 <option value={"02"}>02 - February</option>
                 <option value={"03"}>03 - March</option>
@@ -145,14 +156,18 @@ export default function Login() {
               </select>
             </div>
             <div className="flex flex-1 flex-col">
-              <label htmlFor="birth-year">Birth Year <span className="text-error">*</span></label>
+              <label htmlFor="birth-year">
+                Birth Year <span className="text-error">*</span>
+              </label>
               <select
                 required
                 id="birth-year"
                 name="birth_year"
                 className="bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-xl border px-3 py-2 text-base"
               >
-                <option value="" disabled selected>Select Birth Year</option>
+                <option value="" disabled selected>
+                  Select Birth Year
+                </option>
                 {Array.from(
                   { length: 100 },
                   (_, i) => new Date().getFullYear() - i,
@@ -165,7 +180,9 @@ export default function Login() {
             </div>
           </div>
           <div>
-            <label htmlFor="password">Password <span className="text-error">*</span></label>
+            <label htmlFor="password">
+              Password <span className="text-error">*</span>
+            </label>
             <PasswordInput
               name="password"
               id="password"
@@ -175,7 +192,9 @@ export default function Login() {
             />
           </div>
           <div>
-            <label htmlFor="password">Confirm Password <span className="text-error">*</span></label>
+            <label htmlFor="password">
+              Confirm Password <span className="text-error">*</span>
+            </label>
             <PasswordInput
               name="password2"
               id="password2"
@@ -191,52 +210,53 @@ export default function Login() {
               type="text"
               name="facility"
               id="facility"
+              onChange={(e) => setFacilityEntered(e.target.value.length > 0)}
               placeholder="Facility ID"
               className="input min-w-[25vw]"
             />
           </div>
-          {instructor && (
-            <div>
-              <label htmlFor="email">e-Mail</label>
-              <Input
-                type="email"
-                name="email"
-                id="email"
-                placeholder="jane.smith@example.com"
-                className="input min-w-[25vw]"
-                required
+          {facilityEntered && (
+            <div className="flex w-[1px] min-w-full gap-2">
+              <input
+                type="checkbox"
+                id="consent"
+                name="consent"
+                defaultChecked={false}
+                className="!border-secondary-foreground accent-accent checked:before:bg-accent shrink-0 !bg-transparent"
               />
+              <div className="min-w-0 flex-1 cursor-pointer">
+                <label
+                  htmlFor="consent"
+                  className="cursor-pointer text-sm leading-none font-medium"
+                >
+                  Agree to participate in FORWARD research program.
+                  <p className="text-muted-foreground mt-1 text-sm text-wrap break-words">
+                    You agree to the collection of anonymized data concerning
+                    how you use this platform.
+                  </p>
+                </label>
+              </div>
             </div>
           )}
-          <div className="flex gap-2">
-            {!instructor && (
-              <Button
-                aria-label="Switch to instructor surveying"
-                variant={"outline"}
-                className="px-4"
-                onClick={() => {
-                  setInstructor(true);
-                }}
-              >
-                I am an instructor
-              </Button>
-            )}
-            <Button
-              aria-label="Create Account"
-              type="submit"
-              className="button bg-primary text-primary-foreground outline-primary-border w-full outline-1 active:brightness-110"
-              variant={"default"}
-            >
-              Create Account
-            </Button>
-          </div>
+          <Button
+            aria-label="Create Account"
+            type="submit"
+            className="button bg-primary text-primary-foreground outline-primary-border w-full outline-1 active:brightness-110"
+            variant={"default"}
+          >
+            Create Account
+          </Button>
           {error && (
-            <p className="text-error-border w-full text-center">{error}</p>
+            <p className="text-error-border text-center w-[1px] min-w-full">{error}</p>
           )}
         </form>
         <p className="text-muted-foreground text-center">
           Already have an account? <br />
-          <Link prefetch="intent" to="/login" className="text-blue-500 underline">
+          <Link
+            prefetch="intent"
+            to="/login"
+            className="text-blue-500 underline"
+          >
             Log In
           </Link>{" "}
           instead
@@ -245,4 +265,3 @@ export default function Login() {
     </div>
   );
 }
-//
