@@ -627,7 +627,7 @@ class Question(models.Model):
                 "correct": {"type": "string",'widget': 'textarea'},
                 "incorrect": {"type": "string",'widget': 'textarea'}
             },
-            "required": ["correct", "incorrect"]
+            # "required": ["correct", "incorrect"]
         },
         default=dict,
         help_text="Feedback configuration for correct/incorrect responses"

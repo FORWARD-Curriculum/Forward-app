@@ -1,9 +1,13 @@
 from django.contrib import admin
 from collections import defaultdict
 from django.utils.text import slugify
+from django.utils.html import format_html
 
 class CustomAdminSite(admin.AdminSite):
-    site_header = "FORWARD Administration"
+    site_header = format_html(
+        '<img id="ICON" src="/static/custom/forward_api_icon.svg" style="height: 25px; margin-top: 3px;" />'
+        '<span">FORWARD Administration</span>'
+    )
     site_title = "FORWARD Admin Panel"
     index_title = "Welcome to the FORWARD Admin site"
 
