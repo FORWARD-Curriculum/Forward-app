@@ -4,6 +4,10 @@ from django.contrib import admin
 from .admin import custom_admin_site
 from django.utils.html import format_html
 from django.urls import reverse
+from django.db import models
+from django.utils.safestring import mark_safe
+from martor.widgets import AdminMartorWidget
+from martor.utils import markdownify
 
 @admin.register(User, site=custom_admin_site)
 class CustomUserAdmin(UserAdmin):
@@ -191,3 +195,67 @@ class FacilityAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+
+# Announcement model and admin
+class Announcement(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField(verbose_name="Info", help_text="""Markdown supported
+        announcement content. Links are automatically detected and formatting like **bold** and _italic_ work here.""")
+    
+    def __str__(self):
+        return self.title
+
+@admin.register(Announcement, site=custom_admin_site)
+class AnnouncementAdmin(admin.ModelAdmin):
+    grouping = "Core"
+    list_display = ("title",)
+    formfield_overrides = {
+        models.TextField: {'widget': AdminMartorWidget},
+    }
+    
+    def content_view(self, obj):
+        return format_html("""
+                            {}
+                            <style>
+                            .readonly {{
+                                width: 100%;
+                                flex-grow: 1;
+                            }}
+                            </style>
+                           <div class="martor-preview"
+                           style="border: 1px solid var(--hairline-color); padding: 10px; border-radius: 5px;">
+                            {}
+                           </div>""",
+                           mark_safe("""<link rel="stylesheet" href="/static/custom/custom_martor.css">""")
+                           ,mark_safe(markdownify(obj.content)))
+    
+    content_view.short_description = "Info"
+
+    def get_fields(self, request, obj=None):
+        if self.has_change_permission(request, obj):
+            return ("content",)
+        return ("content_view",)
+
+    def get_readonly_fields(self, request, obj=None):
+        if not self.has_change_permission(request, obj):
+            return ("content_view",)
+        return ()
+
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        return False
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_module_permission(self, request):
+        return request.user.is_superuser or request.user.groups.filter(
+            name="Instructors"
+        ).exists()
+
+    def has_view_permission(self, request, obj=None):
+        return self.has_module_permission(request)

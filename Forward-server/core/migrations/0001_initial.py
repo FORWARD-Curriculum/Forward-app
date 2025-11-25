@@ -23,6 +23,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='Announcement',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('title', models.CharField(max_length=200)),
+                ('content', models.TextField(help_text='Markdown supported\n        announcement content. Links are automatically detected and formatting like **bold** and _italic_ work here.', verbose_name='Info')),
+            ],
+        ),
+        migrations.CreateModel(
             name='ConceptMap',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, help_text='the uuid of the database item', primary_key=True, serialize=False)),

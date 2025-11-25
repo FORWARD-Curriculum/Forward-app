@@ -41,25 +41,7 @@ export const LoadingSpinner = ({
 
 export default function Layout() {
   const location = useLocation();
-  const navigate = useNavigate();
   const { user, status } = useSelector((state: RootState) => state.user);
-
-  useEffect(() => {
-    if (
-      user &&
-      user.consent &&
-      !user.surveyed_at &&
-      !location.pathname.startsWith("/account")
-    ) {
-      navigate("/survey", { replace: true, state: { from: location } });
-    }
-  }, [
-    user?.consent,
-    user?.surveyed_at,
-    location.pathname,
-    navigate,
-    location,
-  ]);
 
   if (status === "loading" || status === "idle") {
     return (

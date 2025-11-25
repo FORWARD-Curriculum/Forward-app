@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { Outlet, useBeforeUnload, useBlocker } from "react-router";
+import { Outlet, useBeforeUnload, useBlocker, useLocation, useNavigate } from "react-router";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/sonner";
@@ -73,6 +73,8 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   const fetchUser = loaderData as User | null;
   const { user, status } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (status === "idle") {
@@ -95,6 +97,24 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
       root.classList.add(...newClasses);
     }
   }, [theme, textSize]);
+
+    useEffect(() => {
+      if (
+        user &&
+        user.consent &&
+        user.surveyed_at === null &&
+        (!location.pathname.startsWith("/account") || !location.pathname.startsWith("/survey"))
+      ) {
+        console.log("Redirecting to survey");
+        navigate("/survey", { replace: true, state: { from: location } });
+      }
+    }, [
+      user?.consent,
+      user?.surveyed_at,
+      location.pathname,
+      navigate,
+      location,
+    ]);
 
   return (
     <>
