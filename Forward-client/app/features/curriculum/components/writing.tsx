@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import {debounce, srcsetOf} from "@/utils/utils"
+import FwdImage from "@/components/ui/fwdimage";
 
 const mdPattern = /(\*\*|\n)/m;
 
@@ -59,14 +60,7 @@ export function PromptArea({
   return (
     <div className="space-y-4">
 
-      {promptObj.image && (
-        <img 
-          className="w-full max-w-md rounded-lg shadow-md"
-          src={promptObj.image.thumbnail}
-          srcSet={srcsetOf(promptObj.image)}
-          sizes="30vw"
-          alt="Prompt visual" />
-      )}
+      {promptObj.image && <FwdImage image={promptObj.image} className="w-full max-w-md rounded-lg shadow-md" sizes="30vw"/>}
       <MarkdownTTS
         controlsClassName={`${mdDisplay} flex flex-col lg:flex-row-reverse grow justify-between`}
         controlsOrientation={"horizontal"}

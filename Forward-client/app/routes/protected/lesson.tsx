@@ -531,6 +531,7 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
             <FwdImage
               image={activity.instructions_image}
               className="h-auto max-h-100 w-auto max-w-full rounded-xl object-contain"
+              skeletonClassName="min-h-100"
             />
           </div>
         )}

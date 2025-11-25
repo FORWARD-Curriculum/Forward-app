@@ -237,6 +237,7 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
                   image={example.image}
                   sizes="(max-width: 1020px) 82vw, 31vw"
                   className="max-h-100 w-auto rounded-3xl shadow-md"
+                  skeletonClassName="min-h-100"
                 />
               )}
               <MarkdownTTS controlsClassName="flex flex-row-reverse gap-2">

@@ -166,9 +166,10 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
           <FwdImage
             image={quiz.image}
             className="w-full max-w-full mx-auto rounded-lg shadow-sm border border-muted object-cover"
-            sizes="31vw"
+            sizes="400px"
             alt={quiz.title} 
             style={{ maxHeight: '400px' }}  
+            skeletonClassName="min-h-[400px]"
           />
         </div>
       )}

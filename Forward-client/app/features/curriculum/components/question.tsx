@@ -67,10 +67,11 @@ export default function Question({
           <div className="mb-4 flex justify-center">
             <FwdImage
             image={question.image}
-            sizes="30vw"
+            sizes="200px"
             alt="Question illustration"
             className="w-full max-w-md mx-auto rounded-md border border-muted object-cover"
             style={{ maxHeight: '200px' }}  // <- ADD THIS
+            skeletonClassName="min-h-[200px]"
             />
           </div>
         )}

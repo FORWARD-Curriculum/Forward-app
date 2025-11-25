@@ -9,7 +9,6 @@ import { useIsMobile } from "@/hooks/useClient";
 import { srcsetOf, type Image } from "@/utils/utils";
 import {
   CircleX,
-  MousePointerClick,
   Plus,
   Pointer,
   Search,
@@ -21,12 +20,14 @@ import { useState } from "react";
 interface FwdImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   image: Image | undefined;
   disableInteractive?: boolean;
+  skeletonClassName?: string;
 }
 
 export default function FwdImage({
   image,
   disableInteractive = false,
   className,
+  skeletonClassName,
   ...props
 }: FwdImageProps) {
   const isMobile = useIsMobile();
@@ -53,7 +54,7 @@ export default function FwdImage({
         {!isImageLoaded && (
           <Skeleton
             // Merge passed className with Skeleton classes
-            className={`aspect-square w-full rounded-xl ${className || ""}`}
+            className={`aspect-square w-full rounded-xl ${className || ""} ${skeletonClassName || ""}`}
           />
         )}
         <img
@@ -73,6 +74,7 @@ export default function FwdImage({
             <Pointer color="white" />
             <Plus
               className="absolute bottom-[12px] left-[7px] scale-60"
+              color="white"
               strokeWidth={4}
             />
           </div>
@@ -84,6 +86,7 @@ export default function FwdImage({
             <Search color="white" />
             <Plus
               className="absolute -top-[1px] -left-[1px] scale-55"
+              color="white"
               strokeWidth={3}
             />
           </div>
