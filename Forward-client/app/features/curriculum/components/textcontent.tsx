@@ -23,7 +23,7 @@ export default function TextContent({
   return (
     <div className="markdown">
       <div className="flex w-full flex-col items-center gap-4">
-        {textContent.image && <FwdImage image={textContent.image} sizes="480px" className="max-h-120 w-full cursor-zoom-in rounded-xl shadow-lg" skeletonClassName="min-h-120"/>}
+        {textContent.image && <FwdImage image={textContent.image} sizes="50vh" className={`max-h-300 ${isMobile ? "" : "h-120"} w-full cursor-zoom-in rounded-xl shadow-lg`} skeletonClassName="min-h-120"/>}
       </div>
       {textContent.content && (
         <MarkdownTTS
