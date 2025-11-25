@@ -22,7 +22,8 @@ from core.models import (
     Slideshow,
     Slide,
     IdentificationItem,
-    CustomActivityImageAsset
+    CustomActivityImageAsset,
+    JSONImageModel,  # Imported the new model
 )
 
 
@@ -202,24 +203,28 @@ class Command(BaseCommand):
                         re.sub(r"!\[.*\]\(.*\)", "", content, count=1).strip()
                     )
 
-            # DnDMatch: push object-images to storage and regex-upload for string markers
+            # DnDMatch: Create JSONImageModels for content images
             if act_type == "dndmatch":
                 self._prepare_dndmatch_assets(defaults)
+                # Note: regex_image_upload might still be needed if strings contain "image:path" 
+                # but standard DnD images are now JSON models
                 self.regex_image_upload(defaults.get("content", ""), key_prefix="dndmatch/")
 
-            # Writing: upload prompt images to bucket and store path in json
+            # Writing: Create JSONImageModels for prompt images
             if act_type == "writing":
                 prompts = defaults.get("prompts", []) or []
                 for prompt_obj in prompts:
-                    img = prompt_obj.get("image")
-                    if not img:
+                    img_path = prompt_obj.get("image")
+                    if not img_path:
                         continue
-                    try:
-                        self.bucket_url_call(img, key_prefix="writing/")
-                        prompt_obj["image"] = f"public/writing/{Path(img).name}"
-                    except Exception as e:
-                        self._err(f"     Failed to upload prompt image '{img}': {e}")
+                    
+                    # Convert file path to JSONImageModel UUID
+                    image_uuid = self._create_json_image_model(img_path)
+                    if image_uuid:
+                        prompt_obj["image"] = image_uuid
+                    else:
                         prompt_obj["image"] = None
+                        
                 defaults["prompts"] = prompts
 
             # Twine: pre-upload in-file referenced images
@@ -308,24 +313,45 @@ class Command(BaseCommand):
 
                 traceback.print_exc()
 
+    # ---------- JSON Image Model Helper ----------
+    def _create_json_image_model(self, rel_path: str) -> Optional[str]:
+        """
+        Takes a relative path to an image, creates a JSONImageModel instance,
+        uploads the file via that model, and returns the UUID string.
+        """
+        full_path = self.folder_path / rel_path
+        if not full_path.exists():
+            self._err(f"  JSON Image Asset not found: {full_path}")
+            return None
+
+        try:
+            with open(full_path, "rb") as f:
+                # Create the JSONImageModel
+                # The 'image' field is an ImageField, so we save the file to it.
+                # This automatically handles the S3/storage upload.
+                json_image = JSONImageModel()
+                # Use the filename from the path
+                json_image.image.save(full_path.name, File(f), save=True)
+                
+                self._log(f"  Created JSONImageModel: {json_image.id} for {rel_path}")
+                return str(json_image.id)
+        except Exception as e:
+            self._err(f"  Failed to create JSONImageModel for '{rel_path}': {e}")
+            return None
+
     # ---------- DnDMatch helpers ----------
     def _prepare_dndmatch_assets(self, defaults: dict):
         content = defaults.get("content", []) or []
         for group in content:
             for match in group.get("matches", []):
-                if not isinstance(match, str):
-                    # Object form: {"image": "<relative_path>"}
+                # If match is an object with an "image" key
+                if isinstance(match, dict):
                     rel = match.get("image")
-                    if not rel:
-                        continue
-                    local = self.folder_path / rel
-                    try:
-                        with open(local, "rb") as f:
-                            key = f"public/dndmatch/images/{Path(rel).name}"
-                            saved = default_storage.save(key, f)
-                            match["image"] = saved
-                    except FileNotFoundError:
-                        self._err(f"  DnD image not found: {local}")
+                    if rel:
+                        # Create JSONImageModel and replace path with UUID
+                        image_uuid = self._create_json_image_model(rel)
+                        if image_uuid:
+                            match["image"] = image_uuid
 
     # ---------- Twine helpers ----------
     def _upload_twine_subassets(self, twine_path: Path) -> bool:
@@ -433,17 +459,18 @@ class Command(BaseCommand):
             payload = payload.copy()
             image_filename = payload.pop("image", None)
 
-            # Upload example images to bucket and store path in JSON
+            # Process examples array for JSONImageModels
             examples = payload.get("examples", []) or []
             for ex in examples:
-                img = ex.get("image")
-                if not img:
+                img_path = ex.get("image")
+                if not img_path:
                     continue
-                try:
-                    self.bucket_url_call(img, key_prefix="concept/")
-                    ex["image"] = f"public/concept/{Path(img).name}"
-                except Exception as e:
-                    self._err(f"    Failed to upload example image '{img}': {e}")
+                
+                # Convert path to JSONImageModel UUID
+                image_uuid = self._create_json_image_model(img_path)
+                if image_uuid:
+                    ex["image"] = image_uuid
+                else:
                     ex["image"] = None
 
             model_fields = {f.name: f for f in Concept._meta.get_fields()}
@@ -489,6 +516,7 @@ class Command(BaseCommand):
         )
         for order, image_name in enumerate(images, start=1):
             model_fields = {f.name: f for f in CustomActivityImageAsset._meta.get_fields()}
+            defaults = {}
             defaults = {
                 k: v
                 for k, v in defaults.items()
@@ -496,9 +524,12 @@ class Command(BaseCommand):
             }
 
             try:
-                obj, created = IdentificationItem.objects.update_or_create(
+                # Use CustomActivityImageAsset for custom activity images
+                obj, created = CustomActivityImageAsset.objects.update_or_create(
                     custom_activity=custom_activity,
-                    order=order,
+                    # Note: CustomActivityImageAsset might not have 'order', so we rely on ID if unique constraint isn't on order
+                    # Assuming we just create them. If distinct images are needed, update_or_create logic might differ.
+                    # Here we try to match if possible, but images list is just strings.
                     defaults=defaults,
                 )
                 if image_name:

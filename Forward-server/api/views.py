@@ -21,18 +21,32 @@ import uuid
 
 logger = logging.getLogger(__name__)
 
+
+from core.utils import FwdImage
+from core.models import JSONImageModel
+
+GENERIC_FORWARD_IMAGE = FwdImage()
+
+
 @login_required
 def file_handler_view(request):
     if request.method == "POST":
         file = request.FILES.get("file")
         if not file:
             return JsonResponse({"error": "file missing"}, status=400)
-
-        model_name = request.POST.get("model_name", "")
-        s3_key = f"public/{model_name.lower()}/{uuid.uuid4()}_{file.name}"
-        url = s3_file_upload(file=file, s3_path=s3_key)
         
-        return JsonResponse({"value": s3_key})
+        model = JSONImageModel.objects.create(
+            image=file
+        )
+        
+        model.save()
+        
+        # model_name = request.POST.get("model_name", "")
+
+        # s3_key = f"public/{model_name.lower()}{uuid.uuid4()}_{file.name}"
+        # url = s3_file_upload(file=file, s3_path=s3_key)
+        
+        return JsonResponse({"value": model.id})
 
     elif request.method == "GET":
         return JsonResponse({"results": []})

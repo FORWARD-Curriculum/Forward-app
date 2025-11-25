@@ -23,6 +23,26 @@ from .utils import FwdImage
 
 GENERIC_FORWARD_IMAGE = FwdImage()
 
+class JSONImageModel(models.Model):
+    """
+    Class for models that store images in JSON fields. Provides utility methods for handling image URLs.
+    """
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item, stored in the json image field'
+    )
+    
+    image = ImageField(upload_to='public/jsonimagemodel/', blank=True,formats=GENERIC_FORWARD_IMAGE.formats, auto_add_fields=True)
+    
+    def stringify(id: uuid):
+        try:
+            model = JSONImageModel.objects.get(id=id)
+            return GENERIC_FORWARD_IMAGE.stringify(model.image)
+        except JSONImageModel.DoesNotExist:
+            return None
+    
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
 # while allowing us to add our own custom fields and methods
@@ -444,7 +464,7 @@ class Writing(BaseActivity):
         prompts = copy.deepcopy(self.prompts)
         for item in prompts:
             if item.get("image"):
-                item["image"] = default_storage.url(item['image'])
+                item["image"] = JSONImageModel.stringify(item["image"])
         return {
             **super().to_dict(),
             "prompts": prompts
@@ -529,7 +549,11 @@ class IdentificationItem(models.Model):
 class Quiz(BaseActivity):
     """Model for quiz activities that contain multiple questions and track scores."""
 
-    image = models.ImageField(upload_to='public/quiz/', null=True, blank=True, help_text="Optional Image to accompany the Quiz")
+    image = ImageField(
+        upload_to='public/quiz/',
+        blank=True,
+        help_text="Optional Image to accompany the Quiz",
+        formats=GENERIC_FORWARD_IMAGE.formats, auto_add_fields=True)
 
     video = models.FileField(upload_to='public/video', null=True, blank=True, validators=[FileExtensionValidator(allowed_extensions=['mp4'])], help_text= "Optional video to accompany the Quiz")
 
@@ -548,7 +572,7 @@ class Quiz(BaseActivity):
             "passing_score": self.passing_score,
             # "feedback_config": self.feedback_config,
             "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')],
-            "image": self.image.url if self.image else None,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
             "video": self.video.url if self.video else None
         }
 
@@ -605,7 +629,11 @@ class Question(models.Model):
         ('multiple_select', 'Multiple Select'),
     ]
 
-    image = models.ImageField(upload_to='public/question/', null=True, blank=True, help_text="Optional image to accompany the Question")
+    order = models.PositiveIntegerField(
+        help_text="Order within the quiz"
+    )
+    
+    image = ImageField(upload_to='public/question/', blank=True, help_text="Optional image to accompany the Question",formats=GENERIC_FORWARD_IMAGE.formats, auto_add_fields=True)
     video = models.FileField( upload_to='public/question/', null=True, blank=True, validators=[FileExtensionValidator(allowed_extensions=['mp4'])], help_text="Optional video to accompany the Question")
     
     # User's generated uuid
@@ -627,18 +655,6 @@ class Question(models.Model):
         help_text="The text of the question"
     )
 
-    feedback_config = JSONField(
-        schema={
-            "type": "object",
-            "properties": {
-                "correct": {"type": "string",'widget': 'textarea'},
-                "incorrect": {"type": "string",'widget': 'textarea'}
-            },
-            "required": ["correct", "incorrect"]
-        },
-        default=dict,
-        help_text="Feedback configuration for correct/incorrect responses"
-    )
 
     question_type = models.CharField(
         max_length=20,
@@ -649,6 +665,11 @@ class Question(models.Model):
     has_correct_answer = models.BooleanField(
         default=True,
         help_text="Whether this question has correct answers"
+    )
+    
+    is_required = models.BooleanField(
+        default=True,
+        help_text="Whether this question must be answered"
     )
 
     choices = JSONField(
@@ -674,13 +695,17 @@ class Question(models.Model):
         help_text="Available choices and correct answers for the question"
     )
 
-    is_required = models.BooleanField(
-        default=True,
-        help_text="Whether this question must be answered"
-    )
-
-    order = models.PositiveIntegerField(
-        help_text="Order within the quiz"
+    feedback_config = JSONField(
+        schema={
+            "type": "object",
+            "properties": {
+                "correct": {"type": "string",'widget': 'textarea'},
+                "incorrect": {"type": "string",'widget': 'textarea'}
+            },
+            # "required": ["correct", "incorrect"]
+        },
+        default=dict,
+        help_text="Feedback configuration for correct/incorrect responses"
     )
 
     class Meta:
@@ -702,7 +727,7 @@ class Question(models.Model):
             "is_required": self.is_required,
             "order": self.order,
             "feedback_config": self.feedback_config,
-            "image": self.image.url if self.image else None,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
             "video": self.video.url if self.video else None
         }
 
@@ -854,7 +879,7 @@ class DndMatch(BaseActivity):
                 "properties": {
                     "category":
                         {
-                            "title": "Name",
+                            "title": "Category Name",
                             "type": "string",
                         },
                     "matches": {
@@ -903,7 +928,7 @@ class DndMatch(BaseActivity):
             for match in group['matches']:
                 if isinstance(match, dict) and 'image' in match:
                     match['key'] = match['image']
-                    match['image'] = default_storage.url(match['image'])
+                    match['image'] = JSONImageModel.stringify(match['image'])
                     
         return {
             **super().to_dict(),
@@ -1017,35 +1042,13 @@ class ConceptMap(BaseActivity):
         }
 
 
-class Concept(BaseActivity):
+class Concept(models.Model):
     """Model for a concept in the concept map"""
     # TODO use jsonschema to enforce and validate the schema of the example field
 
-    """
-    {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "image": {
-            "type": "string"|null
-          },
-          "description": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "name",
-          "logo",
-          "description"
-        ],
-        "additionalProperties": false
-      },
-    }
-    """
+    order = models.PositiveIntegerField(
+        help_text="Order within the concept map"
+    )
 
     concept_map = models.ForeignKey(
         ConceptMap,
@@ -1053,8 +1056,17 @@ class Concept(BaseActivity):
         related_name="concepts",
         help_text="The concept map this concept belongs to"
     )
+    
+    title = models.CharField(
+        help_text="The title of the concept"
+    )
 
-    image = models.ImageField(upload_to='public/concept/', blank=False, null=False, help_text="An image representing the concept.")
+    image = ImageField(
+        upload_to='public/concept/',
+        blank=False, null=False,
+        help_text="An image representing the concept.",
+        formats=GENERIC_FORWARD_IMAGE.formats,
+        auto_add_fields=True)
 
     description = MartorField(
         help_text="A detailed description of the concept"
@@ -1080,17 +1092,17 @@ class Concept(BaseActivity):
     class Meta:
         verbose_name = "Concept Map Concept"
         verbose_name_plural = "Concept Map Concepts"
+        ordering = ['order']
     
     def to_dict(self):
         examples = copy.deepcopy(self.examples)
         for item in examples:
             if item.get('image'):
-                item['image'] = default_storage.url(item['image'])
+                item['image'] = JSONImageModel.stringify(item['image'])
         
         return {
-            **super().to_dict(),
             "id": self.id,
-            "image": self.image.url if self.image else None,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
             "description": self.description,
             "examples": examples,
         }

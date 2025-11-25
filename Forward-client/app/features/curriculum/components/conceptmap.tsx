@@ -16,6 +16,7 @@ import MarkdownTTS from "@/components/ui/markdown-tts";
 import { useResponse } from "../hooks";
 import { useIsMobile } from "@/hooks/useClient";
 import { MousePointerClick, Pointer } from "lucide-react";
+import { srcsetOf } from "@/utils/utils";
 
 export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
   useResponse<ConceptMapResponse, ConceptMap>({
@@ -47,7 +48,8 @@ export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
                     }
                   >
                     <img
-                      src={concept.image}
+                      src={concept.image.thumbnail}
+                      srcSet={srcsetOf(concept.image)}
                       className="aspect-square w-full rounded-3xl shadow-md"
                     />
                     {concept.examples.length<1 ? "":isMobile ?
@@ -78,7 +80,9 @@ export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {
                       >
                         {example.image ? (
                           <img
-                            src={example.image}
+                            src={example.image.thumbnail}
+                            srcSet={srcsetOf(example.image)}
+                            sizes="25vh"
                             className="aspect-square w-60 rounded-3xl shadow-md"
                           />
                         ) : (

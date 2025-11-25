@@ -1,5 +1,6 @@
 import MarkdownTTS from "../../../components/ui/markdown-tts";
 import type { Question, QuestionResponse } from "@/features/curriculum/types";
+import { srcsetOf } from "@/utils/utils";
 import { useEffect, useState } from "react";
 
 export default function Question({
@@ -65,7 +66,9 @@ export default function Question({
         {question.image && (
           <div className="mb-4">
             <img 
-              src={question.image} 
+              src={question.image.thumbnail}
+              srcSet={srcsetOf(question.image)} 
+              sizes="30vw"
               alt="Question illustration" 
               className="w-full max-w-md mx-auto rounded-md border border-muted object-cover"
               style={{ maxHeight: '200px' }}  // <- ADD THIS

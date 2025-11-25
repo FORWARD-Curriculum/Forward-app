@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/store";
 import { saveCurrentResponseThunk } from "../slices/userLessonDataSlice";
 import { toast } from "sonner";
+import { srcsetOf } from "@/utils/utils";
 
 export default function Quiz({ quiz }: { quiz: Quiz }) {
   const { hash } = useLocation();
@@ -163,7 +164,9 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
       {quiz.image && (
         <div className="mb-6">
           <img 
-            src={quiz.image} 
+            src={quiz.image.thumbnail}
+            srcSet={srcsetOf(quiz.image)} 
+            sizes="31vw"
             alt={quiz.title} 
             className="w-full max-w-lg mx-auto rounded-lg shadow-sm border border-muted object-cover"
             style={{ maxHeight: '300px' }}  

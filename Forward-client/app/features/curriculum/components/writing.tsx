@@ -8,7 +8,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import {debounce} from "@/utils/utils"
+import {debounce, srcsetOf} from "@/utils/utils"
 
 const mdPattern = /(\*\*|\n)/m;
 
@@ -63,7 +63,9 @@ export function PromptArea({
       {promptObj.image && (
         <img 
           className="w-full max-w-md rounded-lg shadow-md"
-          src={promptObj.image} 
+          src={promptObj.image.thumbnail}
+          srcSet={srcsetOf(promptObj.image)}
+          sizes="30vw"
           alt="Prompt visual" />
       )}
       <MarkdownTTS

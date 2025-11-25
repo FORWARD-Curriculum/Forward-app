@@ -114,7 +114,7 @@ export interface Writing extends BaseActivity {
     "prompt": string,
     "min_type"?: "word" | "char",
     "minimum"?: number,
-    "image"?: string,
+    "image"?: Image,
   }[];
 }
 
@@ -125,7 +125,7 @@ export interface Quiz extends BaseActivity {
     failing: string;
   };
   questions: Question[];
-  image?: string;
+  image?: Image;
   video?: string;
 }
 
@@ -136,7 +136,7 @@ export interface Question {
   question_type: "multiple_choice" | "true_false" | "multiple_select";
   has_correct_answer: boolean;
   order: number;
-  image?: string;
+  image?: Image;
   caption?: string;
   choices: {
     options: {
@@ -144,7 +144,7 @@ export interface Question {
       text: string;
       is_correct: boolean;
     }[];
-    image?: string;
+    image?: Image;
   };
   is_required: boolean;
   attempts?: number;
@@ -178,7 +178,7 @@ export interface PollQuestion {
 export interface DndMatch extends BaseActivity {
   content: {
     category: string;
-    matches: (string | { image: string; key: string })[];
+    matches: (string | { image: Image; key: string })[];
   }[];
   strict: boolean;
 }
@@ -196,7 +196,7 @@ export interface ConceptMap extends BaseActivity {
     description: string;
     examples: {
       name: string;
-      image?: string;
+      image?: Image;
       description: string;
     }[];
   }[];
@@ -332,7 +332,7 @@ export interface EmbedResponse extends BaseResponse {
 export interface DndMatchResponse extends BaseResponse {
   submission: {
     category: string;
-    matches: (string | { image: string; key: string })[];
+    matches: (string | { image: Image; key: string })[];
   }[];
 }
 

@@ -21,8 +21,9 @@ import { CSS } from "@dnd-kit/utilities";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/store";
 import { saveCurrentResponseThunk } from "../slices/userLessonDataSlice";
+import { srcsetOf, type Image } from "@/utils/utils";
 
-type Item = DndMatch["content"][0]["matches"][0];
+type Item = string | { image: Image; key: string };
 
 const id = (m: Item): UniqueIdentifier =>
   typeof m === "string" ? m : m.key || "";
@@ -80,7 +81,7 @@ function Draggable({
       }`}
     >
       {typeof item !== "string" ? (
-        <img alt="" src={item.image} className="aspect-auto h-25 rounded" />
+        <img alt="" src={item.image.thumbnail} srcSet={srcsetOf(item.image)} sizes="10vw" className="aspect-auto h-25 rounded" />
       ) : (
         item
       )}
