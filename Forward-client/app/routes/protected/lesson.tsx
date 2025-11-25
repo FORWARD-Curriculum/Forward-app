@@ -62,6 +62,7 @@ import MarkdownTTS from "@/components/ui/markdown-tts";
 import CustomActivity from "@/features/curriculum/components/customactivity";
 import { LoadingSpinner } from "./protected";
 import { toast } from "sonner";
+import FwdImage from "@/components/ui/fwdimage";
 
 export async function clientLoader({
   params,
@@ -526,11 +527,12 @@ export default function Lesson({ loaderData }: Route.ComponentProps) {
           </MarkdownTTS>
         )}
         {activity?.instructions_image && (
-          <img
-            className="mb-4 h-auto max-h-100 w-auto max-w-full rounded-xl object-contain"
-            src={activity.instructions_image.thumbnail} srcSet={srcsetOf(activity.instructions_image)}
-            alt=""
-          ></img>
+          <div className="mb-4 flex justify-center">
+            <FwdImage
+              image={activity.instructions_image}
+              className="h-auto max-h-100 w-auto max-w-full rounded-xl object-contain"
+            />
+          </div>
         )}
         {activity && <Activity activity={activity} />}
         <NextActivity />

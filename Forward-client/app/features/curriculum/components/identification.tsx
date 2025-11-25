@@ -48,12 +48,6 @@ function Box({
         className={`block h-auto ${isDialog ? "max-w-[300vw]" : "w-full"}`}
         alt=""
       />
-      {/* <img
-        src={box.image}
-        srcSet={box.image}
-        className={`block h-auto ${isDialog ? "max-w-[300vw]" : "w-full"}`}
-        alt=""
-      /> */}
       <div className="absolute inset-0">
         {box.areas?.map((a) => {
           const key = areaToKey(a);

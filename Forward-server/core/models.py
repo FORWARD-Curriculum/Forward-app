@@ -1105,6 +1105,7 @@ class Concept(models.Model):
             "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
             "description": self.description,
             "examples": examples,
+            "title": self.title,
         }
         
 # Helper method to generate presigned urls

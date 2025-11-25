@@ -326,12 +326,14 @@ class Command(BaseCommand):
 
         try:
             with open(full_path, "rb") as f:
-                # Create the JSONImageModel
-                # The 'image' field is an ImageField, so we save the file to it.
-                # This automatically handles the S3/storage upload.
-                json_image = JSONImageModel()
-                # Use the filename from the path
-                json_image.image.save(full_path.name, File(f), save=True)
+                # FIX: Extract just the filename (e.g. "image.png")
+                # If we don't pass name=..., Django uses the full absolute path from 'f',
+                # causing SuspiciousFileOperation.
+                file_name = Path(rel_path).name
+                
+                json_image = JSONImageModel.objects.create(
+                    image=File(f, name=file_name)
+                )
                 
                 self._log(f"  Created JSONImageModel: {json_image.id} for {rel_path}")
                 return str(json_image.id)
@@ -489,7 +491,6 @@ class Command(BaseCommand):
             try:
                 obj, created = Concept.objects.update_or_create(
                     concept_map=cmap,
-                    lesson=cmap.lesson,
                     order=order,
                     defaults=defaults,
                 )

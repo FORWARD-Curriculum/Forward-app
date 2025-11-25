@@ -1,3 +1,4 @@
+import FwdImage from "@/components/ui/fwdimage";
 import MarkdownTTS from "../../../components/ui/markdown-tts";
 import type { Question, QuestionResponse } from "@/features/curriculum/types";
 import { srcsetOf } from "@/utils/utils";
@@ -64,14 +65,13 @@ export default function Question({
 
         {/* Question-level image */}  
         {question.image && (
-          <div className="mb-4">
-            <img 
-              src={question.image.thumbnail}
-              srcSet={srcsetOf(question.image)} 
-              sizes="30vw"
-              alt="Question illustration" 
-              className="w-full max-w-md mx-auto rounded-md border border-muted object-cover"
-              style={{ maxHeight: '200px' }}  // <- ADD THIS
+          <div className="mb-4 flex justify-center">
+            <FwdImage
+            image={question.image}
+            sizes="30vw"
+            alt="Question illustration"
+            className="w-full max-w-md mx-auto rounded-md border border-muted object-cover"
+            style={{ maxHeight: '200px' }}  // <- ADD THIS
             />
           </div>
         )}
