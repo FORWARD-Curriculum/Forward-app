@@ -1,7 +1,6 @@
 import FwdImage from "@/components/ui/fwdimage";
 import MarkdownTTS from "../../../components/ui/markdown-tts";
 import type { Question, QuestionResponse } from "@/features/curriculum/types";
-import { srcsetOf } from "@/utils/utils";
 import { useEffect, useState } from "react";
 
 export default function Question({

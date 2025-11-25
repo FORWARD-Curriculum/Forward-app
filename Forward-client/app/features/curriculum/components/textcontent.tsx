@@ -4,19 +4,7 @@ import type {
 } from "@/features/curriculum/types";
 import MarkdownTTS from "@/components/ui/markdown-tts";
 import { useResponse } from "@/features/curriculum/hooks";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { CircleX, Pointer } from "lucide-react";
 import { useIsMobile } from "@/hooks/useClient";
-import { srcsetOf } from "@/utils/utils";
 import FwdImage from "@/components/ui/fwdimage";
 
 export default function TextContent({
@@ -30,7 +18,6 @@ export default function TextContent({
   });
 
   // State to track if the image has finished loading
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const isMobile = useIsMobile();
 ``
   return (

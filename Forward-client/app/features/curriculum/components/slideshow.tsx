@@ -21,7 +21,6 @@ import React, {
 import { ArrowRight, Circle, Lock } from "lucide-react";
 import { useResponse } from "../hooks";
 import { useIsMobile } from "@/hooks/useClient";
-import { srcsetOf } from "@/utils/utils";
 import CircularProgress from "@/components/ui/cprogress";
 import FwdImage from "@/components/ui/fwdimage";
 

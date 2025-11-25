@@ -20,7 +20,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/store";
-import { saveCurrentResponseThunk } from "../slices/userLessonDataSlice";
 import { srcsetOf, type Image } from "@/utils/utils";
 
 type Item = string | { image: Image; key: string };

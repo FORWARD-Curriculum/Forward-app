@@ -4,7 +4,6 @@ import type {
 } from "@/features/curriculum/types";
 import { useResponse } from "@/features/curriculum/hooks";
 import { useEffect, useState } from "react";
-import type { p } from "node_modules/@react-router/dev/dist/routes-DHIOx0R9";
 function escapeHTML(str: string) {
   const div = document.createElement('div');
   div.textContent = str;

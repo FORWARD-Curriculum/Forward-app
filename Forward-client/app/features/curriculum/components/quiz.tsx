@@ -13,7 +13,6 @@ import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/store";
 import { saveCurrentResponseThunk } from "../slices/userLessonDataSlice";
 import { toast } from "sonner";
-import { srcsetOf } from "@/utils/utils";
 import FwdImage from "@/components/ui/fwdimage";
 
 export default function Quiz({ quiz }: { quiz: Quiz }) {

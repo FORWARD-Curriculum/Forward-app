@@ -16,7 +16,6 @@ import MarkdownTTS from "@/components/ui/markdown-tts";
 import { useResponse } from "../hooks";
 import { useIsMobile } from "@/hooks/useClient";
 import { MousePointerClick, Pointer } from "lucide-react";
-import { srcsetOf } from "@/utils/utils";
 import FwdImage from "@/components/ui/fwdimage";
 
 export default function ConceptMap({ conceptmap }: { conceptmap: ConceptMap }) {

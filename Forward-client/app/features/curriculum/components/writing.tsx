@@ -3,7 +3,6 @@ import { useResponse } from "../hooks";
 import MarkdownTTS from "@/components/ui/markdown-tts";
 import React, {
   useCallback,
-  useEffect,
   useMemo,
   useRef,
   useState,
