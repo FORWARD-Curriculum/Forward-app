@@ -107,6 +107,7 @@ export interface TextContent extends BaseActivity {
 export interface Video extends BaseActivity {
   video: string;
   scrubbable: boolean;
+  transcript?: string;
 }
 
 export interface Writing extends BaseActivity {

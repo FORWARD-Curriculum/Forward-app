@@ -788,6 +788,7 @@ class Migration(migrations.Migration):
                 ('instructions_image_ppoi', models.CharField(default='0.5x0.5', max_length=20)),
                 ('video', models.FileField(upload_to='public/video/', validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['mp4'])])),
                 ('scrubbable', models.BooleanField(default=False, help_text='Whether the video can be scrubbed by the user')),
+                ('transcript', models.TextField(blank=True, help_text='optional trabscript of the video content', null=True)),
                 ('lesson', models.ForeignKey(help_text='The lesson this activity belongs to', on_delete=django.db.models.deletion.CASCADE, related_name='%(class)s_activities', to='core.lesson')),
             ],
             options={
