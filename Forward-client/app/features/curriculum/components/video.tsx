@@ -83,6 +83,15 @@ export default function Video({ video }: { video: VideoType }) {
         >
           Your browser does not support the video tag.
         </video>
+        
+        {video.transcript && (
+          <div>
+            <details>
+              <summary>Transcript</summary>
+              <div className="whitespace-pre-wrap">{video.transcript}</div>
+            </details>
+          </div>
+        )}
       </div>
     </div>
   );
