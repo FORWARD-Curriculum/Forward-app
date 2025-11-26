@@ -86,7 +86,7 @@ export default function Video({ video }: { video: VideoType }) {
         </video>
         
         {video.transcript && (
-          <details className="w-auto max-w-4xl bg-foreground rounded-lg p-4 shadow">
+          <details className="w-auto max-w-6xl bg-foreground rounded-lg p-4 shadow">
             <summary className="cursor-pointer font-medium text-secondary-foreground hover:text-accent transition-colors">
               Transcript
             </summary>
