@@ -120,12 +120,13 @@ export default function Header() {
                 FORWARD Navigation
               </Sheet.SheetTitle>
               <div className="*:bg-secondary text-secondary-foreground *:outline-secondary-border flex flex-col space-y-1 *:flex *:justify-between *:rounded-xl *:p-4 *:outline-1 *:active:bg-gray-200/80">
-                <Link prefetch="intent" to={"/dashboard"}>Dashboard</Link>
-                {lesson.lesson &&<Link prefetch="intent" to={"/lesson/"+lesson.lesson.id+"#" + (lesson.current_activity)}>Lesson</Link>}
+                <Link prefetch="intent" to={"/dashboard"} onClick={()=>setOpen(false)}>Dashboard</Link>
+                {lesson.lesson &&<Link prefetch="intent" to={"/lesson/"+lesson.lesson.id+"#" + (lesson.current_activity)} onClick={()=>setOpen(false)}>Lesson</Link>}
               </div>
               {user ? (
                 <div className="group mt-auto flex flex-col gap-4">
                   <Link prefetch="intent"
+                    onClick={()=>setOpen(false)}
                     to="/account"
                     className="flex w-full gap-3 active:backdrop-brightness-150"
                   >
@@ -178,6 +179,7 @@ export default function Header() {
               ) : (
                 <Link prefetch="intent"
                   to="/login"
+                  onClick={()=>setOpen(false)}
                   className="bg-primary text-primary-foreground mt-auto w-full p-3 text-center active:brightness-110"
                 >
                   Login

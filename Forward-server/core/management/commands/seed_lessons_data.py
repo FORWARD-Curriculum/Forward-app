@@ -186,7 +186,7 @@ class Command(BaseCommand):
                 if act_type in {"textcontent", "fillintheblank", "quiz"}
                 else None
             )
-            video_name = defaults.pop("video", None) if act_type == "video" else None
+            video_name = defaults.pop("video", None) if act_type in {"video", "quiz"} else None
             twine_name = defaults.pop("file", None) if act_type == "twine" else None
             cust_name = defaults.pop("document", None) if act_type == "customactivity" else None
 
@@ -204,6 +204,21 @@ class Command(BaseCommand):
             if act_type == "dndmatch":
                 self._prepare_dndmatch_assets(defaults)
                 self.regex_image_upload(defaults.get("content", ""), key_prefix="dndmatch/")
+
+            # Writing: upload prompt images to bucket and store path in json
+            if act_type == "writing":
+                prompts = defaults.get("prompts", []) or []
+                for prompt_obj in prompts:
+                    img = prompt_obj.get("image")
+                    if not img:
+                        continue
+                    try:
+                        self.bucket_url_call(img, key_prefix="writing/")
+                        prompt_obj["image"] = f"public/writing/{Path(img).name}"
+                    except Exception as e:
+                        self._err(f"     Failed to upload prompt image '{img}': {e}")
+                        prompt_obj["image"] = None
+                defaults["prompts"] = prompts
 
             # Twine: pre-upload in-file referenced images
             if act_type == "twine" and twine_name:
@@ -247,7 +262,7 @@ class Command(BaseCommand):
                         rel_path=self.folder_path / image_name,
                         label=f"{ActivityModel.__name__} asset",
                     )
-                elif act_type == "video" and video_name:
+                elif act_type in {"video", "quiz"} and video_name:
                     self._save_model_file(
                         instance=activity,
                         field_name="video",
@@ -344,6 +359,7 @@ class Command(BaseCommand):
         for order, q in enumerate(questions, start=1):
             q = q.copy()
             question_image_name = q.pop("image", None)
+            question_video_name = q.pop("video", None)
 
             defaults = {
                 "question_text": q.get("question_text", ""),
@@ -365,6 +381,15 @@ class Command(BaseCommand):
                         field_name="image",
                         rel_path=self.folder_path / question_image_name,
                         label=f"Question image",
+                    )
+
+                # same thing but for video
+                if question_video_name:
+                    self._save_model_file(
+                        instance=obj,
+                        field_name="video",
+                        rel_path=self.folder_path / question_video_name,
+                        label=f"Question video"
                     )
                 self._log(
                     f"    {'Created' if created else 'Updated'} question "

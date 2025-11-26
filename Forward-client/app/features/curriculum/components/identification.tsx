@@ -42,9 +42,15 @@ function Box({
     >
       <img
         src={box.image}
+        srcSet={box.image}
         className={`block h-auto ${isDialog ? "max-w-[300vw]" : "w-full"}`}
         alt=""
       />
+      {/* <img
+        src={box.image}
+        className={`block h-auto ${isDialog ? "max-w-[300vw]" : "w-full"}`}
+        alt=""
+      /> */}
       <div className="absolute inset-0">
         {box.areas?.map((a) => {
           const key = areaToKey(a);
@@ -181,7 +187,6 @@ export default function Identification({
     IdentificationResponse,
     Identification
   >({
-    type: "Identification",
     activity: identification,
     initialFields: {
       identified: 0,
@@ -207,7 +212,9 @@ export default function Identification({
         ...prev,
         identified: newIdentified,
         partial_response:
-          newIdentified < (identification.minimum_correct || totalIdents),
+          prev.partial_response === false ?
+            false :
+            newIdentified < (identification.minimum_correct || totalIdents),
       }));
     }
   }, [response, identification.minimum_correct]);

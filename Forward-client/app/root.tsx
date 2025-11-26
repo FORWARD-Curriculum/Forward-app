@@ -36,8 +36,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
       crossOrigin="anonymous"
       src="//unpkg.com/react-scan/dist/auto.global.js"
       /> */}
+        <title>FORWARD</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="FORWARD is a comprehensive transition curriculum for alternative settings and circumstances."/>
+        <link rel="icon" href="/forward_icon_dark.svg" />
         <Meta />
         <Links />
       </head>

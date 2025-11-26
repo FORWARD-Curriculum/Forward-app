@@ -73,6 +73,20 @@ export default function Question({
           </div>
         )}
 
+
+      {question.video && (
+        <div className="mb-6">
+          <video 
+            controls 
+            className="w-full max-w-lg mx-auto rounded-lg shadow-sm border border-muted object-cover"
+            style={{ maxHeight: '400px' }}
+          >
+            <source src={question.video} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      )}
+
         {question.caption && (
           <p className="text-muted-foreground text-sm italic">
             {question.caption}
@@ -148,7 +162,7 @@ export default function Question({
         <button
           onClick={() => {onCheckAnswer(question.id), setIsChecked(true)}}
           disabled={isDisabled || selectedAnswers.length === 0}
-          className="bg-primary disabled:bg-muted disabled:text-muted-foreground text-primary-foreground rounded-md px-6 py-2 font-medium transition-all hover:brightness-110 active:brightness-90"
+          className="bg-primary disabled:bg-muted disabled:text-muted-foreground disabled:pointer-events-none text-primary-foreground rounded-md px-6 py-2 font-medium transition-all hover:brightness-110 active:brightness-90"
         >
           Check Answer
         </button>

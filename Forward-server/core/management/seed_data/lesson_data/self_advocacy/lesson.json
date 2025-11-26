@@ -16,7 +16,7 @@
       "type": "writing",
       "instructions": "Everyone faces difficult times. The ability to bounce back from and adjust to changes and challenges in life is called <def def=\"The ability to bounce back from tough situations and adjust to life's changes and challenges, while finding ways to keep moving forward.\">resilience</def>.",
       "instructions_image": "determined.jpg",
-      "prompts":["Think about a difficult challenge or circumstance that you have faced and have overcome or moved past. Write about what it was you went through and how you showed resilience in the situation. Be detailed in your response."]
+      "prompts":[{"prompt":"Think about a difficult challenge or circumstance that you have faced and have overcome or moved past. Write about what it was you went through and how you showed resilience in the situation. Be detailed in your response."}]
     },
     {
       "type": "textcontent",
@@ -652,6 +652,7 @@
       "type": "slideshow",
       "title": "Steps to Self-Advocacy",
       "instructions": "So how do you actually advocate for yourself? It starts with knowing your strengths, what you're asking for, who you need to talk to, and what your rights are. Once you have that clear in your mind, you're ready to speak up. On the next few pages you will learn the steps in advocating for yourself.",
+      "force_wait": 15,
       "slides": [
         {
           "content": "**Speak clearly and directly.** Self-advocacy doesn't mean being loud or demanding--it means explaining your needs in a confident way. Using \"I\" statements like, *\"I need more time to finish this assignment\"* or *\"I learn best when I can see an example\"* keeps the focus on your needs, not on blaming anyone else.",
@@ -779,10 +780,10 @@
       "title": "Create Your Self-Advocacy Plan 2",
       "instructions": "Following the same instructions as before, answer the following prompts, trying to shoot for ~40 words.",
       "prompts": [
-        "What challenge are you facing?",
-        "What strengths do you have that can help you in this situation?",
-        "Who has rights in this situation? What are those rights? For example, a teacher might have the right to ask you to do a presentation AND you might have an accommodation at school that gives you the right to do your presentation without the class as an audience.",
-        "Write a summary of your self-advocacy plan. What will you ask for? How will you approach the situation? What will you do if you don't get what you want?"
+        {"prompt":"What challenge are you facing?", "minimum": 15, "min_type": "word"},
+        {"prompt":"What strengths do you have that can help you in this situation?", "minimum": 15, "min_type": "word"},
+        {"prompt":"Who has rights in this situation? What are those rights? For example, a teacher might have the right to ask you to do a presentation AND you might have an accommodation at school that gives you the right to do your presentation without the class as an audience.", "minimum": 15, "min_type": "word"},
+        {"prompt":"Write a summary of your self-advocacy plan. What will you ask for? How will you approach the situation? What will you do if you don't get what you want?", "minimum": 15, "min_type": "word"}
       ]
     },
     {
@@ -790,7 +791,7 @@
       "title": "Self-Advocacy Reflection",
       "instructions": null,
       "prompts": [
-        "You've just finished this lesson on Self-Advocacy. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else."
+        {"prompt":"You've just finished this lesson on Self-Advocacy. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else."}
       ]
     }
   ]

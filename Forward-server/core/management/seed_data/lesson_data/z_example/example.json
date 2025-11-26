@@ -230,9 +230,9 @@
       "title": "Writing Example",
       "instructions": "This is an example writing activity. Write a short response to the prompts below.",
       "prompts": [
-        "What are your goals for attending college?",
-        "Describe a challenge you have faced and how you overcame it.",
-        "What are you most excited about in your college journey?"
+        {"prompt":"What are your goals for attending college?"},
+        {"prompt":"Describe a challenge you have faced and how you overcame it."},
+        {"prompt":"What are you most excited about in your college journey?"}
       ]
     }
   ]

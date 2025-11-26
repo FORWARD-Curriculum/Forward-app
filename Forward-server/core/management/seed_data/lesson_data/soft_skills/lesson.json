@@ -181,9 +181,10 @@
       "title": "Email Reflection",
       "instructions": "Based on the checklist, reflect on your email address and what steps you might need to take.",
       "prompts": [
-        "How many questions did you answer \"yes\" to?",
-        "How many questions did you answer \"no\" to?",
-        "What do you need to do to revise your email address to make it work appropriate?"
+        {"prompt":"Write your current email address."},
+        {"prompt":"How many questions did you answer \"yes\" to?"},
+        {"prompt":"How many questions did you answer \"no\" to?"},
+        {"prompt":"What do you need to do to revise your email address to make it work appropriate?"}
       ]
     },
     {
@@ -276,9 +277,9 @@
       "title": "Critical Thinking and Problem Solving Reflection",
       "instructions": "Think about something in your life that hasn't been going the way you'd like. It could be at school, at work, with friends or family, or even something personal--like keeping up with responsibilities or managing your time. Then, apply critical thinking and problem solving as you consider the challenge you are facing.",
       "prompts": [
-        "Background Information - What's happening? Write 2-3 sentences describing the situation. Stick to the facts--what's going on, where, and with who?",
-        "Critical Thinking - Why might it be happening? Think about possible reasons behind the problem. These might include habits, distractions, emotions, or outside factors.",
-        "Problem Solving - What can you do about it? List at least two or three ideas for how to fix or improve the situation."
+        {"prompt":"Background Information - What's happening? Write 2-3 sentences describing the situation. Stick to the facts--what's going on, where, and with who?"},
+        {"prompt":"Critical Thinking - Why might it be happening? Think about possible reasons behind the problem. These might include habits, distractions, emotions, or outside factors."},
+        {"prompt":"Problem Solving - What can you do about it? List at least two or three ideas for how to fix or improve the situation."}
       ]
     },
     {
@@ -399,11 +400,11 @@
       "title": "Personal Attributes - Reflection",
       "instructions": "Select a prompt from the list below and take some time to reflect on your answer. Write a response to one or more of the prompts.",
       "prompts": [
-        "Write about a time when you stayed positive even though something was difficult.",
-        "How do you usually motivate yourself when you're feeling discouraged?",
-        "Why is honesty important to you, and how do you practice it?",
-        "Describe a time when you made a mistake. How did you handle it?",
-        "How do you show a willingness to learn in school or outside of school?"
+        {"prompt":"Write about a time when you stayed positive even though something was difficult."},
+        {"prompt":"How do you usually motivate yourself when you're feeling discouraged?"},
+        {"prompt":"Why is honesty important to you, and how do you practice it?"},
+        {"prompt":"Describe a time when you made a mistake. How did you handle it?"},
+        {"prompt":"How do you show a willingness to learn in school or outside of school?"}
       ]
     },
     {

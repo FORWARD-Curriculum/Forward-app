@@ -4,11 +4,12 @@ import {
   type LessonResponse,
   type ActivityManager,
   ActivityTypeDisplayNames,
+  type BaseResponse,
 } from "@/features/curriculum/types";
 import type { Route } from "./+types/lesson";
 import { apiFetch } from "@/utils/utils";
 import { useSelector, useDispatch } from "react-redux";
-import store, { type RootState } from "@/store";
+import store, { type AppDispatch, type RootState } from "@/store";
 import { act, useEffect, useCallback, memo } from "react";
 import TextContent from "@/features/curriculum/components/textcontent";
 import Poll from "@/features/curriculum/components/poll";
@@ -38,6 +39,8 @@ import { useState } from "react";
 import { useLocation } from "react-router";
 import {
   incrementHighestActivity,
+  saveCurrentResponseThunk,
+  setCurrentResponse,
   setResponse,
 } from "@/features/curriculum/slices/userLessonDataSlice";
 import {
@@ -57,6 +60,8 @@ import {
 } from "@/components/ui/dialog";
 import MarkdownTTS from "@/components/ui/markdown-tts";
 import CustomActivity from "@/features/curriculum/components/customactivity";
+import { LoadingSpinner } from "./protected";
+import { toast } from "sonner";
 
 export async function clientLoader({
   params,
@@ -216,7 +221,7 @@ const ScrollToTopButton = memo(() => {
 });
 
 export function TableOfContents() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const isMobile = useIsMobile();
   const [showFullToc, setShowFullToc] = useState(false);
   const activities = useSelector(
@@ -299,7 +304,10 @@ export function TableOfContents() {
                     key={activityIndex.order}
                     className={`${activityIndex.order === current_activity ? "bg-accent/40" : ""} group disabled:text-foreground disabled:bg-muted flex h-10 w-full flex-row items-center disabled:!cursor-not-allowed disabled:no-underline ${activity?.order && activity.order < 3 ? "!text-gray" : ""} justify-between px-8 font-bold last:rounded-b-3xl hover:underline active:backdrop-brightness-90`}
                     onClick={() => {
-                      dispatch(setActivity(activityIndex.order));
+                      if(current_activity!=activityIndex.order){
+                        dispatch(saveCurrentResponseThunk());
+                        dispatch(setActivity(activityIndex.order));
+                      }
                       history.replaceState(null, "", `#${activityIndex.order}`);
                     }}
                   >
@@ -333,7 +341,7 @@ export function TableOfContents() {
 }
 
 export function NextActivity() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [showComplete, setShowComplete] = useState(false);
   const user = useSelector((state: RootState) => state.user.user);
   const current_activity = useSelector(
@@ -348,7 +356,12 @@ export function NextActivity() {
   const lessonLength = useSelector(
     (state: RootState) => state.lesson.lesson?.activities.length ?? 0,
   );
+  const current_context = useSelector(
+    (state: RootState) => state.response.current_context,
+  );
   const isMobile = useIsMobile();
+
+  const [saving, setSaving] = useState(false);
 
   const handleLessonComplete = useCallback(() => {
     setShowComplete(true);
@@ -384,26 +397,48 @@ export function NextActivity() {
     <div className="mt-4 flex lg:mt-auto">
       <button
         disabled={user ? current_partial_response || undefined : false}
-        className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden"
+        className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden active:brightness-85 hover:brightness-105"
         onClick={() => {
-          if (isMobile) {
-            window.scrollTo({
-              top: 0,
-              behavior: "smooth",
-            });
-          }
-          if (current_activity === lessonLength) {
-            handleLessonComplete();
-          } else {
-            dispatch(nextActivity());
-            if (current_activity === highest_activity) {
-              dispatch(incrementHighestActivity());
+          setSaving(true);
+          dispatch(saveCurrentResponseThunk())
+            .unwrap()
+            .then((originalPromiseResult) => {
+              setSaving(false);
+              if (isMobile) {
+                window.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                });
+              }
+              if (current_activity === lessonLength) {
+                handleLessonComplete();
+                // Update the state of the component if we aren't navigating off the page
+                // in this case (modal displayed)
+                if (originalPromiseResult!== undefined && originalPromiseResult?.payload)
+                  dispatch(
+                    setCurrentResponse(
+                      (originalPromiseResult.payload as any)
+                        .response as BaseResponse,
+                    ),
+                  );
+              } else {
+                dispatch(nextActivity());
+                if (current_activity === highest_activity) {
+                  dispatch(incrementHighestActivity());
+                }
+                history.replaceState(null, "", "#" + (current_activity + 1));
+              }
+            })
+            .catch((e) =>{
+              toast.error("Something went wrong saving the activity.");
+              throw e;
             }
-            history.replaceState(null, "", "#" + (current_activity + 1));
-          }
+            );
         }}
       >
-        Save and Continue
+        <span className="flex min-w-[13ch] justify-center">
+          {saving ? <LoadingSpinner /> : "Save and Continue"}
+        </span>
         <ArrowRightIcon className="!text-primary-foreground" />
       </button>
       <Dialog open={showComplete} onOpenChange={setShowComplete}>
@@ -439,7 +474,7 @@ export function NextActivity() {
 }
 
 export default function Lesson({ loaderData }: Route.ComponentProps) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { hash } = useLocation();
   const activity = useSelector(

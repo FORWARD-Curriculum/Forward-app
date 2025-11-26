@@ -12,6 +12,7 @@ from botocore.exceptions import ClientError
 import re, os
 import json
 import copy
+from abc import abstractmethod
 from django_jsonform.models.fields import JSONField
 from martor.models import MartorField
 from django.utils.safestring import mark_safe
@@ -310,6 +311,7 @@ class BaseActivity(models.Model):
     def activity_type(self):
         return self.__class__.__name__
 
+    @abstractmethod
     def to_dict(self):
         return {
             "id": self.id,
@@ -391,7 +393,37 @@ class Video(BaseActivity):
 class Writing(BaseActivity):
     """Model for writing activities where students provide written responses."""
     prompts = JSONField(
-        schema={"type": "array", "items": {"type": "string", 'widget': 'textarea'}},
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "prompt": {"type": "string", "title": "Prompt", 'widget': 'textarea'},
+                    # https://django-jsonform.readthedocs.io/en/stable/guide/choices.html
+                    "image": {"type": "string", "format": "file-url"},
+                    "min_type": {
+                        "type": "string",
+                        "choices": [
+                            {'title': 'Words', 'value': 'word'},
+                            {'title': 'Characters', 'value': 'char'}
+                        ],
+                        'title': "Minimum Counting Type",
+                        'widget': 'radio',
+                        'default': 'char'
+                    },
+                    "minimum": {
+                        "type": "integer",
+                        "title": "Minimum Words/Chars",
+                        "minimum": 0,
+                        "default": 0
+                    }
+
+                },
+                "required": ["prompt"]
+            },
+            'default': [],
+            'minItems': 1,
+        },
         default=list,
         help_text="List of writing prompts for the activity"
     )
@@ -399,15 +431,15 @@ class Writing(BaseActivity):
     class Meta(BaseActivity.Meta):
         verbose_name = "Writing"
         verbose_name_plural = "Writings"
-
-    def get_prompts(self):
-        """Returns the list of prompts or an empty list if none set"""
-        return self.prompts or []
-
+        
     def to_dict(self):
+        prompts = copy.deepcopy(self.prompts)
+        for item in prompts:
+            if item.get("image"):
+                item["image"] = default_storage.url(item['image'])
         return {
             **super().to_dict(),
-            "prompts": self.prompts
+            "prompts": prompts
         }
 
 
@@ -433,6 +465,7 @@ class Identification(BaseActivity):
             "feedback": self.feedback
         }
         
+
 
 class IdentificationItem(models.Model):
     id = models.UUIDField(
@@ -468,6 +501,7 @@ class IdentificationItem(models.Model):
         help_text="""This field is a list of selectable rectangles on the image. Any rectangles you define in the list will show 
         up after this Activity has been saved, this means, to see any rectangles you must save at least once.""",
         verbose_name="Coordinates", blank=True, null=True)
+    
     image = models.ImageField(
         upload_to='public/identification/items/images', blank=False, null=False, help_text="""The image below automatically shows
         percentage values when hovered. If the tooltop at the bottom is not visible, holding still for a bit will show a tooltop
@@ -480,7 +514,8 @@ class IdentificationItem(models.Model):
         return {
             "areas": [[area['x1'], area['y1'], area['x2'], area['y2']] for area in self.areas] if self.areas else None,
             "image": self.image.url if self.image else None,
-            "hints": self.hints
+            "hints": self.hints,
+            # "_image": {"srcset": ", ".join([f"{getattr(self.image, key, None)} {FORMATS[key][1][1][0]}w" for key in FORMATS.keys()]), "src": self.image.micro}
         }
 
 
@@ -489,23 +524,12 @@ class Quiz(BaseActivity):
 
     image = models.ImageField(upload_to='public/quiz/', null=True, blank=True, help_text="Optional Image to accompany the Quiz")
 
+    video = models.FileField(upload_to='public/video', null=True, blank=True, validators=[FileExtensionValidator(allowed_extensions=['mp4'])], help_text= "Optional video to accompany the Quiz")
+
     passing_score = models.PositiveIntegerField(
         help_text="Minimum score required to pass the quiz",
         default=80
     )
-
-    # feedback_config = JSONField(
-    #     schema={
-    #         "type": "object",
-    #         "properties": {
-    #             "correct": {"type": "string"},
-    #             "incorrect": {"type": "string"}
-    #         },
-    #         "required": ["correct", "incorrect"]
-    #     },
-    #     default=dict,
-    #     help_text="Configuration for correct/incorrect feedback"
-    # )
 
     class Meta(BaseActivity.Meta):
         verbose_name = "Quiz"
@@ -518,6 +542,7 @@ class Quiz(BaseActivity):
             # "feedback_config": self.feedback_config,
             "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')],
             "image": self.image.url if self.image else None,
+            "video": self.video.url if self.video else None
         }
 
 
@@ -574,8 +599,9 @@ class Question(models.Model):
     ]
 
     image = models.ImageField(upload_to='public/question/', null=True, blank=True, help_text="Optional image to accompany the Question")
-
-    # User's ge`ne`rated uuid
+    video = models.FileField( upload_to='public/question/', null=True, blank=True, validators=[FileExtensionValidator(allowed_extensions=['mp4'])], help_text="Optional video to accompany the Question")
+    
+    # User's generated uuid
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -601,7 +627,7 @@ class Question(models.Model):
                 "correct": {"type": "string",'widget': 'textarea'},
                 "incorrect": {"type": "string",'widget': 'textarea'}
             },
-            "required": ["correct", "incorrect"]
+            # "required": ["correct", "incorrect"]
         },
         default=dict,
         help_text="Feedback configuration for correct/incorrect responses"
@@ -629,10 +655,11 @@ class Question(models.Model):
                         "properties": {
                             "id": {"type": "number"},
                             "text": {"type": "string", 'widget': 'textarea'},
-                            "is_correct": {"type": "boolean"}
+                            "is_correct": {"type": "boolean", "default": False}
                         },
-                        "required": ["id", "text", "is_correct"]
-                    }
+                        "required": ["id", "text"]
+                    },
+                    'minItems': 1
                 }
             },
             "required": ["options"]
@@ -668,7 +695,8 @@ class Question(models.Model):
             "is_required": self.is_required,
             "order": self.order,
             "feedback_config": self.feedback_config,
-            "image": self.image.url if self.image else None
+            "image": self.image.url if self.image else None,
+            "video": self.video.url if self.video else None
         }
 
 class Poll(BaseActivity):
@@ -1163,13 +1191,23 @@ class LikertScale(BaseActivity):
         
 class Slideshow(BaseActivity):
     
+    force_wait = models.IntegerField(default=0, help_text="""The amount of time, per-slide, in seconds, a student must wait
+                                     before being able to proceed to the next. A value of 0 (the default) will allow the student
+                                     to navigate freely at their own pace. """, verbose_name="Force Wait")
+    
+    autoplay = models.BooleanField(default=False, help_text="""If selected, slideshow will automatically advance to the next slide
+                                    after the time specified in above 'Force Wait' has elapsed. If false, the student must manually advance the slides.
+                                    If 'Force Wait' is set to 0, this setting has no effect.""")
+    
     def get_num_slides(self):
         return Slide.objects.filter(slideshow=self).count()
     
     def to_dict(self):
         return {
             **super().to_dict(),
-            "slides": [s.to_dict() for s in Slide.objects.filter(slideshow=self).order_by('order')]
+            "slides": [s.to_dict() for s in Slide.objects.filter(slideshow=self).order_by('order')],
+            "force_wait": self.force_wait,
+            "autoplay": self.autoplay,
         }
     
 class Slide(models.Model):
@@ -1341,6 +1379,7 @@ class BaseResponse(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
+    @abstractmethod
     def to_dict(self):
         return {
             "id": self.id,
@@ -1378,6 +1417,8 @@ class SlideshowResponse(BaseResponse):
         help_text='The slideshow this response is for'
     )
     
+    highest_slide = models.IntegerField(default=-1, help_text="highest slide student has gotten to")
+    
     class Meta:
         verbose_name = "Slideshow Response"
         verbose_name_plural = "Slideshow Responses"
@@ -1385,6 +1426,7 @@ class SlideshowResponse(BaseResponse):
     def to_dict(self):
         return {
             **super().to_dict(),
+            "highest_slide": self.highest_slide
         }
 
 class UserQuizResponse(BaseResponse):
@@ -2051,7 +2093,7 @@ class ActivityManager():
                               "watched_percentage": ["watched_percentage", 0.0]
                               })
         self.registerActivity(Twine, TwineResponse)
-        self.registerActivity(Slideshow, SlideshowResponse)
+        self.registerActivity(Slideshow, SlideshowResponse, {"highest_slide": ["highest_slide", -1]})
         self.registerActivity(CustomActivity, CustomActivityResponse)
 
 

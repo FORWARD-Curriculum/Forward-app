@@ -20,7 +20,6 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
 
     //use response hoook, we cerate an array the size of the empty responses we have
     const[response, setResponse] = useResponse<FillInTheBlankResponse, FillInTheBlank>({
-        type: "FillInTheBlank",
         activity: fillInTheBlank,
         initialFields: {
             submission: new Array(totalBlanks).fill(""),

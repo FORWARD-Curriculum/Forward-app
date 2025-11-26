@@ -108,7 +108,12 @@ export interface Video extends BaseActivity {
 }
 
 export interface Writing extends BaseActivity {
-  prompts: string[];
+  prompts: {
+    "prompt": string,
+    "min_type"?: "word" | "char",
+    "minimum"?: number,
+    "image"?: string,
+  }[];
 }
 
 export interface Quiz extends BaseActivity {
@@ -119,6 +124,7 @@ export interface Quiz extends BaseActivity {
   };
   questions: Question[];
   image?: string;
+  video?: string;
 }
 
 export interface Question {
@@ -144,6 +150,7 @@ export interface Question {
     correct: string;
     incorrect: string;
   };
+  video?: string;
 }
 
 export interface Poll extends BaseActivity {
@@ -227,6 +234,8 @@ export interface Twine extends BaseActivity {
 
 export interface Slideshow extends BaseActivity {
   slides: {content: string; image: string | null}[]
+  force_wait: number;
+  autoplay: boolean;
 }
 
 export interface CustomActivity extends BaseActivity {
@@ -302,11 +311,13 @@ export interface PollQuestionResponse extends BaseResponse {
 }
 
 export interface WritingResponse extends BaseResponse {
-  responses: string[];
+  responses: {"prompt": string, "response": string}[];
 }
 
 export interface TextContentResponse extends BaseResponse {}
-export interface SlideshowResponse extends BaseResponse {}
+export interface SlideshowResponse extends BaseResponse {
+  highest_slide: number;
+}
 export interface CustomActivityResponse extends BaseResponse {}
 export interface ConceptMapResponse extends BaseResponse {}
 export interface IdentificationResponse extends BaseResponse {
