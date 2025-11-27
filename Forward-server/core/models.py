@@ -375,6 +375,13 @@ class Video(BaseActivity):
         help_text="Whether the video can be scrubbed by the user"
     )
 
+    transcript = models.TextField(
+        blank =True,
+        null=True,
+        help_text="optional trabscript of the video content"
+    )
+
+
     class Meta:
         ordering = ['order', 'created_at']
         verbose_name = "Video"
@@ -387,6 +394,7 @@ class Video(BaseActivity):
         return {
             **super().to_dict(),
             "video": self.video.url if self.video else None,
+            "transcript": self.transcript
         }
 
 
