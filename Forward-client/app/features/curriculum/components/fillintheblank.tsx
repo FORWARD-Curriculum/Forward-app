@@ -1,6 +1,7 @@
 import type { FillInTheBlank, FillInTheBlankResponse } from "../types";
 import { useResponse } from "../hooks";
 import { useMemo, useState, useEffect } from "react";
+import FwdImage from "@/components/ui/fwdimage";
 
 interface FillInTheBlankProps {
     fillInTheBlank: FillInTheBlank;
@@ -178,13 +179,8 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
 
             
             {fillInTheBlank.image && (
-                <div className="mb-6">
-                <img 
-                    src={fillInTheBlank.image} 
-                    alt={fillInTheBlank.title} 
-                    className="w-full max-w-lg mx-auto rounded-lg shadow-sm border border-muted object-cover"
-  
-                />
+                <div className="mb-6 flex justify-center">
+                <FwdImage image={fillInTheBlank.image} className="w-full max-w-lg mx-auto rounded-lg shadow-sm border border-muted object-cover"/>
                 </div>
             )}
             

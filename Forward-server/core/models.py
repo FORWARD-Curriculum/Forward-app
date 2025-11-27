@@ -959,7 +959,8 @@ class FillInTheBlank(BaseActivity):
         verbose_name = "Fill in the Blank"
         verbose_name_plural = "Fill in the Blanks"
     
-    image = models.ImageField(upload_to='public/fillintheblank/images/', blank=True, null=True)
+    image = ImageField(upload_to='public/fillintheblank/images/', blank=True, formats=GENERIC_FORWARD_IMAGE.formats,
+        auto_add_fields=True)
 
     content = JSONField(
         verbose_name="Sentences",
@@ -1027,7 +1028,7 @@ class FillInTheBlank(BaseActivity):
         return {
             **super().to_dict(),
             "content": self.content,
-            "image": self.image.url if self.image else None
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None
         }
 
 
