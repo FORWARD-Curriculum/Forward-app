@@ -988,6 +988,7 @@ class FillInTheBlank(BaseActivity):
         return {
             **super().to_dict(),
             "content": self.content,
+            "image": self.image.url if self.image else None
         }
 
 
@@ -1002,6 +1003,7 @@ class ConceptMap(BaseActivity):
         verbose_name = "Concept Map"
         verbose_name_plural = "Concept Maps"
 
+    #TODO return and configure images for fill in the blank activities
     def to_dict(self):
         return {
             **super().to_dict(),
@@ -1791,6 +1793,7 @@ class DndMatchResponse(BaseResponse):
         }
 
 class FillInTheBlankResponse(BaseResponse):
+
     
     associated_activity = models.ForeignKey(
         FillInTheBlank,
@@ -1810,7 +1813,7 @@ class FillInTheBlankResponse(BaseResponse):
     def to_dict(self):
         return{
             **super().to_dict(),
-            "submission": self.submission
+            "submission": self.submission,
         }
 
 
