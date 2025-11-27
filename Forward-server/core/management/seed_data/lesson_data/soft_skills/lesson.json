@@ -297,19 +297,6 @@
       ]
     },
     {
-      "type": "fillintheblank",
-      "title": "Attention to Detail Practice",
-      "instructions": "Fill in the blanks based on the job listing from the previous slide.",
-      "image": "job_listing_1_customer_service_rep.png",
-      "content": [
-        "The company hiring for this position is called <options keyword=\"true\">ConnectCo, connectco</options>.",
-        "The job is located in <options keyword=\"true\">Orlando, FL, Florida, florida</options>.",
-        "The hourly pay range for this position is <options keyword=\"true\">16-18, 16, 17, 18</options>.",
-        "This role requires at least a <options keyword=\"true\">high school diploma</options> or <options keyword=\"true\">GED</options>.",
-        "Employees in this job will handle customer inquiries through <options keyword=\"true\">phone email chat, phone, email, chat</options>."
-      ]
-    },
-    {
       "type": "conceptmap",
       "title": "Working Well with Others",
       "instructions": "Click on each skill below to learn more about how they can help you succeed at school, at work, and in everyday life.",
@@ -553,7 +540,7 @@
       "type": "textcontent",
       "title": "Soft Skills Reflection",
       "instructions": "You've just finished this lesson on Soft Skills. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else.",
-      "prompts":[{"prompt":""}]
+      "image": "soft_skills.jpg"
     }
   ]
 }
