@@ -3,6 +3,9 @@ name: Backend Deploy
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'Forward-client/**'
+      - 'README.md'
 
 jobs:
   build:
