@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   deploy:
+    environment: Frontend Deploy
     runs-on: ubuntu-latest
     defaults:
       run:
