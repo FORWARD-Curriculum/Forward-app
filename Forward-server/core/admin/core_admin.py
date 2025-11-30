@@ -39,7 +39,7 @@ class CustomUserAdmin(UserAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": ("username", "display_name","password", "password2", "facility"),
+                "fields": ("username", "display_name","password1", "password2", "facility"),
             },
         ),
     )
@@ -233,8 +233,8 @@ class AnnouncementAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         if self.has_change_permission(request, obj):
-            return ("content",)
-        return ("content_view",)
+            return ("title","content",)
+        return ("title", "content_view",)
 
     def get_readonly_fields(self, request, obj=None):
         if not self.has_change_permission(request, obj):
