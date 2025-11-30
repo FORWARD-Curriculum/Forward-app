@@ -1,0 +1,42 @@
+name: Backend Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'Forward-server/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
+jobs:
+  build:
+    environment: Backend Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code 
+      uses: actions/checkout@v4
+      with:
+        # TODO: We should remove this lfs once the first job runs and the DB is seeded with all the video files
+        lfs: true
+        fetch-depth: 1
+        
+    - name: Deploy to Server
+      uses: easingthemes/ssh-deploy@v5.1.0
+      with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-rlPtDvz --delete"
+          SOURCE: "./"
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: ${{ secrets.REMOTE_TARGET }}
+          # TODO: After first job run, exclude the seed_data folder for bandwidth
+          EXCLUDE: "/Forward-client, .git/, .github/"
+          SCRIPT_AFTER: |
+            cd ${{ secrets.REMOTE_TARGET }}
+            echo "Rebuilding and restarting backend..."
+            docker-compose -f compose.production.yaml up -d --build backend
+            docker image prune -f
