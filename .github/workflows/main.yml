@@ -20,9 +20,11 @@ jobs:
     - name: Checkout Code 
       uses: actions/checkout@v4
       with:
-        # TODO: We should remove this lfs once the first job runs and the DB is seeded with all the video files
-        lfs: true
+        lfs: false
         fetch-depth: 1
+      
+    - name: Remove a directory
+      run: rm -rf Forward-server/core/management/seed_data Forward-client
         
     - name: Deploy to Server
       uses: easingthemes/ssh-deploy@v5.1.0
@@ -33,10 +35,16 @@ jobs:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           TARGET: ${{ secrets.REMOTE_TARGET }}
-          # TODO: After first job run, exclude the seed_data folder for bandwidth
-          EXCLUDE: "/Forward-client, .git/, .github/"
+          EXCLUDE: "Forward-client, .git/, .github/, Forward-server/core/management/seed_data/"
           SCRIPT_AFTER: |
-            cd ${{ secrets.REMOTE_TARGET }}
+            cd "${{ secrets.REMOTE_TARGET }}"
             echo "Rebuilding and restarting backend..."
-            docker-compose -f compose.production.yaml up -d --build backend
+            docker compose -f compose.production.yaml up -d --build backend
+
+            echo "Running database migrations..."
+            docker compose -f compose.production.yaml exec -T backend python manage.py migrate
+            
+            echo "Collecting static files..."
+            docker compose -f compose.production.yaml exec -T backend python manage.py collectstatic --noinput
+            
             docker image prune -f
