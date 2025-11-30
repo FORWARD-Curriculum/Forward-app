@@ -7,5 +7,6 @@ minio_data/
 !Forward-server/.env.development
 !Forward-client/
 !Forward-client/.env.development
+!Forward-client/.env.production
 !Forward-client/
 Forward-server/staticfiles/*
