@@ -6,13 +6,14 @@ services:
       dockerfile: Dockerfile.Production
     volumes:
       - ./Forward-server:/app/server
+      - static_volume:/app/static
     restart: unless-stopped
+    cpus: "0.85"
+    mem_limit: 750m
     env_file:
       - ../env_files/django/.env.production
     networks:
       - proxy
-    volumes:
-      - static_volume:/app/static
 
   caddy:
     image: caddy
