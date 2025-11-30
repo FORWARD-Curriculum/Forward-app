@@ -3,9 +3,8 @@ name: Backend Deploy
 on:
   push:
     branches: [ "main" ]
-    paths-ignore:
-      - 'Forward-client/**'
-      - 'README.md'
+    paths:
+      - 'Forward-server/**'
 
 jobs:
   build:
@@ -34,5 +33,5 @@ jobs:
           SCRIPT_AFTER: |
             cd ${{ secrets.REMOTE_TARGET }}
             echo "Rebuilding and restarting backend..."
-            docker compose up -d --build backend
+            docker-compose up -d --build backend
             docker image prune -f
