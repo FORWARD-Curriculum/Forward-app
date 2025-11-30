@@ -233,8 +233,8 @@ class AnnouncementAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         if self.has_change_permission(request, obj):
-            return ("content",)
-        return ("content_view",)
+            return ("title","content",)
+        return ("title", "content_view",)
 
     def get_readonly_fields(self, request, obj=None):
         if not self.has_change_permission(request, obj):
