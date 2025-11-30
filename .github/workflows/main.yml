@@ -38,5 +38,5 @@ jobs:
           SCRIPT_AFTER: |
             cd ${{ secrets.REMOTE_TARGET }}
             echo "Rebuilding and restarting backend..."
-            docker-compose up -d -f compose.production.yaml --build backend
+            docker-compose -f compose.production.yaml up -d --build backend
             docker image prune -f
