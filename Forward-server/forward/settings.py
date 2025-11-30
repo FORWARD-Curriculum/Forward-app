@@ -28,6 +28,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'True'
 
+OPTIMIZE_MEDIA = True
+
 ALLOWED_HOSTS_RAW = os.environ.get('ALLOWED_HOSTS', '')
 ALLOWED_HOSTS = [host.strip()
                  for host in ALLOWED_HOSTS_RAW.split(',') if host.strip()]
@@ -54,6 +56,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'api',
     'adminsortable2',
+    "imagefield",
 ]
 
 # REST Framework settings

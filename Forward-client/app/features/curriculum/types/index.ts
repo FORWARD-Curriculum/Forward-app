@@ -1,5 +1,7 @@
 // Fields should always be snake_case, and class names should always be ProperCase
 
+import type { Image } from "@/utils/utils";
+
 export interface Lesson {
   id: string;
   title: string;
@@ -7,7 +9,7 @@ export interface Lesson {
   objectives: string[];
   order: number;
   tags: string[];
-  image: string | undefined;
+  image: Image;
   activities: BaseActivity[];
   completion: number;
 }
@@ -93,13 +95,13 @@ export interface BaseActivity {
   }[keyof ActivityManager];
   title: string;
   instructions: string | null;
-  instructions_image: string | null;
+  instructions_image: Image | null;
   order: number;
 }
 
 export interface TextContent extends BaseActivity {
   content?: string;
-  image?: string; // Optional image URL to accompany the text content
+  image?: Image; // Optional image URL to accompany the text content
 }
 
 export interface Video extends BaseActivity {
@@ -113,7 +115,7 @@ export interface Writing extends BaseActivity {
     "prompt": string,
     "min_type"?: "word" | "char",
     "minimum"?: number,
-    "image"?: string,
+    "image"?: Image,
   }[];
 }
 
@@ -124,7 +126,7 @@ export interface Quiz extends BaseActivity {
     failing: string;
   };
   questions: Question[];
-  image?: string;
+  image?: Image;
   video?: string;
 }
 
@@ -135,7 +137,7 @@ export interface Question {
   question_type: "multiple_choice" | "true_false" | "multiple_select";
   has_correct_answer: boolean;
   order: number;
-  image?: string;
+  image?: Image;
   caption?: string;
   choices: {
     options: {
@@ -143,7 +145,7 @@ export interface Question {
       text: string;
       is_correct: boolean;
     }[];
-    image?: string;
+    image?: Image;
   };
   is_required: boolean;
   attempts?: number;
@@ -177,7 +179,7 @@ export interface PollQuestion {
 export interface DndMatch extends BaseActivity {
   content: {
     category: string;
-    matches: (string | { image: string; key: string })[];
+    matches: (string | { image: Image; key: string })[];
   }[];
   strict: boolean;
 }
@@ -185,18 +187,18 @@ export interface DndMatch extends BaseActivity {
 
 export interface FillInTheBlank extends BaseActivity {
   content: string[];
-  image?: string;
+  image?: Image;
 }
 
 export interface ConceptMap extends BaseActivity {
   content: string;
   concepts: {
     title: string;
-    image?: string;
+    image?: Image;
     description: string;
     examples: {
       name: string;
-      image?: string;
+      image?: Image;
       description: string;
     }[];
   }[];
@@ -208,7 +210,7 @@ export interface ConceptMap extends BaseActivity {
  */
 export interface Identification extends BaseActivity {
   content: {
-    image: string;
+    image: Image;
     areas: [number, number, number, number][]
     hints: boolean;
   }[];
@@ -234,7 +236,7 @@ export interface Twine extends BaseActivity {
 }
 
 export interface Slideshow extends BaseActivity {
-  slides: {content: string; image: string | null}[]
+  slides: {content: string; image: Image | null}[]
   force_wait: number;
   autoplay: boolean;
 }
@@ -332,7 +334,7 @@ export interface EmbedResponse extends BaseResponse {
 export interface DndMatchResponse extends BaseResponse {
   submission: {
     category: string;
-    matches: (string | { image: string; key: string })[];
+    matches: (string | { image: Image; key: string })[];
   }[];
 }
 

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/useClient";
 import { CircleX, Pointer } from "lucide-react";
+import { srcsetOf } from "@/utils/utils";
 
 /**
  * Converts an area array to a stable string key.
@@ -41,16 +42,12 @@ function Box({
       className={`relative ${isDialog ? "w-fit" : (className ?? "")} shadow-lg`}
     >
       <img
-        src={box.image}
-        srcSet={box.image}
+        src={isDialog ? box.image.original : box.image.thumbnail}
+        srcSet={isDialog ? undefined : srcsetOf(box.image)}
+        sizes={isDialog ? "100vw":"76vw"}
         className={`block h-auto ${isDialog ? "max-w-[300vw]" : "w-full"}`}
         alt=""
       />
-      {/* <img
-        src={box.image}
-        className={`block h-auto ${isDialog ? "max-w-[300vw]" : "w-full"}`}
-        alt=""
-      /> */}
       <div className="absolute inset-0">
         {box.areas?.map((a) => {
           const key = areaToKey(a);

@@ -225,6 +225,8 @@
   }
 }
 
+html body[data-scroll-locked] { padding-right: 0px !important; margin-right: 0px !important; } 
+
 .markdown>*ul {
   list-style-type: disc !important; 
   list-style-position: inside !important; 

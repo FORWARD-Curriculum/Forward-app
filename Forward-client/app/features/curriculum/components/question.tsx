@@ -1,3 +1,4 @@
+import FwdImage from "@/components/ui/fwdimage";
 import MarkdownTTS from "../../../components/ui/markdown-tts";
 import type { Question, QuestionResponse } from "@/features/curriculum/types";
 import { useEffect, useState } from "react";
@@ -63,12 +64,14 @@ export default function Question({
 
         {/* Question-level image */}  
         {question.image && (
-          <div className="mb-4">
-            <img 
-              src={question.image} 
-              alt="Question illustration" 
-              className="w-full max-w-md mx-auto rounded-md border border-muted object-cover"
-              style={{ maxHeight: '200px' }}  // <- ADD THIS
+          <div className="mb-4 flex justify-center">
+            <FwdImage
+            image={question.image}
+            sizes="200px"
+            alt="Question illustration"
+            className="w-full max-w-md mx-auto rounded-md border border-muted object-cover"
+            style={{ maxHeight: '200px' }}  // <- ADD THIS
+            skeletonClassName="min-h-[200px]"
             />
           </div>
         )}

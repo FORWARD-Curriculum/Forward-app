@@ -22,6 +22,7 @@ import { ArrowRight, Circle, Lock } from "lucide-react";
 import { useResponse } from "../hooks";
 import { useIsMobile } from "@/hooks/useClient";
 import CircularProgress from "@/components/ui/cprogress";
+import FwdImage from "@/components/ui/fwdimage";
 
 function NextSlide({
   goNext,
@@ -208,17 +209,19 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
 
   return (
     <div className="mt-10 flex w-full flex-col-reverse items-center gap-2 lg:mt-4 lg:flex-col">
-      {slideshow.autoplay &&  slideshow.force_wait != 0 &&<span className="text-muted-foreground italic">autoplay is enabled for this slideshow</span>}
+      {slideshow.autoplay && slideshow.force_wait != 0 && (
+        <span className="text-muted-foreground italic">
+          autoplay is enabled for this slideshow
+        </span>
+      )}
       <Carousel
         setApi={setApi}
         className="w-full max-w-xs md:max-w-2xl lg:max-w-4xl"
         // The below disables dragging on force wait, but because we are slicing the slides array to only unlocked slides,
         // it is not nessecary. Leaving it commented out for now in case we want to revisit this behavior.
-        opts={
-          {
-            watchDrag: !slideshow.autoplay || slideshow.force_wait == 0,
-          }
-        }
+        opts={{
+          watchDrag: !slideshow.autoplay || slideshow.force_wait == 0,
+        }}
       >
         <CarouselContent>
           {(slideshow.force_wait == 0 || slideshow.autoplay
@@ -230,13 +233,13 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
               className="flex flex-col items-center justify-center gap-4"
             >
               {example.image && (
-                <img
-                  src={example.image}
-                  alt=""
+                <FwdImage
+                  image={example.image}
+                  sizes="(max-width: 1020px) 82vw, 31vw"
                   className="max-h-100 w-auto rounded-3xl shadow-md"
+                  skeletonClassName="min-h-100"
                 />
               )}
-
               <MarkdownTTS controlsClassName="flex flex-row-reverse gap-2">
                 {example.content}
               </MarkdownTTS>

@@ -6,6 +6,20 @@ import { twMerge } from "tailwind-merge";
 
 export const API_PROGRESS_EVENT = "api-progress-update";
 
+export type Image = {
+  thumbnail: string;
+  optimized: { [key: string]: number };
+  original: string;
+};
+
+export function srcsetOf(image: Image) {
+  let out: string[] = [];
+  for (const [url, width] of Object.entries(image.optimized)) {
+    out.push(`${url} ${width}w`);
+  }
+  return out.join(", ");
+}
+
 declare global {
   interface Window {
     apiProgress: {

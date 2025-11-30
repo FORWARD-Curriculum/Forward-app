@@ -8,8 +8,8 @@ set -x
 
 echo "Setting up Django development environment..."
 
-# rm -rf core/migrations/*
-# touch core/migrations/__init__.py
+rm -rf core/migrations/*
+touch core/migrations/__init__.py
 
 # Run migrations
 python manage.py makemigrations

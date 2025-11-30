@@ -7,6 +7,8 @@ import uuid
 from django.urls import reverse
 import json
 
+from imagefield.fields import ImageFieldFile
+
 def s3_file_upload(file: IO[Any], s3_path="") -> str:
     """
         Uploads the blob file to the default s3 storage with the given key.
@@ -39,3 +41,39 @@ def s3_file_delete(s3_path):
         default_storage.delete(s3_path)
     except:
         raise
+
+DEFAULT_IMAGE_FORMATS = {
+    "mobile":  ("default", ("thumbnail", (480,  480))),
+    "tablet":  ("default", ("thumbnail", (800,  800))),
+    "desktop": ("default", ("thumbnail", (1500, 1500))),
+} if settings.OPTIMIZE_MEDIA else {}
+
+
+
+class FwdImage():
+    _formats: dict[str, tuple[str, tuple[str, tuple[int, int]]]] = {}
+    def __init__(self, formats: dict[str, tuple[str, tuple[str, tuple[int, int]]]] = None):
+        base = formats if formats is not None else DEFAULT_IMAGE_FORMATS
+        if settings.OPTIMIZE_MEDIA:
+            self._formats = {
+                "internal_default_thumbnail": ("default", ("thumbnail", (240, 240))),
+                **base,
+            }
+    
+    @property
+    def formats(self):
+        return {key: list(value) for key, value in self._formats.items()}
+    
+    def stringify(self, image: ImageFieldFile) -> dict[str, str | dict[str, int]]:
+        if image is None or not isinstance(image, ImageFieldFile):
+            raise TypeError("Passed image was not an ImageFieldFile")
+        
+        optimized: dict[str, int] = {}
+        for key, value in self._formats.items():
+            optimized[getattr(image, key)] = value[1][1][0]
+            
+        return {
+            "thumbnail": image.internal_default_thumbnail if image.internal_default_thumbnail else image.url,
+            "original": image.url,
+            "optimized": optimized
+        }
