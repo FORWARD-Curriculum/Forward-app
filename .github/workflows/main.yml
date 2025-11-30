@@ -45,6 +45,6 @@ jobs:
             docker compose -f compose.production.yaml exec -T backend python manage.py migrate
             
             echo "Collecting static files..."
-            docker compose -f compose.production.yaml exec -T backend python manage.py collectstatic --noinput
+            docker compose -f compose.production.yaml exec -T backend python manage.py collectstatic --noinput --clear
             
             docker image prune -f
