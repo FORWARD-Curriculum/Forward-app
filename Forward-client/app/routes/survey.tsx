@@ -1,4 +1,4 @@
-import { apiFetch } from "@/utils/utils";
+import { apiFetch, useTitle } from "@/utils/utils";
 import type { Route } from "./+types/survey";
 import { useEffect } from "react";
 import { toast } from "sonner";
@@ -24,10 +24,11 @@ export default function Onboard({ loaderData }: Route.ComponentProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || "/dashboard";
+  useTitle('FORWARD Readiness Survey | Forward');
 
   useEffect(() => {
     const surveyEnd: (this: Window, ev: MessageEvent<any>) => any = (e) => {
-      if (e.origin.includes("qualtrics.com") ) console.log(e)
+      // if (e.origin.includes("qualtrics.com") ) console.log(e)
       if (
         e.origin.includes("qualtrics.com") &&
         e.data == "endOfSurvey"

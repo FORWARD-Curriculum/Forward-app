@@ -3,10 +3,12 @@
 .postgres_data/
 minio_data/
 .env*
-*.mp4
+# *.mp4
 !Forward-server/.env.development
 !Forward-client/
 !Forward-client/.env.development
 !Forward-client/.env.production
 !Forward-client/
 Forward-server/staticfiles/*
+Forward-server/staticfiles/custom
+Forward-server/staticfiles/custom/*

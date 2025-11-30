@@ -5,14 +5,12 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useAuth } from "@/features/account/hooks";
 import { toast } from "sonner";
-import { apiFetch } from "@/utils/utils";
+import { apiFetch, useTitle } from "@/utils/utils";
 
 export default function Login() {
   const [error, setError] = useState(null);
   const login = useAuth().login;
-  const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from || "/dashboard";
+  useTitle('Login | FORWARD')
 
   const handleSubmit = async (e: any) => {
     e.preventDefault(); // Prevent the default form submission behavior
@@ -41,7 +39,9 @@ export default function Login() {
       login({...result.data.user})
 
       // Redirect to the route user attempted to access prior to logging in
-      navigate(from, { replace: true });
+      // removed it; made it so the user when logging in is always redirected to dashboard this is because with the use of guest i need to redirect 
+      // away from a route the guest was in and cause a refresh 
+      // navigate(from, { replace: true });
       toast.success("Successfully Logged In!");
     } catch (err: any) {
       setError(err.message);
@@ -87,13 +87,25 @@ export default function Login() {
             <p className="text-error-border w-full text-center">{error}</p>
           )}
         </form>
-        <p className="text-muted-foreground text-center">
-          Don't have an account? <br />
-          <Link prefetch="intent" to="/register" className="text-blue-500 underline">
-            Sign Up
-          </Link>{" "}
-          instead
-        </p>
+        <div className="text-muted-foreground flex w-full flex-col items-center">
+          <p>Don't have an account?</p>
+          <div className="flex lg:flex-row flex-col w-full gap-3">
+            <Link
+              prefetch="intent"
+              to="/register"
+              className="text-primary-foreground bg-primary flex grow basis-0 items-center justify-center rounded-xl p-2 active:brightness-90 hover:brightness-110"
+            >
+              Sign Up
+            </Link>{" "}
+            <Link
+              prefetch="intent"
+              to="/dashboard"
+              className="text-primary-foreground bg-accent flex grow basis-0 items-center justify-center rounded-xl p-2  active:brightness-90 hover:brightness-110"
+            >
+              Try as a Guest
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

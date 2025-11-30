@@ -1,0 +1,33 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block extrahead %}
+    <link rel="icon" href="{% static 'custom/forward_api_icon.svg' %}" type="image/x-icon">
+    <style>
+
+        .rjf-form-group, .rjf-form-group-wrapper {
+            max-width: 100% !important;
+        }
+        .imagefield-preview-image, .imagefield-point{
+            display: none;
+        }
+
+        a:has(img#ICON) {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        {% comment %} div.martor-preview, .ace-github {
+            background: var(--body-bg) !important;
+            color: var(--body-fg);
+        }
+
+        body {
+            background: var(--body-bg) !important;
+        }
+    
+        .ace-github .ace_marker-layer .ace_active-line {
+            background: #333333;
+        } {% endcomment %}
+    </style>
+{% endblock %}

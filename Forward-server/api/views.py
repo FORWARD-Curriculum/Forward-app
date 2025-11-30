@@ -10,9 +10,107 @@ from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUp
 from core.services import UserService, LessonService, QuizResponseService, ResponseService
 # , QuestionResponseService
 from .utils import json_go_brrr, messages
-from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, User
+from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, User, BugReport
 from rest_framework import serializers, request
+import logging
+from django.contrib.auth.decorators import login_required
+from core.utils import s3_file_upload, s3_file_delete
+from django.http import JsonResponse, HttpResponse
+import uuid
 
+
+logger = logging.getLogger(__name__)
+
+
+from core.utils import FwdImage
+from core.models import JSONImageModel
+
+GENERIC_FORWARD_IMAGE = FwdImage()
+
+
+@login_required
+def file_handler_view(request):
+    if request.method == "POST":
+        file = request.FILES.get("file")
+        if not file:
+            return JsonResponse({"error": "file missing"}, status=400)
+        
+        model = JSONImageModel.objects.create(
+            image=file
+        )
+        
+        model.save()
+        
+        # model_name = request.POST.get("model_name", "")
+
+        # s3_key = f"public/{model_name.lower()}{uuid.uuid4()}_{file.name}"
+        # url = s3_file_upload(file=file, s3_path=s3_key)
+        
+        return JsonResponse({"value": model.id})
+
+    elif request.method == "GET":
+        return JsonResponse({"results": []})
+
+    elif request.method == "DELETE":
+        trigger = request.GET.get("trigger")
+        file_names = request.GET.getlist("value")
+
+        if trigger != "delete_button":
+            return HttpResponse(status=200)
+
+        for name in file_names:
+            s3_file_delete(name)
+
+        return HttpResponse(status=200)
+
+      
+class BugReportView(APIView):
+    """
+    API endpoint for submitting bug reports.
+
+    POST: Submit a bug report
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        """Submit a bug report"""
+        # Extract bug report details from the request data
+        description = request.data.get('description')
+        steps_to_reproduce = request.data.get('steps_to_reproduce')
+        recent_window_locations = request.data.get('recent_window_locations')
+        app_state = request.data.get('app_state')
+        device_info = request.data.get('device_info')
+        app_version = request.data.get('app_version')
+        
+        if not description:
+            return json_go_brrr(
+                message="Description is required for a bug report",
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        br = BugReport.objects.create(
+            user=request.user,
+            description=description,
+            steps_to_reproduce=steps_to_reproduce,
+            recent_window_locations=recent_window_locations,
+            app_state=app_state,
+            device_info=device_info,
+            app_version=app_version
+        )
+        
+        if not br:
+            return json_go_brrr(
+                message="Failed to submit bug report",
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )     
+
+        return json_go_brrr(
+            message="Bug report submitted successfully",
+            data={
+                "id": br.id,
+            },
+            status=status.HTTP_201_CREATED
+        )
 
 class UserRegistrationView(generics.CreateAPIView):
     """
@@ -138,6 +236,35 @@ class CurrentUserView(APIView):
             data=serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+
+class ResetStudentProgressView(APIView):
+
+    permission_classes=[IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        """Delete all lesson response data for teh current user"""
+
+        user = request.user
+
+        #failsafe on teh chance of frontend manipulation
+        if user.username not in ['student1', 'student2']:
+            return Response(
+                {"error": "Unauthorized: only test acounts can reset progress"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        manager = ActivityManager()
+        for activity_name, (ActivityClass, ResponseClass, _, __, ___) in manager.registered_activities.items(): # syntax for unpacking tuple / activity manager
+            if ResponseClass:  # some activities have no response (like Concept)
+                ResponseClass.objects.filter(user=user).delete()
+
+
+        return json_go_brrr(
+            message="All lesson progress reset successfully",
+            status=status.HTTP_200_OK
+        )
+      
 
 
 class QuizView(APIView):
@@ -173,20 +300,32 @@ class GetLessonIds(APIView):
 
 
 class CurriculumView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] # need to double check this
 
     def get(self, request, *args, **kwargs):
         '''
         gets all lessons
         '''
-        lessons = Lesson.objects.all()
+        lessons = Lesson.objects.filter(active=True)
 
         if not lessons:
             return Response({"detail": "cannot find any lessons"}, status=status.HTTP_404_NOT_FOUND)
 
+        lesson_data = []
+        for i in lessons:
+            data = i.to_dict()
+            
+            # In case an individual accessing the lesson is a guest
+            if request.user.is_authenticated:
+                data["completion"] = LessonService.get_lesson_completion(request.user, i)
+            else:
+                data["completion"] = 0 
+            lesson_data.append(data)
         return Response({
             "detail": messages['successful_id'],
-            "data": [{**l.to_dict(), "completion": LessonService.get_lesson_completion(request.user, l)} for l in lessons]},
+            # "data": [{**l.to_dict(), "completion": LessonService.get_lesson_completion(request.user, l)} for l in lessons]},
+            "data": lesson_data},
             status=status.HTTP_200_OK)
 
 
@@ -224,13 +363,18 @@ class LessonView(APIView):
 
 
 class LessonContentView(APIView):
-    permission_classes = [IsAuthenticated]
+    # Any Allowed for guest user access
+    permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
         lesson_id = kwargs.get('id')
         lesson = LessonService.get_lesson_content(lesson_id=lesson_id)
-        response = ResponseService.get_response_data(
-            lesson_id=lesson_id, user=request.user)
+
+        if (request.user.is_authenticated):
+            response = ResponseService.get_response_data(
+                lesson_id=lesson_id, user=request.user)
+        else:
+            response = {} # empty for now
 
         return json_go_brrr(
             message="Successfully retrieved lesson content",
@@ -239,6 +383,13 @@ class LessonContentView(APIView):
         )
 
     def post(self, request, *args, **kwargs):
+
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "Guest users cannot save responses"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
         data_type = self.request.body.data_type
         time = self.request.body.time
         score = self.request.body.score
@@ -358,80 +509,6 @@ class ResponseView(APIView):
             return Response({"detail": "An internal error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class QuizResponseView(APIView):
-    """
-    API endpoint for submitting and retrieving quiz responses.
-
-    POST: Submit a quiz response
-    GET: Retrieve a user's quiz responses
-    """
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, *args, **kwargs):
-        """Submit a quiz response"""
-        serializer = QuizSubmissionSerializer(data=request.data)
-        if (serializer.is_valid()):
-            result = QuizResponseService.submit_quiz_response(
-                user=request.user,
-                data=serializer.validated_data
-            )
-
-            quiz_response = result['quiz_response']
-            feedback = result['feedback']
-
-            return json_go_brrr(
-                message="Quiz response submitted successfully",
-                data={
-                    "quiz_response": quiz_response.to_dict(),
-                    "feedback": feedback
-                },
-                status=status.HTTP_201_CREATED
-            )
-
-        return json_go_brrr(
-            message="Failed to submit quiz response",
-            data=serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    def get(self, request, *args, **kwargs):
-        """Retrieve a user's quiz responses, optionally filtered by quiz_id"""
-        quiz_id = request.query_params.get('quiz_id')
-        responses = QuizResponseService.get_user_quiz_responses(
-            request.user, quiz_id)
-
-        return json_go_brrr(
-            message="Quiz responses retrieved successfully",
-            data={'quiz_responses': [response.to_dict()
-                                     for response in responses]},
-            status=status.HTTP_200_OK
-        )
-
-
-class QuizResponseDetailView(APIView):
-    """
-    API endpoint for retrieving a specific quiz response
-
-    GET: Retrieve details of a specific quiz response
-    """
-
-    def get(self, request, response_id, *args, **kwargs):
-        try:
-            response = QuizResponseService.get_quiz_response_details(
-                request.user, response_id)
-
-            return json_go_brrr(
-                message="Quiz response details retrieved successfully",
-                data={'quiz_response': response.to_dict()},
-                status=status.HTTP_200_OK
-            )
-        except Exception as e:
-            return json_go_brrr(
-                message=str(e),
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-
 class QuizResponseStatusView(APIView):
     """
     API endpoint for tracking quiz status within a lesson.
@@ -487,41 +564,7 @@ class QuizResponseStatusView(APIView):
                 message="Quiz not found",
                 status=status.HTTP_404_NOT_FOUND
             )
-        
-# class QuestionResponseView(APIView):
-#     """Handle individual question responses within a quiz, god i hate this, so now questions wil be embedded and more coupled to quizes"""
-#     permission_classes = [IsAuthenticated]
-    
-#     def post(self, request, quiz_id, question_id):
-#         """Submit answer to a specific question"""
-#         try:
-#             question = Question.objects.get(id=question_id, quiz_id=quiz_id)
-#             quiz = Quiz.objects.get(id=quiz_id)
-            
-#             # Prepare data for service
-#             validated_data = {
-#                 'associated_activity': question,
-#                 'quiz_id': quiz_id,
-#                 'lesson_id': quiz.lesson,
-#                 'response_data': request.data.get('response_data', {}),
-#                 'time_spent': request.data.get('time_spent', 0)
-#             }
-            
-#             question_response = QuestionResponseService.submit_question_response(
-#                 validated_data, request
-#             )
-            
-#             return json_go_brrr(
-#                 message="Question response submitted successfully",
-#                 data=question_response.to_dict(),
-#                 status=status.HTTP_200_OK
-#             )
-#         except Exception as e:
-#             return json_go_brrr(
-#                 message=str(e),
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-            
+           
 class OnboardView(APIView):
     def get(self, request):
         user: User = request.user

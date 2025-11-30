@@ -12,11 +12,10 @@ export default function LikertScale({
 
   const [response, setResponse] = useResponse<LikertScaleResponse, LikertScale>(
     {
-      type: "LikertScale",
       activity: likertScale,
       initialFields: {
         content: {
-          selection: new Array(likertScale.content.length),
+          selection: new Array(likertScale.content.length).fill(null),
           explanation: null,
         },
       },
@@ -48,18 +47,16 @@ export default function LikertScale({
         setResponse((old) => {
           const newSelection = [...old.content.selection];
           newSelection[index] = val;
+          const all_answered = newSelection.every(v=>v!==null);
           return {
             ...old,
             content: {
               ...old.content,
               selection: newSelection,
             },
+            partial_response: !all_answered,
           };
         });
-        setResponse((old) => ({
-          ...old,
-          partial_response: old.content.selection.every((v) => v !== null),
-        }));
       };
 
       if (isContinuous) {
@@ -96,7 +93,7 @@ export default function LikertScale({
           return (
             <div
               key={index}
-              className="group bg-background/70 space-y-4 rounded-3xl border border-gray-200/60 px-10 py-6 shadow-sm backdrop-blur-sm transition-shadow hover:shadow-md"
+              className="group bg-background/70 space-y-4 rounded-3xl border border-gray-200/60 px-10 pt-3 shadow-sm backdrop-blur-sm transition-shadow hover:shadow-md"
               role="group"
               aria-labelledby={`${rangeId}-label`}
             >
@@ -104,7 +101,7 @@ export default function LikertScale({
                 id={`${rangeId}-label`}
                 className="text-fg flex items-center gap-2 text-lg font-semibold tracking-tight"
               >
-                <p className="bg-accent text-secondary flex aspect-square w-8 items-center justify-center rounded-full">
+                <p className="bg-accent text-secondary flex aspect-square w-8 min-w-8 items-center justify-center rounded-full">
                   {index + 1}
                 </p>
                 {item.statement}

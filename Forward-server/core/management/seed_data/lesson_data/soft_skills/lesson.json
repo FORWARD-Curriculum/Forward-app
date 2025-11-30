@@ -1,0 +1,546 @@
+{
+  "lesson": {
+    "title": "Soft Skills Development",
+    "description": "This lesson introduces the importance of soft skills in school, at work, and in everyday life. Through videos, reflections, and interactive activities, you'll learn how to strengthen these skills and see how they connect to your goals. By the end, you'll be able to identify your strengths, recognize areas to grow, and take steps to develop the soft skills that matter most for your future success.",
+    "objectives": [
+      "Define soft skills in your own words.",
+      "Identify soft skills that are most important to employers.",
+      "Align your strengths and weaknesses with specific soft skills.",
+      "Select one or more soft skills to focus on improving."
+    ],
+    "order": 5,
+    "tags": ["soft skills", "lesson"],
+    "image": "fist_bump.jpg"
+  },
+  "activities": [
+    {
+      "type": "textcontent",
+      "title": "Defining Soft Skills",
+      "instructions": null,
+      "content": "Every job needs <def def='how you communicate, work with others, and handle challenges'>soft skills</def>. These are the ways you communicate, solve problems, and work with others. They're not just for work--you'll use them in school, with friends, and in everyday life. Employers often say they care more about soft skills than job knowledge. Why? Because they can train you on the tasks of a job, but how you show up, interact, and handle challenges is up to you.\n\n <br> In this lesson, we'll focus on several categories of soft skills. We'll break them down one by one, and you can always come back later to review or see how much you've grown."
+    },
+    {
+      "type": "video",
+      "title": "Soft Skills Overview",
+      "instructions": "Watch this video to get a better idea of what soft skills are.",
+      "video": "soft_skills_video.mp4",
+      "scrubbable": false,
+      "transcript": "Soft skills are the people skills and personal habits that shape how you interact, communicate, and handle challenges. They’re what help you work well with others, manage responsibilities, and adapt when things change. Unlike technical skills, which are job-specific, soft skills apply everywhere—at school, at work, at home, and in your community. They’re the foundation for success in both your personal and professional life.\n\nThere are five main categories of soft skills that can help you grow and reach your goals.\n\nCommunication is all about how you express yourself and listen to others, such as through how you write professional emails.\n\nProblem solving skills involve thinking through challenges and finding solutions, like figuring out how to manage your time better when you have a busy schedule.\n\nDynamics of working with others include the ways you collaborate and build relationships, such as supporting your teammates during a group project.\n\nPersonal attributes are the qualities that shape who you are, like staying positive even when things don’t go as planned.\n\nProfessional habits are the daily actions that show reliability, such as showing up on time and staying organized.\n\nSoft skills don’t just make you a better student or employee—they make you a better communicator, problem solver, and teammate in every part of life. When you practice these skills, you’re not only preparing for a career—you’re building confidence, character, and connections that will help you succeed anywhere you go."
+    },
+    {
+      "type": "textcontent",
+      "title": "Soft Skill Categories",
+      "instructions": null,
+      "content": "These are the soft skill categories we will explore. Some of these categories may relate to other lessons. As you go through the lesson, pay attention to which category each soft skill falls under.\n\n* Communication  \n* Problem solving skills  \n* Dynamics of working with others  \n* Personal attributes  \n* Professional habits"
+    },
+    {
+      "type": "textcontent",
+      "title": "Email Etiquette",
+      "instructions": null,
+      "image": "email.jpg",
+      "content": "**Email etiquette is a skill that falls under communication.**  \nIt means knowing how to write emails in a respectful and professional way. Email etiquette is important because it helps you make a good first impression. You'll use it in many situations--like applying for a job, asking about a scholarship, or communicating with teachers, supervisors, and coworkers.\n\n <br> So what does good email etiquette look like?\n\n* **Start with a greeting.** Examples: \"Dear,\" \"Good morning,\" or \"Hello.\"  \n* **Write a clear subject line.** This should say what your email is about. Keep it short and direct.  \n  * Example: If you need to make up a test, write \"Make up test Friday.\" If you are writing about a job interview, write \"Interview for job position.\"  \n* **Keep the main message simple and professional.** Be respectful, avoid slang, and check your spelling and punctuation.  \n* **End with a closing.** Examples: \"Sincerely,\" \"Thank you,\" or \"Best.\""
+    },
+    {
+      "type": "fillintheblank",
+      "title": "Email Creation",
+      "instructions": "Before you start sending professional emails, you need an address that makes a good impression. In this activity, you’ll go through a checklist to see if your email address is ready for work—or if it needs a quick upgrade. \n \n <br> What is your email address? If you do not have one make one up here. Only include the first part of your email. We will include the @email.com as a generic ending",
+      "content": [
+        "<options></options>"
+      ]
+    },
+    {
+      "type": "quiz",
+      "title": "Professional Email Address Checklist and Reflection",
+      "instructions": "Before you start sending professional emails, you need an address that makes a good impression. In this activity, you'll go through a checklist to see if your email address is ready for work--or if it needs a quick upgrade.",
+      "passing_score": 0,
+      "feedback_config": {
+        "default": null,
+        "ranges": []
+      },
+      "questions": [
+        {
+          "question_text": "Does my email address include my real name or a simple version of my name?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Yes" },
+              { "id": 2, "text": "No" }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "Is my email address free of nicknames (like \"bigboy2010\" or \"princess_peach\")?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Yes" },
+              { "id": 2, "text": "No" }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "Is my email address free of silly words or slang (like \"yolo_queen\" or \"skibidi_sigma\")?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Yes" },
+              { "id": 2, "text": "No" }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "Is my email address free of bad words, symbols, or jokes (like \"gamer69\" or \"bad.bunny\")?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Yes" },
+              { "id": 2, "text": "No" }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "Is my email address free of words or phrases that could upset or offend people (like \"conservative_cracker\" or \"newjimcrow\")?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Yes" },
+              { "id": 2, "text": "No" }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "Is my email address free of political references (like \"voteobama\" or \"republicans4lyfe\")?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Yes" },
+              { "id": 2, "text": "No" }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "Is my email address free of hobbies or interests (like \"animal_luver\" or \"gamer4life\")?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Yes" },
+              { "id": 2, "text": "No" }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "Is my email address short and simple?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Yes" },
+              { "id": 2, "text": "No" }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "Do I have access to emails sent to this address?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": false,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Yes" },
+              { "id": 2, "text": "No" }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        }
+      ]
+    },
+    {
+      "type": "writing",
+      "title": "Email Reflection",
+      "instructions": "Based on the checklist, reflect on your email address and what steps you might need to take.",
+      "prompts": [
+        {"prompt":"Write your current email address."},
+        {"prompt":"How many questions did you answer \"yes\" to?"},
+        {"prompt":"How many questions did you answer \"no\" to?"},
+        {"prompt":"What do you need to do to revise your email address to make it work appropriate?"}
+      ]
+    },
+    {
+      "type": "textcontent",
+      "title": "Phone Etiquette",
+      "instructions": null,
+      "image": "on_the_phone.jpg",
+      "content": "Phone etiquette is part of communication. It covers both how you talk on the phone and when it's appropriate to use your phone in school, work, or other professional settings. Good phone etiquette shows respect, helps you come across as professional, and makes conversations smoother.\n\n#### **Communicating Over the Phone**\n\n* Try to pick up within the first 2-3 rings.  \n* Have a professional voicemail set up so callers can leave a message.  \n* Start by identifying yourself (\"Hi, this is Jordan\").  \n* Since people can't see your face, your tone matters--sound positive, not bored or harsh.  \n* Move to a quiet area to cut down on background noise.  \n* Listen closely and stay focused during the call.  \n* Keep the conversation clear and to the point--avoid going off track.  \n* End the call politely, making sure everything was covered.\n\n#### **When and How to Use Your Phone**\n\nPhones can also be a big distraction if used at the wrong time. To keep things professional at work and school:\n\n* Use your phone mostly during breaks, unless it's an emergency.  \n* Put your phone on silent or \"Do Not Disturb\" during class or work hours.  \n* Step into a private spot if you need to take a call.  \n* Follow school or workplace phone rules, since every place may have different expectations."
+    },
+    {
+      "type": "twine",
+      "title": "Phone Etiquette Practice",
+      "instructions": "Practice professional phone etiquette in this activity. Pay attention to how different methods of answering the phone can have an impact on the conversation you have.",
+      "file": "twine_phone.html"
+    },
+    {
+      "type": "conceptmap",
+      "title": "Conflict Resolution Strategies",
+      "instructions": "Click through the pages to learn some key strategies for resolving conflict.",
+      "content": "Conflict resolution is a key part of communication--it's more than just avoiding fights or grudges. When disagreements happen (at work, school, or in daily life), the way you respond shows your <def def='How you handle situations and emotions in a responsible and respectful way.'>maturity</def>, respect, and ability to find solutions. Good conflict resolution means staying calm, listening well, understanding others' views, and working toward a solution everyone can accept.",
+      "examples": [
+        {
+          "title": "Stay calm",
+          "image": "calm.jpg",
+          "description": "Take a breath before responding so you don't let anger control the moment. A calm tone helps keep the situation from escalating."
+        },
+        {
+          "title": "Listen first",
+          "image": "listening.jpg",
+          "description": "Let the other person share their side without interrupting. People are more open to resolution when they feel heard."
+        },
+        {
+          "title": "Use respectful language",
+          "image": "respect.jpg",
+          "description": "Speak with \"I\" statements and avoid blame or insults. Respectful words keep the focus on solving, not fighting."
+        },
+        {
+          "title": "Find common ground",
+          "image": "agreement.jpg",
+          "description": "Look for areas where you agree, then build from there. Starting with shared goals makes compromise easier."
+        },
+        {
+          "title": "Agree on next steps",
+          "image": "walking_together.jpg",
+          "description": "End the conversation with a clear plan moving forward. This prevents the same conflict from happening again."
+        }
+      ]
+    },
+    {
+      "type": "textcontent",
+      "title": "Critical Thinking",
+      "instructions": "Read the following and think on the contents",
+      "image": "critical_thinking.jpg",
+      "content": "Critical thinking is the process of using your knowledge, experiences, and reasoning to make smart and fair decisions. It means slowing down to look at a situation from different angles, asking questions, and considering the facts before deciding what to do. This skill helps you solve problems, avoid mistakes, and make choices that make sense--not just ones based on emotion or habit.\n\n <br> Critical thinking is closely connected to problem solving--but they're not exactly the same. Critical thinking is about *how* you think, while problem solving is about *what* you do with that thinking.\n\n <br> For example, if you're stuck on your homework, critical thinking helps you figure out *why*--maybe you missed a key step, don't understand the directions, or need to review your notes.\n\n <br> Then problem solving comes in as you decide *what to do next*, like re-reading the question, finding examples online, asking a classmate, or emailing your teacher. Critical thinking helps you plan your next steps and make decisions that actually move you forward."
+    },
+    {
+      "type": "dndmatch",
+      "title": "Critical Thinking and Problem Solving Practice",
+      "instructions": "In this activity, you'll apply what you know about critical thinking and problem solving. You can choose between writing about a problem you have been facing, or sorting items related to a problem in a story.\n\nRead the story below and sort each item into the proper category. Background information is for items that tell you what you need to know about the story. The critical thinking category is for explanations of *why* the problem might be happening. The problem solving category is for *what* might be done to solve the problem.",
+      "image": "waiter.jpg",
+      "content": [
+        {
+          "category": "Background Information",
+          "matches": [
+            "Marcus has been showing up late.",
+            "He sometimes forgets steps while taking orders.",
+            "His manager seems frustrated."
+          ]
+        },
+        {
+          "category": "Critical Thinking",
+          "matches": [
+            "Marcus might not be used to balancing school and work.",
+            "He could be struggling with time management.",
+            "Maybe he feels nervous and rushes, which leads to mistakes."
+          ]
+        },
+        {
+          "category": "Problem Solving",
+          "matches": [
+            "Marcus could set reminders to leave earlier for work.",
+            "He could review the order steps before each shift.",
+            "He might talk to his manager about ways to improve."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "writing",
+      "title": "Critical Thinking and Problem Solving Reflection",
+      "instructions": "Think about something in your life that hasn't been going the way you'd like. It could be at school, at work, with friends or family, or even something personal--like keeping up with responsibilities or managing your time. Then, apply critical thinking and problem solving as you consider the challenge you are facing.",
+      "prompts": [
+        {"prompt":"Background Information - What's happening? Write 2-3 sentences describing the situation. Stick to the facts--what's going on, where, and with who?"},
+        {"prompt":"Critical Thinking - Why might it be happening? Think about possible reasons behind the problem. These might include habits, distractions, emotions, or outside factors."},
+        {"prompt":"Problem Solving - What can you do about it? List at least two or three ideas for how to fix or improve the situation."}
+      ]
+    },
+    {
+      "type": "fillintheblank",
+      "title": "Attention to Detail Practice",
+      "instructions": "Fill in the blanks based on the job listing from the previous slide.",
+      "image": "job_listing_1_customer_service_rep.png",
+      "content": [
+        "The company hiring for this position is called <options keyword=\"true\">ConnectCo, connectco</options>.",
+        "The job is located in <options keyword=\"true\">Orlando, FL, Florida, florida</options>.",
+        "The hourly pay range for this position is <options keyword=\"true\">16-18, 16, 17, 18</options>.",
+        "This role requires at least a <options keyword=\"true\">high school diploma</options> or <options keyword=\"true\">GED</options>.",
+        "Employees in this job will handle customer inquiries through <options keyword=\"true\">phone email chat, phone, email, chat</options>."
+      ]
+    },
+    {
+      "type": "conceptmap",
+      "title": "Working Well with Others",
+      "instructions": "Click on each skill below to learn more about how they can help you succeed at school, at work, and in everyday life.",
+      "content": "Working well with others means understanding, respecting, and communicating with people who may have different experiences, ideas, or backgrounds from your own. These skills--like diversity, inclusivity, civility, teamwork, collaboration, and leadership--help you build positive relationships and create spaces where everyone feels valued and supported. Developing these habits allows you to share ideas, solve problems, and reach common goals together.",
+      "examples": [
+        {
+          "title": "Diversity",
+          "image": "diversity.jpg",
+          "description": "Diversity means having people from different races, cultures, and backgrounds working or learning together in the same group or organization. When a team is diverse, it brings together many different ideas and perspectives, which often leads to more creative and effective solutions. Diversity also means making sure everyone feels valued, respected, and included, no matter their background."
+        },
+        {
+          "title": "Inclusivity",
+          "image": "inclusivity.jpg",
+          "description": "Inclusivity means making sure everyone has a fair chance to learn, work, and succeed--no matter their background. It's about creating spaces where all people have access to the same resources, opportunities, and support. When an environment is inclusive, everyone feels comfortable sharing ideas and taking risks without worrying about being judged or left out. Inclusivity can grow through actions and policies that promote fairness, prevent discrimination, and make sure everyone can participate fully."
+        },
+        {
+          "title": "Civility",
+          "image": "civility.jpg",
+          "description": "Civility means showing politeness, respect, and courtesy in how you speak and act toward others. It's about communicating in a way that values people's dignity, even when you disagree. Being civil means listening carefully, showing appreciation, and giving or receiving feedback in a respectful way. Practicing civility helps build trust, strengthen relationships, and create a positive environment for everyone."
+        },
+        {
+          "title": "Teamwork",
+          "image": "teamwork.jpg",
+          "description": "Teamwork means working together with others to reach shared goals. When people combine their ideas, skills, and perspectives, they can solve problems more creatively and efficiently. Strong teamwork builds trust, communication, and a sense of belonging. Clear goals, open communication, and celebrating success help teams stay motivated and connected."
+        },
+        {
+          "title": "Collaboration",
+          "image": "collaboration.jpg",
+          "description": "Collaboration happens when people use their different strengths and ideas to create something better together. It allows team members to share knowledge, learn from each other, and find solutions more effectively. Working collaboratively encourages respect, efficiency, and creativity. When everyone contributes and listens, the team's work becomes stronger and more meaningful."
+        },
+        {
+          "title": "Leadership",
+          "image": "leadership.jpg",
+          "description": "Leadership means guiding and inspiring others toward a shared goal. A good leader listens, communicates clearly, and helps their team stay focused and motivated. Effective leaders share ideas, give and receive feedback, and handle challenges with fairness and flexibility. Leadership isn't just about being in charge--it's about helping others grow and succeed together."
+        }
+      ]
+    },
+    {
+      "type": "likertscale",
+      "title": "Working Well with Others - Reflection",
+      "instructions": "Think about how you usually act, feel, or think in different situations. Rate your level of agreement with each statement. There are no right or wrong answers--just be honest with yourself!",
+      "content": [
+        {
+          "statement": "I enjoy learning from people who have different backgrounds or experiences than me. (Diversity)",
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
+        },
+        {
+          "statement": "I try to make sure everyone in a group feels welcome and included. (Inclusivity)",
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
+        },
+        {
+          "statement": "I stay polite and respectful, even when I disagree with someone. (Civility)",
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
+        },
+        {
+          "statement": "When working on a team, I do my fair share of the work. (Teamwork)",
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
+        },
+        {
+          "statement": "I listen to other people's ideas before sharing my own. (Collaboration)",
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
+        },
+        {
+          "statement": "I try to take the lead when the group needs direction or organization. (Leadership)",
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
+        },
+        {
+          "statement": "I speak up when I see someone being treated unfairly or left out. (Inclusivity / Civility)",
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
+        },
+        {
+          "statement": "I stay calm and look for solutions when conflicts happen in a group. (Teamwork / Leadership)",
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
+        },
+        {
+          "statement": "I celebrate other people's achievements and give credit when it's due. (Civility / Collaboration)",
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
+        },
+        {
+          "statement": "I believe working with people who think differently helps us create better results. (Diversity / Teamwork)",
+          "scale": ["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]
+        }
+      ]
+    },
+    {
+      "type": "fillintheblank",
+      "title": "Skill Development",
+      "instructions": "What is one skill related to working with others that you want to work on? Choose and write down one of the following --> Diversity, Inclusivity, Civility, Teamwork, Collaboration, Leadership",
+      "content": [
+        "I want to work on <options keyword=\"true\">Diversity, Inclusivity, Civility, Teamwork, Collaboration, Leadership</options>."
+      ]
+    },
+    {
+      "type": "video",
+      "title": "Personal Attributes",
+      "instructions": "Some soft skills are more about who you are than what you do. These are called personal attributes, and they shape how you think, act, and grow. Watch the video below to learn about three important ones—having a positive attitude, showing honesty and integrity, and being willing to learn—and see how each can help you succeed in school, at work, and in everyday life.",
+      "video": "Personal Attributes.mp4",
+      "scrubbable": false,
+      "transcript": "Some soft skills aren't just about how you work with others—they're personal attributes, or the qualities that shape who you are and how you show up every day. These traits help you do well in school, succeed in a job, and build independence in everyday life.\n\n• Having a positive attitude means focusing on what's going well and looking for solutions instead of problems. People with a positive mindset handle stress better and are often more productive. You can build this habit by practicing gratitude, smiling more often, and reminding yourself of what you can do when things get tough.\n\n• Honesty and integrity mean being truthful, taking responsibility for your actions, and doing what's right even when no one is watching. These qualities help people trust and respect you at school, at work, and in your community. You can develop integrity by admitting mistakes, keeping your word, and following rules and ethical standards.\n\n• Having a willingness to learn means being open to new ideas and ready to grow. In school or the workplace, things are always changing—and people who stay curious adapt the best. You can practice this by asking questions, seeking feedback, and viewing challenges as chances to build new skills.\n\nThese personal attributes—your attitude, honesty, integrity, and curiosity—shape how others see you and how far you'll go. Keep working on them every day, and you'll be ready for whatever comes next in school, your career, and life."
+    },
+    {
+      "type": "writing",
+      "title": "Personal Attributes - Reflection",
+      "instructions": "Select a prompt from the list below and take some time to reflect on your answer. Write a response to one or more of the prompts.",
+      "prompts": [
+        {"prompt":"Write about a time when you stayed positive even though something was difficult."},
+        {"prompt":"How do you usually motivate yourself when you're feeling discouraged?"},
+        {"prompt":"Why is honesty important to you, and how do you practice it?"},
+        {"prompt":"Describe a time when you made a mistake. How did you handle it?"},
+        {"prompt":"How do you show a willingness to learn in school or outside of school?"}
+      ]
+    },
+    {
+      "type": "conceptmap",
+      "title": "Professional Habits",
+      "instructions": "Click on each professional habit below to learn more about how it helps you succeed in school, at work, and in everyday life.",
+      "content": "Professional habits are the everyday behaviors that show you are responsible, dependable, and ready to succeed. These habits include being on time, staying organized, keeping a positive attitude, and taking ownership of your work. Developing professionalism takes practice--things like setting reminders, preparing ahead of time, and following through on what you say you'll do all help build consistency. These skills make a big difference not only at work, but also in school and independent living. When you show professionalism, people learn they can trust and rely on you, and that helps you grow and succeed in any setting.",
+      "examples": [
+        {
+          "title": "Professionalism",
+          "image": "professional.jpg",
+          "description": "Professionalism means acting in a way that shows you are responsible, respectful, and reliable. It's about how you communicate, treat others, and handle your work every day."
+        },
+        {
+          "title": "Punctuality and Attendance",
+          "image": "punctual.jpg",
+          "description": "Punctuality and attendance show that you can be counted on. Being on time--and letting your teacher or supervisor know early if plans change--shows respect and commitment."
+        },
+        {
+          "title": "Appropriate Appearance",
+          "image": "appearance.jpg",
+          "description": "Appropriate appearance helps make a good first impression. Dressing neatly, following the dress code, and keeping a clean and confident look show that you take your role seriously."
+        },
+        {
+          "title": "Organization",
+          "image": "organized.jpg",
+          "description": "Organization helps you manage your time, tasks, and materials effectively. Staying organized keeps you prepared, reduces stress, and shows that you take your responsibilities seriously."
+        },
+        {
+          "title": "Work Ethic and Reliability",
+          "image": "work_ethic.jpg",
+          "description": "Work ethic and reliability are about following through and doing your best, even when the task is hard or no one is watching. Strong effort and consistency build a reputation for dependability."
+        }
+      ]
+    },
+    {
+      "type": "quiz",
+      "title": "Professional Habits Quiz",
+      "instructions": "Answer the questions below to check your understanding of professionalism, appearance, punctuality, and reliability.",
+      "passing_score": 4,
+      "image": "barber.jpg",
+      "feedback_config": {
+        "default": "Thanks for completing this quiz on professional habits!",
+        "ranges": [
+          {
+            "min": 0,
+            "max": 2,
+            "feedback": "You might want to review the section on professionalism and workplace habits."
+          },
+          {
+            "min": 3,
+            "max": 5,
+            "feedback": "Excellent work! You have a solid understanding of professional habits."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "question_text": "What does professionalism mean?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Wearing expensive clothes", "is_correct": false },
+              { "id": 2, "text": "Acting responsibly, respectfully, and reliably in work settings", "is_correct": true },
+              { "id": 3, "text": "Working long hours", "is_correct": false }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "If you can't attend work or class, what should you do?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Stay silent and don't inform anyone", "is_correct": false },
+              { "id": 2, "text": "Inform your teacher or supervisor immediately", "is_correct": true },
+              { "id": 3, "text": "Send a message the next week", "is_correct": false }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "Which of the following describes appropriate appearance?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Wearing dirty clothes to save time", "is_correct": false },
+              { "id": 2, "text": "Wearing whatever you want regardless of the setting", "is_correct": false },
+              { "id": 3, "text": "Wearing clean, wrinkle-free clothes suitable for the workplace", "is_correct": true }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "What should you do to maintain a professional appearance?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Ignore your personal grooming", "is_correct": false },
+              { "id": 2, "text": "Dress casually even if a dress code requires otherwise", "is_correct": false },
+              { "id": 3, "text": "Keep hair, nails, and facial hair neat", "is_correct": true }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        },
+        {
+          "question_text": "What is a good rule of thumb for attendance and punctuality?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Show up ten minutes early", "is_correct": true },
+              { "id": 2, "text": "Show up exactly at the start time", "is_correct": false },
+              { "id": 3, "text": "Show up whenever you feel like it", "is_correct": false }
+            ]
+          },
+          "is_required": true,
+          "feedback_config": {}
+        }
+      ]
+    },
+    {
+      "type": "textcontent",
+      "title": "Soft Skills Reflection",
+      "instructions": "You've just finished this lesson on Soft Skills. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else.",
+      "image": "soft_skills.jpg"
+    }
+  ]
+}

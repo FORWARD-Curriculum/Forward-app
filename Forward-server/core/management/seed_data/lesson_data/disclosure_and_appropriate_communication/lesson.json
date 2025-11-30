@@ -1,0 +1,728 @@
+{
+  "lesson": {
+    "title": "Disclosure and Appropriate Communication",
+    "description": "This lesson focuses on how to professionally disclose personal information, recognize your audience, and communicate appropriately in different settings.",
+    "objectives": [
+      "Professionally disclose personal information and past histories without oversharing.",
+      "Make connections between audience and communication styles.",
+      "Identify appropriate levels of sharing in various situations.",
+      "Ask effective questions to gather information."
+    ],
+    "order": 4,
+    "tags": ["communication", "disclosure", "lesson"],
+    "image": "talkingintheoffice.jpg"
+  },
+  "activities": [
+    {
+      "type": "slideshow",
+      "title": "The Power of Communication",
+      "instructions": "Click through the pages to learn more about communication as a tool.",
+      "slides": [
+        {
+          "content": "Communication is one of the most important skills we use every day. It helps us share our thoughts, build connections, and create understanding with others. Strong communication isn't just about talking--it's about listening, being clear, and finding the right balance between honesty and respect. These skills can open doors in school, work, and relationships.\n\n Communication is one of the most powerful tools we use every day--it shapes relationships, opportunities, and trust. It is a key part of our lives and humanity.\n <br>",
+          "image": "youth talking.jpg"
+        },
+        {
+          "content": "Good communication helps us connect with others, share our ideas, and work toward our goals.",
+          "image": "discussion.jpg"
+        },
+        {
+          "content": "It's not just about talking--listening and understanding are just as important as expressing yourself. Being a good communicator involves actively listening.",
+          "image": "casualconvo.jpg"
+        },
+        {
+          "content": "Clear and respectful communication builds trust with friends, teachers, employers, and family. Lacking good communication skills can lead to misunderstandings, frustration, and hurt feelings.",
+          "image": "couple talking.jpg"
+        },
+        {
+          "content": "One part of being a good communicator is being honest. Being honest doesn't mean sharing everything--it means expressing what you do share in a truthful, respectful way.",
+          "image": "honest.jpg"
+        },
+        {
+          "content": "In addition to the words used when communicating, tone and attitude also matter. It's not just about what you say, but how and when you say it.",
+          "image": "crossingtheroad.jpg"
+        },
+        {
+          "content": "Body language, tone, and facial expressions can send powerful messages without words. This is called non-verbal communication.",
+          "image": "teenschatting.jpg"
+        },
+        {
+          "content": "Every conversation is a chance to practice, learn, and strengthen your skills as a communicator.",
+          "image": "groupofteens.jpg"
+        }
+      ]
+    },
+    {
+      "type": "writing",
+      "title": "Reflect on Communication",
+      "instructions": null,
+      "prompts": [
+        {"prompt":"What is one thing you could work on improving in your communication?"}
+      ]
+    },
+    {
+      "type": "textcontent",
+      "title": "Professional Communication",
+      "instructions": null,
+      "image": "professional.jpg",
+      "content": "Communication looks different depending on context. In casual situations with friends, we might laugh loudly, use slang, or interrupt playfully without being seen as rude. In more professional settings like school or work, communication is deliberately respectful and intentional. The tone should be clear and calm rather than joking or exaggerated. Body language also matters--professional communication often includes making eye contact, nodding to show understanding, and keeping posture open and attentive\n\n <br> Professional communication uses polite and complete language. This might mean speaking in full sentences instead of short phrases, avoiding curses, and choosing words that are respectful. Tone is often steady and polite, rather than sarcastic or overly relaxed. Body language that supports professionalism includes a firm handshake, standing or sitting upright, and not fidgeting while someone else is speaking. These details show that you are serious, reliable, and capable of handling responsibility.\n\n<def def='Doing something on purpose, with thought and intention, instead of by accident.'>Deliberately</def>"
+    },
+    {
+      "type": "dndmatch",
+      "title": "Professional vs. Casual Communication",
+      "instructions": "Knowing which type of communication to use, and how to communicate professionally, can help you build stronger connections in all areas of life. Sort the following quotes into Professional Communication, Casual Communication, or Either.",
+      "content": [
+        {
+          "category": "Professional Communication",
+          "matches": [
+            "Good morning, how are you today?",
+            "Thank you for your time, I really appreciate it.",
+            "Could you please explain that again?",
+            "I look forward to working with you.",
+            "Yes, ma'am / No, sir",
+            "My name is Jordan Smith, nice to meet you."
+          ]
+        },
+        {
+          "category": "Casual Communication",
+          "matches": [
+            "Hey, what's up?",
+            "These fries are bussin",
+            "Ohio rizz",
+            "That movie was fire",
+            "You coming to the game?",
+            "No cap"
+          ]
+        },
+        {
+          "category": "Either",
+          "matches": [
+            "Please",
+            "Thanks so much!",
+            "Sorry, my bad.",
+            "Good job, that was solid.",
+            "See you later!",
+            "That makes sense."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "fillintheblank",
+      "title": "Practicing Written Communication",
+      "instructions": "Written communication is any message you share through words on paper or screens, such as texts, emails, letters, or notes. It is important because it gives you time to think about what you want to say and allows others to go back and read your words later. Strong written communication means using clear words, correct spelling, and an appropriate tone depending on who will read it. For example, the way you write to a teacher or employer should look more professional than how you text a close friend. Practicing written communication helps you express your thoughts clearly, build stronger relationships, and show responsibility in school, work, and daily life.\n\n <br> Imagine you are writing a cover letter to send with a job application for an entry level position at a grocery store. Even though this is an entry level position, you still want to be as professional as possible -- it could mean the difference between being hired or not. Fill in the blank truthfully, and to the best of your ability, while also being professional. This means having proper punctuation, spelling, and grammar; complete sentences; and using appropriate language. If you need help, view the example cover letter to review what kind of things you might say.",
+      "image": "writing.jpg",
+      "content": [
+        "I am excited to apply for the <options></options> position at Safeway grocery store. I am interested in this job because <options></options>. I believe I can contribute to your store by <options></options>.",
+        "In the past, I have worked on <options></options> and gained skills in <options></options>. I am comfortable with <options></options> and willing to learn more about <options></options>. I take pride in <options></options> and always try to <options></options>.",
+        "I am <options></options>, <options></options>, and <options></options>. These qualities will help me succeed at <options></options> and be a strong part of your team.",
+        "Thank you for taking the time to review my application. I would be happy to <options></options> and share more about how I can support your team.",
+        "Sincerely, <options></options>"
+      ]
+    },
+    {
+      "type": "writing",
+      "title": "Verbal and Non-Verbal Communication",
+      "instructions": "Verbal communication is the way we use words to talk with others. We use it to share ideas, ask questions, and give information. The words we choose and how clearly we speak can change how well people understand us. At work or school, clear and respectful words help build trust and avoid confusion. With friends, our words help us tell stories, laugh, and share how we feel. No matter the situation, spoken words are one of the easiest ways to communicate.\n\n <br> Non-verbal communication is the way we send messages without using words. This includes our facial expressions, <def def='Hand and body movements that help to communicate. For example, a shrug or pointing.'>gestures</def>, body posture, and even the tone of our voice. These signals can show feelings or add meaning to what we say. In professional settings, good non-verbal communication can show confidence, respect, and attention. With friends, it can make our conversations feel more fun and connected. Paying attention to body language--both ours and others'--can make our communication stronger and clearer.",
+      "prompts": [
+        {"prompt":"Think about a conversation you recently had with a peer or teacher. What did the person say with their words? Write about what they said through verbal communication."},
+        {"prompt":"Now shift your thinking. What did the person say with their face, body, tone, and gestures? Write about what they said with non-verbal communication."}
+      ]
+    },
+    {
+      "type": "quiz",
+      "title": "Recognizing Non-Verbal Communication",
+      "instructions": "Learning to understand non-verbal communication can help you become a stronger communicator. This activity will help you recognize non-verbal messages shown in each image or video. Keep in mind that many non-verbal communication patterns depend on culture and region. The patterns in this activity are based on common examples from the United States.\n\n <br> It's important not to assume you always know exactly what someone's body language means, since non-verbal signals can also be influenced by things like being tired, stressed, or distracted. That's why checking in and clarifying with the speaker is important. Practicing with this activity will help you notice common patterns and begin to think more carefully about what non-verbal communication might be saying.\n\n <br> For each question, select what you think the non-verbal communication is saying. The goal is to practice noticing these signals, not to be perfect.",
+      "passing_score": 0,
+      "feedback_config": {},
+      "questions": [
+        {
+          "question_text": "What non-verbal message is this person showing?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Sad about something", "is_correct": true },
+              {
+                "id": 2,
+                "text": "Bored with the conversation",
+                "is_correct": false
+              },
+              { "id": 3, "text": "Just woke up", "is_correct": false }
+            ]
+          },
+          "feedback_config": {
+            "correct": "That's correct! You can tell this is sadness by how the person's eyes are cast downward and their mouth forms a frown.",
+            "incorrect": "Try again!"
+          },
+          "image": "nonverbal1.jpg"
+        },
+        {
+          "question_text": "Which feeling is being expressed without words here?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Impatience", "is_correct": false },
+              { "id": 2, "text": "Daydreaming", "is_correct": false },
+              { "id": 3, "text": "Boredom", "is_correct": true }
+            ]
+          },
+          "feedback_config": {
+            "correct": "That's correct! You can tell this is boredom by the person's empty stare, flat mouth, and slouched posture.",
+            "incorrect": "Try again!"
+          },
+          "image": "nonverbal2.jpg"
+        },
+        {
+          "question_text": "What is the person on the left communicating in this image?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "Rejection", "is_correct": false },
+              { "id": 2, "text": "Welcoming", "is_correct": true },
+              { "id": 3, "text": "Desire", "is_correct": false }
+            ]
+          },
+          "feedback_config": {
+            "correct": "That's correct! You can tell this is welcoming by how the person's body leans forward slightly and their posture is open toward the other person.",
+            "incorrect": "Try again!"
+          },
+          "image": "nonverbal3.jpg"
+        },
+        {
+          "question_text": "What is this person's body language communicating",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "They are feeling peaceful",
+                "is_correct": false
+              },
+              { "id": 2, "text": "They are closed off", "is_correct": true },
+              {
+                "id": 3,
+                "text": "They have just woken up",
+                "is_correct": false
+              }
+            ]
+          },
+          "feedback_config": {
+            "correct": "That's correct! You can tell they are closed off by their crossed arms and the way their body is turned slightly away.",
+            "incorrect": "Try again!"
+          },
+          "image": "nonverbal4.jpg"
+        },
+        {
+          "question_text": "Based on their expression, what is this person saying non-verbally?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "They are worried", "is_correct": true },
+              { "id": 2, "text": "They are stressed", "is_correct": false },
+              { "id": 3, "text": "They are hungry", "is_correct": false }
+            ]
+          },
+          "feedback_config": {
+            "correct": "That's correct! You can tell this person is worried by their furrowed brows and tense mouth.",
+            "incorrect": "Try again!"
+          },
+          "image": "nonverbal5.jpg"
+        },
+        {
+          "question_text": "What do you think this person is showing through their non-verbal cues?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "They are preparing for a fight",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "They are praying for a good outcome",
+                "is_correct": false
+              },
+              {
+                "id": 3,
+                "text": "They are feeling excited",
+                "is_correct": true
+              }
+            ]
+          },
+          "feedback_config": {
+            "correct": "That's correct! You can tell this person is excited by their big smile and how they pump their fists in the air.",
+            "incorrect": "Try again!"
+          },
+          "video": "nonverbal6.mp4"
+        },
+        {
+          "question_text": "Based on their expression and body language, what is the non-verbal message this person is communicating?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "They are serious about what they are saying",
+                "is_correct": true
+              },
+              {
+                "id": 2,
+                "text": "They are extremely mad at someone",
+                "is_correct": false
+              },
+              {
+                "id": 3,
+                "text": "They are very bored with the conversation",
+                "is_correct": false
+              }
+            ]
+          },
+          "feedback_config": {
+            "correct": "That's correct! You can tell this person is serious by their straight face, direct eye contact, and eyebrows drawn together.",
+            "incorrect": "Try again!"
+          },
+          "video": "nonverbal7.mp4"
+        },
+        {
+          "question_text": "What do these people's non-verbal behaviors suggest?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              { "id": 1, "text": "They are in love", "is_correct": true },
+              {
+                "id": 2,
+                "text": "They have just met each other",
+                "is_correct": false
+              },
+              { "id": 3, "text": "They work together", "is_correct": false }
+            ]
+          },
+          "feedback_config": {
+            "correct": "That's correct! You can tell they're in love by their soft smiles, open body language, and how they lean toward each other.",
+            "incorrect": "Try again!"
+          },
+          "video": "nonverbal8.mp4"
+        },
+        {
+          "question_text": "What is being communicated through this person's actions?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "They would rather be out having fun",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "They are enjoying their daily tasks",
+                "is_correct": true
+              },
+              {
+                "id": 3,
+                "text": "They are feeling worn out",
+                "is_correct": false
+              }
+            ]
+          },
+          "feedback_config": {
+            "correct": "That's correct! You can tell they're enjoying their work by the way they dance, smile, and move lightly as they complete tasks.",
+            "incorrect": "Try again!"
+          },
+          "video": "nonverbal9.mp4"
+        },
+        {
+          "question_text": "Which feeling or message is being expressed without words here?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "They are focused on their discussion",
+                "is_correct": true
+              },
+              {
+                "id": 2,
+                "text": "They don't feel confident in their work",
+                "is_correct": false
+              },
+              {
+                "id": 3,
+                "text": "They are feeling powerless",
+                "is_correct": false
+              }
+            ]
+          },
+          "feedback_config": {
+            "correct": "That's correct! You can tell this person is focused by their steady gaze, nodding, and slightly furrowed brows while listening.",
+            "incorrect": "Try again!"
+          },
+          "video": "nonverbal10.mp4"
+        }
+      ]
+    },
+    {
+      "type": "conceptmap",
+      "title": "Adapting Communication for Different Audiences",
+      "instructions": "To learn more about how audience changes communication, read about Ava and the time she spilled her lunch in the cafeteria at school. She told a few different people about the incident, but because the audience changed, the information she shared changed too.",
+      "content": "Every time we communicate, we're talking to an audience -- whether that's one person, a group of people, or even ourselves. Our audience shapes the words we choose, the details we share, and even the tone of our voice. Talking to a teacher often looks different than talking to a sibling, and the way we tell a story to a boss may not be the same way we'd share it with a best friend. Being aware of our audience helps us make choices about what to say, how much to share, and how to say it respectfully.\n\n <br> Changing communication for different audiences doesn't mean being fake. Instead, it shows that we understand the situation and the relationship. For example, using casual language with a friend can help us connect, while using more professional language with an employer shows responsibility. Thinking about audience is part of being an effective communicator because it helps our message land in the way we intend.",
+      "examples": [
+        {
+          "title": "To her mom",
+          "image": "ava-mom.png",
+          "description": "\"Mom, today was so embarrassing. I tripped in the cafeteria line, and my whole tray spilled on me. Everyone saw. I had to wear my gym shirt for the rest of the day. It was awful, but at least my teacher helped me get cleaned up.\"",
+          "examples": []
+        },
+        {
+          "title": "To her best friend",
+          "image": "ava-friend.png",
+          "description": "\"OMG, you would've died laughing. I slipped, and my spaghetti went everywhere. My pants looked like a crime scene! The worst part is that Josh saw the whole thing -- and of course he told everyone at the table. Please tell me you'll sit with me tomorrow so I don't die of embarrassment.\"",
+          "examples": []
+        },
+        {
+          "title": "To her teacher",
+          "image": "ava-teacher.png",
+          "description": "\"I'm sorry I was late coming back to class. I slipped in the cafeteria and spilled food on myself. I had to change clothes before returning. It won't happen again, and thank you for understanding.\"",
+          "examples": []
+        },
+        {
+          "title": "To her coworker",
+          "image": "ava-coworker.png",
+          "description": "\"You won't believe what happened at school today. I totally wiped out in the lunchroom and dumped spaghetti all over myself. It was super embarrassing, but honestly kind of funny once I got over it.\"",
+          "examples": []
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "title": "Oversharing",
+      "instructions": "Oversharing happens when someone gives out more personal information than is needed for a situation. For example, telling a friend what you ate for lunch might be fine, but telling a teacher all the details about your crush or relationship probably isn't the right time or place. Oversharing can make other people feel uncomfortable, or it can lead to people knowing things about you that you don't want shared. It's important to think about who your audience is, what your relationship with them is like, and whether the details you want to share are necessary for the conversation.\n\n <br> Learning to recognize and avoid oversharing is a useful skill for both personal and professional situations. On the job, it shows maturity when you can keep conversations friendly but focused without spilling too much private information. With friends and family, it helps you set healthy boundaries and protect your privacy. Remember, you're in control of how much you share about your life, and it's okay to keep some things just for yourself.\n\n <br> Watch the video to learn about Jordan and his experience with oversharing.",
+      "video": "Oversharing video.mp4",
+      "scrubbable": false,
+      "transcript": "My name’s Jordan, and in my early twenties I had a big problem with oversharing. Honestly, I used to tell people everything. If someone asked how my day was going, I’d launch into a twenty-minute story about my roommate drama, the fight I had with my ex, or how I cried at work that morning. It didn’t matter if it was my boss, a teacher, or even a new coworker I’d just met—I shared way too much, way too soon. At first, I thought it made me seem open and honest, but it actually ended up hurting me.\n\nOne time, I told a supervisor all about a family issue I was going through, and later I found out they thought I wasn’t reliable enough to handle a promotion. Another time, I posted personal details about my relationship on social media, and it got back to the person involved. That not only embarrassed me but also damaged some friendships. Oversharing made people uncomfortable, and sometimes it gave them reasons not to trust me or to judge me unfairly.\n\nI finally started realizing it was a problem when I noticed people pulling away or changing the subject when I talked. A close friend gently pointed out that I didn’t always need to give the 'full story.' That was tough to hear, but it was true. I began working on keeping certain details private, and I practiced asking myself, 'Does this person really need to know this?' before I spoke.\n\nIt’s still something I struggle with sometimes—I like being open, and I don’t always notice when I’m going too far. But now I know the difference between sharing enough to connect and oversharing in a way that causes trouble. Setting those boundaries has helped me keep better relationships and also feel more in control of what I put out into the world."
+    },
+    {
+      "type": "textcontent",
+      "title": "Understanding Disclosure and Levels of Communication",
+      "instructions": "Read the infographic below to learn about levels of communication and what you might consider sharing in different situations.",
+      "image": "levels_of_communication.png",
+      "content": "Disclosure means sharing information that was not previously known. Anytime you share information with someone that was previously kept secret, you are disclosing information. There are different levels of sharing that are appropriate for different situations, your comfortability, and your audience. Disclosing some details in some situations might be considered oversharing, but in other situations it is necessary to share."
+    },
+    {
+      "type": "likertscale",
+      "title": "Is This My Story to Tell?",
+      "instructions": "Another important question is whether the information you're about to share is really yours to share. Sometimes we hold details about friends, family, or classmates that may feel important in the moment, but those details belong to them, not us. Sharing someone else's story without their permission can damage trust and cause harm. When deciding whether to disclose something, pause and ask yourself: *Is this my story to tell?* <b> It's also worth remembering that even information about yourself can affect others. For example, if you talk about something that happened at home, it may also reveal things about your family that they might not want shared. Thinking about ownership of information helps us practice respect, protect relationships, and keep communication safe and responsible.\n\n <br> For each item, consider whether or not you would share the information with a friend. Use the scale to show whether you \"Would absolutely NOT share\" or \"Definitely WOULD share\" or somewhere in between.",
+      "content": [
+        {
+          "statement": "That you got a bad grade on a test.",
+          "scale": [1, 2, 3, 4, 5]
+        },
+        {
+          "statement": "That you're nervous before a sports game.",
+          "scale": [1, 2, 3, 4, 5]
+        },
+        {
+          "statement": "That you have a crush on someone at school.",
+          "scale": [1, 2, 3, 4, 5]
+        },
+        {
+          "statement": "A photo of your report card.",
+          "scale": [1, 2, 3, 4, 5]
+        },
+        {
+          "statement": "How much money you made at work.",
+          "scale": [1, 2, 3, 4, 5]
+        },
+        {
+          "statement": "That your sibling got in trouble at school.",
+          "scale": [1, 2, 3, 4, 5]
+        },
+        { "statement": "Your favorite TV show.", "scale": [1, 2, 3, 4, 5] },
+        {
+          "statement": "That your parents are fighting.",
+          "scale": [1, 2, 3, 4, 5]
+        },
+        { "statement": "A secret someone told you.", "scale": [1, 2, 3, 4, 5] },
+        {
+          "statement": "That you feel depressed sometimes.",
+          "scale": [1, 2, 3, 4, 5]
+        },
+        {
+          "statement": "That your family doesn't have much money.",
+          "scale": [1, 2, 3, 4, 5]
+        },
+        {
+          "statement": "A fight you saw between classmates.",
+          "scale": [1, 2, 3, 4, 5]
+        },
+        {
+          "statement": "That you got in trouble with the law.",
+          "scale": [1, 2, 3, 4, 5]
+        },
+        {
+          "statement": "That your cousin is pregnant.",
+          "scale": [1, 2, 3, 4, 5]
+        },
+        {
+          "statement": "Something you're proud of achieving.",
+          "scale": [1, 2, 3, 4, 5]
+        }
+      ]
+    },
+    {
+      "type": "writing",
+      "title": "Disclosure in the Workplace",
+      "instructions": "In the workplace, disclosure can take on a very specific meaning: sharing information about a criminal history with an employer. Just like with other kinds of personal information, the key is balancing what is appropriate for the situation and who you are sharing with. Employers expect honesty. If a background check is part of the hiring process, being upfront about criminal history can show responsibility and build trust. At the same time, not every detail of your past is always relevant or necessary to share.\n\n <br> When we talk about criminal history, it's important to understand what that actually means. A criminal history is a record of a person's involvement with the legal system, but not all involvement is the same.\n\n <br> Having a criminal history does not stop someone from getting a job. However, the type of criminal history may put limits on what type of job someone might get. For example, an employer may not want to hire someone to handle their finances if that person has a history of stealing money from a past employer. Or, someone who has a history of violence might not be allowed to work with children. These limits can be set by the state, or may be the preference of the employer.",
+      "prompts": [
+        {"prompt":"If you were an employer, would you hire someone with a criminal history? Think about the different circumstances that might lead you to hire or not hire someone with a criminal history and write about your thoughts."}
+      ]
+    },
+    {
+      "type": "conceptmap",
+      "title": "Workplace Disclosure Statistics",
+      "instructions" : "Here's a snapshot of what some Arizona employers said when they were asked about hiring someone with a criminal record.",
+      "examples" : [
+        {
+          "title": null,
+          "image": "employers4.png",
+          "description": "Employers in Arizona were asked if they would interview someone who had a **non-violent offense.**",
+          "examples": []
+        },
+        {
+          "title": null,
+          "image": "employers5.png",
+          "description": "Employers in Arizona were asked if they would interview someone with **a violent offense.**",
+          "examples": []
+        }
+      ] 
+
+    },
+    {
+      "type": "slideshow",
+      "title": "Understanding Criminal History Terms",
+      "instructions": "Click through each page to learn different words that may come up and what information you may need to disclose if you have a criminal history. If you do not have a criminal history, this information can still give you important background knowledge so you feel confident answering questions if they come up.",
+      "slides": [
+        {
+          "content": "When employers ask about criminal history on a job application or in an interview, they usually use certain key terms. Understanding these words can help you know exactly what is being asked and how to respond.\n\n**Arrest** - When the police take someone in because they think a crime happened. This does *not* mean the person is guilty. Most job applications do not ask about arrests, because an arrest is not proof of guilt. However, an arrest may still appear on some background checks.",
+          "image": "arrest.jpg"
+        },
+        {
+          "content": "**Charge** - When the court says a person broke the law. Sometimes charges get dropped or changed. Most applications do not ask about charges, only convictions. But if an interviewer or background check report brings it up, you may need to explain what happened and how the case ended.",
+          "image": "charges.jpg"
+        },
+        {
+          "content": "**Conviction** - When a person is found guilty, either by admitting it or after a trial. This is the word jobs usually mean when they ask about criminal history. Job applications often ask, \"Have you ever been convicted of a crime?\" If you only have a juvenile record, you can usually answer \"no.\" If you have an adult conviction, the honest answer is \"yes.\"",
+          "image": "conviction.jpg"
+        },
+        {
+          "content": "**Adjudication** - The judgment made in juvenile court that a minor is guilty of a delinquent act, much like how adults can be convicted in regular court. Juvenile adjudications usually do not count as convictions on job applications. If you only have a juvenile adjudication, you should answer \"no\" when asked about convictions.",
+          "image": "adjudication.jpg"
+        },
+        {
+          "content": "**Expungement/Sealed** - When a record is cleared or hidden, so it usually doesn't show up on a background check. If your record has been expunged or sealed, you can legally answer \"no\" when asked about convictions, because the law treats it as though it never happened. It is a myth that juvenile records are automatically sealed when a juvenile turns 18. Juvenile records may still show up on a background check!",
+          "image": "expunge.jpg"
+        },
+        {
+          "content": "**Felony** - A serious crime, like robbery or assault, that usually has bigger consequences and longer sentences. Applications may specifically ask, \"Have you ever been convicted of a felony?\" If you only have a juvenile record, you should answer \"no.\" If you have an adult felony conviction, the honest answer is \"yes.\"",
+          "image": "felony.jpg"
+        },
+        {
+          "content": "**Misdemeanor** - A less serious crime, like shoplifting or trespassing, with smaller penalties. Some applications ask, \"Have you ever been convicted of a misdemeanor?\" Many employers focus only on felonies, but if the application mentions misdemeanors, answer honestly for adult convictions. Juvenile misdemeanors usually do not need to be reported.",
+          "image": "misdemeanor.jpg"
+        }
+      ]
+    },
+    {
+      "type": "textcontent",
+      "title": "Discussing Criminal History During Hiring",
+      "instructions": "Read through this flowchart to learn more about what you might say or do based on your criminal history.",
+      "content": "Talking about criminal history during the hiring process can feel uncomfortable, but being prepared makes it easier. Employers expect honesty, especially if a background check is part of the job. The key is to share only what is necessary, while also showing what you have learned and how you have grown. Think of it as an opportunity to explain your story in a positive way, rather than letting an employer make assumptions.\n\n <br> If you are asked about your criminal history in an interview or know it will show up on a background check, keep your response short, honest, and focused on the positive changes you've made. For example, you could say: \"I made some mistakes in my past that may come up on a background check. Since then, I've worked hard to complete school and build job skills. I'm proud of the progress I've made and I'm ready to bring that same dedication to this job.",
+      "image": "Criminal Record Infographic Crop.png"
+    },
+    {
+      "type": "twine",
+      "title": "Disclosure Decisions",
+      "instructions": "In this activity, you will make decisions around disclosing a criminal history. Pay attention to how honesty or dishonesty can lead to different outcomes.",
+      "file": "Disclosure_twine.html"
+    },
+    {
+      "type": "quiz",
+      "title": "Communicating Online",
+      "instructions": "The internet contains endless opportunities for communication. Although not all of your communication online has to be professional, you still should be mindful of what you share online. Watch the video and answer the questions about communicating online.",
+      "passing_score": 0,
+      "feedback_config": {},
+      "questions": [
+        {
+          "question_text": "When posting pictures online, you should consider keeping them private if they include:",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "An identifiable location, like your home address",
+                "is_correct": true
+              },
+              {
+                "id": 2,
+                "text": "Just your face without any filters",
+                "is_correct": false
+              },
+              {
+                "id": 3,
+                "text": "Your significant other, since you might break up",
+                "is_correct": false
+              }
+            ]
+          },
+          "feedback_config": {},
+          "video": "Online Sharing.mp4"
+        },
+        {
+          "question_text": "What's one risk of posting a lot of personal details online?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "People may think you're boring",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "Information could be shared or used in ways you didn't plan",
+                "is_correct": true
+              },
+              {
+                "id": 3,
+                "text": "Your friends won't want to follow you anymore",
+                "is_correct": false
+              }
+            ]
+          },
+          "feedback_config": {}
+        },
+        {
+          "question_text": "Which of these would be considered oversharing on social media?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "A long rant about private family or relationship problems",
+                "is_correct": true
+              },
+              {
+                "id": 2,
+                "text": "A picture of your dinner",
+                "is_correct": false
+              },
+              {
+                "id": 3,
+                "text": "A post saying you passed your driver's test",
+                "is_correct": false
+              }
+            ]
+          },
+          "feedback_config": {}
+        },
+        {
+          "question_text": "If you're unsure whether a post is a good idea, the smartest first step is to:",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "Pause and think about who might see it later",
+                "is_correct": true
+              },
+              {
+                "id": 2,
+                "text": "Post it anyway and delete it if people react badly",
+                "is_correct": false
+              },
+              {
+                "id": 3,
+                "text": "Ask your followers if they think it's okay",
+                "is_correct": false
+              }
+            ]
+          },
+          "feedback_config": {}
+        },
+        {
+          "question_text": "Which type of message is safest to send in a group chat?",
+          "question_type": "multiple_choice",
+          "has_correct_answer": true,
+          "is_required": true,
+          "choices": {
+            "options": [
+              {
+                "id": 1,
+                "text": "Your full schedule for the week, including when no one is home",
+                "is_correct": false
+              },
+              {
+                "id": 2,
+                "text": "A funny story or update you're comfortable with everyone seeing",
+                "is_correct": true
+              },
+              {
+                "id": 3,
+                "text": "Screenshots of private conversations with someone else",
+                "is_correct": false
+              }
+            ]
+          },
+          "feedback_config": {}
+        }
+      ]
+    },
+    {
+      "type": "fillintheblank",
+      "title": "Asking Effective Questions",
+      "instructions": "Asking good questions is more than just getting an answer--it's about sparking conversation, showing respect, and creating space for deeper thinking. Effective questions are open-ended, thoughtful, and specific. Instead of yes/no responses, they encourage others to share ideas, explain reasoning, or connect personally. To ask effectively: (1) be clear about what you want to understand, (2) phrase your question in a way that invites more than one-word answers, and (3) listen closely so you can build on what the other person says. Strong questions build trust, improve problem-solving, and help you understand situations in school, work, and everyday life.\n\n <br> **Instead of asking:** *\"Is this going to be on the test?\"* **You might ask:** *\"Can you explain how this connects to what we learned last week?\"*\n\n <br> **Instead of asking:** *\"Do I have to do it this way?\"* **You might ask:** *\"What's the goal for this project, and are there other ways I could reach it?\"**Instead of asking:** *\"Why are you mad?\"* **You might ask:** *\"I notice you seem upset--do you want to talk about what's on your mind?\"*\n\n <br> Each sentence below is missing the best way to phrase a question. Select the most effective option from the three choices to fill in the blank.",
+      "content": [
+        "In class, instead of asking, \"Do we have homework?\" a more effective question would be: \"Can you explain <options>Why we have to do homework, *How today's lesson will be applied in the homework, what the exact page number is</options>?\"",
+        "At work, instead of asking, \"Do I have to do this right now?\" a more effective question would be: \"Could you help me understand <options>why this task is on my to-do list, how long this meeting will last, *which part of this task is the top priority</options>?\"",
+        "In daily life, instead of asking, \"Why didn't you text me back?\" a more effective question would be: \"Can you let me know <options>if you were ignoring me, why you're always so busy, *when a good time is for us to talk</options>?\""
+      ]
+    },
+    {
+      "type": "writing",
+      "title": "Disclosure and Appropriate Communication: Reflection",
+      "instructions": null,
+      "prompts": [
+        {"prompt":"You've just finished this lesson on Disclosure and Appropriate Communication. Take a moment to think about the most important things you want to remember. These lessons aren't just for now -- they're tools you can carry with you into the future.\n\nUse the space here to write anything you'd like -- this can be a space for things to remember, what you learned from this lesson, questions you still have, or something else."}
+      ]
+    }
+  ]
+}

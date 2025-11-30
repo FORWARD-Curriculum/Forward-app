@@ -1,5 +1,7 @@
 // Fields should always be snake_case, and class names should always be ProperCase
 
+import type { Image } from "@/utils/utils";
+
 export interface Lesson {
   id: string;
   title: string;
@@ -7,7 +9,7 @@ export interface Lesson {
   objectives: string[];
   order: number;
   tags: string[];
-  image: string | undefined;
+  image: Image;
   activities: BaseActivity[];
   completion: number;
 }
@@ -49,7 +51,9 @@ export type ActivityManager = {
   LikertScale: [LikertScale, LikertScaleResponse, false];
   Video: [Video, VideoResponse, false];
   Twine: [Twine, TwineResponse, false];
-  FillInTheBlank: [FillInTheBlank, FillInTheBlankResponse, false]
+  FillInTheBlank: [FillInTheBlank, FillInTheBlankResponse, false];
+  Slideshow: [Slideshow,SlideshowResponse,false];
+  CustomActivity: [CustomActivity, CustomActivityResponse, false];
 };
 
 /**
@@ -73,7 +77,9 @@ export const ActivityTypeDisplayNames: Record<
   LikertScale: "Likert Scale",
   Video: "Video",
   Twine: "Twine",
-  FillInTheBlank: "Fill In The Blank"
+  FillInTheBlank: "Fill In The Blank",
+  Slideshow: "Slideshow",
+  CustomActivity: "Activity"
 };
 
 // #region -------------------------- Activities ---------------------------
@@ -89,21 +95,28 @@ export interface BaseActivity {
   }[keyof ActivityManager];
   title: string;
   instructions: string | null;
+  instructions_image: Image | null;
   order: number;
 }
 
 export interface TextContent extends BaseActivity {
   content?: string;
-  image?: string; // Optional image URL to accompany the text content
+  image?: Image; // Optional image URL to accompany the text content
 }
 
 export interface Video extends BaseActivity {
   video: string;
   scrubbable: boolean;
+  transcript?: string;
 }
 
 export interface Writing extends BaseActivity {
-  prompts: string[];
+  prompts: {
+    "prompt": string,
+    "min_type"?: "word" | "char",
+    "minimum"?: number,
+    "image"?: Image,
+  }[];
 }
 
 export interface Quiz extends BaseActivity {
@@ -113,6 +126,8 @@ export interface Quiz extends BaseActivity {
     failing: string;
   };
   questions: Question[];
+  image?: Image;
+  video?: string;
 }
 
 export interface Question {
@@ -122,7 +137,7 @@ export interface Question {
   question_type: "multiple_choice" | "true_false" | "multiple_select";
   has_correct_answer: boolean;
   order: number;
-  image?: string;
+  image?: Image;
   caption?: string;
   choices: {
     options: {
@@ -130,6 +145,7 @@ export interface Question {
       text: string;
       is_correct: boolean;
     }[];
+    image?: Image;
   };
   is_required: boolean;
   attempts?: number;
@@ -137,6 +153,7 @@ export interface Question {
     correct: string;
     incorrect: string;
   };
+  video?: string;
 }
 
 export interface Poll extends BaseActivity {
@@ -160,22 +177,28 @@ export interface PollQuestion {
 }
 
 export interface DndMatch extends BaseActivity {
-  content: string[][];
+  content: {
+    category: string;
+    matches: (string | { image: Image; key: string })[];
+  }[];
+  strict: boolean;
 }
+
 
 export interface FillInTheBlank extends BaseActivity {
   content: string[];
+  image?: Image;
 }
 
 export interface ConceptMap extends BaseActivity {
   content: string;
   concepts: {
     title: string;
-    image?: string;
+    image?: Image;
     description: string;
     examples: {
       name: string;
-      image?: string;
+      image?: Image;
       description: string;
     }[];
   }[];
@@ -186,8 +209,12 @@ export interface ConceptMap extends BaseActivity {
  * surrounding the correct phrases for the uset to identify.
  */
 export interface Identification extends BaseActivity {
-  content: string;
-  minimum_correct: number;
+  content: {
+    image: Image;
+    areas: [number, number, number, number][]
+    hints: boolean;
+  }[];
+  minimum_correct: number | null;
   feedback: string;
 }
 
@@ -206,7 +233,18 @@ export interface LikertScale extends BaseActivity {
 
 export interface Twine extends BaseActivity {
   file: string; 
-  }
+}
+
+export interface Slideshow extends BaseActivity {
+  slides: {content: string; image: Image | null}[]
+  force_wait: number;
+  autoplay: boolean;
+}
+
+export interface CustomActivity extends BaseActivity {
+  document: string;
+  images: {[key: string]: string;}
+}
 
 // #endregion -------------------------- Activities ---------------------------
 
@@ -264,6 +302,8 @@ export interface QuestionResponse extends BaseResponse {
   response_data: { selected: number[] };
   quiz_id: string;
   lesson_id: string;
+  is_correct?: boolean | null
+  feedback?: string,
 }
 
 /**
@@ -274,18 +314,28 @@ export interface PollQuestionResponse extends BaseResponse {
 }
 
 export interface WritingResponse extends BaseResponse {
-  responses: string[];
+  responses: {"prompt": string, "response": string}[];
 }
 
 export interface TextContentResponse extends BaseResponse {}
+export interface SlideshowResponse extends BaseResponse {
+  highest_slide: number;
+}
+export interface CustomActivityResponse extends BaseResponse {}
 export interface ConceptMapResponse extends BaseResponse {}
-export interface IdentificationResponse extends BaseResponse {}
+export interface IdentificationResponse extends BaseResponse {
+  identified: number;
+
+}
 export interface PollResponse extends BaseResponse {}
 export interface EmbedResponse extends BaseResponse {
   inputted_code: string;
 }
 export interface DndMatchResponse extends BaseResponse {
-  submission: number[][][];
+  submission: {
+    category: string;
+    matches: (string | { image: Image; key: string })[];
+  }[];
 }
 
 export interface LikertScaleResponse extends BaseResponse {

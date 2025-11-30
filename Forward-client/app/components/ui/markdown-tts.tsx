@@ -167,12 +167,12 @@ export function MarkdownTTSControls({
   const [warned, setWarned] = useState(!customComponents);
   const [isWarningDialogOpen, setIsWarningDialogOpen] = useState(false);
   // TODO: Pausing is not handled by library, at least as far as I can tell
-  useEffect(() => {console.log(warned,isWarningDialogOpen)},[warned,isWarningDialogOpen])
+  // useEffect(() => {console.log(warned,isWarningDialogOpen)},[warned,isWarningDialogOpen])
   return (
     <div
       className={cn(
         className,
-        `bg-background flex h-fit w-fit gap-2 rounded-full ${orientation == "vertical" ? "flex-col px-1 py-2" : "flex-row px-2 py-1"}`,
+        `remark bg-background flex h-fit w-fit gap-2 rounded-full ${orientation == "vertical" ? "flex-col px-1 py-2" : "flex-row px-2 py-1"}`,
       )}
     >
       <FileVolume />

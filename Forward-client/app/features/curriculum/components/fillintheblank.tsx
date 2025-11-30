@@ -1,6 +1,7 @@
 import type { FillInTheBlank, FillInTheBlankResponse } from "../types";
 import { useResponse } from "../hooks";
 import { useMemo, useState, useEffect } from "react";
+import FwdImage from "@/components/ui/fwdimage";
 
 interface FillInTheBlankProps {
     fillInTheBlank: FillInTheBlank;
@@ -20,7 +21,6 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
 
     //use response hoook, we cerate an array the size of the empty responses we have
     const[response, setResponse] = useResponse<FillInTheBlankResponse, FillInTheBlank>({
-        type: "FillInTheBlank",
         activity: fillInTheBlank,
         initialFields: {
             submission: new Array(totalBlanks).fill(""),
@@ -176,7 +176,13 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
 
     return (
         <div className="max-w-4xl mx-auto p-6">
-            <h2 className="text-2xl font-bold text-center mb-8">{fillInTheBlank.title}</h2>
+
+            
+            {fillInTheBlank.image && (
+                <div className="mb-6 flex justify-center">
+                <FwdImage image={fillInTheBlank.image} className="w-full max-w-lg mx-auto rounded-lg shadow-sm border border-muted object-cover"/>
+                </div>
+            )}
             
             <div className="space-y-6">
                 {(() => {
@@ -191,9 +197,9 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
                                     if (part.includes('<input')) {
                                         const currentIndex = globalInputIndex++;
                                         return (
-                                            <input 
+                                            <textarea 
                                                 key={partIndex} 
-                                                type="text" 
+                                                // type="text" 
                                                 value={userInputs[currentIndex] || ''}
                                                 onChange={(e) => handleInputChange(currentIndex, e.target.value)}
                                                 disabled={lockedInputs[currentIndex]}
@@ -201,7 +207,8 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
                                                     validationResults[currentIndex] === 'correct' ? 'border-green-500 bg-green-50' : 
                                                     validationResults[currentIndex] === 'incorrect' ? 'border-red-500 bg-red-50' : 
                                                     'border-muted focus:border-primary'
-                                                }`}
+                                                } resize-x h-12 overflow-y-clip whitespace-nowrap overflow-x-hidden field-sizing-content`}
+                                                rows={1}
                                             />
                                         );
                                     }
@@ -229,7 +236,7 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
                                         );
                                     }
                                     else {
-                                        return <span key={partIndex} className="whitespace-nowrap">{part}</span>;
+                                        return <span key={partIndex} className=" break-words">{part}</span>;
                                     }
                                 })}
                             </div>

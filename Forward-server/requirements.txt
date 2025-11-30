@@ -8,5 +8,12 @@ psycopg[binary]
 django-storages[s3]==1.14.2
 boto3==1.40.0
 botocore==1.40.0
+
+django-imagefield==0.22.0
+
+# Admin help
 django-json-widget==2.0.3
+pillow==12.0.0
 martor
+django-jsonform==2.23.2
+django-admin-sortable2==2.2.8

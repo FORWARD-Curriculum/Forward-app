@@ -13,6 +13,7 @@
   --animate-slide-down: slideDown 0.3s ease-out;
   --animate-slide-left: slideLeft 0.115s ease-out 75ms;
   --animate-slide-right: slideRight 0.115s ease-in;
+  --animate-marquee: marquee 7s linear infinite;
 
   /* Dynamic theming */
   --color-background: var(--background);
@@ -46,6 +47,18 @@
   --text-7xl: var(--txt-7xl);
   --text-8xl: var(--txt-8xl);
   --text-9xl: var(--txt-9xl);
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    5% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
 
   @keyframes slide-out-to-right {
     from {
@@ -211,6 +224,8 @@
     }
   }
 }
+
+html body[data-scroll-locked] { padding-right: 0px !important; margin-right: 0px !important; } 
 
 .markdown>*ul {
   list-style-type: disc !important; 
@@ -522,18 +537,21 @@ Description: Styling for Remark
 Documentation: style.txt
 */
 
+.mdFont {
+      font-family: 'Times New Roman', Times, serif, Sans-serif;
+    color: var(--secondary-foreground) !important;
+}
+
 /* The 'remark-all'-div contains the 'remark'-div and the 'remark-footer'-div */
 .remark
 {
     /* Fonts from the sans-serif generic family are easier to read
     on the screen. Sans-serif means 'without wiggles'. */
-    font-family: 'Times New Roman', Times, serif, Sans-serif;
-    color: var(--secondary-foreground) !important;
 
     /* Limit the width of the content. This makes it easier to read. */
 
     /* Center the content. */
-    margin: auto;
+    /* margin: auto; */
 
     /* Add padding for the case when the browser is made small. */
     padding: 0.5em;

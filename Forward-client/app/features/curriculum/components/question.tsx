@@ -1,3 +1,4 @@
+import FwdImage from "@/components/ui/fwdimage";
 import MarkdownTTS from "../../../components/ui/markdown-tts";
 import type { Question, QuestionResponse } from "@/features/curriculum/types";
 import { useEffect, useState } from "react";
@@ -8,7 +9,7 @@ export default function Question({
   answer,
   onAnswerChange,
   onCheckAnswer,
-  disabled,
+  // disabled,
 }: {
   question: Question;
   questionNumber: number;
@@ -23,21 +24,26 @@ export default function Question({
   // question configuration
   const [isChecked, setIsChecked] = useState(false);
   const isMultipleSelect = question.question_type === "multiple_select";
-  const correctAnswers = question.choices.options.filter(
+  const correctAnswers = question.choices.options?.filter(
     (option) => option.is_correct,
   );
   const selectedAnswers = answer?.response_data?.selected || [];
   // question state
-  const isDisabled = disabled || (answer?.attempts_left ?? 3) <= 0;
-  const isAnswered =
-    selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
-  // Check if the answer is correct
-  const isCorrect = isMultipleSelect
+  // const isDisabled = disabled || (answer?.attempts_left ?? 3) <= 0;
+  const isDisabled = (answer?.attempts_left ?? 3) <= 0;
+
+  // const isAnswered = selectedAnswers.length >= (isMultipleSelect ? correctAnswers.length : 1);
+  const isAnswered = selectedAnswers.length > 0;
+  
+    // Check if the answer is correct
+    // If no correct answer (opinion question) always mark as correct
+  const isCorrect = !question.has_correct_answer ? true : isMultipleSelect
     ? areArraysEqual(
         selectedAnswers.slice().sort(),
-        correctAnswers.map((c) => c.id).sort(),
+        correctAnswers?.map((c) => c.id).sort(),
       )
-    : correctAnswers.map((c) => c.id).includes(selectedAnswers[0]);
+    : correctAnswers?.map((c) => c.id).includes(selectedAnswers[0]);
+
   /**
    * Handles when a user selects or deselects an option
    */
@@ -54,12 +60,41 @@ export default function Question({
   return (
     <div className="bg-foreground border-muted mx-auto max-w-3xl rounded-lg border p-4 shadow-sm mb-4">
       <div className="space-y-4">
+
+
+        {/* Question-level image */}  
+        {question.image && (
+          <div className="mb-4 flex justify-center">
+            <FwdImage
+            image={question.image}
+            sizes="200px"
+            alt="Question illustration"
+            className="w-full max-w-md mx-auto rounded-md border border-muted object-cover"
+            style={{ maxHeight: '200px' }}  // <- ADD THIS
+            skeletonClassName="min-h-[200px]"
+            />
+          </div>
+        )}
+
+
+      {question.video && (
+        <div className="mb-6">
+          <video 
+            controls 
+            className="w-full max-w-lg mx-auto rounded-lg shadow-sm border border-muted object-cover"
+            style={{ maxHeight: '400px' }}
+          >
+            <source src={question.video} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      )}
+
         {question.caption && (
           <p className="text-muted-foreground text-sm italic">
             {question.caption}
           </p>
-        )}
-
+        )}     
         {/* Question Text and Options */}
         <div className="space-y-3">
           <div className="space-y-3">
@@ -68,7 +103,7 @@ export default function Question({
             </MarkdownTTS>
 
             <div className="space-y-2">
-              {question.choices.options.map((option) => (
+              {question.choices.options?.map((option) => (
                 <label
                   key={option.id}
                   htmlFor={`question-${questionNumber}:option-${option.id}`}
@@ -130,7 +165,7 @@ export default function Question({
         <button
           onClick={() => {onCheckAnswer(question.id), setIsChecked(true)}}
           disabled={isDisabled || selectedAnswers.length === 0}
-          className="bg-primary disabled:bg-muted disabled:text-muted-foreground text-primary-foreground rounded-md px-6 py-2 font-medium transition-all hover:brightness-110 active:brightness-90"
+          className="bg-primary disabled:bg-muted disabled:text-muted-foreground disabled:pointer-events-none text-primary-foreground rounded-md px-6 py-2 font-medium transition-all hover:brightness-110 active:brightness-90"
         >
           Check Answer
         </button>

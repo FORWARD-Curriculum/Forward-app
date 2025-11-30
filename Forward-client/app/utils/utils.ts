@@ -1,8 +1,24 @@
+import { addError } from "@/features/logging/slices/loggingSlice";
+import store from "@/store";
 import { clsx, type ClassValue } from "clsx";
 import { useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 
 export const API_PROGRESS_EVENT = "api-progress-update";
+
+export type Image = {
+  thumbnail: string;
+  optimized: { [key: string]: number };
+  original: string;
+};
+
+export function srcsetOf(image: Image) {
+  let out: string[] = [];
+  for (const [url, width] of Object.entries(image.optimized)) {
+    out.push(`${url} ${width}w`);
+  }
+  return out.join(", ");
+}
 
 declare global {
   interface Window {
@@ -142,7 +158,59 @@ export function useTitle(
   ...deps: React.DependencyList
 ): void {
   useEffect(() => {
-    console.log(titleOrFn);
+    // console.log(titleOrFn);
     document.title = typeof titleOrFn === "function" ? titleOrFn() : titleOrFn;
   }, [...deps]);
 }
+
+function getCallerStack(skipLines = 2) {
+  const err = new Error();
+  const raw = err.stack || "";
+  const lines = raw.split(/\r?\n/);
+  return lines.slice(skipLines).join("\n");
+}
+
+
+
+declare global {
+  interface String {
+    trunc(n: number): string;
+  }
+}
+
+String.prototype.trunc = 
+      function(n){
+          return this.substr(0,n-1)+(this.length>n?'...':'');
+      };
+
+const originalConsoleError = console.error.bind(console);
+
+console.error = (...args: any[]) => {
+  const stack = getCallerStack(2);
+  originalConsoleError(...args);
+
+  store.dispatch(
+    addError(
+      {
+        args,
+        stack,
+        time: Date.now(),
+      }
+    )
+  );
+};
+
+export const debounce = <F extends (...args: any[]) => any>(
+  callback: F,
+  wait: number,
+) => {
+  let timeoutId: number | null = null;
+  return (...args: Parameters<F>): void => {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
+    timeoutId = window.setTimeout(() => {
+      callback(...args);
+    }, wait);
+  };
+};

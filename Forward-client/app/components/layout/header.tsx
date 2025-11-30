@@ -3,7 +3,7 @@ import { useAuth } from "@/features/account/hooks";
 import * as Sheet from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import * as DropdownMenu from "@/components/ui/dropdown-menu";
-import { useClient } from "@/hooks/useClient";
+import { useClient, useIsMobile } from "@/hooks/useClient";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
@@ -11,7 +11,7 @@ import { Link } from "react-router";
 
 export default function Header() {
   const { logout } = useAuth();
-  const { windowDimensions } = useClient();
+  const isMobile = useIsMobile();
   const user = useSelector((state: RootState) => state.user.user);
   const lesson = useSelector((state: RootState) => state.lesson);
 
@@ -31,7 +31,7 @@ export default function Header() {
         {/* This is the mobile menu */}
 
         {/* This is the desktop menu */}
-        {windowDimensions.width > 1024 ? (
+        {!isMobile ? (
           <ul className="ml-auto flex list-none items-center gap-6 font-medium *:hover:underline">
             <li>
               <Link prefetch="intent" to={"/dashboard"}>Dashboard</Link>
@@ -64,7 +64,7 @@ export default function Header() {
                         />
                       ) : (
                         <p className="text-xl font-light">
-                          {(user.display_name || "   ")
+                          {(user.display_name || "Guest")
                             .substring(0, 2)
                             .toUpperCase()}
                         </p>
@@ -120,12 +120,13 @@ export default function Header() {
                 FORWARD Navigation
               </Sheet.SheetTitle>
               <div className="*:bg-secondary text-secondary-foreground *:outline-secondary-border flex flex-col space-y-1 *:flex *:justify-between *:rounded-xl *:p-4 *:outline-1 *:active:bg-gray-200/80">
-                <Link prefetch="intent" to={"/dashboard"}>Dashboard</Link>
-                {lesson.lesson &&<Link prefetch="intent" to={"/lesson/"+lesson.lesson.id+"#" + (lesson.current_activity)}>Lesson</Link>}
+                <Link prefetch="intent" to={"/dashboard"} onClick={()=>setOpen(false)}>Dashboard</Link>
+                {lesson.lesson &&<Link prefetch="intent" to={"/lesson/"+lesson.lesson.id+"#" + (lesson.current_activity)} onClick={()=>setOpen(false)}>Lesson</Link>}
               </div>
               {user ? (
                 <div className="group mt-auto flex flex-col gap-4">
                   <Link prefetch="intent"
+                    onClick={()=>setOpen(false)}
                     to="/account"
                     className="flex w-full gap-3 active:backdrop-brightness-150"
                   >
@@ -143,7 +144,7 @@ export default function Header() {
                         />
                       ) : (
                         <p className="text-secondary-foreground text-xl font-light">
-                          {(user.display_name || "   ")
+                          {(user.display_name || "Guest")
                             .substring(0, 2)
                             .toUpperCase()}
                         </p>
@@ -178,6 +179,7 @@ export default function Header() {
               ) : (
                 <Link prefetch="intent"
                   to="/login"
+                  onClick={()=>setOpen(false)}
                   className="bg-primary text-primary-foreground mt-auto w-full p-3 text-center active:brightness-110"
                 >
                   Login

@@ -2,19 +2,50 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
 from django.urls import reverse
-from django.contrib.postgres.fields import ArrayField
+from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
 import uuid
 import boto3  # pyright: ignore[reportMissingImports]
 from django.conf import settings
 # pyright: ignore[reportMissingImports]
 from botocore.exceptions import ClientError
-import re
+import re, os
 import json
+import copy
+from abc import abstractmethod
+from abc import abstractmethod
+from django_jsonform.models.fields import JSONField
+from martor.models import MartorField
+from django.utils.safestring import mark_safe
+from django.core.files.storage import default_storage
+from imagefield.fields import ImageField
+from .utils import FwdImage
 
+GENERIC_FORWARD_IMAGE = FwdImage()
+
+class JSONImageModel(models.Model):
+    """
+    Class for models that store images in JSON fields. Provides utility methods for handling image URLs.
+    """
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item, stored in the json image field'
+    )
+    
+    image = ImageField(upload_to='public/jsonimagemodel/', blank=True,formats=GENERIC_FORWARD_IMAGE.formats, auto_add_fields=True)
+    
+    def stringify(id: uuid):
+        try:
+            model = JSONImageModel.objects.get(id=id)
+            return GENERIC_FORWARD_IMAGE.stringify(model.image)
+        except JSONImageModel.DoesNotExist:
+            return None
+    
 # Custom User model that extends Django's AbstractUser
 # This gives us all the default user functionality (username, password, groups, permissions)
 # while allowing us to add our own custom fields and methods
-
 
 class Facility(models.Model):
     """
@@ -165,13 +196,17 @@ class Lesson(models.Model):
         validators=[MinLengthValidator(3)],
         help_text="The title of the lesson"
     )
+    
+    active = models.BooleanField(default=False, help_text="Wether or not the lesson is shown to students. Keep this unchecked until you\
+        are ready for students to start taking this lesson.")
 
     description = models.TextField(
         help_text="A detailed description of what the lesson covers"
     )
 
-    objectives = models.JSONField(
+    objectives = JSONField(
         default=list,
+        schema={"type": "array", "items": {"type": "string"}},
         help_text="List of learning objectives for this lesson"
     )
 
@@ -186,13 +221,17 @@ class Lesson(models.Model):
         help_text="Optional ordering within a curriculum"
     )
 
-    tags = models.JSONField(
+    tags = JSONField(
+        schema={"type": "array", "items": {"type": "string"}},
         default=list,
         blank=True,
         help_text="Tags for categorizing and searching lessons"
     )
     
-    image = models.CharField(null=True, blank=True, max_length=200, help_text="Optional image to represent the lesson")
+    # image = models.CharField(null=True, blank=True, max_length=200, help_text="Optional image to represent the lesson")
+    image = ImageField(upload_to='public/lesson/', blank=True,
+                              help_text="Optional image to represent the lesson in the dashboard",
+                              auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -233,7 +272,7 @@ class Lesson(models.Model):
             "objectives": self.objectives,
             "order": self.order,
             "tags": self.tags,
-            "image": create_presigned_url(self.image) if self.image else None,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
         }
 
 
@@ -256,6 +295,8 @@ class BaseActivity(models.Model):
         Lesson,
         on_delete=models.CASCADE,
         # Will create writing_activities, quiz_activities, poll_activities
+        blank=False,
+        null=False,
         related_name="%(class)s_activities",
         help_text="The lesson this activity belongs to"
     )
@@ -265,16 +306,23 @@ class BaseActivity(models.Model):
         validators=[MinLengthValidator(3)],
         help_text="The title of the activity"
     )
+    
+    order = models.PositiveIntegerField(
+        help_text="Order of the activity within the lesson. When creating a new activity,<br> this value should be 1 + the number of activities in the lesson found above."
+    )
 
-    instructions = models.TextField(
+    instructions = MartorField(
+        verbose_name="Instructions",
         null=True,
         blank=True,
         help_text="Instructions for completing the activity"
     )
-
-    order = models.PositiveIntegerField(
-        help_text="Order within the lesson"
-    )
+    
+    instructions_image = ImageField(
+        upload_to="public/instructions/",
+        blank=True,
+        help_text="An optional helpful image to display alongside the instructions.",
+        auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -290,12 +338,14 @@ class BaseActivity(models.Model):
     def activity_type(self):
         return self.__class__.__name__
 
+    @abstractmethod
     def to_dict(self):
         return {
             "id": self.id,
             "lesson_id": self.lesson_id,
             "type": self.activity_type,
             "title": self.title,
+            "instructions_image": GENERIC_FORWARD_IMAGE.stringify(self.instructions_image) if self.instructions_image else None,
             "instructions": self.instructions,
             "order": self.order
         }
@@ -307,14 +357,17 @@ class TextContent(BaseActivity):
     Can contain formatted text, HTML, or markdown content.
     """
     # User's generated uuid
-    content = models.TextField(
+    content = MartorField(
         null=True, blank=True,
         help_text="The main content text, can include HTML/markdown formatting"
-
     )
 
-    image = models.TextField(
-        null=True, blank=True, help_text="Optional image to accompany the text content")
+    # image = models.TextField(
+    #     null=True, blank=True, help_text="Optional image to accompany the text content")
+    
+    image = ImageField(upload_to='public/textcontent/', blank=True,
+                       help_text="Optional image to accompany the text content",auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
+    
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -322,7 +375,7 @@ class TextContent(BaseActivity):
         verbose_name_plural = "Readings"
 
     def __str__(self):
-        return f"Text Content: {self.title}"
+        return self.title
 
     @property
     def activity_type(self):
@@ -332,7 +385,7 @@ class TextContent(BaseActivity):
         return {
             **super().to_dict(),
             "content": self.content,
-            "image": create_presigned_url(self.image) if self.image else None,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
         }
 
 
@@ -341,14 +394,21 @@ class Video(BaseActivity):
     Model for video content within a lesson.
     Can be used to embed videos from external sources or local files.
     """
-    video = models.TextField(
-        help_text="URL of the video to be embedded"
-    )
+    video = models.FileField(
+        upload_to="public/video/",
+        validators=[FileExtensionValidator(allowed_extensions=['mp4'])])
 
     scrubbable = models.BooleanField(
         default=False,
         help_text="Whether the video can be scrubbed by the user"
     )
+
+    transcript = models.TextField(
+        blank =True,
+        null=True,
+        help_text="optional trabscript of the video content"
+    )
+
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -361,13 +421,45 @@ class Video(BaseActivity):
     def to_dict(self):
         return {
             **super().to_dict(),
-            "video": create_presigned_url(self.video),
+            "video": self.video.url if self.video else None,
+            "transcript": self.transcript
         }
 
 
 class Writing(BaseActivity):
     """Model for writing activities where students provide written responses."""
-    prompts = models.JSONField(
+    prompts = JSONField(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "prompt": {"type": "string", "title": "Prompt", 'widget': 'textarea'},
+                    # https://django-jsonform.readthedocs.io/en/stable/guide/choices.html
+                    "image": {"type": "string", "format": "file-url"},
+                    "min_type": {
+                        "type": "string",
+                        "choices": [
+                            {'title': 'Words', 'value': 'word'},
+                            {'title': 'Characters', 'value': 'char'}
+                        ],
+                        'title': "Minimum Counting Type",
+                        'widget': 'radio',
+                        'default': 'char'
+                    },
+                    "minimum": {
+                        "type": "integer",
+                        "title": "Minimum Words/Chars",
+                        "minimum": 0,
+                        "default": 0
+                    }
+
+                },
+                "required": ["prompt"]
+            },
+            'default': [],
+            'minItems': 1,
+        },
         default=list,
         help_text="List of writing prompts for the activity"
     )
@@ -375,51 +467,107 @@ class Writing(BaseActivity):
     class Meta(BaseActivity.Meta):
         verbose_name = "Writing"
         verbose_name_plural = "Writings"
-
-    def get_prompts(self):
-        """Returns the list of prompts or an empty list if none set"""
-        return self.prompts or []
-
+        
     def to_dict(self):
+        prompts = copy.deepcopy(self.prompts)
+        for item in prompts:
+            if item.get("image"):
+                item["image"] = JSONImageModel.stringify(item["image"])
         return {
             **super().to_dict(),
-            "prompts": self.prompts
+            "prompts": prompts
         }
 
 
 class Identification(BaseActivity):
     """Model for students to identify key phrases or concepts in a text."""
-    content = models.CharField(
-        max_length=50000,
-        default="",
-    )
+   
+    # TODO: implement image/pdf coordinate based identification
     
     class Meta:
         verbose_name = "Identification"
         verbose_name_plural = "Identifications"
 
-    minimum_correct = models.PositiveIntegerField(default=0)
 
-    feedback = models.CharField(max_length=2000, default="")
+    minimum_correct = models.PositiveIntegerField(default=None, null=True, blank=True)
+
+    feedback = models.CharField(max_length=2000, default="", blank=True,null=True)
 
     def to_dict(self):
         return {
             **super().to_dict(),
-            "content": self.content,
+            "content": [i.to_dict() for i in IdentificationItem.objects.filter(identification=self).order_by('order')],
             "minimum_correct": self.minimum_correct,
             "feedback": self.feedback
+        }
+        
+
+
+class IdentificationItem(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+    order = models.PositiveIntegerField(
+    default=0,
+    blank=False,
+    null=False,)
+
+    identification = models.ForeignKey(
+        to=Identification, on_delete=models.CASCADE, related_name='identItems')
+    hints = models.BooleanField(default=True, help_text=mark_safe(
+        'If true, will show a cursor pointer over unidentified areas to help with selection, just like  <code style="cursor: pointer; color: var(--error-fg)">when you hover over this text</code>.'))
+    areas = JSONField(schema={
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "x1": {"type": "number", "title": "Top Left X (%)", "minimum": 0, "maximum": 100},
+                "y1": {"type": "number", "title": "Top Left Y (%)", "minimum": 0, "maximum": 100},
+                "x2": {"type": "number", "title": "Bottom Right X (%)", "minimum": 0, "maximum": 100},
+                "y2": {"type": "number", "title": "Bottom Right Y (%)", "minimum": 0, "maximum": 100}
+            },
+            "required": ["x1", "y1", "x2", "y2"]
+        },
+        'default': []
+        # 'minItems': 1
+        },
+        help_text="""This field is a list of selectable rectangles on the image. Any rectangles you define in the list will show 
+        up after this Activity has been saved, this means, to see any rectangles you must save at least once.""",
+        verbose_name="Coordinates", blank=True, null=True)
+    
+    image = ImageField(
+        upload_to='public/identification/items/images', blank=False, null=False, help_text="""The image below automatically shows
+        percentage values when hovered. If the tooltop at the bottom is not visible, holding still for a bit will show a tooltop
+        with the percentage of the image you are hovered over.""",auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
+
+    class Meta:
+        ordering = ("order",)
+
+    def to_dict(self):
+        return {
+            "areas": [[area['x1'], area['y1'], area['x2'], area['y2']] for area in self.areas] if self.areas else None,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
+            "hints": self.hints,
         }
 
 
 class Quiz(BaseActivity):
     """Model for quiz activities that contain multiple questions and track scores."""
-    passing_score = models.PositiveIntegerField(
-        help_text="Minimum score required to pass the quiz"
-    )
 
-    feedback_config = models.JSONField(
-        default=dict,
-        help_text="Configuration for feedback based on score ranges"
+    image = ImageField(
+        upload_to='public/quiz/',
+        blank=True,
+        help_text="Optional Image to accompany the Quiz",
+        formats=GENERIC_FORWARD_IMAGE.formats, auto_add_fields=True)
+
+    video = models.FileField(upload_to='public/video', null=True, blank=True, validators=[FileExtensionValidator(allowed_extensions=['mp4'])], help_text= "Optional video to accompany the Quiz")
+
+    passing_score = models.PositiveIntegerField(
+        help_text="Minimum score required to pass the quiz",
+        default=80
     )
 
     class Meta(BaseActivity.Meta):
@@ -430,15 +578,35 @@ class Quiz(BaseActivity):
         return {
             **super().to_dict(),
             "passing_score": self.passing_score,
-            "feedback_config": self.feedback_config,
-            "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')]
+            # "feedback_config": self.feedback_config,
+            "questions": [q.to_dict() for q in Question.objects.filter(quiz__id=self.id).order_by('order')],
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
+            "video": self.video.url if self.video else None
         }
 
 
 class Twine(BaseActivity):
     """Model for Twine activities, which are interactive stories or games."""
-    file = models.TextField(
-        help_text="The Twine story as a built HTML file in string format"
+    file = models.FileField(
+        upload_to="public/twine/",
+        validators=[FileExtensionValidator(allowed_extensions=['html'])],
+        help_text=mark_safe("""  
+                            An exported twine file with the extension ".html"<br>
+                            <br>
+                            The Twine story format must be "SugarCube", and in order to inform the
+                            app that a student has finshed the story, all ending passages must include the
+                            following text somewhere within them:<br>
+                            <br>
+                            <code>
+                                &lt;&lt;script&gt;&gt;<br>
+                                window.parent.postMessage({ type: "twineEnd" }, "*");<br>
+                                &lt;&lt;/script&gt;&gt;<br>
+                            </code><br>
+                            
+                            All images in the twine file should be prefixed with <code>image:&lt;filename&gt;</code>
+                            where the filename does not have any spaces (reccomended replace with underscores)    
+                            """
+        ), blank=False, null=False
     )
 
     class Meta(BaseActivity.Meta):
@@ -446,10 +614,19 @@ class Twine(BaseActivity):
         verbose_name_plural = "Twine Stories"
 
     def to_dict(self):
+        result = None
+        if self.file and self.file.name:
+            with self.file.open('r') as f:
+                result = re.sub(
+                    r"image:(.*?\.(jpe?g|png|gif|bmp|webp|tiff?))",
+                    lambda m: f"image:{default_storage.url(f'public/twine/images/{m.group(1)}')} ",
+                    f.read()
+                )
+               
         return {
-            **super().to_dict(),
-            "file": regex_image_sub(self.file, key_prefix="twine/", isJson=False),
-        }
+                    **super().to_dict(),
+                    "file": result,
+                }
 
 
 class Question(models.Model):
@@ -459,6 +636,14 @@ class Question(models.Model):
         ('true_false', 'True/False'),
         ('multiple_select', 'Multiple Select'),
     ]
+
+    order = models.PositiveIntegerField(
+        help_text="Order within the quiz"
+    )
+    
+    image = ImageField(upload_to='public/question/', blank=True, help_text="Optional image to accompany the Question",formats=GENERIC_FORWARD_IMAGE.formats, auto_add_fields=True)
+    video = models.FileField( upload_to='public/question/', null=True, blank=True, validators=[FileExtensionValidator(allowed_extensions=['mp4'])], help_text="Optional video to accompany the Question")
+    
     # User's generated uuid
     id = models.UUIDField(
         primary_key=True,
@@ -474,16 +659,10 @@ class Question(models.Model):
         help_text="The quiz this question belongs to"
     )
 
-    question_text = models.TextField(
+    question_text = MartorField(
         help_text="The text of the question"
     )
-
-    feedback_config = models.JSONField(
-        default=dict,
-        blank=True,
-        help_text="Feedback configuration for this question, with options for correct/incorrect responses"
-    )
-
+    
     question_type = models.CharField(
         max_length=20,
         choices=QUESTION_TYPES,
@@ -494,18 +673,46 @@ class Question(models.Model):
         default=True,
         help_text="Whether this question has correct answers"
     )
-
-    choices = models.JSONField(
-        help_text="Available choices and correct answers in JSON format"
-    )
-
+    
     is_required = models.BooleanField(
         default=True,
         help_text="Whether this question must be answered"
     )
 
-    order = models.PositiveIntegerField(
-        help_text="Order within the quiz"
+    choices = JSONField(
+        schema={
+            "type": "object",
+            "properties": {
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "number"},
+                            "text": {"type": "string", 'widget': 'textarea'},
+                            "is_correct": {"type": "boolean", "default": False}
+                        },
+                        "required": ["id", "text"]
+                    },
+                    'minItems': 1
+                }
+            },
+            "required": ["options"]
+        },
+        help_text="Available choices and correct answers for the question"
+    )
+
+    feedback_config = JSONField(
+        schema={
+            "type": "object",
+            "properties": {
+                "correct": {"type": "string",'widget': 'textarea'},
+                "incorrect": {"type": "string",'widget': 'textarea'}
+            },
+            # "required": ["correct", "incorrect"]
+        },
+        default=dict,
+        help_text="Feedback configuration for correct/incorrect responses"
     )
 
     class Meta:
@@ -526,9 +733,10 @@ class Question(models.Model):
             "choices": self.choices,
             "is_required": self.is_required,
             "order": self.order,
-            "feedback_config": self.feedback_config
+            "feedback_config": self.feedback_config,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
+            "video": self.video.url if self.video else None
         }
-
 
 class Poll(BaseActivity):
     """
@@ -665,11 +873,52 @@ class DndMatch(BaseActivity):
             ["red herring drop", null]
         ]
     """
-
-    content = models.JSONField(
-        help_text="List of arrays to match in the format [[drop, drag], ...]"
-    )
     
+    strict = models.BooleanField(default=True,
+                                 help_text="Whether matches must be exact or if any match is allowed",
+                                 null=False, blank=False)
+
+    content = JSONField(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "category":
+                        {
+                            "title": "Category Name",
+                            "type": "string",
+                        },
+                    "matches": {
+                        "type": "array",
+                        "items": {
+                            "oneOf": [
+                                {
+                                    "title": "Type: Text",
+                                    "type": "string",
+                                },
+                                {
+                                    "title": "Type: Image",
+                                    "type": "object",
+                                    "properties": {
+                                        "image": {
+                                            "type": "string",
+                                            "format": "file-url",
+                                            "widget": "fileinput",
+                                            "title": "Image"
+                                        }
+                                    },
+                                    "required": ["image"]
+                                },
+                            ]
+                        }
+                        },
+                }
+            }
+        },
+        help_text="List of DND match categories and their associated items"
+    )
+
     class Meta:
         verbose_name = "Drag N' Drop"
         verbose_name_plural = "Drag N' Drops"
@@ -681,9 +930,17 @@ class DndMatch(BaseActivity):
         )
 
     def to_dict(self):
+        content = copy.deepcopy(self.content)
+        for group in content:
+            for match in group['matches']:
+                if isinstance(match, dict) and 'image' in match:
+                    match['key'] = match['image']
+                    match['image'] = JSONImageModel.stringify(match['image'])
+                    
         return {
             **super().to_dict(),
-            "content": regex_image_sub(self.content, key_prefix="dndmatch/"),
+            "content": content,
+            "strict": self.strict
         }
 
 class FillInTheBlank(BaseActivity):
@@ -701,9 +958,61 @@ class FillInTheBlank(BaseActivity):
     class Meta:
         verbose_name = "Fill in the Blank"
         verbose_name_plural = "Fill in the Blanks"
+    
+    image = ImageField(upload_to='public/fillintheblank/images/', blank=True, formats=GENERIC_FORWARD_IMAGE.formats,
+        auto_add_fields=True)
 
-    content = models.JSONField(
-        help_text= "Array of sentences with <options> markup for blanks"
+    content = JSONField(
+        verbose_name="Sentences",
+        schema={
+            "type": "array",
+            "items": {
+                "type": "string", "widget": "textarea"
+            }
+        },
+        help_text= mark_safe("""
+                             <details>
+                             <summary>Help with formatting Fill in The Blank sentances.</summary>
+                               <p>This is an array of strings, where each string can contain special <code>&lt;options&gt;</code> tags to define an interactive element. There are three distinct ways to use these tags:</p>
+
+  <h3>1. Dropdown Menu</h3>
+  <p>This use case is for when you want users to select the correct answer from a predefined list.</p>
+
+  <ul>
+    <li>
+      <strong>Syntax</strong>: The <code>&lt;options&gt;</code> tag contains a comma-separated list of choices. The correct answer is prefixed with an asterisk (<code>*</code>).
+    </li>
+    <li>
+      <strong>Example</strong>: To create a dropdown with "an animal", "a bird", and "a fish" as options, where "an animal" is the correct answer, you would write:
+      <pre><code>"Cats are &lt;options&gt;*an animal, a bird, a fish&lt;/options&gt;."</code></pre>
+    </li>
+  </ul>
+
+  <h3>2. Keyword-Based Text Input</h3>
+  <p>This is used for a text input field where multiple different answers could be considered correct.</p>
+
+  <ul>
+    <li>
+      <strong>Syntax</strong>: The <code>&lt;options&gt;</code> tag includes the <code>keyword="true"</code> attribute and contains a comma-separated list of acceptable answers. The user's input will be marked correct if it matches any of these keywords.
+    </li>
+    <li>
+      <strong>Example</strong>: To create a text field where "blue", "clear", or "bright" are all correct answers, you would write:
+      <pre><code>"The sky is &lt;options keyword=\"true\"&gt;blue, clear, bright&lt;/options&gt;."</code></pre>
+    </li>
+  </ul>
+
+  <h3>3. Free Text Input</h3>
+  <p>This is used for an open-ended text input where any non-empty answer is considered correct.</p>
+
+  <ul>
+    <li>
+      <strong>Syntax</strong>: The <code>&lt;options&gt;</code> tag is left empty.
+    </li>
+    <li>
+      <strong>Example</strong>: To create a simple text input field for a user's favorite color, you would write:
+      <pre><code>"My favorite color is &lt;options&gt;&lt;/options&gt;."</code></pre>
+    </li>
+  </ul></details>""")
     )
 
     def incorrect_fills(self):
@@ -719,6 +1028,7 @@ class FillInTheBlank(BaseActivity):
         return {
             **super().to_dict(),
             "content": self.content,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None
         }
 
 
@@ -726,14 +1036,14 @@ class FillInTheBlank(BaseActivity):
     
 class ConceptMap(BaseActivity):
     """Model for mapping concepts to each other"""
-    content = models.CharField(
-        max_length=50000,
+    content = MartorField(
         default="",
     )
     class Meta:
         verbose_name = "Concept Map"
         verbose_name_plural = "Concept Maps"
 
+    #TODO return and configure images for fill in the blank activities
     def to_dict(self):
         return {
             **super().to_dict(),
@@ -742,35 +1052,13 @@ class ConceptMap(BaseActivity):
         }
 
 
-class Concept(BaseActivity):
+class Concept(models.Model):
     """Model for a concept in the concept map"""
     # TODO use jsonschema to enforce and validate the schema of the example field
 
-    """
-    {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "image": {
-            "type": "string"|null
-          },
-          "description": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "name",
-          "logo",
-          "description"
-        ],
-        "additionalProperties": false
-      },
-    }
-    """
+    order = models.PositiveIntegerField(
+        help_text="Order within the concept map"
+    )
 
     concept_map = models.ForeignKey(
         ConceptMap,
@@ -778,39 +1066,58 @@ class Concept(BaseActivity):
         related_name="concepts",
         help_text="The concept map this concept belongs to"
     )
+    
+    title = models.CharField(
+        help_text="The title of the concept"
+    )
 
-    image = models.TextField(blank=True, null=True)
+    image = ImageField(
+        upload_to='public/concept/',
+        blank=False, null=False,
+        help_text="An image representing the concept.",
+        formats=GENERIC_FORWARD_IMAGE.formats,
+        auto_add_fields=True)
 
-    description = models.TextField(
+    description = MartorField(
         help_text="A detailed description of the concept"
     )
 
-    examples = models.JSONField(
-        default=list,
+    examples = JSONField(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "image": {"type": "string", "format": "file-url"},
+                    "description": {"type": "string"}
+                },
+                "required": ["name","description"],
+                "additionalProperties": False
+            }
+        },
         help_text="List of examples for this concept"
     )
     
     class Meta:
         verbose_name = "Concept Map Concept"
         verbose_name_plural = "Concept Map Concepts"
+        ordering = ['order']
     
     def to_dict(self):
-        print(f"DEBUG: to_dict() method called for concept ID: {self.id}")
-        
-        try:
-            image_url = create_presigned_url(self.image) if self.image else None
-            print(f"DEBUG: Image URL generated: {image_url}")
-        except Exception as e:
-            print(f"ERROR: Error generating presigned URL: {e}")
-            image_url = None
+        examples = copy.deepcopy(self.examples)
+        for item in examples:
+            if item.get('image'):
+                item['image'] = JSONImageModel.stringify(item['image'])
         
         return {
-            **super().to_dict(),
             "id": self.id,
-            "image": image_url,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
             "description": self.description,
-            "examples": self.examples,
+            "examples": examples,
+            "title": self.title,
         }
+        
 # Helper method to generate presigned urls
 """
 There might be a better way to do this useing django storages settings setting it to presigned url without creating a client here
@@ -849,6 +1156,7 @@ def create_presigned_url(s3_key):
     if (settings.DEBUG):
         print(f"SUCCESS: Generated presigned URL: {response}")
     return response
+
     
 
 
@@ -871,39 +1179,32 @@ def regex_image_sub(tosub: any, key_prefix="", isJson: bool = True):
 
 
 class LikertScale(BaseActivity):
-    """"
-    "type": "array",
-    "items": {
-    "type": "object",
-    "properties": {
-      "explain": {
-        "type": "boolean",
-        "description": "Indicates whether an explanation is required for the statement."
-      },
-      "statement": {
-        "type": "string",
-        "description": "The statement or question being presented."
-      },
-      "map": {
+    LIKERT_CONTENT_SCHEMA = {
         "type": "array",
-        "description": "Possible answer options or numeric scale values.",
         "items": {
-          "anyOf": [
-            {
-              "type": "integer",
-              "description": "Numeric scale value (e.g., 0–5)."
+            "type": "object",
+            "properties": {
+                "statement": {"type": "string", "widget": "textarea"},
+                "scale": {
+                    "type": "array",
+                    "title": "Scale Markers",
+                    "items": {
+                        "anyOf": [
+                            {"type": "number", "title": "Type: number"},
+                            {"type": "string", "title": "Type: text"}
+                        ]
+                    },
+                    "minItems": 2
+                    },
+                "continuous": {"type": "boolean"}
             },
-            {
-              "type": "string",
-              "description": "Textual option (e.g., Likert scale labels)."
-            }
-          ]
-        }
-      }
-    },
-    """
-    content = models.JSONField(
-
+            "required": ["statement", "scale", "continuous"],
+            "additionalProperties": False
+            }}
+    
+    content = JSONField(
+        schema=LIKERT_CONTENT_SCHEMA,
+        help_text="Content for the Likert scale activity"
     )
 
     class Meta:
@@ -915,6 +1216,152 @@ class LikertScale(BaseActivity):
             **super().to_dict(),
             "content": self.content
         }
+        
+class Slideshow(BaseActivity):
+    
+    force_wait = models.IntegerField(default=0, help_text="""The amount of time, per-slide, in seconds, a student must wait
+                                     before being able to proceed to the next. A value of 0 (the default) will allow the student
+                                     to navigate freely at their own pace. """, verbose_name="Force Wait")
+    
+    autoplay = models.BooleanField(default=False, help_text="""If selected, slideshow will automatically advance to the next slide
+                                    after the time specified in above 'Force Wait' has elapsed. If false, the student must manually advance the slides.
+                                    If 'Force Wait' is set to 0, this setting has no effect.""")
+    
+    def get_num_slides(self):
+        return Slide.objects.filter(slideshow=self).count()
+    
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "slides": [s.to_dict() for s in Slide.objects.filter(slideshow=self).order_by('order')],
+            "force_wait": self.force_wait,
+            "autoplay": self.autoplay,
+        }
+    
+class Slide(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+    
+    slideshow = models.ForeignKey(to=Slideshow,on_delete=models.CASCADE, related_name='slides')
+    content = MartorField(default="")
+    image = ImageField(upload_to='public/slideshow/slides/images', blank=True,
+                       auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
+    order = models.PositiveIntegerField(
+        default=0,
+        blank=False,
+        null=False,)
+    
+    class Meta:
+        ordering = ("order",)
+    
+    
+    def to_dict(self):
+        return {
+            "content": self.content,
+            "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None
+        }
+
+class CustomActivity(BaseActivity):
+    """
+        Allows html documents to be uploaded for custom activities. Handles images by replacing
+        <img> tags in place via regex. All functionality is expected to be inlined;
+        no external stylesheets/scripts.
+        
+        Completion is notified to FORWARD by firing an "activityEnd" event to window.parent like so:
+        
+        ```html
+        <script>
+            window.parent.postMessage({ type: "activityEnd" }, "*");
+        </script>
+        ```
+    """
+    
+    def validate_passing_script(file):
+        file.seek(0)    
+        try:
+            content = file.read().decode('utf-8')
+        except UnicodeDecodeError:
+            raise ValidationError("The uploaded file is not a valid text file and could not be read.")
+        finally:
+            file.seek(0)
+        if re.search(r"window\.parent\.postMessage\({\s*type:\s*\"activityEnd\"\s*},\s*\"\*\"\)", content) is None:
+            raise ValidationError(mark_safe(f"""
+                Custom Activity HTML Files must include at least:<br><br>
+                    <code>&lt;script&gt;window.parent.postMessage({{ type: \"activityEnd\" }}, \"*\");&lt;/script&gt;</code><br><br>
+                to tell FORWARD the activity is completed, and let students proceede in the lesson."""))
+    
+    document = models.FileField(validators=[FileExtensionValidator(allowed_extensions=[
+                                "html"]),validate_passing_script], null=False, blank=False, help_text=mark_safe("""
+                                    This is an HTML document that has no external dependencies other than image files.<br>
+                                    Once this activity is saved, all detected images in the document will be displayed below.
+                                    Images that are referenced can furthermore be uploaded farther down below BUT must have the
+                                    exact same name as found in the "Detected Images" section for them to work.<br>
+                                    Once those images are saved, the preview should show the expected document as was in your
+                                    editor of choice. This is the same exact view students will have in-app.<br><br>Provided under
+                                    the following dropdown is an AI prompt you can copy and paste at the start of creating a custom activity
+                                    to hopefully ensure you do not get any errors on upload.
+                                    <details><summary>AI Prompt</summary>
+                                    <code>
+                                        SYSTEM:: You are a frontend developer tasked with taking some description of a simple activity and writing
+                                        code to achieve that vision. Functionally, whenever the activity achieves some state of being "complete",
+                                        you must post a message to the window's parent as follows: `window.parent.postMessage({ type: "activityEnd" }}, "*")` 
+                                        this tells the greater app that the activity is finished and the student may proceed. If you are unsure of what
+                                        constitutes a completion state for the activity you will be tasked to implement, please ask the USER for more
+                                        clarification to ensure correct results. If the activity does not have a completion state, you must still post:
+                                        `window.parent.postMessage({ type: "activityEnd" }}, "*")` to the window's parent by default somewhere in the document.
+                                        If you neglect to do so, the student will be stuck on the activity provided and will be unable to proceed.
+                                        Functionality should, if not specified one way or another by the USER, be reactive to student input via callback
+                                        functions. You may not use any external libraries, as this is a single HTML file bundled with images. DO NOT
+                                        reference external stylesheets or scripts, as only referenced images will be bundled in the full production release
+                                        of the app. Please inline all styles and scripts into `style` and `script` tags, while all images must not be in
+                                        any subdirectory, just the same unpathed filename. When you have re-read over this system prompt at least 3 times,
+                                        respond to the user as an assistant with the phrase "Please describe the activity you have in mind:" and await further
+                                        instruction. Thank you. ::SYSTEM
+                                    </details>
+                                """))
+
+    def referenced_images(self):
+        try:
+            with self.document.storage.open(self.document.name, "rb") as f:
+                f.seek(0)
+                content = f.read(self.document.size).decode("utf-8", errors="replace")
+                found = re.findall(r"<img[^>]+src=[\'\"]?([^\'\"]+\.(?:jpe?g|png|gif|bmp|webp|tiff?))[\'\"]?", content)
+                return found
+        except:
+            return []
+        
+    class Meta:
+        verbose_name = "Custom Activity"
+        verbose_name_plural = "Custom Activities"
+
+    def to_dict(self):
+
+        images = {image.name: image.image.url for image in CustomActivityImageAsset.objects.filter(
+            custom_activity=self)}
+
+        return {
+            **super().to_dict(),
+            "document": self.document.url,
+            "images": images,
+        }
+
+
+class CustomActivityImageAsset(models.Model):
+    image = models.ImageField(
+        upload_to='public/custom_activities/images/', null=False, blank=False)
+
+    custom_activity = models.ForeignKey(
+        to=CustomActivity, on_delete=models.CASCADE, related_name='custom_activity_assets')
+
+    @property
+    def name(self):
+        """Returns image name for regex replacement."""
+        return os.path.basename(self.image.name)
+
 
 class BaseResponse(models.Model):
     """
@@ -961,6 +1408,7 @@ class BaseResponse(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
+    @abstractmethod
     def to_dict(self):
         return {
             "id": self.id,
@@ -972,6 +1420,43 @@ class BaseResponse(models.Model):
     
 # TODO: Make quiz and question response inherit from BaseResponse, or make
 # them adhere to the contract enforced by BaseResponse
+
+class CustomActivityResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        CustomActivity,
+        on_delete=models.CASCADE,
+        related_name='custom_activity_responses',
+        help_text='The custom activity this response is for'
+    )
+    
+    class Meta:
+        verbose_name = "Custom Activity Response"
+        verbose_name_plural = "Custom Activity Responses"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
+
+class SlideshowResponse(BaseResponse):
+    associated_activity = models.ForeignKey(
+        Slideshow,
+        on_delete=models.CASCADE,
+        related_name='slideshow_responses',
+        help_text='The slideshow this response is for'
+    )
+    
+    highest_slide = models.IntegerField(default=-1, help_text="highest slide student has gotten to")
+    
+    class Meta:
+        verbose_name = "Slideshow Response"
+        verbose_name_plural = "Slideshow Responses"
+
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+            "highest_slide": self.highest_slide
+        }
 
 class UserQuizResponse(BaseResponse):
     """
@@ -1146,9 +1631,11 @@ class UserQuestionResponse(models.Model):
     def evaluate_correctness(self):
         """Determine if the response is correct based on question type and correct answer"""
         if not self.question.has_correct_answer:
-            self.is_correct = None
-            # self.save()
-            return None
+
+            self.is_correct = True
+            feedback_config = self.question.feedback_config or {}
+            self.feedback = self.question.feedback_config.get('correct', '')
+            return True
 
         options = self.question.choices.get('options', [])
         # Get correct answers from the question
@@ -1205,12 +1692,13 @@ class UserQuestionResponse(models.Model):
             "associated_activity": self.question_id,
             "response_data": self.response_data,
             "quiz_id": self.quiz_response.associated_activity.id,
-            # "is_correct": self.is_correct,
             "lesson_id": self.lesson_id,
             "partial_response": self.partial_response,
             "time_spent": self.time_spent,
-            # "feedback": self.feedback,
             "attempts_left": self.attempts_left,
+            # test
+            "is_correct": self.is_correct,
+            "feedback": self.feedback,
         }
 
 class VideoResponse(BaseResponse):
@@ -1276,19 +1764,65 @@ class DndMatchResponse(BaseResponse):
     ]
     
     """
-    submission = models.JSONField()
+    submission = JSONField(
+        schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "category":
+                        {
+                            "title": "Name",
+                            "type": "string",
+                        },
+                    "matches": {
+                        "type": "array",
+                        "items": {
+                            "oneOf": [
+                                {
+                                    "title": "Type: Text",
+                                    "type": "string",
+                                },
+                                {
+                                    "title": "Type: Image",
+                                    "type": "object",
+                                    "properties": {
+                                        "image": {
+                                            "type": "string",
+                                            "format": "file-url",
+                                            "widget": "fileinput",
+                                            "title": "Image"
+                                        }
+                                    },
+                                    "required": ["image"]
+                                },
+                            ]
+                        }
+                        },
+                }
+            }
+        },
+    )
+    
 
     class Meta:
         verbose_name = "Drag N' Drop Response"
         verbose_name_plural = "Drag N' Drop Responses"
 
     def to_dict(self):
+        content = copy.deepcopy(self.submission)
+        for group in content:
+            for match in group['matches']:
+                if isinstance(match, dict) and 'image' in match:
+                    match['image'] = default_storage.url(match['key'])
+                    
         return {
             **super().to_dict(),
-            "submission": self.submission
+            "submission": content
         }
 
 class FillInTheBlankResponse(BaseResponse):
+
     
     associated_activity = models.ForeignKey(
         FillInTheBlank,
@@ -1308,7 +1842,7 @@ class FillInTheBlankResponse(BaseResponse):
     def to_dict(self):
         return{
             **super().to_dict(),
-            "submission": self.submission
+            "submission": self.submission,
         }
 
 
@@ -1404,6 +1938,8 @@ class IdentificationResponse(BaseResponse):
         related_name='associated_identification',
         help_text='The identification activity associated with this response'
     )
+    
+    identified = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = "Identification Response"
@@ -1412,6 +1948,7 @@ class IdentificationResponse(BaseResponse):
     def to_dict(self):
         return {
             **super().to_dict(),
+            "identified": self.identified
         }
 
 
@@ -1585,7 +2122,93 @@ class ActivityManager():
                               "watched_percentage": ["watched_percentage", 0.0]
                               })
         self.registerActivity(Twine, TwineResponse)
+        self.registerActivity(Slideshow, SlideshowResponse, {"highest_slide": ["highest_slide", -1]})
+        self.registerActivity(CustomActivity, CustomActivityResponse)
 
 
 # Register on launch
 ActivityManager()
+
+class BugReport(models.Model):
+    """
+    Model for reporting bugs within the platform
+    """
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text='the uuid of the database item'
+    )
+    
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='bug_reports',
+        help_text='The user who reported the bug'
+    )
+
+    description = models.TextField(
+        help_text="A detailed description of the bug"
+    )
+
+    steps_to_reproduce = models.TextField(
+        help_text="Steps to reproduce the bug"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    recent_window_locations = models.JSONField(
+        default=list,
+        help_text="List of recent window locations leading up to the bug report"
+    )
+
+    app_state = models.JSONField(
+        default=dict,
+        help_text="Snapshot of the application state at the time of the bug report"
+    )
+    
+    device_info = models.JSONField(
+        default=dict,
+        help_text="Information about the user's device and environment"
+    )
+    
+    app_version = models.CharField(
+        max_length=100,
+        help_text="Version of the application"
+    )
+    
+    def recent_dispatches(self):
+        """Returns a list of recent redux dispatches leading up to the bug report"""
+        return self.app_state.get("logging", {}).get("dispatches", [])
+    
+    def recent_errors(self):
+        """Returns a list of recent redux dispatches leading up to the bug report"""
+        return self.app_state.get("logging", {}).get("errors", [])
+
+    def app_state_short(self):
+        """Returns a version of appstate sans the info from logging for clarity"""
+        app_state_copy = copy.deepcopy(self.app_state)
+        if "logging" in app_state_copy:
+            del app_state_copy["logging"]
+        return app_state_copy
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Bug Report"
+        verbose_name_plural = "Bug Reports"
+
+    def __str__(self):
+        return f"Bug Report by {self.user.username} at {self.created_at}"
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user": self.user.username,
+            "description": self.description,
+            "steps_to_reproduce": self.steps_to_reproduce,
+            "created_at": self.created_at.isoformat(),
+            "recent_errors": self.recent_errors,
+            "recent_window_locations": self.recent_window_locations,
+            "recent_redux_dispatches": self.recent_redux_dispatches,
+            "app_state": self.app_state,
+        }

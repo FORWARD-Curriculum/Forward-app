@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, Target, Users } from "lucide-react";
+import { ArrowRight, BookOpen, Target } from "lucide-react";
 import type { Route } from "./+types/home";
 import { Link } from "react-router";
 
@@ -31,7 +31,7 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
           <Link 
             prefetch="intent" 
-            to={"/dashboard"} 
+            to={"/login"} 
             className="group bg-accent hover:brightness-85 text-primary-foreground px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2"
           >
             Start Here
@@ -39,7 +39,7 @@ export default function Home() {
           </Link>
           <Link 
             prefetch="intent"
-            to={"/supportersOfYouth"}
+            to={"/youth"}
             className="bg-secondary/80 backdrop-blur-sm text-secondary-foreground px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 border border-secondary-border hover:border-muted-foreground shadow-sm hover:shadow-md">
             Learn More
           </Link>

@@ -1,0 +1,98 @@
+div.martor-preview, .ace-github {
+                background: var(--body-bg) !important;
+                color: var(--body-fg);
+            }
+
+div.martor-preview h1, div.martor-preview h2, div.martor-preview h3, div.martor-preview h4, div.martor-preview h5, div.martor-preview h6 {
+    color: var(--body-fg) !important;
+    background-color: transparent !important;
+    font-size: revert !important;
+}
+
+.modal-help-guide, .modal-emoji {
+    display: none;
+}
+
+.main-martor {
+    width: 100%;
+}
+
+.dropdown-menu{
+    display: none;
+}
+.dropdown-menu.show{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    background-color: var(--body-bg);
+    padding: 0.2em;
+    border-radius: 0.2em;
+    filter: drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.5));
+}
+
+.dropdown-item:hover {
+    background-color: var(--hairline-color);
+    cursor: pointer;
+}
+
+.main-martor .nav-tabs, .martor-field {
+    border-bottom: 2px solid var(--hairline-color) !important;
+}
+
+.ace_active-line {
+    background-color: color-mix(in srgb, var(--hairline-color), transparent 60%) !important;
+}
+
+div.martor-preview code,div.martor-preview pre {
+    background-color: var(--hairline-color) !important;
+    color: #D14;
+    padding: 0.2em 0.4em !important;
+    border-radius: 0.3em !important;
+    border-width: 0px !important;
+}
+
+div.martor-preview blockquote {
+    border-left: 4px solid var(--default-button-bg) !important;
+    background-color: color-mix(in srgb, var(--hairline-color), transparent 20%) !important;
+    /* padding: 0.2em 0.4em !important; */
+    margin-left: 0px !important;
+    color: var(--body-fg) !important;
+}
+
+.martor-field {
+    border-right: 2px solid var(--hairline-color) !important;
+    
+}
+html:not([data-theme="light"]) .ace_selection,
+html[data-theme="dark"] .ace_selection {
+    background: color-mix(in srgb, var(--link-selected-fg), transparent 60%) !important;
+}
+
+.ace-github .ace_cursor {
+    color: var(--body-fg) !important;
+}
+
+.btn-group {
+    display: flex;
+}
+
+.markdown-bold {
+    margin-left: auto;
+}
+
+.btn {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.btn:hover, .ace-github .ace_gutter {
+    background-color: var(--hairline-color);
+}
+.ace-github .ace_gutter-active-line {
+    background-color: var(--border-color);
+}
+
+.btn svg {
+    width: 1.5em;
+    height: 1.5em;
+}

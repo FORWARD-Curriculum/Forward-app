@@ -4,7 +4,6 @@ import type {
 } from "@/features/curriculum/types";
 import { useResponse } from "@/features/curriculum/hooks";
 import { useEffect, useState } from "react";
-import type { p } from "node_modules/@react-router/dev/dist/routes-DHIOx0R9";
 function escapeHTML(str: string) {
   const div = document.createElement('div');
   div.textContent = str;
@@ -12,7 +11,6 @@ function escapeHTML(str: string) {
 }
 export default function Twine({ twine }: { twine: TwineType }) {
   const [response, setResponse] = useResponse<TwineResponse, TwineType>({
-    type: "Twine",
     activity: twine,
     initialFields: {
       partial_response: true,
@@ -36,7 +34,7 @@ export default function Twine({ twine }: { twine: TwineType }) {
       `);
 
     // Process the twine file content to replace the custom image syntax
-    const processedHtml = twine.file.replace(imageRegex, replacementPattern);
+    const processedHtml = twine.file?.replace(imageRegex, replacementPattern);
 
     // Create the Blob from the processed HTML
     const blob = new Blob([processedHtml], { type: "text/html" });

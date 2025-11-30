@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Expand, FileVolume } from "lucide-react";
-import Pie from "@/components/ui/cprogress";
+import CircularProgress from "@/components/ui/cprogress";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import type { User } from "@/features/account/types";
@@ -26,9 +26,9 @@ export async function clientLoader({}: Route.ClientLoaderArgs) {
 function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
   return (
     <div className="bg-background rounded-2xl pt-3">
-      <div className="mx-4 flex items-center gap-4 pb-3">
+      <div className="mx-4 flex lg:flex-row flex-col items-center gap-4 pb-3">
         <img
-          src={props.lesson?.image || "grad_cap.png"}
+          src={props.lesson?.image?.thumbnail ?? "grad_cap.png"}
           className="h-full max-w-20"
         ></img>
         <MarkdownTTS className="flex grow" controlsClassName="flex flex-row-reverse grow justify-between">
@@ -98,7 +98,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <div className="mx-4 my-12 lg:mx-[15vw]">
-        <div className="text-secondary-foreground mb-4 flex w-full gap-3 text-sm">
+        <div className="text-secondary-foreground mb-4 flex w-full gap-3 text-sm flex-col lg:flex-row">
           <p>Sort By:</p>
           <button
             aria-label="Sort by progress"
@@ -153,21 +153,22 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                     <LessonCard key={e.id} lesson={e}>
                       <Accordion>
                         {e.objectives.length > 0 && (
-                          <p className="ml-4 mb-4">
+                          <div className="ml-4 mb-4">
                             <span className="font-medium">
                               Lesson Objectives:
                             </span>{" "}
                             <ul>
                               {e.objectives.map((o) => (
-                                <li className="ml-10 list-disc font-light">{o}</li>
+                                <li key={o} className="ml-10 list-disc font-light">{o}</li>
                               ))}
                             </ul>
-                          </p>
+                          </div>
                         )}
                         {e.tags && (
-                          <div className="flex gap-2 ml-4 italic">
+                          <div className="flex gap-2 ml-4 italic flex-col lg:flex-row">
                             Tags: {e.tags.map((t) => (
                               <p
+                              key={t}
                                 className={`bg-secondary outline-foreground-border rounded-md px-2 text-center outline-1 drop-shadow-xs`}
                               >
                                 {t}
@@ -185,25 +186,26 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
             <div className="bg-foreground outline-foreground-border flex h-fit w-full items-center gap-3 rounded-3xl p-4 outline-1">
               <div
                 className={`flex h-16 w-16 items-center justify-center overflow-hidden rounded-full ${
-                  user.profile_picture
+                  user?.profile_picture
                     ? ""
                     : "border-secondary-foreground border-1 border-solid"
                 }`}
               >
-                {user.profile_picture ? (
+                {user?.profile_picture ? (
                   <img src={user.profile_picture} className="object-cover" />
                 ) : (
                   <p className="text-secondary-foreground text-2xl font-light">
-                    {(user.display_name || "   ").substring(0, 2).toUpperCase()}
+                    {user?.display_name ? user.display_name.substring(0, 2).toUpperCase()
+                      : "GU" }
                   </p>
                 )}
               </div>
               <div className="text-left">
                 <h3 className="text-secondary-foreground text-lg">
-                  {user.display_name}
+                  {user?.display_name ?? "Guest"}
                 </h3>
                 <p className="text-muted-foreground text-sm">
-                  {user?.username}
+                  {user?.username ?? "Guest"}
                 </p>
               </div>
               <Link
@@ -235,11 +237,11 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                       if (e.completion != 0)
                         return (
                           <div className="flex items-center" key={e.id}>
-                            <Pie
+                            <CircularProgress
                               size={120}
                               percentage={e.completion * 100}
                               color=""
-                            />
+                            >{(e.completion * 100).toFixed(0)}%</CircularProgress>
                             <Link
                               prefetch="intent"
                               to={"/lesson/" + e.id}

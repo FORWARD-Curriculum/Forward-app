@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, Embed, EmbedResponse, Facility
+from .models import ActivityManager, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, Embed, EmbedResponse, Facility, BaseResponse
 from rest_framework.request import Request as DRFRequest
 from django.core.exceptions import ValidationError as DjangoValidationError
 
@@ -124,7 +124,7 @@ class LessonService:
             [_, Response, _, child_class] = value[:4]
             if not child_class:
                 responses += Response.objects.filter(lesson=lesson,user=user).count()
-        return responses/lesson.total_activities
+        return (responses/lesson.total_activities) if lesson.total_activities != 0 else 0
     
     @staticmethod
     def get_lesson_content(lesson_id):
@@ -201,8 +201,10 @@ class ResponseService:
                 out_dict['response_data'][Activity.__name__] = [a.to_dict() for a in list(Response.objects.filter(lesson=lesson,user=user))]
         
         out_dict['highest_activity'] = 1
-        for value in out_dict['response_data'].values():
-            out_dict['highest_activity'] += len(value)
+        for activity_type in out_dict['response_data'].values():
+            response: dict
+            for response in activity_type:
+                out_dict['highest_activity'] += 1 if response.get('partial_response', False) == False else 0
 
 
         return {
@@ -211,41 +213,6 @@ class ResponseService:
 
 
 class QuizResponseService:
-    @staticmethod
-    def __get_feedback_for_score(quiz, score):
-        """
-        (Private method)
-        Get the appropriate feedback based on the quiz score
-
-
-        Args:
-            quiz: The Quiz object
-            score: The user's score
-
-
-        Returns:
-            str: The feedback message
-        """
-        if not quiz.feedback_config or 'ranges' not in quiz.feedback_config:
-            return quiz.feedback_config.get('default', '')
-
-
-        ranges = quiz.feedback_config.get('ranges', [])
-        default_feedback = quiz.feedback_config.get('default', '')
-
-
-        for range_config in ranges:
-            min_score = range_config.get('min', 0)
-            max_score = range_config.get('max', 0)
-
-
-            if min_score <= score <= max_score:
-                return range_config.get('feedback', default_feedback)
-
-
-        return default_feedback
-
-    
     @staticmethod
     @transaction.atomic
     def submit_quiz_response(validated_data, request):
@@ -317,9 +284,30 @@ class QuizResponseService:
                         # then we decrement
                         question_response.attempts_left = max(0, question_response.attempts_left - 1)
 
+                    question_response.save()
+
+                    # Questions are considered responded after one answer is submitted
+                    total_questions = Question.objects.filter(quiz=quiz).count()
+                    attempted_questions = quiz_response.question_responses.count()
+
+                    if attempted_questions >= total_questions:
+                        quiz_response.partial_response = False
+
+                    if not quiz_response.partial_response:
+                        quiz_response.calculate_score()
+                        
+
 
                     question_response.save()
-                    
+
+            # check if all questions have been attempted
+            all_questions_attempted = all(
+                qr.partial_response == False
+                for qr in quiz_response.question_responses.all()
+            )
+
+            if all_questions_attempted:
+                quiz_response.partial_response = False        
             
             # calculate completion percentage
             total_questions = Question.objects.filter(quiz=quiz).count()
@@ -329,9 +317,9 @@ class QuizResponseService:
                 quiz_response.completion_percentage = (answered_questions / total_questions) * 100
             
             # calculate score if not partial
-            if not partial_response:
+            if not quiz_response.partial_response:
                 quiz_response.calculate_score()
-                feedback = QuizResponseService.__get_feedback_for_score(quiz, quiz_response.score)
+                feedback = ""
                 quiz_response.completion_percentage = 100.0
             else:
                 feedback = ''
@@ -339,6 +327,7 @@ class QuizResponseService:
             quiz_response.save()
             
             # return wrapper with feedback
+            # TODO remove dependencies and connections to this wrapper
             class QuizResponseWrapper:
                 def __init__(self, quiz_response, feedback):
                     self.quiz_response = quiz_response
@@ -394,92 +383,6 @@ class QuizResponseService:
             UserQuizResponse.DoesNotExist: If the response doesn't exist or belong to the user
         """
         return UserQuizResponse.objects.get(id=response_id, user=user)
-
-# class QuestionResponseService:
-#     @staticmethod
-#     @transaction.atomic
-#     def submit_question_response(validated_data, request):
-#         """
-#         Process a user's response to an individual question.
-        
-#         Args:
-#             validated_data: The validated data from the serializer
-#             request: The request object containing the user
-            
-#         Returns:
-#             UserQuestionResponse: The created/updated question response
-#         """
-#         try:
-#             user = request.user
-            
-#             # Extract the question object from validated_data
-#             question = validated_data.get('associated_activity')
-#             quiz_id = validated_data.get('quiz_id')
-#             response_data = validated_data.get('response_data', {})
-#             time_spent = validated_data.get('time_spent', 0)
-            
-#             # Get the quiz first
-#             quiz = Quiz.objects.get(id=quiz_id)
-            
-#             # Handle lesson_id properly
-#             # if lesson_id:
-#             #     if isinstance(lesson_id, Lesson):
-#             #         lesson = lesson_id
-#             #     else:
-#             #         try:
-#             #             lesson = Lesson.objects.get(id=lesson_id)
-#             #         except Lesson.DoesNotExist:
-#             #             lesson = quiz.lesson
-#             # else:
-#             #     lesson = quiz.lesson
-
-#             lesson = quiz.lesson
-                    
-#             # Get or create the parent quiz response
-#             quiz_response, created = UserQuizResponse.objects.update_or_create(
-#                 user=user,
-#                 associated_activity=quiz,
-#                 defaults={
-#                     'lesson': lesson,  # ← Changed
-#                     'partial_response': True,
-#                     'completion_percentage': 0.0
-#                 }
-#             )
-            
-#             # Get or create the question response
-#             question_response, created = UserQuestionResponse.objects.update_or_create(
-#                 user=user,
-#                 quiz_response=quiz_response,
-#                 question=question,
-#                 defaults={
-#                     'lesson': lesson,  # ← Changed
-#                     'response_data': response_data,
-#                     'time_spent': time_spent
-#                 }
-#             )
-            
-#             # Evaluate the correctness of the response
-#             question_response.evaluate_correctness()
-            
-#             # Update quiz completion percentage
-#             total_quiz_questions = Question.objects.filter(quiz_id=quiz_id).count()
-#             answered_questions = quiz_response.question_responses.count()
-            
-#             if total_quiz_questions > 0:
-#                 quiz_response.completion_percentage = (answered_questions / total_quiz_questions) * 100
-#             else:
-#                 quiz_response.completion_percentage = 0.0
-                
-#             quiz_response.save()
-            
-#             return question_response
-            
-#         except Exception as e:
-#             print(f"Error in submit_question_response: {e}")
-#             import traceback
-#             traceback.print_exc()
-#             raise
-
 
 class EmbedResponseService:
     @staticmethod
