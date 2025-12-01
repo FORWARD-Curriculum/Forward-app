@@ -236,7 +236,7 @@ export interface Twine extends BaseActivity {
 }
 
 export interface Slideshow extends BaseActivity {
-  slides: {content: string; image: Image | null}[]
+  slides: {content: string | null; image: Image | null}[]
   force_wait: number;
   autoplay: boolean;
 }

@@ -84,7 +84,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS_RAW = os.environ.get('CORS_ALLOWED_ORIGINS', '')
 CORS_ALLOWED_ORIGINS = [origin.strip()
-                        for origin in CORS_ALLOWED_ORIGINS_RAW.split(',')]
+                        for origin in CORS_ALLOWED_ORIGINS_RAW.split(',') if len(origin) != 0] # error for 0-len strings?
 
 CORS_ALLOW_CREDENTIALS = True
 

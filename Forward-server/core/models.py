@@ -1247,7 +1247,7 @@ class Slide(models.Model):
     )
     
     slideshow = models.ForeignKey(to=Slideshow,on_delete=models.CASCADE, related_name='slides')
-    content = MartorField(default="")
+    content = MartorField(blank=True, null=True) # allow slideshow text content to be null, for just images
     image = ImageField(upload_to='public/slideshow/slides/images', blank=True,
                        auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
     order = models.PositiveIntegerField(
