@@ -522,41 +522,73 @@
       ]
     },
     {
-      "type": "quiz",
-      "title": "Scholarship Winners Review",
-      "instructions": "Pick one of the previous scholarship essay winners below. Read the essay and then answer the questions.",
-      "content": "Even if you aren't eligible for this scholarship or don't plan to attend college, it can still be helpful to see what makes a strong scholarship essay. Understanding how applicants effectively share their experiences, goals, and challenges can improve your writing skills for future opportunities.",
-      "questions": [
+      "type": "textcontent",
+      "title": "Scholarship Essays",
+      "instructions": null,
+      "content": "For the next few activities, you will read a scholarship essay and answer related questions. There are two essays available: one immediately after this activity and another later on. You only need to read one of them to complete the writing-prompt questions."
+    },
+    {
+      "type": "slideshow",
+      "title": "Scholarship Winners Review 'Substance Abuse and Its Impact'",
+      "instructions": "There are two scholarship essays in this slideshow, read through one of the scholarship essay winners below. . Afterward go to the next activity and answer some questions related to the story",
+      "force_wait": 0,
+      "slides": [
         {
-          "question_text": "What was the main message of the essay? Summarize the key points in your own words.",
-          "question_type": "multiple_choice",
-          "has_correct_answer": false,
-          "choices": { "options": [{ "id": 1, "text": "FIXME", "is_correct": true }] },
-          "is_required": true
+          "content": "",
+          "image": "Substance Abuse and Its Impact -1.png"
         },
         {
-          "question_text": "What did the author do well in their essay?",
-          "question_type": "multiple_choice",
-          "has_correct_answer": false,
-          "choices": { "options": [{ "id": 1, "text": "FIXME", "is_correct": true }] },
-          "is_required": true
+          "content": "",
+          "image": "Substance Abuse and Its Impact -2.png"
         },
         {
-          "question_text": "Did the essay clearly explain the author's challenges? How did they demonstrate personal growth?",
-          "question_type": "multiple_choice",
-          "has_correct_answer": false,
-          "choices": { "options": [{ "id": 1, "text": "FIXME", "is_correct": true }] },
-          "is_required": true
-        },
-        {
-          "question_text": "If you had to write a scholarship essay about your own experiences, what would you focus on? Brainstorm a topic or personal story that you think would make a strong application.",
-          "question_type": "multiple_choice",
-          "has_correct_answer": false,
-          "choices": { "options": [{ "id": 1, "text": "FIXME", "is_correct": true }] },
-          "is_required": true
+          "content": "",
+          "image": "Substance Abuse and Its Impact -3.png"
         }
-      ],
-      "TODO:": "ADD EMBEDS"
+      ]
+    },
+    {
+      "type": "slideshow",
+      "title": "Scholarship Winners Review 'The Price of Fentanyl'",
+      "instructions": "There are two scholarship essays in this slideshow, read through one of the scholarship essay winners below. . Afterward go to the next activity and answer some questions related to the story",
+      "force_wait": 0,
+      "slides": [
+        {
+          "content": "",
+          "image": "The Price of Fentanyl-1.png"
+        },
+        {
+          "content": "",
+          "image": "The Price of Fentanyl-2.png"
+        },
+        {
+          "content": "",
+          "image": "The Price of Fentanyl-3.png"
+        },
+        {
+          "content": "",
+          "image": "The Price of Fentanyl-4.png"
+        }
+      ]
+    },
+    {
+      "type": "writing",
+      "title": "Scholarship Winners Review Writing",
+      "instructions": "Pick one of the previous scholarship essay winners below. Read the essay and then answer the questions.\n\n Even if you aren't eligible for this scholarship or don't plan to attend college, it can still be helpful to see what makes a strong scholarship essay. Understanding how applicants effectively share their experiences, goals, and challenges can improve your writing skills for future opportunities.",
+      "prompts": [
+        {
+          "prompt": "What was the main message of the essay? Summarize the key points in your own words."
+        },
+        {
+          "prompt": "What did the author do well in their essay?"
+        },
+        {
+          "prompt": "Did the essay clearly explain the author's challenges? How did they demonstrate personal growth?"
+        },
+        {
+          "prompt": "If you had to write a scholarship essay about your own experiences, what would you focus on? Brainstorm a topic or personal story that you think would make a strong application."
+        }
+      ]
     },
     {
       "type": "slideshow",
