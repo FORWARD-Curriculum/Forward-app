@@ -3,7 +3,7 @@ import MarkdownTTS from "@/components/ui/markdown-tts";
 
 export default function supportersOfYouth(){
     return (
-        <div className="max-w-6xl mx-auto px-6 py-5">
+        <div className="max-w-6xl mx-auto px-6 py-5 text-secondary-foreground">
             <h4 className="text-accent text-right">For supporters of youth</h4>
             
             <MarkdownTTS controlsClassName="flex flex-row-reverse items-start justify-between gap-4">
