@@ -240,9 +240,11 @@ export default function Slideshow({ slideshow }: { slideshow: SlideshowType }) {
                   skeletonClassName="min-h-100"
                 />
               )}
-              <MarkdownTTS controlsClassName="flex flex-row-reverse gap-2">
-                {example.content}
-              </MarkdownTTS>
+              {example.content && (
+                <MarkdownTTS controlsClassName="flex flex-row-reverse gap-2">
+                  {example.content}
+                </MarkdownTTS>
+              )}
             </CarouselItem>
           ))}
         </CarouselContent>
