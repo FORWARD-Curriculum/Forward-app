@@ -1,4 +1,4 @@
-from core.models import (Lesson, ActivityManager, BaseActivity, Twine, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
+from core.models import (Lesson, ActivityManager, BaseActivity, Twine, TextContent, Quiz, Question, Writing,
                          Embed, DndMatch, Concept, ConceptMap, Video, LikertScale, FillInTheBlank, Identification, IdentificationItem,
                          Slideshow, Slide, CustomActivity, CustomActivityImageAsset)
 from django import forms

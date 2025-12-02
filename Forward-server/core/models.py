@@ -281,7 +281,7 @@ class BaseActivity(models.Model):
     Abstract base class for all activity types in the curriculum.
 
     This class provides common fields and functionality shared by all
-    activity types (Quiz, Poll, Writing Activities)
+    activity types (Quiz, Writing Activities)
     """
     # User's generated uuid
     id = models.UUIDField(
@@ -294,7 +294,7 @@ class BaseActivity(models.Model):
     lesson = models.ForeignKey(
         Lesson,
         on_delete=models.CASCADE,
-        # Will create writing_activities, quiz_activities, poll_activities
+        # Will create writing_activities, quiz_activities
         blank=False,
         null=False,
         related_name="%(class)s_activities",
@@ -736,83 +736,6 @@ class Question(models.Model):
             "feedback_config": self.feedback_config,
             "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
             "video": self.video.url if self.video else None
-        }
-
-class Poll(BaseActivity):
-    """
-    Model for Poll activities. Unlike quizzes, polls don't have correct answers and focus on collecting
-    and optionally displaying aggregate responses.
-    """
-    config = models.JSONField(
-        default=dict,
-        help_text="Configuration options for poll display and behavior"
-    )
-
-    class Meta:
-        verbose_name = "Poll"
-        verbose_name_plural = "Polls"
-
-    def to_dict(self):
-        return {
-            **super().to_dict(),
-            "config": self.config,
-            "questions": [q.to_dict() for q in PollQuestion.objects.filter(poll__id=self.id).order_by('order')]
-        }
-
-
-class PollQuestion(models.Model):
-    """Models for individual poll questions within a poll"""
-    # User's generated uuid
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        help_text='the uuid of the database item'
-    )
-
-    poll = models.ForeignKey(
-        Poll,
-        on_delete=models.CASCADE,
-        related_name="polls",
-        help_text="The poll this poll question belongs to"
-    )
-
-    question_text = models.TextField(
-        help_text="The text of the poll question"
-    )
-
-    options = models.JSONField(
-        help_text="Available options for the poll question"
-    )
-
-    allow_multiple = models.BooleanField(
-        default=False,
-        help_text="Whether multiple options can be selected"
-    )
-
-    order = models.PositiveIntegerField(
-        help_text="Order within the poll"
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['order']
-        verbose_name = "Poll Question"
-        verbose_name_plural = "Poll Questions"
-
-    def __str__(self):
-        return f"Poll Question {self.order}: {self.question_text[:50]}..."
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "poll_id": self.poll_id,
-            "question_text": self.question_text,
-            "options": self.options,
-            "allow_multiple": self.allow_multiple,
-            "order": self.order,
         }
 
 
@@ -1907,30 +1830,6 @@ class TwineResponse(BaseResponse):
             **super().to_dict(),
         }
 
-
-class PollQuestionResponse(BaseResponse):
-    response_data = models.JSONField(
-        help_text="The user's response data in JSON format"
-    )
-
-    associated_activity = models.ForeignKey(
-        Poll,
-        on_delete=models.CASCADE,
-        related_name='associated_poll_for_question',
-        help_text="The poll associated with this question"
-    )
-
-    class Meta:
-        verbose_name = "Poll Question Response"
-        verbose_name_plural = "Poll Question Responses"
-
-    def to_dict(self):
-        return {
-            **super().to_dict(),
-            "response_data": self.response_data
-        }
-
-
 class IdentificationResponse(BaseResponse):
     associated_activity = models.ForeignKey(
         Identification,
@@ -1950,25 +1849,6 @@ class IdentificationResponse(BaseResponse):
             **super().to_dict(),
             "identified": self.identified
         }
-
-
-class PollResponse(BaseResponse):
-    associated_activity = models.ForeignKey(
-        Poll,
-        on_delete=models.CASCADE,
-        related_name='associated_poll',
-        help_text='The poll associated with this response'
-    )
-
-    class Meta:
-        verbose_name = "Poll Response"
-        verbose_name_plural = "Poll Responses"
-
-    def to_dict(self):
-        return {
-            **super().to_dict(),
-        }
-
 
 class EmbedResponse(BaseResponse):
     associated_activity = models.ForeignKey(
@@ -2101,9 +1981,6 @@ class ActivityManager():
         self.registerActivity(Identification, IdentificationResponse)
         self.registerActivity(Writing, WritingResponse, {
                               "responses": ["responses", []]})
-        self.registerActivity(Poll, PollResponse)
-        self.registerActivity(
-            PollQuestion, PollQuestionResponse, child_class=True)
         self.registerActivity(Quiz, UserQuizResponse, {
                                 "submission": ["submission", []]}) # test
         # self.registerActivity(Question, UserQuestionResponse, child_class=True) # Testing this

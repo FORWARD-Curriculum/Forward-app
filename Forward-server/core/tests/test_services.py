@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.contrib.sessions.middleware import SessionMiddleware
 from core.services import UserService, QuizResponseService, LessonService
-from core.models import Poll, PollQuestion, User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, TextContent, Writing
+from core.models import User, Lesson, Quiz, Question, UserQuizResponse, UserQuestionResponse, TextContent, Writing
 
 User = get_user_model()
 
@@ -263,30 +263,6 @@ class LessonServiceTests(TestCase):
             order=1
         )
         
-        # Create a poll
-        self.poll = Poll.objects.create(
-            lesson=self.lesson,
-            title='Test Poll',
-            instructions='Share your opinion',
-            order=3,
-            config={'display_results': True}
-        )
-        
-        # Create poll questions
-        self.poll_question = PollQuestion.objects.create(
-            poll=self.poll,
-            question_text='How comfortable are you with Django?',
-            options={
-                'choices': [
-                    {'id': 1, 'text': 'Very comfortable'},
-                    {'id': 2, 'text': 'Somewhat comfortable'},
-                    {'id': 3, 'text': 'Not comfortable'}
-                ]
-            },
-            allow_multiple=False,
-            order=1
-        )
-        
         # Create a writing activity
         self.writing = Writing.objects.create(
             lesson=self.lesson,
@@ -320,12 +296,6 @@ class LessonServiceTests(TestCase):
         self.assertEqual(activities[2]['type'], 'Quiz')
         self.assertEqual(len(activities[2]['questions']), 1)
         self.assertEqual(activities[2]['questions'][0]['questionText'], 'What is the main purpose of testing?')
-        
-        # Check poll
-        self.assertEqual(activities[3]['title'], 'Test Poll')
-        self.assertEqual(activities[3]['type'], 'Poll')
-        self.assertEqual(len(activities[3]['questions']), 1)
-        self.assertEqual(activities[3]['questions'][0]['questionText'], 'How comfortable are you with Django?')
         
         # Check writing activity
         self.assertEqual(activities[4]['title'], 'Test Writing Activity')

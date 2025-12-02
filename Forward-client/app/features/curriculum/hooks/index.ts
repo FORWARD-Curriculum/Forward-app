@@ -18,7 +18,7 @@ import store from "@/store";
  * from anywhere in the app
  *
  * @param activity - The activity object to retrieve id from.
- * @param trackTime - Used in Higher Order Activites (Quiz, Poll) to indicate that time
+ * @param trackTime - Used in Higher Order Activites (Quiz) to indicate that time
  * should not be tracked as a whole, but instead is the aggregate of the children's times.
  * This is important to ensure that the unmounting of the parent, which if true calls the
  * `resetTimeSpent()`, and thus tracked time would be inacurate for children.

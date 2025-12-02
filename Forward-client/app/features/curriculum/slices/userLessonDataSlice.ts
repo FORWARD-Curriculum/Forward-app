@@ -26,13 +26,11 @@ export const initialLessonResponseState: LessonResponse & {
   current_response: null,
   response_data: {
     Quiz: [],
-    PollQuestion: [],
     Writing: [],
     FillInTheBlank: [],
     TextContent: [],
     ConceptMap: [],
     Identification: [],
-    Poll: [],
     Embed: [],
     LikertScale: [],
     Twine: [],

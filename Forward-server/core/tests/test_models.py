@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
-from core.models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, UserQuizResponse, UserQuestionResponse
+from core.models import User, Lesson, TextContent, Quiz, Question, Writing, UserQuizResponse, UserQuestionResponse
 
 User = get_user_model()
 
@@ -212,99 +212,6 @@ class QuizModelTests(TestCase):
         # Check choices JSON structure
         self.assertEqual(len(question_dict['choices']['options']), 3)
         self.assertTrue(question_dict['choices']['options'][0]['is_correct'])
-
-
-class PollModelTests(TestCase):
-    """Test cases for the Poll model."""
-    
-    def setUp(self):
-        """Set up test data for Poll model tests."""
-        self.test_lesson = Lesson.objects.create(
-            title='Test Lesson',
-            description='A test lesson description'
-        )
-        
-        self.test_poll = Poll.objects.create(
-            lesson=self.test_lesson,
-            title='Test Poll',
-            instructions='Complete this poll to share your opinion.',
-            order=1,
-            config={
-                'display_results': True,
-                'allow_anonymous': False
-            }
-        )
-        
-        self.test_poll_question = PollQuestion.objects.create(
-            poll=self.test_poll,
-            question_text='What is your favorite color?',
-            options={
-                'choices': [
-                    {'id': 1, 'text': 'Red'},
-                    {'id': 2, 'text': 'Blue'},
-                    {'id': 3, 'text': 'Green'}
-                ]
-            },
-            allow_multiple=False,
-            order=1
-        )
-    
-    def test_poll_creation(self):
-        """Test basic poll creation and validation."""
-        self.assertEqual(self.test_poll.title, 'Test Poll')
-        self.assertEqual(self.test_poll.instructions, 'Complete this poll to share your opinion.')
-        self.assertEqual(self.test_poll.order, 1)
-        self.assertEqual(self.test_poll.lesson, self.test_lesson)
-        self.assertEqual(
-            self.test_poll.config,
-            {'display_results': True, 'allow_anonymous': False}
-        )
-    
-    def test_poll_question_creation(self):
-        """Test basic poll question creation and validation."""
-        self.assertEqual(self.test_poll_question.question_text, 'What is your favorite color?')
-        self.assertFalse(self.test_poll_question.allow_multiple)
-        self.assertEqual(self.test_poll_question.order, 1)
-        self.assertEqual(self.test_poll_question.poll, self.test_poll)
-        
-        # Check options JSON structure
-        self.assertEqual(len(self.test_poll_question.options['choices']), 3)
-        self.assertEqual(self.test_poll_question.options['choices'][0]['text'], 'Red')
-    
-    def test_poll_string_representation(self):
-        """Test the string representation of a Poll."""
-        self.assertEqual(str(self.test_poll), 'Poll - Test Poll')
-    
-    def test_poll_question_string_representation(self):
-        """Test the string representation of a PollQuestion."""
-        self.assertEqual(str(self.test_poll_question), 'Poll Question 1: What is your favorite color?...')
-    
-    def test_poll_to_dict_method(self):
-        """Test to_dict method returns expected dictionary for Poll."""
-        poll_dict = self.test_poll.to_dict()
-        self.assertEqual(poll_dict['title'], 'Test Poll')
-        self.assertEqual(poll_dict['instructions'], 'Complete this poll to share your opinion.')
-        self.assertEqual(poll_dict['order'], 1)
-        self.assertEqual(poll_dict['lessonId'], self.test_lesson.id)
-        self.assertEqual(poll_dict['id'], self.test_poll.id)
-        self.assertEqual(
-            poll_dict['config'],
-            {'display_results': True, 'allow_anonymous': False}
-        )
-    
-    def test_poll_question_to_dict_method(self):
-        """Test to_dict method returns expected dictionary for PollQuestion."""
-        question_dict = self.test_poll_question.to_dict()
-        self.assertEqual(question_dict['questionText'], 'What is your favorite color?')
-        self.assertFalse(question_dict['allowMultiple'])
-        self.assertEqual(question_dict['order'], 1)
-        self.assertEqual(question_dict['pollId'], self.test_poll.id)
-        self.assertEqual(question_dict['id'], self.test_poll_question.id)
-        
-        # Check options JSON structure
-        self.assertEqual(len(question_dict['options']['choices']), 3)
-        self.assertEqual(question_dict['options']['choices'][0]['text'], 'Red')
-
 
 class WritingModelTests(TestCase):
     """Test cases for the Writing model."""
