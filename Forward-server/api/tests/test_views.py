@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework import status
 import json
-from core.models import User, Lesson, TextContent, Quiz, Question, Poll, PollQuestion, Writing, UserQuizResponse, UserQuestionResponse
+from core.models import User, Lesson, TextContent, Quiz, Question, Writing, UserQuizResponse, UserQuestionResponse
 
 User = get_user_model()
 
@@ -635,92 +635,7 @@ class WritingViewTests(TestCase):
         """Test getting writing activities when not authenticated."""
         response = self.client.get(self.writing_url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-
-class PollViewTests(TestCase):
-    """Test cases for PollView."""
-
-    def setUp(self):
-        """Set up test client and other test variables."""
-        self.client = APIClient()
         
-        # Create a test user for authentication
-        self.user = User.objects.create_user(
-            username='testuser',
-            password='TestPassword123!',
-            display_name='Test User'
-        )
-        
-        # Create test data
-        self.lesson = Lesson.objects.create(
-            title='Test Lesson',
-            description='A test lesson description'
-        )
-        
-        self.poll = Poll.objects.create(
-            lesson=self.lesson,
-            title='Test Poll',
-            instructions='Complete this poll.',
-            order=1,
-            config={'display_results': True}
-        )
-        
-        self.poll_question = PollQuestion.objects.create(
-            poll=self.poll,
-            question_text='Poll question?',
-            options={
-                'choices': [
-                    {'id': 1, 'text': 'Option A'},
-                    {'id': 2, 'text': 'Option B'}
-                ]
-            },
-            allow_multiple=False,
-            order=1
-        )
-        
-        self.poll_url = reverse('polls', args=[self.lesson.id])
-
-    def test_get_poll_by_lesson_id(self):
-        """Test getting a poll by lesson ID."""
-        # Authenticate the client
-        self.client.force_authenticate(user=self.user)
-        
-        response = self.client.get(self.poll_url)
-        
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['detail'], messages['successful_id'])
-        self.assertTrue('data' in response.data)
-        self.assertTrue('poll' in response.data['data'])
-        self.assertTrue('pollQuestions' in response.data['data'])
-        
-        # Check poll data
-        self.assertEqual(response.data['data']['poll']['title'], 'Test Poll')
-        self.assertEqual(response.data['data']['poll']['lessonId'], self.lesson.id)
-        
-        # Check poll question data
-        self.assertEqual(len(response.data['data']['pollQuestions']), 1)
-        self.assertEqual(response.data['data']['pollQuestions'][0]['questionText'], 'Poll question?')
-
-    def test_get_poll_nonexistent_lesson(self):
-        """Test getting a poll for a nonexistent lesson."""
-        # Authenticate the client
-        self.client.force_authenticate(user=self.user)
-        
-        nonexistent_url = reverse('polls', args=[999])  # Assuming ID 999 doesn't exist
-        
-        try:
-            response = self.client.get(nonexistent_url)
-            self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-            self.assertEqual(response.data['detail'], "cannot find poll with this lesson id")
-        except:
-            # The test will pass if the view is updated to properly handle this case
-            pass
-            
-    def test_get_poll_unauthenticated(self):
-        """Test getting a poll when not authenticated."""
-        response = self.client.get(self.poll_url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
 
 class QuizResponseAPITests(TestCase):
     def setUp(self):

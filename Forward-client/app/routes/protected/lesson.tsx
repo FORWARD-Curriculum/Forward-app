@@ -12,7 +12,6 @@ import { useSelector, useDispatch } from "react-redux";
 import store, { type AppDispatch, type RootState } from "@/store";
 import { act, useEffect, useCallback, memo } from "react";
 import TextContent from "@/features/curriculum/components/textcontent";
-import Poll from "@/features/curriculum/components/poll";
 import Quiz from "@/features/curriculum/components/quiz";
 import Twine from "@/features/curriculum/components/twine";
 import Writing from "@/features/curriculum/components/writing";
@@ -105,8 +104,6 @@ export function Activity({ activity }: { activity: BaseActivity }) {
       );
     case "Quiz":
       return <Quiz key={key} quiz={activity as ActivityManager["Quiz"][0]} />;
-    case "Poll":
-      return <Poll key={key} poll={activity as ActivityManager["Poll"][0]} />;
     case "TextContent":
       return (
         <TextContent

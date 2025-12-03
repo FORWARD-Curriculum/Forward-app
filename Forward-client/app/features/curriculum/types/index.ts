@@ -42,10 +42,7 @@ export type ActivityManager = {
   TextContent: [TextContent, TextContentResponse, false];
   Writing: [Writing, WritingResponse, false];
   Quiz: [Quiz, QuizResponse, false];
-  Poll: [Poll, PollResponse, false];
   ConceptMap: [ConceptMap, ConceptMapResponse, false];
-  // Question: [Question, QuestionResponse, true];
-  PollQuestion: [PollQuestion, PollQuestionResponse, true];
   Embed: [Embed, EmbedResponse, false];
   DndMatch: [DndMatch, DndMatchResponse, false];
   LikertScale: [LikertScale, LikertScaleResponse, false];
@@ -68,7 +65,6 @@ export const ActivityTypeDisplayNames: Record<
   Writing: "Writing",
   Quiz: "Quiz",
   TextContent: "Info",
-  Poll: "Poll",
   Default: "Activity",
   ConceptMap: "Concept Map",
   Identification: "Identification",
@@ -154,26 +150,6 @@ export interface Question {
     incorrect: string;
   };
   video?: string;
-}
-
-export interface Poll extends BaseActivity {
-  config: {
-    show_results: boolean;
-    allow_anonymous: boolean;
-  };
-  questions: PollQuestion[];
-}
-
-export interface PollQuestion {
-  id: string;
-  poll_id: number;
-  question_text: string;
-  options: {
-    id: number;
-    text: string;
-  }[];
-  allow_multiple: boolean;
-  order: number;
 }
 
 export interface DndMatch extends BaseActivity {
@@ -274,7 +250,7 @@ export interface LessonResponse {
  * responding. A `null` value means that no response was recieved from
  * the server and it's expected the server will take note and generate
  * a new entry into the associated table.
- * @field associatedId - ex: quizId, pollId...
+ * @field associatedId - ex: quizId...
  */
 export interface BaseResponse {
   id: null | string;
@@ -309,9 +285,6 @@ export interface QuestionResponse extends BaseResponse {
 /**
  * @field choices: an array of options by id
  */
-export interface PollQuestionResponse extends BaseResponse {
-  response_data: number[];
-}
 
 export interface WritingResponse extends BaseResponse {
   responses: {"prompt": string, "response": string}[];
@@ -327,7 +300,6 @@ export interface IdentificationResponse extends BaseResponse {
   identified: number;
 
 }
-export interface PollResponse extends BaseResponse {}
 export interface EmbedResponse extends BaseResponse {
   inputted_code: string;
 }
