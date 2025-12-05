@@ -14,6 +14,7 @@ echo "Setting up Django development environment..."
 # Run migrations
 python manage.py makemigrations
 
+
 # Run migrations
 python manage.py migrate
 
