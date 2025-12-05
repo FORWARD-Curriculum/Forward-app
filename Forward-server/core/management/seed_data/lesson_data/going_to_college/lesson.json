@@ -33,20 +33,17 @@
               {
                 "id": 1,
                 "text": "Yes!",
-                "is_correct": true,
-                "feedback": "Great! This lesson will help you prepare for your college journey."
+                "is_correct": true
               },
               {
                 "id": 2,
                 "text": "I'm still deciding...",
-                "is_correct": true,
-                "feedback": "That's okay! Let's explore together and see if college might be right for you."
+                "is_correct": true
               },
               {
                 "id": 3,
                 "text": "No, it's not for me.",
-                "is_correct": true,
-                "feedback": "That's a valid choice! You can skip this lesson if you'd like, or learn about options just in case."
+                "is_correct": true
               }
             ]
           },

@@ -28,6 +28,12 @@ export default function Question({
     (option) => option.is_correct,
   );
   const selectedAnswers = answer?.response_data?.selected || [];
+
+  const selectedOptionsFeedback = question.choices.options
+    ?.filter(opt => selectedAnswers.includes(opt.id))
+    .map(opt => opt.feedback)
+    .filter(Boolean)
+    .join(' ') || '';
   // question state
   // const isDisabled = disabled || (answer?.attempts_left ?? 3) <= 0;
   const isDisabled = (answer?.attempts_left ?? 3) <= 0;
@@ -138,28 +144,6 @@ export default function Question({
         </div>
 
         {/* Feedback area */}
-        {/* {(isDisabled || (isAnswered && isChecked)) && (
-          <div
-            className={`rounded-md p-3 text-sm ${
-              isCorrect
-                ? "bg-green-300/10 border-green-600 border"
-                : "bg-error/10 border-error border"
-            }`}
-          >
-            {isCorrect ? (
-              <>
-                <span className="text-green-600 font-semibold">Correct!</span>{" "}
-                {question.feedback_config.correct}
-              </>
-            ) : (
-              <>
-                <span className="text-error font-semibold">Not quite!</span>{" "}
-                {question.feedback_config.incorrect}
-              </>
-            )}
-          </div>
-        )} */}
-
         {(isDisabled || (isAnswered && isChecked)) && (
           <div
             className={`rounded-md p-3 text-sm ${
@@ -168,22 +152,20 @@ export default function Question({
                 : "bg-error/10 border-error border"
             }`}
           >
-           
             {question.has_correct_answer ? (
               isCorrect ? (
                 <>
                   <span className="text-green-600 font-semibold">Correct!</span>{" "}
-                  {answer?.feedback || question.feedback_config.correct}
+                  {selectedOptionsFeedback || question.feedback_config.correct}
                 </>
               ) : (
                 <>
                   <span className="text-error font-semibold">Not quite!</span>{" "}
-                  {answer?.feedback || question.feedback_config.incorrect}
+                  {question.feedback_config.incorrect}
                 </>
               )
             ) : (
-            
-              <>{answer?.feedback || question.feedback_config.correct}</>
+              <>{selectedOptionsFeedback || question.feedback_config.correct}</>
             )}
           </div>
         )}
