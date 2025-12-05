@@ -70,7 +70,7 @@ export default function Question({
             sizes="200px"
             alt="Question illustration"
             className="w-full max-w-md mx-auto rounded-md border border-muted object-cover"
-            style={{ maxHeight: '200px' }}  // <- ADD THIS
+            style={{ maxHeight: '200px' }}
             skeletonClassName="min-h-[200px]"
             />
           </div>
@@ -138,7 +138,7 @@ export default function Question({
         </div>
 
         {/* Feedback area */}
-        {(isDisabled || (isAnswered && isChecked)) && (
+        {/* {(isDisabled || (isAnswered && isChecked)) && (
           <div
             className={`rounded-md p-3 text-sm ${
               isCorrect
@@ -156,6 +156,34 @@ export default function Question({
                 <span className="text-error font-semibold">Not quite!</span>{" "}
                 {question.feedback_config.incorrect}
               </>
+            )}
+          </div>
+        )} */}
+
+        {(isDisabled || (isAnswered && isChecked)) && (
+          <div
+            className={`rounded-md p-3 text-sm ${
+              isCorrect
+                ? "bg-green-300/10 border-green-600 border"
+                : "bg-error/10 border-error border"
+            }`}
+          >
+           
+            {question.has_correct_answer ? (
+              isCorrect ? (
+                <>
+                  <span className="text-green-600 font-semibold">Correct!</span>{" "}
+                  {answer?.feedback || question.feedback_config.correct}
+                </>
+              ) : (
+                <>
+                  <span className="text-error font-semibold">Not quite!</span>{" "}
+                  {answer?.feedback || question.feedback_config.incorrect}
+                </>
+              )
+            ) : (
+            
+              <>{answer?.feedback || question.feedback_config.correct}</>
             )}
           </div>
         )}
