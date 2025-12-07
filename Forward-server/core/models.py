@@ -388,6 +388,21 @@ class TextContent(BaseActivity):
             "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
         }
 
+# Don't think we need a response class for this one
+class PDF(BaseActivity):
+
+    pdf_file = models.TextField(
+        null=True, blank=True, help_text="Pdf content to acompany lesson" 
+    )
+    
+    def to_dict(self):
+        return{
+            **super().to_dict(),
+            "pdf_file": self.pdf_file
+        }
+        
+
+
 
 class Video(BaseActivity):
     """
