@@ -1824,6 +1824,24 @@ class TextContentResponse(BaseResponse):
         return {
             **super().to_dict(),
         }
+    
+class PDFResponse(BaseResponse):
+    
+    associated_activity = models.ForeignKey(
+        PDF,
+        on_delete=models.CASCADE,
+        related_name='associated_pdf',
+        help_text='The pdf associated with this response'
+    )
+
+    class Meta:
+        verbose_name = "PDF Response"
+        verbose_name_plural = "PDF Responses"
+    
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
 
 
 class TwineResponse(BaseResponse):
@@ -1993,6 +2011,7 @@ class ActivityManager():
             return
         self._initialized = True
         self.registerActivity(TextContent, TextContentResponse)
+        self.registerActivity(PDF, PDFResponse)
         self.registerActivity(Identification, IdentificationResponse)
         self.registerActivity(Writing, WritingResponse, {
                               "responses": ["responses", []]})
@@ -2007,7 +2026,7 @@ class ActivityManager():
         self.registerActivity(DndMatch, DndMatchResponse, {
                               "submission": ["submission", []]})
         self.registerActivity(FillInTheBlank, FillInTheBlankResponse, {
-                              "submission": ["submission", []]}) # a little unsure about this part
+                              "submission": ["submission", []]}) 
         self.registerActivity(LikertScale, LikertScaleResponse, {
                               "content": ["content", {}]})
         self.registerActivity(Video, VideoResponse, {

@@ -191,6 +191,7 @@ class Command(BaseCommand):
             video_name = defaults.pop("video", None) if act_type in {"video", "quiz"} else None
             twine_name = defaults.pop("file", None) if act_type == "twine" else None
             cust_name = defaults.pop("document", None) if act_type == "customactivity" else None
+            pdf_name = defaults.pop("pdf_file", None) if act_type == "pdf" else None
 
             # Special case: TextContent image referenced in content like ![alt](path)
             if act_type == "textcontent" and not image_name:
@@ -288,6 +289,13 @@ class Command(BaseCommand):
                         field_name="document",
                         rel_path=self.folder_path / cust_name,
                         label=f"{ActivityModel.__name__} asset",
+                    )
+                elif act_type == "pdf" and pdf_name:
+                    self._save_model_file(
+                        instance=activity,
+                        field_name="pdf",
+                        rel_path=self.folder_path / pdf_name,
+                        label=f"{ActivityModel.__name__} asset"
                     )
                     
 
