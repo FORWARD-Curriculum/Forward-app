@@ -40,6 +40,7 @@ export interface Lesson {
 export type ActivityManager = {
   Identification: [Identification, IdentificationResponse, false];
   TextContent: [TextContent, TextContentResponse, false];
+  PDF: [PDF, PDFResponse, false]
   Writing: [Writing, WritingResponse, false];
   Quiz: [Quiz, QuizResponse, false];
   ConceptMap: [ConceptMap, ConceptMapResponse, false];
@@ -65,6 +66,7 @@ export const ActivityTypeDisplayNames: Record<
   Writing: "Writing",
   Quiz: "Quiz",
   TextContent: "Info",
+  PDF: "PDF",
   Default: "Activity",
   ConceptMap: "Concept Map",
   Identification: "Identification",
@@ -98,6 +100,10 @@ export interface BaseActivity {
 export interface TextContent extends BaseActivity {
   content?: string;
   image?: Image; // Optional image URL to accompany the text content
+}
+
+export interface PDF extends BaseActivity{
+  pdf_file: string;
 }
 
 export interface Video extends BaseActivity {
@@ -291,6 +297,7 @@ export interface WritingResponse extends BaseResponse {
 }
 
 export interface TextContentResponse extends BaseResponse {}
+export interface PDFResponse extends BaseResponse {}
 export interface SlideshowResponse extends BaseResponse {
   highest_slide: number;
 }

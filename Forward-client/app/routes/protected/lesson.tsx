@@ -21,6 +21,7 @@ import ConceptMap from "@/features/curriculum/components/conceptmap";
 import DndMatch from "@/features/curriculum/components/dndmatch";
 import FillInTheBlank from "@/features/curriculum/components/fillintheblank";
 import Slideshow from "@/features/curriculum/components/slideshow";
+import PDF from "@/features/curriculum/components/pdf";
 import { useIsMobile } from "@/hooks/useClient";
 import {
   Accordion,
@@ -109,6 +110,13 @@ export function Activity({ activity }: { activity: BaseActivity }) {
         <TextContent
           key={key}
           textContent={activity as ActivityManager["TextContent"][0]}
+        />
+      );
+    case "PDF":
+      return (
+        <PDF 
+          key={key} 
+          pdf={activity as ActivityManager["PDF"][0]}
         />
       );
     case "Identification":

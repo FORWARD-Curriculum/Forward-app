@@ -528,24 +528,10 @@
       "content": "For the next few activities, you will read a scholarship essay and answer related questions. There are two essays available: one immediately after this activity and another later on. You only need to read one of them to complete the writing-prompt questions."
     },
     {
-      "type": "slideshow",
+      "type": "pdf",
       "title": "Scholarship Winners Review 'Substance Abuse and Its Impact'",
       "instructions": "There are two scholarship essays in this slideshow, read through one of the scholarship essay winners below. . Afterward go to the next activity and answer some questions related to the story",
-      "force_wait": 0,
-      "slides": [
-        {
-          "content": "",
-          "image": "Substance Abuse and Its Impact -1.png"
-        },
-        {
-          "content": "",
-          "image": "Substance Abuse and Its Impact -2.png"
-        },
-        {
-          "content": "",
-          "image": "Substance Abuse and Its Impact -3.png"
-        }
-      ]
+      "pdf_file": "Substance Abuse and Its Impact.pdf"
     },
     {
       "type": "slideshow",
