@@ -3,6 +3,13 @@ import type { PDF, PDFResponse,} from "@/features/curriculum/types";
 import { useResponse } from '../hooks';
 import { useState, useEffect, lazy, Suspense } from 'react';
 
+
+/**
+ * So this package for viewing pdfs depends on Broswer API
+ * But before its rendered client side, components are processed on NEXT.js server,
+ * At that moment this breaks because it expects broswer api connection
+ * So the lazy load make it so the actual pdfviewer is only unpacked once we arrive on the client side browser
+ */
 const LazyPDFViewer = lazy(() => 
   import('./pdfViewerClient').catch(() => ({
     default: () => <div>Failed to load PDF viewer</div>
@@ -25,7 +32,7 @@ export default function PDF({pdf}: PDFProps){
     const [isClient, setIsClient] = useState(false);
    
 
-    // need to change this to something that actually runs once and once only
+    // Only render PDF viewer on client-side to avoid SSR issues
     useEffect(() => {
         setIsClient(true);
     }, []);
