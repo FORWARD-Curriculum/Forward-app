@@ -40,15 +40,20 @@ export default function PDF({pdf}: PDFProps){
 
     if (!isClient){
         return (
-            <div>
-                <p>This is Loading</p>
+            <div className="flex items-center justify-center h-64 bg-muted rounded-lg">
+                <p className="text-muted-foreground">Loading PDF viewer...</p>
             </div>
         )
     }
     
     return(
-        <Suspense fallback={<div>Loading PDF...</div>}>
-            <LazyPDFViewer pdfUrl={pdf.pdf_file} />
-        </Suspense>
+        <div className="w-full">
+            <Suspense fallback={
+                <div className="flex items-center justify-center h-64 bg-muted rounded-lg">
+                    <p className='text-muted-foreground'>Loading PDF...</p>
+                </div>}>
+                <LazyPDFViewer pdfUrl={pdf.pdf_file} />
+            </Suspense>
+        </div>
     );
 }

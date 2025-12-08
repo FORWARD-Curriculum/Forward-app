@@ -534,28 +534,10 @@
       "pdf_file": "Substance Abuse and Its Impact_.pdf"
     },
     {
-      "type": "slideshow",
+      "type": "pdf",
       "title": "Scholarship Winners Review 'The Price of Fentanyl'",
-      "instructions": "There are two scholarship essays in this slideshow, read through one of the scholarship essay winners below. . Afterward go to the next activity and answer some questions related to the story",
-      "force_wait": 0,
-      "slides": [
-        {
-          "content": "",
-          "image": "The Price of Fentanyl-1.png"
-        },
-        {
-          "content": "",
-          "image": "The Price of Fentanyl-2.png"
-        },
-        {
-          "content": "",
-          "image": "The Price of Fentanyl-3.png"
-        },
-        {
-          "content": "",
-          "image": "The Price of Fentanyl-4.png"
-        }
-      ]
+      "instructions": "",
+      "pdf_file": "The Price of Fentanyl.pdf"
     },
     {
       "type": "writing",
