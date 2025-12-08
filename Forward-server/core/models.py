@@ -20,6 +20,7 @@ from django.utils.safestring import mark_safe
 from django.core.files.storage import default_storage
 from imagefield.fields import ImageField
 from .utils import FwdImage
+from django.core.validators import FileExtensionValidator
 
 GENERIC_FORWARD_IMAGE = FwdImage()
 
@@ -388,17 +389,17 @@ class TextContent(BaseActivity):
             "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
         }
 
-# Don't think we need a response class for this one
 class PDF(BaseActivity):
 
-    pdf_file = models.TextField(
-        null=True, blank=True, help_text="Pdf content to acompany lesson" 
-    )
+
+    pdf_file = models.FileField(upload_to='public/pdf/', blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=['pdf'])],
+                       help_text="Pdf content to acompany lesson")
+    
     
     def to_dict(self):
         return{
             **super().to_dict(),
-            "pdf_file": self.pdf_file
+            "pdf_file": self.pdf_file.url if self.pdf_file else None
         }
         
 

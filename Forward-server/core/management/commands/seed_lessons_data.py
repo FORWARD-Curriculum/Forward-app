@@ -11,6 +11,7 @@ from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand
 from django.db import IntegrityError, transaction
 
+
 from core.models import (
     ActivityManager,
     BaseActivity,
@@ -293,7 +294,7 @@ class Command(BaseCommand):
                 elif act_type == "pdf" and pdf_name:
                     self._save_model_file(
                         instance=activity,
-                        field_name="pdf",
+                        field_name="pdf_file",
                         rel_path=self.folder_path / pdf_name,
                         label=f"{ActivityModel.__name__} asset"
                     )

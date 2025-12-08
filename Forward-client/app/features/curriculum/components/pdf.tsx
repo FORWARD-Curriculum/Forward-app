@@ -1,8 +1,13 @@
 import React from 'react';
 import type { PDF, PDFResponse,} from "@/features/curriculum/types";
 import { useResponse } from '../hooks';
-import { useState, useEffect } from 'react';
-import { Document, Page } from 'react-pdf';
+import { useState, useEffect, lazy, Suspense } from 'react';
+
+const LazyPDFViewer = lazy(() => 
+  import('./pdfViewerClient').catch(() => ({
+    default: () => <div>Failed to load PDF viewer</div>
+  }))
+);
 
 
 interface PDFProps {
@@ -18,23 +23,25 @@ export default function PDF({pdf}: PDFProps){
     });
 
     const [isClient, setIsClient] = useState(false);
-    const [numPages, setNumPages] = useState<number>();
-    const [pageNumber, setPageNumber] = useState<number>(1);
+   
 
+    // need to change this to something that actually runs once and once only
     useEffect(() => {
         setIsClient(true);
     }, []);
 
-    function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
-        setNumPages(numPages);
+
+    if (!isClient){
+        return (
+            <div>
+                <p>This is Loading</p>
+            </div>
+        )
     }
     
-
     return(
-        <Document file={pdf.pdf_file} onLoadSuccess={onDocumentLoadSuccess}>
-            {Array.from(new Array(numPages), (stuff, index) =>(
-                <Page pageNumber={index + 1}/>
-            ))}
-        </Document>
+        <Suspense fallback={<div>Loading PDF...</div>}>
+            <LazyPDFViewer pdfUrl={pdf.pdf_file} />
+        </Suspense>
     );
 }
