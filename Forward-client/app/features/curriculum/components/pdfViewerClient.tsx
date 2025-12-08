@@ -18,11 +18,13 @@ export default function PDFViewerClient({ pdfUrl }: PDFViewerClientProps) {
   }
 
   return (
-    <Document file={{url: pdfUrl}} onLoadSuccess={onDocumentLoadSuccess}>
-        {numPages && Array.from(new Array(numPages), (el, index) => (
-            <Page key={`page_${index + 1}`} pageNumber={index + 1} />
-        ))}
-    </Document>
+    <div className="h-[600px] overflow-auto border">
+      <Document file={{url: pdfUrl}} onLoadSuccess={onDocumentLoadSuccess}>
+          {numPages && Array.from(new Array(numPages), (el, index) => (
+              <Page key={`page_${index + 1}`} pageNumber={index + 1} />
+          ))}
+      </Document>
+    </div>
   )
 
 }
