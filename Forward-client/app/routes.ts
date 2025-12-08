@@ -12,12 +12,12 @@ export default [
     route("register", "routes/register.tsx"),
     route("youth", "routes/youth.tsx"),
     route("supportersOfYouth", "routes/supportersOfYouth.tsx"),
-    route("survey","routes/survey.tsx"),
     route("lesson/:lessonId", "routes/protected/lesson.tsx"),
     route("dashboard", "routes/protected/dashboard.tsx"),
     layout("routes/protected/protected.tsx", [
       // route("dashboard", "routes/protected/dashboard.tsx"),
       route("account", "routes/protected/account.tsx"),
+      route("survey","routes/protected/survey.tsx"),
       // route("lesson/:lessonId", "routes/protected/lesson.tsx"),
     ]),
   ]),
