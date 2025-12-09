@@ -103,7 +103,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
         user &&
         user.consent &&
         user.surveyed_at === null &&
-        (!location.pathname.startsWith("/account") || !location.pathname.startsWith("/survey"))
+        (!location.pathname.startsWith("/account") && !location.pathname.startsWith("/survey"))
       ) {
         console.log("Redirecting to survey");
         navigate("/survey", { replace: true, state: { from: location } });

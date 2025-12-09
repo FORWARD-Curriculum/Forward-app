@@ -706,7 +706,9 @@ class Question(models.Model):
                         "properties": {
                             "id": {"type": "number"},
                             "text": {"type": "string", 'widget': 'textarea'},
-                            "is_correct": {"type": "boolean", "default": False}
+                            "is_correct": {"type": "boolean", "default": False},
+                            "feedback": {"type": "string", 'widget': 'textarea'}
+                            
                         },
                         "required": ["id", "text"]
                     },
@@ -1568,17 +1570,20 @@ class UserQuestionResponse(models.Model):
         return f"Response to question {self.question.order} in {self.quiz_response}"
 
     def evaluate_correctness(self):
+
+        feedback_config = self.question.feedback_config or {}
+        options = self.question.choices.get('options', [])
+
         """Determine if the response is correct based on question type and correct answer"""
         if not self.question.has_correct_answer:
 
             self.is_correct = True
-            feedback_config = self.question.feedback_config or {}
-            self.feedback = self.question.feedback_config.get('correct', '')
-            return True
 
-        options = self.question.choices.get('options', [])
-        # Get correct answers from the question
-        correct_answers = self.question.choices.get('is_correct', [])
+            if feedback_config.get('correct'):
+                self.feedback = feedback_config.get('correct', )
+            else:
+                self.feedback = self._get_choice_feedback(options)
+            return True
 
         #lets try and extract the ID's of options where is_correct is TRUE
         correct_answer_ids = []
@@ -1587,9 +1592,6 @@ class UserQuestionResponse(models.Model):
                 correct_answer_ids.append(opt['id'])
 
         selected = self.response_data.get('selected', None)
-
-        # Set default feedback
-        feedback_config = self.question.feedback_config or {}
         default_feedback = feedback_config.get('default', '')
 
         # If nothing's selected, it's incorrect
@@ -1597,12 +1599,10 @@ class UserQuestionResponse(models.Model):
             self.is_correct = False
             self.feedback = feedback_config.get(
                 'no_response', default_feedback)
-            # self.save()
             return False
 
         # Handle different question types
         if self.question.question_type == 'multiple_choice':
-            # self.is_correct = selected in correct_answers
             self.is_correct = selected[0] in correct_answer_ids
         elif self.question.question_type == 'multiple_select':
             if not isinstance(selected, list):
@@ -1617,12 +1617,13 @@ class UserQuestionResponse(models.Model):
             self.is_correct = None
 
         # Set appropriate feedback based on correctness
-        if self.is_correct:
-            self.feedback = feedback_config.get('correct', default_feedback)
+        if self.is_correct and feedback_config.get('correct'):
+            self.feedback = feedback_config.get('correct')
+        elif not self.is_correct and feedback_config.get('incorrect'):
+            self.feedback = feedback_config.get('incorrect')
         else:
-            self.feedback = feedback_config.get('incorrect', default_feedback)
+            self.feedback = self._get_choice_feedback(options) or default_feedback
 
-        # self.save()
         return self.is_correct
 
     def to_dict(self):
@@ -1635,10 +1636,42 @@ class UserQuestionResponse(models.Model):
             "partial_response": self.partial_response,
             "time_spent": self.time_spent,
             "attempts_left": self.attempts_left,
-            # test
             "is_correct": self.is_correct,
             "feedback": self.feedback,
         }
+
+    def _get_choice_feedback(self, options):
+        """
+        Helper method to get feedback from the selected choice.
+        
+        Args:
+            options: List of choice options from question.choices['options']
+            
+        Returns:
+            str or None: The feedback text from the selected option, or None if not found
+        """
+
+        selected = self.response_data.get('selected', None)
+
+        if selected is None:
+            return None
+        
+        # Single selection
+        if self.question.question_type == 'multiple_choice':
+            selected_id = selected[0] if isinstance(selected, list) else selected
+            for opt in options:
+                if opt.get('id') == selected_id:
+                    return opt.get('feedback', None)
+                
+        #TODO ask annee but maybe handle multiple select? How would that work
+
+        #True/False --> Do we even do true or false
+        elif self.question.question_type == 'true_false':
+            selected_id = selected[0] if isinstance(selected,list) else selected
+            for opt in options:
+                if opt.get('id') == selected_id:
+                    return opt.get('feedback', None)
+
 
 class VideoResponse(BaseResponse):
     """

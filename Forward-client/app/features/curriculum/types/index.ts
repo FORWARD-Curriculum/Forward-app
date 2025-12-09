@@ -146,14 +146,15 @@ export interface Question {
       id: number;
       text: string;
       is_correct: boolean;
+      feedback?: string;
     }[];
     image?: Image;
   };
   is_required: boolean;
   attempts?: number;
   feedback_config: {
-    correct: string;
-    incorrect: string;
+    correct?: string; // test made these two optional as they might not be present 
+    incorrect?: string;
   };
   video?: string;
 }
