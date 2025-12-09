@@ -12,7 +12,11 @@ import { useState, useEffect, lazy, Suspense } from 'react';
  */
 const LazyPDFViewer = lazy(() => 
   import('./pdfViewerClient').catch(() => ({
-    default: () => <div>Failed to load PDF viewer</div>
+    default: () => (
+      <div className="flex items-center justify-center h-64 bg-muted rounded-lg">
+        <p className="text-primary-foreground">Failed to load PDF viewer</p>
+      </div>
+    )
   }))
 );
 
