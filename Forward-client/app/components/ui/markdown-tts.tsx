@@ -105,12 +105,14 @@ export default function MarkdownTTS({
   children,
   className,
   customComponents,
+  hideContent = false
 }: {
   controlsClassName?: ClassNameValue;
   className?: ClassNameValue;
   children: React.ReactNode;
   controlsOrientation?: "vertical" | "horizontal";
   customComponents?: Partial<Components>;
+  hideContent?: Boolean;
 }) {
   const { voices } = useVoices();
   const renderedMarkdown = useRemark({
@@ -144,10 +146,12 @@ export default function MarkdownTTS({
           orientation={controlsOrientation}
           customComponents={customComponents ? true : false}
         />
+        {!hideContent &&(
         <TtsMDRenderer
           Text={speech.Text()}
           speechStatus={speech.speechStatus}
         />
+        )}
       </div>
     </div>
   );
