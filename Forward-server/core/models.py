@@ -20,7 +20,6 @@ from django.utils.safestring import mark_safe
 from django.core.files.storage import default_storage
 from imagefield.fields import ImageField
 from .utils import FwdImage
-from django.core.validators import FileExtensionValidator
 
 GENERIC_FORWARD_IMAGE = FwdImage()
 
@@ -395,6 +394,11 @@ class PDF(BaseActivity):
     pdf_file = models.FileField(upload_to='public/pdf/', blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=['pdf'])],
                        help_text="Pdf content to acompany lesson")
     
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "PDF"
+        verbose_name_plural = "PDFs"
+
     
     def to_dict(self):
         return{
