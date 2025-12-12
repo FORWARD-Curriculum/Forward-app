@@ -446,20 +446,20 @@ export default function account() {
                       type="range"
                       step={1}
                       min={0}
-                      max={3}
+                      max={6}
                       value={
                         user.preferences?.text_size
-                          ? ["txt-sm", "txt-base", "txt-lg", "txt-xl"].indexOf(
+                          ? ["txt-sm", "txt-md", "txt-base", "txt-lg", "txt-xl", "txt-2xl", "txt-3xl"].indexOf(
                               user.preferences.text_size,
                             )
-                          : 1
+                          : 6
                       }
                       onChange={(e) => {
                         setFormState({
                           ...formState,
-                          textSize: ["txt-sm", "txt-base", "txt-lg", "txt-xl"][
+                          textSize: ["txt-sm", "txt-md", "txt-base", "txt-lg", "txt-xl", "txt-2xl", "txt-3xl"][
                             parseInt(e.target.value, 10)
-                          ] as "txt-sm" | "txt-base" | "txt-lg" | "txt-xl",
+                          ] as "txt-sm" | "txt-md" | "txt-base" | "txt-lg" | "txt-xl" | "txt-2xl" | "txt-3xl",
                         });
                       }}
                     />
