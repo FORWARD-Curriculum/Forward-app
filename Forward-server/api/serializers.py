@@ -158,7 +158,7 @@ class UserUpdateSerializer(serializers.Serializer):
                 )
 
         if text_size:
-            if not text_size in ['txt-sm', 'txt-base', 'txt-lg', 'txt-xl']:
+            if not text_size in ['txt-sm', 'txt-md', 'txt-base', 'txt-lg', 'txt-xl', 'txt-2xl', 'txt-3xl']:
                 raise serializers.ValidationError(
                     'Text size is not a valid option.',
                     code='validation'
