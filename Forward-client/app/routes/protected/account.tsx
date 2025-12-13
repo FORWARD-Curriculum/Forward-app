@@ -161,6 +161,17 @@ export default function account() {
     user.preferences?.text_size || "txt-base"
   );
 
+  //used for the preview
+  const textSizeMap = {
+    'txt-sm': '0.875rem',
+    'txt-md': '1rem', 
+    'txt-base': '1.125rem',
+    'txt-lg': '1.25rem',
+    'txt-xl': '1.5rem',
+    'txt-2xl': '1.875rem',
+    'txt-3xl': '2.25rem',
+};
+
   const handleSubmit = async (e: any) => {
     e.preventDefault(); // Prevent the default form submission behavior
     const formData = new FormData(e.target as HTMLFormElement);
@@ -525,7 +536,7 @@ export default function account() {
               </div>
             </dt>
             <div className="mt-4 p-4 border border-secondary-foreground rounded-xl bg-background">
-              <p className={`${textSizePreview}`}>
+              <p style={{ fontSize: textSizeMap[textSizePreview] }}>
                 Preview: The quick brown fox jumps over the lazy dog
               </p>
             </div>
