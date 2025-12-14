@@ -475,7 +475,7 @@ export default function account() {
                         setTextSizePreview(newSize);
                       }}
                     />
-                    <div className="text-secondary-foreground pointer-events-none absolute -top-[calc(0.5rem-2px)] z-10 flex w-[104%] justify-between text-[1rem] font-bold">
+                    <div className="text-secondary-foreground pointer-events-none absolute -top-[calc(0.5rem-2px)] z-10 flex w-[100%] justify-between px-[0.75rem] text-[1rem] font-bold">
                       <p>|</p>
                       <p>|</p>
                       <p>|</p>
@@ -495,12 +495,10 @@ export default function account() {
                     border-radius: 50%;
                     border: 2px solid var(--secondary-foreground);
                     cursor: pointer;
-                    transform: scaleX(0.8);
+                    
                   }
 
-                  .fontSizeInput input[type="range" i]::-webkit-slider-runnable-track {
-                    transform: scaleX(1.2);
-                  }
+    
                          
                   .fontSizeInput input[type="range"]::-moz-range-thumb {
                     width: 1.5rem;
@@ -509,7 +507,6 @@ export default function account() {
                     border-radius: 50%;
                     border-color: black;
                     cursor: pointer;
-                    transform: scaleX(0.8);
                   }
                   
                   input[type="range"]::-webkit-slider-thumb {
@@ -537,7 +534,7 @@ export default function account() {
             </dt>
             <div className="mt-4 p-4 border border-secondary-foreground rounded-xl bg-background">
               <p style={{ fontSize: textSizeMap[textSizePreview] }}>
-                Preview: The quick brown fox jumps over the lazy dog
+                This is how large your text will be!
               </p>
             </div>
             <dt className="w-full">
