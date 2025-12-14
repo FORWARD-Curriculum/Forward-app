@@ -388,6 +388,26 @@ class TextContent(BaseActivity):
             "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
         }
 
+class PDF(BaseActivity):
+
+
+    pdf_file = models.FileField(upload_to='public/pdf/', blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=['pdf'])],
+                       help_text="Pdf content to acompany lesson")
+    
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "PDF"
+        verbose_name_plural = "PDFs"
+
+    
+    def to_dict(self):
+        return{
+            **super().to_dict(),
+            "pdf_file": self.pdf_file.url if self.pdf_file else None
+        }
+        
+
+
 
 class Video(BaseActivity):
     """
@@ -1842,6 +1862,24 @@ class TextContentResponse(BaseResponse):
         return {
             **super().to_dict(),
         }
+    
+class PDFResponse(BaseResponse):
+    
+    associated_activity = models.ForeignKey(
+        PDF,
+        on_delete=models.CASCADE,
+        related_name='associated_pdf',
+        help_text='The pdf associated with this response'
+    )
+
+    class Meta:
+        verbose_name = "PDF Response"
+        verbose_name_plural = "PDF Responses"
+    
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
 
 
 class TwineResponse(BaseResponse):
@@ -2011,6 +2049,7 @@ class ActivityManager():
             return
         self._initialized = True
         self.registerActivity(TextContent, TextContentResponse)
+        self.registerActivity(PDF, PDFResponse)
         self.registerActivity(Identification, IdentificationResponse)
         self.registerActivity(Writing, WritingResponse, {
                               "responses": ["responses", []]})
@@ -2025,7 +2064,7 @@ class ActivityManager():
         self.registerActivity(DndMatch, DndMatchResponse, {
                               "submission": ["submission", []]})
         self.registerActivity(FillInTheBlank, FillInTheBlankResponse, {
-                              "submission": ["submission", []]}) # a little unsure about this part
+                              "submission": ["submission", []]}) 
         self.registerActivity(LikertScale, LikertScaleResponse, {
                               "content": ["content", {}]})
         self.registerActivity(Video, VideoResponse, {
