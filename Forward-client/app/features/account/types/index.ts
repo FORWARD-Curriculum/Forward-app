@@ -13,7 +13,7 @@ export interface User {
     surveyed_at: string | null;
     preferences: {
       theme: "light" | "dark" | "high-contrast";
-      text_size: "txt-sm" | "txt-base" | "txt-lg" | "txt-xl";
+      text_size: "txt-sm" | "txt-md" | "txt-base" | "txt-lg" | "txt-xl" | "txt-2xl" | "txt-3xl";
       speech_uri_index?: number;
       speech_speed?: number;
     };
