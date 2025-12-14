@@ -1,45 +1,42 @@
 import { Link } from "react-router";
 import MarkdownTTS from "@/components/ui/markdown-tts";
-
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
 export default function supportersOfYouth(){
+    const user = useSelector((state: RootState) => state.user.user);
     return (
-        <div className="max-w-6xl mx-auto px-6 py-5 text-secondary-foreground">
+        <div className={`max-w-6xl mx-auto px-6 py-5 text-secondary-foreground ${user?.preferences?.text_size || ""}`}>
             <h4 className="text-accent text-right">For supporters of youth</h4>
             
             <MarkdownTTS controlsClassName="flex flex-row-reverse items-start justify-between gap-4">
                 <h1 className="text-4xl font-black text-accent mb-6">About Forward</h1>
                 {/* This adds a pause between reading the options. The opacity makes it invisible */}
                 <span className="text-[0px] opacity-0">.</span>
-                <h4 className="mb-6">Facilitating Opportunities for Reentry, Workforce, and Academic Readiness for Youth with Disabilities in Juvenile Justice</h4>
+                <h4 className="mb-6 text-base">Facilitating Opportunities for Reentry, Workforce, and Academic Readiness for Youth with Disabilities in Juvenile Justice</h4>
                 <span className="text-[0px] opacity-0">.</span>
                 
-                <p className="mb-8">FORWARD is a web-based transition curriculum designed to support youth with disabilities in juvenile justice and other alternative education settings as they prepare for life beyond high school. 
+                <p className="mb-8 text-base">FORWARD is a web-based transition curriculum designed to support youth with disabilities in juvenile justice and other alternative education settings as they prepare for life beyond high school. 
                     Whether you're a parent, caregiver, educator, mental health provider, probation officer, mentor, or other another type of youth supporter, your role in supporting young people during key transitions 
                     is essential — and FORWARD was developed with that in mind.
                 </p>
-
                 <img 
                     src="/about_page/student_staring_off.jpg" 
                     alt="Student looking thoughtfully into the distance" 
                     className="w-full max-w-2xl mx-auto rounded-lg my-6"
                 />
             </MarkdownTTS>
-
             {/* paragraph two */}
             <div className="border-t border-muted pt-8">
                 <MarkdownTTS controlsClassName="flex flex-row-reverse items-start justify-between gap-4">
                     <h3 className="text-2xl font-black mb-6">Why FORWARD?</h3>
                     <span className="text-[0px] opacity-0">.</span>
-
-                    <p className="mb-6">  FORWARD builds on several existing, research-informed transition curricula (e.g., INSITE, RISE, RAISE, Merging Two Worlds) 
+                    <p className="mb-6 text-base">  FORWARD builds on several existing, research-informed transition curricula (e.g., INSITE, RISE, RAISE, Merging Two Worlds) 
                         and was designed in response to persistent challenges observed in juvenile justice and alternative education settings. 
                         These include limited instructional time, variability in youth participation, and difficulties delivering the most relevant content 
                         before a young person exits a program.
                     </p>
-
-                    <p className="mb-4">FORWARD addresses these issues by offering:</p>
-
-                    <div className="markdown mb-6">
+                    <p className="mb-4 text-base">FORWARD addresses these issues by offering:</p>
+                    <div className="markdown mb-6 text-base">
                         <ul>
                             <li><b>Flexible, web-based content</b> that youth can access during and after placement</li>
                             <li><b>Lessons that stand alone</b>, allowing youth to begin with whichever topic is most relevant to them</li>
@@ -55,26 +52,22 @@ export default function supportersOfYouth(){
                     />
                 </MarkdownTTS>
             </div>
-
             {/* section 3 */}
             <div className="border-t border-muted pt-8 mt-8">
                 <MarkdownTTS controlsClassName="flex flex-row-reverse items-start justify-between gap-4">
                     <h3 className="text-2xl font-black mb-6">What Does FORWARD Teach?</h3>
                     <span className="text-[0px] opacity-0">.</span>
                     
-                    <p className="mb-4">FORWARD helps youth develop practical knowledge and skills across three key areas of transition:</p>
-
-                    <div className="markdown mb-6">
+                    <p className="mb-4 text-base">FORWARD helps youth develop practical knowledge and skills across three key areas of transition:</p>
+                    <div className="markdown mb-6 text-base">
                         <ul>
                             <li>Academic Readiness - Preparing for postsecondary education, including college, trade school, or GED programs</li>
                             <li>Workforce Readiness - Building job-seeking and workplace communication skills</li>
                             <li>Independent Living Readiness - Managing responsibilities like budgeting, housing, and transportation</li>
                         </ul>
                     </div>
-
-                    <p className="mb-4">The curriculum includes five core lessons:</p>
-
-                    <div className="markdown mb-6">
+                    <p className="mb-4 text-base">The curriculum includes five core lessons:</p>
+                    <div className="markdown mb-6 text-base">
                         <ol>
                             <li><b>Going to College</b></li>
                             <li><b>Disclosure and Appropriate Communication</b></li>
@@ -83,8 +76,7 @@ export default function supportersOfYouth(){
                             <li><b>Soft Skills Development</b></li>
                         </ol>
                     </div>
-
-                    <p className="mb-8">
+                    <p className="mb-8 text-base">
                         Each lesson includes written content, videos, and interactive activities such as quizzes, 
                         choose-your-path scenarios, simulations, and open-ended reflection. Lessons typically take 
                         45–60 minutes to complete, though students are encouraged to move at their own pace and explore 
@@ -95,13 +87,12 @@ export default function supportersOfYouth(){
                     </p>
                 </MarkdownTTS>
             </div>
-
             <div className="mt-8">
                 <MarkdownTTS controlsClassName="flex flex-row-reverse items-start justify-between gap-4">
                     <h3 className="text-2xl font-black mb-6">Designed for Flexibility and Choice</h3>
                     <span className="text-[0px] opacity-0">.</span>
                     
-                    <p className="mb-8">
+                    <p className="mb-8 text-base">
                         Many transition programs follow a set order of instruction, which can limit access to high-priority content 
                         when youth are facing unpredictable timelines. FORWARD intentionally removes the requirement to move through 
                         lessons sequentially. Youth can choose the topics that matter most to them and explore the rest as time allows. 
@@ -110,13 +101,12 @@ export default function supportersOfYouth(){
                     </p>
                 </MarkdownTTS>
             </div>
-
             <div className="mt-8">
                 <MarkdownTTS controlsClassName="flex flex-row-reverse items-start justify-between gap-4">
                     <h3 className="text-2xl font-black mb-6">Who Is It For?</h3>
                     <span className="text-[0px] opacity-0">.</span>
                     
-                    <p className="mb-8">
+                    <p className="mb-8 text-base">
                         FORWARD was created for youth ages 14–21 with disabilities in juvenile justice or other alternative settings. However, 
                         the content may also benefit any young person preparing for transition, particularly those with low literacy levels or limited access to consistent instruction.
                         We encourage adults who support youth — including parents, foster parents, teachers, case managers, mentors, parole officers, and others — to explore the site, 
@@ -125,20 +115,18 @@ export default function supportersOfYouth(){
                     </p>
                 </MarkdownTTS>
             </div>
-
             <div className="mt-8">
                 <MarkdownTTS controlsClassName="flex flex-row-reverse items-start justify-between gap-4">
                     <h3 className="text-2xl font-black mb-6">How can I help?</h3>
                     <span className="text-[0px] opacity-0">.</span>
                     
-                    <p>
+                    <p className="text-base">
                         In addition to becoming familiar with the lessons and site, you can review the facilitator guides that accompany each lesson. 
                         These are designed with your support in mind, offering specific activities, conversation starters, and other ideas for engaging 
                         youth and making connections that will enhance their learning. Facilitator guides can be accessed here. 
                     </p>
                 </MarkdownTTS>
             </div>
-
         <div className="text-right mt-8">
             <Link to={"/youth"} className="bg-primary hover:brightness-90 text-primary-foreground px-4 py-2 rounded">
                 Youth
