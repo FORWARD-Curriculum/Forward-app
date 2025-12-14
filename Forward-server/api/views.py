@@ -70,7 +70,7 @@ class BugReportView(APIView):
 
     POST: Submit a bug report
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         """Submit a bug report"""
@@ -89,7 +89,7 @@ class BugReportView(APIView):
             )
 
         br = BugReport.objects.create(
-            user=request.user,
+            user=request.user if request.user.is_authenticated else None,
             description=description,
             steps_to_reproduce=steps_to_reproduce,
             recent_window_locations=recent_window_locations,
