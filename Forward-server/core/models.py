@@ -2092,6 +2092,8 @@ class BugReport(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        null = True,
+        blank= True,
         related_name='bug_reports',
         help_text='The user who reported the bug'
     )
@@ -2147,12 +2149,13 @@ class BugReport(models.Model):
         verbose_name_plural = "Bug Reports"
 
     def __str__(self):
-        return f"Bug Report by {self.user.username} at {self.created_at}"
+        username = self.user.username if self.user else "Guest"
+        return f"Bug Report by {username} at {self.created_at}"
 
     def to_dict(self):
         return {
             "id": self.id,
-            "user": self.user.username,
+            "user": self.user.username if self.user else None,
             "description": self.description,
             "steps_to_reproduce": self.steps_to_reproduce,
             "created_at": self.created_at.isoformat(),
