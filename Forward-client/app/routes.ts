@@ -15,6 +15,7 @@ export default [
     route("survey","routes/survey.tsx"),
     route("lesson/:lessonId", "routes/protected/lesson.tsx"),
     route("dashboard", "routes/protected/dashboard.tsx"),
+    route("ferpa", "routes/ferpa.tsx"),
     layout("routes/protected/protected.tsx", [
       // route("dashboard", "routes/protected/dashboard.tsx"),
       route("account", "routes/protected/account.tsx"),
