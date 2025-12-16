@@ -15,6 +15,10 @@ export default function Footer() {
             <Link prefetch="intent" to="/supportersOfYouth">About</Link>
           </li>
           <li className="hidden lg:block">|</li>
+          <li>
+            <Link prefetch="intent" to="/ferpa">FERPA Statement</Link>
+          </li>
+          <li className="hidden lg:block">|</li>
           <li className="mt-4 !no-underline lg:mt-0">©2025 Annee Grayson</li>
         </ul>
       </div>

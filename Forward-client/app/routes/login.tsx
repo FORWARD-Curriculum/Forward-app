@@ -50,61 +50,69 @@ export default function Login() {
 
   return (
     <div className="flex w-screen grow items-center justify-center">
-      <div className="bg-foreground outline-foreground-border text-secondary-foreground flex w-fit flex-col items-center rounded-3xl p-6 outline-1">
-        <h1 className="text-xl font-medium">Login to an existing account</h1>
-        <form onSubmit={handleSubmit} className="my-6 flex flex-col gap-6">
-          <div>
-            <label htmlFor="username">Username</label>
-            <Input
-              aria-label="Input username"
-              type="text"
-              name="username"
-              id="username"
-              placeholder="Username"
-              className="input min-w-[25vw]"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="password">Password</label>
-            <PasswordInput
-              name="password"
-              id="password"
-              placeholder="Password"
-              className="input"
-              disabled={false}
-            />
-          </div>
-          <Button
-            aria-label="Login"
-            type="submit"
-            className="button bg-primary text-primary-foreground outline-primary-border w-full outline-1 active:brightness-125"
-            variant={"default"}
-          >
-            Login
-          </Button>
-          {error && (
-            <p className="text-error-border w-full text-center">{error}</p>
-          )}
-        </form>
-        <div className="text-muted-foreground flex w-full flex-col items-center">
-          <p>Don't have an account?</p>
-          <div className="flex lg:flex-row flex-col w-full gap-3">
-            <Link
-              prefetch="intent"
-              to="/register"
-              className="text-primary-foreground bg-primary flex grow basis-0 items-center justify-center rounded-xl p-2 active:brightness-90 hover:brightness-110"
+      <div className="flex flex-col items-center gap-6">
+        <div className="bg-foreground outline-foreground-border text-secondary-foreground flex w-fit flex-col items-center rounded-3xl p-6 outline-1">
+          <h1 className="text-xl font-medium">Login to an existing account</h1>
+          <form onSubmit={handleSubmit} className="my-6 flex flex-col gap-6">
+            <div>
+              <label htmlFor="username">Username</label>
+              <Input
+                aria-label="Input username"
+                type="text"
+                name="username"
+                id="username"
+                placeholder="Username"
+                className="input min-w-[25vw]"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="password">Password</label>
+              <PasswordInput
+                name="password"
+                id="password"
+                placeholder="Password"
+                className="input"
+                disabled={false}
+              />
+            </div>
+            <Button
+              aria-label="Login"
+              type="submit"
+              className="button bg-primary text-primary-foreground outline-primary-border w-full outline-1 active:brightness-125"
+              variant={"default"}
             >
-              Sign Up
-            </Link>{" "}
-            <Link
-              prefetch="intent"
-              to="/dashboard"
-              className="text-primary-foreground bg-accent flex grow basis-0 items-center justify-center rounded-xl p-2  active:brightness-90 hover:brightness-110"
-            >
-              Try as a Guest
-            </Link>
+              Login
+            </Button>
+            {error && (
+              <p className="text-error-border w-full text-center">{error}</p>
+            )}
+          </form>
+          <div className="text-muted-foreground flex w-full flex-col items-center">
+            <p>Don't have an account?</p>
+            <div className="flex lg:flex-row flex-col w-full gap-3">
+              <Link
+                prefetch="intent"
+                to="/register"
+                className="text-primary-foreground bg-primary flex grow basis-0 items-center justify-center rounded-xl p-2 active:brightness-90 hover:brightness-110"
+              >
+                Sign Up
+              </Link>{" "}
+              <Link
+                prefetch="intent"
+                to="/dashboard"
+                className="text-primary-foreground bg-accent flex grow basis-0 items-center justify-center rounded-xl p-2  active:brightness-90 hover:brightness-110"
+              >
+                Try as a Guest
+              </Link>
+            </div>
           </div>
+        </div>
+        <div className="mt-6 max-w-md rounded-lg bg-muted p-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            <span className="font-semibold">FORWARD protects student privacy.</span>
+            {" "}All information shared in this program is kept confidential and handled in accordance with FERPA. Your responses are used only to support learning and program improvement, and any data shared outside your school or the research team is de-identified so you cannot be identified.
+          </p>
         </div>
       </div>
     </div>
