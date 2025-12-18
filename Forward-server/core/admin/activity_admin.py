@@ -7,6 +7,7 @@ from django.utils.html import format_html, format_html_join
 from django.contrib import admin
 from django import core
 import json
+from django.apps import apps
 from pathlib import Path
 from django.core.files.storage import default_storage
 from django.urls import reverse, path
@@ -70,84 +71,87 @@ def save_file(uploaded_file, key_prefix: str) -> str:
 # Curriculum
 # ---------------------------------------------------------------------
 
+class ReorderableActivityWidget(forms.Widget):
+    template_name = "admin/reorderable_activity_widget.html"
+    def __init__(self, attrs=None):
+        super().__init__(attrs)
+        self.activities = [] 
+
+    def get_context(self, name, value, attrs=None):
+        context = super().get_context(name, value, attrs)
+        context['widget']['activities'] = getattr(self, 'activities', [])
+        return context
+    
+class LessonAdminForm(forms.ModelForm):
+    sorted_activities = forms.CharField(
+        required=False,
+        widget=ReorderableActivityWidget(),
+        label="Reorder Activities",
+        help_text="Drag and drop items to reorder them."
+    )
+
+    class Meta:
+        model = Lesson
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Only populate if we have an existing instance
+        if self.instance and self.instance.pk:
+            all_activities = []
+            
+            # 1. Fetch all activities
+            for val in ActivityManager.registered_activities.values():
+                ActivityModel, child_class = val[0], val[3]
+                if not child_class:
+                    activities = list(ActivityModel.objects.filter(lesson=self.instance))
+                    for activity in activities:
+                        # Attach meta helper for the template
+                        activity.meta = activity._meta
+                        all_activities.append(activity)
+            
+            all_activities.sort(key=lambda x: x.order)
+            self.fields['sorted_activities'].widget.activities = all_activities
+
+    def save(self, commit=True):
+        lesson = super().save(commit=commit)
+        sorted_data = self.cleaned_data.get('sorted_activities')
+        
+        if sorted_data:
+            try:
+                # JS returns a JSON list: ["app.model:1", "app.model:5", ...]
+                identifiers = json.loads(sorted_data)
+                
+                for index, identifier in enumerate(identifiers):
+                    try:
+                        model_str, pk = identifier.split(':')
+                        app_label, model_name = model_str.split('.')
+                        
+                        ModelClass = apps.get_model(app_label, model_name)
+                        ModelClass.objects.filter(pk=pk, lesson=lesson).update(order=index+1)
+                        
+                    except (ValueError, LookupError, IndexError):
+                        continue # Skip invalid
+                        
+            except json.JSONDecodeError:
+                pass 
+
+        return lesson
+    
+    
 @admin.register(Lesson, site=custom_admin_site)
 class LessonAdmin(admin.ModelAdmin):
     grouping = "Curriculum"
-    list_display = ("title", "order","active", "created_at", "updated_at")
-    search_fields = ("title", "description")
+    list_display = ("title", "order", "active", "created_at")
     ordering = ("order",)
     list_editable = ("order",)
     
-    fields = ("title","active", "order", "objectives", "tags", "image", "image_preview", "sorted_activities")
-    readonly_fields = ("image_preview", "sorted_activities")
-
-    def sorted_activities(self, obj: Lesson):
-        """
-        Gathers all related activity instances from various registered models,
-        sorts them by their 'order' attribute, and renders them as an HTML list
-        with links to their admin change pages.
-        """
-        if not obj.id:
-            return format_html("<strong>Save the lesson to view and add activities.</strong>")
-
-        all_activities = []
-        
-        for value in ActivityManager.registered_activities.values():
-            ActivityModel, child_class = value[0], value[3]
-            if not child_class:
-                activities = list(ActivityModel.objects.filter(
-                    lesson=obj))
-                for activity in activities:
-                    all_activities.append(activity)
-
-        all_activities.sort(key=lambda x: x.order)
-
-        if not all_activities:
-            return "No activities found for this lesson."
-
-        # Build the HTML list
-        html_list_items = []
-        for activity in all_activities:
-            meta = activity._meta
-            
-            # Generate the URL to the admin change view for the specific activity object
-            url = reverse(f'admin:{meta.app_label}_{meta.model_name}_change', args=(activity.pk,))
-            
-            # Create a list item with the model name, a link to the object, and its order
-            list_item = format_html(
-                '<tr style="margin-bottom: 5px;">'
-                    '<td>{order}</td>'
-                    '<td>{model_name}</a></td>'
-                    '<td><a href="{url}">{obj_str}</a></td>'
-                '</tr>',
-                model_name=capfirst(meta.verbose_name),
-                url=url,
-                obj_str=str(activity),
-                order=activity.order
-            )
-            html_list_items.append(list_item)
-        
-        return format_html(
-            '<style>'
-            '.readonly:has(table) {{flex-grow: 1;}}'
-            '</style>'
-            '<table style="width: 100%;">'
-            '<thead>'
-                '<tr>'
-                    '<th scope="col">'
-                        '<div class="text">Order</div>'
-                    '</th>'
-                    '<th scope="col">'
-                        '<div class="text">Type</div>'
-                    '</th>'
-                    '<th scope="col">'
-                        '<div class="text">Title</div>'
-                    '</th>'
-                '</tr>'
-            '</thead>'
-            '<tbody>{}</tbody>''</table>', format_html("".join(html_list_items)))
-
-    sorted_activities.short_description = "Activities (sorted by order)"
+    form = LessonAdminForm
+    
+    # We include sorted_activities in fields so the widget renders
+    fields = ("title", "active", "order", "objectives", "tags", "image", "sorted_activities")
+    readonly_fields = ("image_preview",)
 
     # The get_inlines method is no longer needed with this approach.
     # def get_inlines(self, request, obj=None):

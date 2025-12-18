@@ -1,0 +1,113 @@
+{% load static %}
+<div class="reorderable-container">
+    <!-- The visual list -->
+    <ul id="activity-drag-list" class="activity-list">
+        {% for activity in widget.activities %}
+            <li class="activity-item" 
+                draggable="true" 
+                data-key="{{ activity.meta.app_label }}.{{ activity.meta.model_name }}:{{ activity.pk }}">
+                
+                <span class="handle">☰</span>
+                <span class="type-label">{{ activity.meta.verbose_name|capfirst }}</span>
+                <strong class="title">{{ activity }}</strong>
+                <span class="current-order-badge">#{{ activity.order|add:"1" }}</span>
+            </li>
+        {% empty %}
+            <li class="empty-state">No activities to reorder. Add activities and save to enable reordering.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Hidden input that actually submits the data -->
+    <input type="hidden" 
+           name="{{ widget.name }}" 
+           value="{{ widget.value|default:'' }}" 
+           id="{{ widget.attrs.id }}">
+</div>
+
+<style>
+    .activity-list { list-style: none; padding: 0; margin: 0; border: 1px solid #ccc; border-radius: 4px; max-width: 600px; }
+    .activity-item { 
+        padding: 10px; 
+        border-bottom: 1px solid #eee; 
+        background: var(--body-bg); 
+        display: flex; 
+        align-items: center; 
+        cursor: grab; 
+        transition: background 0.2s;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-item:hover { background: #f9f9f9; }
+    .activity-item.dragging { opacity: 0.5; background: #eef; }
+    .handle { margin-right: 15px; color: #999; cursor: move; font-size: 1.2em; }
+    .type-label { 
+        font-size: 0.8em; 
+        background: #eee; 
+        padding: 2px 6px; 
+        border-radius: 4px; 
+        margin-right: 10px; 
+        color: #555; 
+    }
+    .title { flex-grow: 1; }
+    .current-order-badge { color: #ccc; font-size: 0.9em; }
+</style>
+
+<script>
+    (function() {
+        const list = document.getElementById('activity-drag-list');
+        const hiddenInput = document.getElementById('{{ widget.attrs.id }}');
+        let draggedItem = null;
+
+        if (!list) return;
+
+        function updateInput() {
+            // Collect all data-keys in their current order
+            const keys = Array.from(list.querySelectorAll('li.activity-item'))
+                              .map(item => item.getAttribute('data-key'));
+            hiddenInput.value = JSON.stringify(keys);
+        }
+
+        // Initialize input with current order on load
+        updateInput();
+
+        list.addEventListener('dragstart', function(e) {
+            draggedItem = e.target.closest('li');
+            e.dataTransfer.effectAllowed = 'move';
+            // Set data to ensure drag works in FF
+            e.dataTransfer.setData('text/html', draggedItem.innerHTML);
+            setTimeout(() => draggedItem.classList.add('dragging'), 0);
+        });
+
+        list.addEventListener('dragend', function(e) {
+            if (draggedItem) draggedItem.classList.remove('dragging');
+            draggedItem = null;
+            updateInput(); // Update the hidden field when drag ends
+        });
+
+        list.addEventListener('dragover', function(e) {
+            e.preventDefault(); // Necessary to allow dropping
+            const afterElement = getDragAfterElement(list, e.clientY);
+            if (draggedItem) {
+                if (afterElement == null) {
+                    list.appendChild(draggedItem);
+                } else {
+                    list.insertBefore(draggedItem, afterElement);
+                }
+            }
+        });
+
+        // Helper to find the element position
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.activity-item:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+    })();
+</script>
