@@ -213,7 +213,7 @@ if DEBUG: # uses Minio for development
                 "bucket_name": "media-bucket",
                 "access_key": "minioadmin",
                 "secret_key": "minioadmin",
-                "endpoint_url": "http://localhost:9000",
+                "endpoint_url": "http://minio.localhost:9000",
                 # "custom_domain": "http://localhost:9000", # test
                 # "url_protocol": "http:",
                 # "default_acl": "public-read",

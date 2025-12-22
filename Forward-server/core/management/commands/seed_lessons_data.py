@@ -65,7 +65,9 @@ class Command(BaseCommand):
         if not lesson_title:
             self._err('JSON must contain "lesson" with a "title".')
             return
-
+        
+        if settings.DEBUG:
+            self._create_minio_bucket()
         try:
             with transaction.atomic():
                 if options["reset"]:
