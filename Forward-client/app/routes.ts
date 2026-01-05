@@ -11,6 +11,8 @@ export default [
     route("login", "routes/login.tsx"),
     route("register", "routes/register.tsx"),
     route("youth", "routes/youth.tsx"),
+    route("faq", "routes/faq.tsx"),
+    route("help", "routes/help.tsx"),
     route("supportersOfYouth", "routes/supportersOfYouth.tsx"),
     route("lesson/:lessonId", "routes/protected/lesson.tsx"),
     route("dashboard", "routes/protected/dashboard.tsx"),

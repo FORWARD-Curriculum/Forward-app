@@ -6,7 +6,7 @@ import type { RootState } from "@/store";
 export default function youth(){
     const user = useSelector((state: RootState) => state.user.user);
     return (
-        <div className={`max-w-6xl mx-auto px-6 py-5 text-secondary-foreground ${user?.preferences?.text_size || ""}`}>
+        <div className={`max-w-6xl mx-auto px-6 py-5 text-secondary-foreground bg-foreground ${user?.preferences?.text_size || ""}`}>
             <h4 className="text-accent text-right">For youth</h4>
             
             <MarkdownTTS controlsClassName="flex flex-row-reverse items-start justify-between gap-4">
