@@ -34,7 +34,7 @@ export default function StudentFAQ(){
                         <h3 className="text-xl font-bold mb-3">Who sees my answers?</h3>
                         <p className="text-base">
                             Most of the time, only you see your answers. If your facility is part of the FORWARD research project and you agreed to be in the study when you took the survey, 
-                            then researchers at Arizona State University can see your answers. You can review that agreement <a href="#" className="text-accent hover:underline">here</a>. 
+                            then researchers at Arizona State University can see your answers. You can review that agreement <a href="/assent" className="text-accent hover:underline">here</a>. 
                             Your answers are used for learning and research.
                         </p>
                     </div>
