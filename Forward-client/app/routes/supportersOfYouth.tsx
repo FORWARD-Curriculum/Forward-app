@@ -9,7 +9,9 @@ export default function supportersOfYouth(){
             <h4 className="text-accent text-right">For supporters of youth</h4>
             
             <MarkdownTTS controlsClassName="flex flex-row-reverse items-start justify-between gap-4">
-                <h1 className="text-4xl font-black text-accent mb-6">About Forward</h1>
+                <h1 className="text-4xl font-black text-accent mb-6">
+                    About Forward - <span className="italic">For Supporters of Youth</span>
+                </h1>
                 {/* This adds a pause between reading the options. The opacity makes it invisible */}
                 <span className="text-[0px] opacity-0">.</span>
                 <h4 className="mb-6 text-base">Facilitating Opportunities for Reentry, Workforce, and Academic Readiness for Youth with Disabilities in Juvenile Justice</h4>
@@ -123,7 +125,7 @@ export default function supportersOfYouth(){
                     <p className="text-base">
                         In addition to becoming familiar with the lessons and site, you can review the facilitator guides that accompany each lesson. 
                         These are designed with your support in mind, offering specific activities, conversation starters, and other ideas for engaging 
-                        youth and making connections that will enhance their learning. Facilitator guides can be accessed here. 
+                        youth and making connections that will enhance their learning. To access facilitator guides, please reach out to Annee at anjenks@asu.edu.
                     </p>
                 </MarkdownTTS>
             </div>
