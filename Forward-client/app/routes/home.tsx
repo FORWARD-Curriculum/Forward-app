@@ -46,16 +46,20 @@ export default function Home() {
         </div>
         
         <div className="flex gap-6 max-w-2xl mx-auto justify-center">
-          <div className="bg-secondary/60 backdrop-blur-sm p-6 rounded-2xl border border-secondary-border shadow-sm hover:shadow-md transition-all duration-300 group flex-1">
+          <Link 
+            to={"/researchEvidence"}
+            className="bg-secondary/60 backdrop-blur-sm p-6 rounded-2xl border border-secondary-border shadow-sm hover:shadow-md transition-all duration-300 group flex-1 cursor-pointer"
+          >
             <BookOpen className="w-8 h-8 mb-3 mx-auto group-hover:scale-110 transition-transform" />
             <h3 className="font-bold text-secondary-foreground mb-2">Research & Evidence Based</h3>
-            {/* <p className="text-sm text-muted-foreground">Step-by-step guidance for sustainable progress</p> */}
-          </div>
-          <div className="bg-secondary/60 backdrop-blur-sm p-6 rounded-2xl border border-secondary-border shadow-sm hover:shadow-md transition-all duration-300 group flex-1">
+          </Link>
+          <Link 
+            to={"/universalDesign"}
+            className="bg-secondary/60 backdrop-blur-sm p-6 rounded-2xl border border-secondary-border shadow-sm hover:shadow-md transition-all duration-300 group flex-1 cursor-pointer"
+          >
             <Target className="w-8 h-8 mb-3 mx-auto group-hover:scale-110 transition-transform" />
             <h3 className="font-bold text-secondary-foreground mb-2">Universal Design for Transition</h3>
-            {/* <p className="text-sm text-muted-foreground">Clear milestones and measurable outcomes</p> */}
-          </div>
+          </Link>
         </div>
       </div>
     </div>

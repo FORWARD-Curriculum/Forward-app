@@ -14,6 +14,8 @@ export default [
     route("faq", "routes/faq.tsx"),
     route("help", "routes/help.tsx"),
     route("assent", "routes/assent.tsx"),
+    route("researchEvidence", "routes/researchEvidence.tsx"),
+    route("universalDesign", "routes/universalDesign.tsx"),
     route("supportersOfYouth", "routes/supportersOfYouth.tsx"),
     route("lesson/:lessonId", "routes/protected/lesson.tsx"),
     route("dashboard", "routes/protected/dashboard.tsx"),
