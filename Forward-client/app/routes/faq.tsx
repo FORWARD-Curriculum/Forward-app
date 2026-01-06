@@ -2,12 +2,19 @@ import { Link } from "react-router";
 import MarkdownTTS from "@/components/ui/markdown-tts";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@radix-ui/react-accordion";
 
 export default function StudentFAQ(){
     const user = useSelector((state: RootState) => state.user.user);
     
     return (
-        <div className={`max-w-6xl mx-auto px-6 py-5 text-secondary-foreground ${user?.preferences?.text_size || ""}`}>
+        <div className={`max-w-6xl mx-auto px-6 py-5 text-secondary-foreground bg-foreground ${user?.preferences?.text_size || ""}`}>
+
+            <img 
+                src="/info-images/faq.jpg" 
+                alt="Young Adults chilling by a buildings curb" 
+                className="w-full max-w-2xl mx-auto rounded-lg my-6"
+            />
             <h4 className="text-accent text-right">Student FAQ</h4>
             
             <MarkdownTTS controlsClassName="flex flex-row-reverse items-start justify-between gap-4">
