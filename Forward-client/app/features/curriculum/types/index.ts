@@ -40,12 +40,10 @@ export interface Lesson {
 export type ActivityManager = {
   Identification: [Identification, IdentificationResponse, false];
   TextContent: [TextContent, TextContentResponse, false];
+  PDF: [PDF, PDFResponse, false]
   Writing: [Writing, WritingResponse, false];
   Quiz: [Quiz, QuizResponse, false];
-  Poll: [Poll, PollResponse, false];
   ConceptMap: [ConceptMap, ConceptMapResponse, false];
-  // Question: [Question, QuestionResponse, true];
-  PollQuestion: [PollQuestion, PollQuestionResponse, true];
   Embed: [Embed, EmbedResponse, false];
   DndMatch: [DndMatch, DndMatchResponse, false];
   LikertScale: [LikertScale, LikertScaleResponse, false];
@@ -68,7 +66,7 @@ export const ActivityTypeDisplayNames: Record<
   Writing: "Writing",
   Quiz: "Quiz",
   TextContent: "Info",
-  Poll: "Poll",
+  PDF: "PDF",
   Default: "Activity",
   ConceptMap: "Concept Map",
   Identification: "Identification",
@@ -102,6 +100,10 @@ export interface BaseActivity {
 export interface TextContent extends BaseActivity {
   content?: string;
   image?: Image; // Optional image URL to accompany the text content
+}
+
+export interface PDF extends BaseActivity{
+  pdf_file: string;
 }
 
 export interface Video extends BaseActivity {
@@ -144,36 +146,17 @@ export interface Question {
       id: number;
       text: string;
       is_correct: boolean;
+      feedback?: string;
     }[];
     image?: Image;
   };
   is_required: boolean;
   attempts?: number;
   feedback_config: {
-    correct: string;
-    incorrect: string;
+    correct?: string; // test made these two optional as they might not be present 
+    incorrect?: string;
   };
   video?: string;
-}
-
-export interface Poll extends BaseActivity {
-  config: {
-    show_results: boolean;
-    allow_anonymous: boolean;
-  };
-  questions: PollQuestion[];
-}
-
-export interface PollQuestion {
-  id: string;
-  poll_id: number;
-  question_text: string;
-  options: {
-    id: number;
-    text: string;
-  }[];
-  allow_multiple: boolean;
-  order: number;
 }
 
 export interface DndMatch extends BaseActivity {
@@ -236,7 +219,7 @@ export interface Twine extends BaseActivity {
 }
 
 export interface Slideshow extends BaseActivity {
-  slides: {content: string; image: Image | null}[]
+  slides: {content: string | null; image: Image | null}[]
   force_wait: number;
   autoplay: boolean;
 }
@@ -274,7 +257,7 @@ export interface LessonResponse {
  * responding. A `null` value means that no response was recieved from
  * the server and it's expected the server will take note and generate
  * a new entry into the associated table.
- * @field associatedId - ex: quizId, pollId...
+ * @field associatedId - ex: quizId...
  */
 export interface BaseResponse {
   id: null | string;
@@ -309,15 +292,13 @@ export interface QuestionResponse extends BaseResponse {
 /**
  * @field choices: an array of options by id
  */
-export interface PollQuestionResponse extends BaseResponse {
-  response_data: number[];
-}
 
 export interface WritingResponse extends BaseResponse {
   responses: {"prompt": string, "response": string}[];
 }
 
 export interface TextContentResponse extends BaseResponse {}
+export interface PDFResponse extends BaseResponse {}
 export interface SlideshowResponse extends BaseResponse {
   highest_slide: number;
 }
@@ -327,7 +308,6 @@ export interface IdentificationResponse extends BaseResponse {
   identified: number;
 
 }
-export interface PollResponse extends BaseResponse {}
 export interface EmbedResponse extends BaseResponse {
   inputted_code: string;
 }

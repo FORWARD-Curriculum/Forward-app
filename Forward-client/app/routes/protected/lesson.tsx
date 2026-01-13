@@ -12,7 +12,6 @@ import { useSelector, useDispatch } from "react-redux";
 import store, { type AppDispatch, type RootState } from "@/store";
 import { act, useEffect, useCallback, memo } from "react";
 import TextContent from "@/features/curriculum/components/textcontent";
-import Poll from "@/features/curriculum/components/poll";
 import Quiz from "@/features/curriculum/components/quiz";
 import Twine from "@/features/curriculum/components/twine";
 import Writing from "@/features/curriculum/components/writing";
@@ -22,6 +21,7 @@ import ConceptMap from "@/features/curriculum/components/conceptmap";
 import DndMatch from "@/features/curriculum/components/dndmatch";
 import FillInTheBlank from "@/features/curriculum/components/fillintheblank";
 import Slideshow from "@/features/curriculum/components/slideshow";
+import PDF from "@/features/curriculum/components/pdf";
 import { useIsMobile } from "@/hooks/useClient";
 import {
   Accordion,
@@ -105,13 +105,18 @@ export function Activity({ activity }: { activity: BaseActivity }) {
       );
     case "Quiz":
       return <Quiz key={key} quiz={activity as ActivityManager["Quiz"][0]} />;
-    case "Poll":
-      return <Poll key={key} poll={activity as ActivityManager["Poll"][0]} />;
     case "TextContent":
       return (
         <TextContent
           key={key}
           textContent={activity as ActivityManager["TextContent"][0]}
+        />
+      );
+    case "PDF":
+      return (
+        <PDF 
+          key={key} 
+          pdf={activity as ActivityManager["PDF"][0]}
         />
       );
     case "Identification":

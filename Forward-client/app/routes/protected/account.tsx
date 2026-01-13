@@ -155,7 +155,22 @@ export default function account() {
       ...user,
       preferences: { theme: formState.theme, text_size: formState.textSize },
     });
-  }, [formState.theme, formState.textSize]);
+  }, [formState.theme]);
+
+  const [textSizePreview, setTextSizePreview] = useState(
+    user.preferences?.text_size || "txt-base"
+  );
+
+  //used for the preview
+  const textSizeMap = {
+    'txt-sm': '0.875rem',
+    'txt-md': '1rem', 
+    'txt-base': '1.125rem',
+    'txt-lg': '1.25rem',
+    'txt-xl': '1.5rem',
+    'txt-2xl': '1.875rem',
+    'txt-3xl': '2.25rem',
+};
 
   const handleSubmit = async (e: any) => {
     e.preventDefault(); // Prevent the default form submission behavior
@@ -173,7 +188,7 @@ export default function account() {
       display_name: formData.get("display_name"),
       consent: formData.has("consent"),
       theme: formState.theme,
-      text_size: formState.textSize,
+      text_size: textSizePreview,
       speech_uri_index: voiceURIIndex,
       speech_speed: voiceSpeed,
     };
@@ -446,24 +461,24 @@ export default function account() {
                       type="range"
                       step={1}
                       min={0}
-                      max={3}
+                      max={6}
                       value={
-                        user.preferences?.text_size
-                          ? ["txt-sm", "txt-base", "txt-lg", "txt-xl"].indexOf(
-                              user.preferences.text_size,
-                            )
-                          : 1
+                        textSizePreview
+                          ? ["txt-sm", "txt-md", "txt-base", "txt-lg", "txt-xl", "txt-2xl", "txt-3xl"].indexOf(textSizePreview)
+                          : 2
                       }
                       onChange={(e) => {
-                        setFormState({
-                          ...formState,
-                          textSize: ["txt-sm", "txt-base", "txt-lg", "txt-xl"][
-                            parseInt(e.target.value, 10)
-                          ] as "txt-sm" | "txt-base" | "txt-lg" | "txt-xl",
-                        });
+                        const newSize = ["txt-sm", "txt-md", "txt-base", "txt-lg", "txt-xl", "txt-2xl", "txt-3xl"][
+                          parseInt(e.target.value, 10)
+                        ] as "txt-sm" | "txt-md" | "txt-base" | "txt-lg" | "txt-xl" | "txt-2xl" | "txt-3xl";
+                        
+                        setTextSizePreview(newSize);
                       }}
                     />
-                    <div className="text-secondary-foreground pointer-events-none absolute -top-[calc(0.5rem-2px)] z-10 flex w-[104%] justify-between text-[1rem] font-bold">
+                    <div className="text-secondary-foreground pointer-events-none absolute -top-[calc(0.5rem-2px)] z-10 flex w-[100%] justify-between px-[0.75rem] text-[1rem] font-bold">
+                      <p>|</p>
+                      <p>|</p>
+                      <p>|</p>
                       <p>|</p>
                       <p>|</p>
                       <p>|</p>
@@ -480,12 +495,10 @@ export default function account() {
                     border-radius: 50%;
                     border: 2px solid var(--secondary-foreground);
                     cursor: pointer;
-                    transform: scaleX(0.8);
+                    
                   }
 
-                  .fontSizeInput input[type="range" i]::-webkit-slider-runnable-track {
-                    transform: scaleX(1.2);
-                  }
+    
                          
                   .fontSizeInput input[type="range"]::-moz-range-thumb {
                     width: 1.5rem;
@@ -494,7 +507,6 @@ export default function account() {
                     border-radius: 50%;
                     border-color: black;
                     cursor: pointer;
-                    transform: scaleX(0.8);
                   }
                   
                   input[type="range"]::-webkit-slider-thumb {
@@ -520,6 +532,11 @@ export default function account() {
                 </fieldset>
               </div>
             </dt>
+            <div className="mt-4 p-4 border border-secondary-foreground rounded-xl bg-background">
+              <p style={{ fontSize: textSizeMap[textSizePreview] }}>
+                This is how large your text will be!
+              </p>
+            </div>
             <dt className="w-full">
               <p className="mb-5 w-full text-left">Text to speech</p>
               <div className="flex flex-col items-center gap-10 px-20 lg:flex-row lg:items-start">

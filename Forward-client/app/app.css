@@ -397,7 +397,7 @@ button {
     --error-border: var(--color-fuchsia-500);
   }
 
-  .txt-sm {
+ .txt-sm {
     --txt-xs: 0.625rem;
     --txt-sm: 0.75rem;
     --txt-base: 0.875rem;
@@ -413,7 +413,7 @@ button {
     --txt-9xl: 6rem;
   }
 
-  .txt-base {
+  .txt-md{
     --txt-xs: 0.75rem;
     --txt-sm: 0.875rem;
     --txt-base: 1rem;
@@ -429,7 +429,7 @@ button {
     --txt-9xl: 8rem;
   }
 
-  .txt-lg {
+  .txt-base {
     --txt-xs: 0.875rem;
     --txt-sm: 1rem;
     --txt-base: 1.125rem;
@@ -445,7 +445,7 @@ button {
     --txt-9xl: 10rem;
   }
 
-  .txt-xl {
+  .txt-lg {
     --txt-xs: 1rem;
     --txt-sm: 1.125rem;
     --txt-base: 1.25rem;
@@ -459,6 +459,54 @@ button {
     --txt-7xl: 8rem;
     --txt-8xl: 10rem;
     --txt-9xl: 12rem;
+  }
+
+  .txt-xl {
+    --txt-xs: 1.125rem;   
+    --txt-sm: 1.25rem;    
+    --txt-base: 1.5rem;   
+    --txt-lg: 1.875rem;   
+    --txt-xl: 2.25rem;    
+    --txt-2xl: 3rem;     
+    --txt-3xl: 3.75rem;   
+    --txt-4xl: 4.5rem;    
+    --txt-5xl: 6rem;      
+    --txt-6xl: 8rem;      
+    --txt-7xl: 10rem;     
+    --txt-8xl: 12rem;     
+    --txt-9xl: 14rem;
+  }
+
+  .txt-2xl{
+    --txt-xs: 1.25rem;    
+    --txt-sm: 1.5rem;     
+    --txt-base: 1.875rem; 
+    --txt-lg: 2.25rem;    
+    --txt-xl: 3rem;       
+    --txt-2xl: 3.75rem;   
+    --txt-3xl: 4.5rem;    
+    --txt-4xl: 6rem;      
+    --txt-5xl: 8rem;      
+    --txt-6xl: 10rem;     
+    --txt-7xl: 12rem;     
+    --txt-8xl: 14rem;     
+    --txt-9xl: 16rem; 
+  }
+
+  .txt-3xl{
+    --txt-xs: 1.5rem;   
+    --txt-sm: 1.875rem;  
+    --txt-base: 2.25rem;  
+    --txt-lg: 3rem;       
+    --txt-xl: 3.75rem;   
+    --txt-2xl: 4.5rem;    
+    --txt-3xl: 6rem;      
+    --txt-4xl: 8rem;      
+    --txt-5xl: 10rem;     
+    --txt-6xl: 12rem;     
+    --txt-7xl: 14rem;     
+    --txt-8xl: 16rem;     
+    --txt-9xl: 18rem; 
   }
 }
 

@@ -10,7 +10,7 @@ from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserUp
 from core.services import UserService, LessonService, QuizResponseService, ResponseService
 # , QuestionResponseService
 from .utils import json_go_brrr, messages
-from core.models import ActivityManager, Quiz, Lesson, TextContent, Poll, PollQuestion, UserQuizResponse, Writing, Question, User, BugReport
+from core.models import ActivityManager, Quiz, Lesson, TextContent, UserQuizResponse, Writing, Question, User, BugReport
 from rest_framework import serializers, request
 import logging
 from django.contrib.auth.decorators import login_required
@@ -70,7 +70,7 @@ class BugReportView(APIView):
 
     POST: Submit a bug report
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         """Submit a bug report"""
@@ -89,7 +89,7 @@ class BugReportView(APIView):
             )
 
         br = BugReport.objects.create(
-            user=request.user,
+            user=request.user if request.user.is_authenticated else None,
             description=description,
             steps_to_reproduce=steps_to_reproduce,
             recent_window_locations=recent_window_locations,
@@ -433,30 +433,6 @@ class WritingView(APIView):
             "detail": messages['successful_id'],
             "data": [w.to_dict() for w in writing]},
             status=status.HTTP_200_OK)
-
-
-class PollView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        '''
-        this structure wont work for multiple polls unless we add a limit to these
-        '''
-        [id] = kwargs.values()
-        poll = Poll.objects.get(lesson_id=id)
-
-        if not poll:
-            return Response({"detail": "cannot find poll with this lesson id"}, status=status.HTTP_404_NOT_FOUND)
-
-        poll_qs = PollQuestion.objects.filter(poll_id=poll.id)
-
-        return Response({
-            "detail": messages['successful_id'],
-            "data": {
-                "poll": poll.to_dict(),
-                "pollQuestions": [q.to_dict() for q in poll_qs]}},
-            status=status.HTTP_200_OK)
-
 
 class ResponseView(APIView):
     permission_classes = [IsAuthenticated]

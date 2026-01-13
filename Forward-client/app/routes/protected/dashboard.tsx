@@ -29,7 +29,7 @@ function LessonCard(props: { lesson?: Lesson; children?: ReactNode }) {
       <div className="mx-4 flex lg:flex-row flex-col items-center gap-4 pb-3">
         <img
           src={props.lesson?.image?.thumbnail ?? "grad_cap.png"}
-          className="h-full max-w-20"
+          className="w-20 h-20"
         ></img>
         <MarkdownTTS className="flex grow" controlsClassName="flex flex-row-reverse grow justify-between">
           <div className="flex flex-col text-left">

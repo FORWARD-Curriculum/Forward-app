@@ -11,13 +11,13 @@ from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand
 from django.db import IntegrityError, transaction
 
+
 from core.models import (
     ActivityManager,
     BaseActivity,
     Concept,
     ConceptMap,
     Lesson,
-    PollQuestion,
     Question,
     Slideshow,
     Slide,
@@ -113,8 +113,8 @@ class Command(BaseCommand):
         for key, (Model, _, __, is_child, ___) in manager.registered_activities.items():
             if is_child:
                 continue
-            # Questions/PollQuestions cascade via their parents
-            if key in ["question", "pollquestion"]:
+            # Questions cascade via their parents
+            if key in ["question"]:
                 continue
             if hasattr(Model, "lesson"):
                 deleted, _ = Model.objects.filter(lesson=lesson).delete()
@@ -168,7 +168,7 @@ class Command(BaseCommand):
                 continue
 
             # Extract children payloads before building defaults
-            questions = act.pop("questions", None) if act_type in {"quiz", "poll"} else None
+            questions = act.pop("questions", None) if act_type == "quiz" else None
             concepts = act.pop("examples", None) if act_type == "conceptmap" else None
             slides = act.pop("slides", None) if act_type == "slideshow" else None
             idents = act.pop("content", None) if act_type == "identification" else None
@@ -192,6 +192,7 @@ class Command(BaseCommand):
             video_name = defaults.pop("video", None) if act_type in {"video", "quiz"} else None
             twine_name = defaults.pop("file", None) if act_type == "twine" else None
             cust_name = defaults.pop("document", None) if act_type == "customactivity" else None
+            pdf_name = defaults.pop("pdf_file", None) if act_type == "pdf" else None
 
             # Special case: TextContent image referenced in content like ![alt](path)
             if act_type == "textcontent" and not image_name:
@@ -290,13 +291,18 @@ class Command(BaseCommand):
                         rel_path=self.folder_path / cust_name,
                         label=f"{ActivityModel.__name__} asset",
                     )
+                elif act_type == "pdf" and pdf_name:
+                    self._save_model_file(
+                        instance=activity,
+                        field_name="pdf_file",
+                        rel_path=self.folder_path / pdf_name,
+                        label=f"{ActivityModel.__name__} asset"
+                    )
                     
 
                 # Children
                 if act_type == "quiz" and questions:
                     self._create_questions(activity, questions)
-                elif act_type == "poll" and questions:
-                    self._create_poll_questions(activity, questions)
                 elif act_type == "conceptmap" and concepts:
                     self._create_concepts(activity, concepts)
                 elif act_type == "identification" and idents:
@@ -429,28 +435,6 @@ class Command(BaseCommand):
                 self._err(
                     f"    Failed question (Order: {order}) for "
                     f"quiz '{quiz.title}': {e}"
-                )
-
-    def _create_poll_questions(self, poll, questions: List[dict]):
-        self._log(f"  Processing {len(questions)} questions for poll: {poll.title}")
-        for order, q in enumerate(questions, start=1):
-            defaults = {
-                "question_text": q.get("question_text", ""),
-                "options": q.get("options", []),
-                "allow_multiple": q.get("allow_multiple", False),
-            }
-            try:
-                obj, created = PollQuestion.objects.update_or_create(
-                    poll=poll, order=order, defaults=defaults
-                )
-                self._log(
-                    f"    {'Created' if created else 'Updated'} poll question "
-                    f"(Order: {order}): {obj.question_text[:50]}..."
-                )
-            except Exception as e:
-                self._err(
-                    f"    Failed poll question (Order: {order}) for "
-                    f"poll '{poll.title}': {e}"
                 )
 
     def _create_concepts(self, cmap, concepts: List[dict]):

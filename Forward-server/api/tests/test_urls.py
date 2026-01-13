@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse, resolve
 from api.views import (
     UserRegistrationView, SessionView, CurrentUserView, 
-    QuizView, LessonView, TextContentView, WritingView, PollView
+    QuizView, LessonView, TextContentView, WritingView
 )
 
 
@@ -66,10 +66,3 @@ class UrlsTests(TestCase):
         resolver = resolve(url)
         self.assertEqual(resolver.func.view_class, WritingView)
     
-    def test_polls_url(self):
-        """Test the polls URL."""
-        url = reverse('polls', args=[1])
-        self.assertEqual(url, '/api/polls/1/')
-        
-        resolver = resolve(url)
-        self.assertEqual(resolver.func.view_class, PollView)

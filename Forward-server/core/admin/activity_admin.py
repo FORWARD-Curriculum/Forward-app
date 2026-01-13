@@ -1,6 +1,6 @@
-from core.models import (Lesson, ActivityManager, BaseActivity, Twine, TextContent, Quiz, Question, Poll, PollQuestion, Writing,
+from core.models import (Lesson, ActivityManager, BaseActivity, Twine, TextContent, Quiz, Question, Writing,
                          Embed, DndMatch, Concept, ConceptMap, Video, LikertScale, FillInTheBlank, Identification, IdentificationItem,
-                         Slideshow, Slide, CustomActivity, CustomActivityImageAsset)
+                         Slideshow, Slide, CustomActivity, CustomActivityImageAsset, PDF)
 from django import forms
 from .admin import custom_admin_site
 from django.utils.html import format_html, format_html_join
@@ -478,6 +478,10 @@ class FillInTheBlankAdmin(BaseActivityAdmin):
     
     # TODO: content needs a lengthy desscription of the text formatting
 
+
+@admin.register(PDF, site=custom_admin_site)
+class PDFAdmin(BaseActivityAdmin):
+    grouping = "Activities"
 
 @admin.register(LikertScale, site=custom_admin_site)
 class LikertScaleAdmin(BaseActivityAdmin):

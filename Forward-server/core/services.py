@@ -422,6 +422,4 @@ class EmbedResponseService:
         return response_object
 
 ActivityManager().registerService("response", Quiz, QuizResponseService.submit_quiz_response) # temp for now
-# ActivityManager().registerService("response", Question, QuestionResponseService.submit_question_response) 
-
 ActivityManager().registerService("response", Embed, EmbedResponseService.update_embed_completion_status)

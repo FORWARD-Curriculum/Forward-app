@@ -16,6 +16,14 @@ export default function Footer() {
           </li>
           <li className="hidden lg:block">|</li>
           <li>
+            <Link prefetch="intent" to="/faq">FAQ</Link>
+          </li>
+          <li className="hidden lg:block">|</li>
+          <li>
+            <Link prefetch="intent" to="/help">Help</Link>
+          </li>
+          <li className="hidden lg:block">|</li>
+          <li>
             <Link prefetch="intent" to="/ferpa">FERPA Statement</Link>
           </li>
           <li className="hidden lg:block">|</li>

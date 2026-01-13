@@ -281,7 +281,7 @@ class BaseActivity(models.Model):
     Abstract base class for all activity types in the curriculum.
 
     This class provides common fields and functionality shared by all
-    activity types (Quiz, Poll, Writing Activities)
+    activity types (Quiz, Writing Activities)
     """
     # User's generated uuid
     id = models.UUIDField(
@@ -294,7 +294,7 @@ class BaseActivity(models.Model):
     lesson = models.ForeignKey(
         Lesson,
         on_delete=models.CASCADE,
-        # Will create writing_activities, quiz_activities, poll_activities
+        # Will create writing_activities, quiz_activities
         blank=False,
         null=False,
         related_name="%(class)s_activities",
@@ -387,6 +387,26 @@ class TextContent(BaseActivity):
             "content": self.content,
             "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
         }
+
+class PDF(BaseActivity):
+
+
+    pdf_file = models.FileField(upload_to='public/pdf/', blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=['pdf'])],
+                       help_text="Pdf content to acompany lesson")
+    
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "PDF"
+        verbose_name_plural = "PDFs"
+
+    
+    def to_dict(self):
+        return{
+            **super().to_dict(),
+            "pdf_file": self.pdf_file.url if self.pdf_file else None
+        }
+        
+
 
 
 class Video(BaseActivity):
@@ -690,7 +710,9 @@ class Question(models.Model):
                         "properties": {
                             "id": {"type": "number"},
                             "text": {"type": "string", 'widget': 'textarea'},
-                            "is_correct": {"type": "boolean", "default": False}
+                            "is_correct": {"type": "boolean", "default": False},
+                            "feedback": {"type": "string", 'widget': 'textarea'}
+                            
                         },
                         "required": ["id", "text"]
                     },
@@ -736,83 +758,6 @@ class Question(models.Model):
             "feedback_config": self.feedback_config,
             "image": GENERIC_FORWARD_IMAGE.stringify(self.image) if self.image else None,
             "video": self.video.url if self.video else None
-        }
-
-class Poll(BaseActivity):
-    """
-    Model for Poll activities. Unlike quizzes, polls don't have correct answers and focus on collecting
-    and optionally displaying aggregate responses.
-    """
-    config = models.JSONField(
-        default=dict,
-        help_text="Configuration options for poll display and behavior"
-    )
-
-    class Meta:
-        verbose_name = "Poll"
-        verbose_name_plural = "Polls"
-
-    def to_dict(self):
-        return {
-            **super().to_dict(),
-            "config": self.config,
-            "questions": [q.to_dict() for q in PollQuestion.objects.filter(poll__id=self.id).order_by('order')]
-        }
-
-
-class PollQuestion(models.Model):
-    """Models for individual poll questions within a poll"""
-    # User's generated uuid
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        help_text='the uuid of the database item'
-    )
-
-    poll = models.ForeignKey(
-        Poll,
-        on_delete=models.CASCADE,
-        related_name="polls",
-        help_text="The poll this poll question belongs to"
-    )
-
-    question_text = models.TextField(
-        help_text="The text of the poll question"
-    )
-
-    options = models.JSONField(
-        help_text="Available options for the poll question"
-    )
-
-    allow_multiple = models.BooleanField(
-        default=False,
-        help_text="Whether multiple options can be selected"
-    )
-
-    order = models.PositiveIntegerField(
-        help_text="Order within the poll"
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['order']
-        verbose_name = "Poll Question"
-        verbose_name_plural = "Poll Questions"
-
-    def __str__(self):
-        return f"Poll Question {self.order}: {self.question_text[:50]}..."
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "poll_id": self.poll_id,
-            "question_text": self.question_text,
-            "options": self.options,
-            "allow_multiple": self.allow_multiple,
-            "order": self.order,
         }
 
 
@@ -1247,7 +1192,7 @@ class Slide(models.Model):
     )
     
     slideshow = models.ForeignKey(to=Slideshow,on_delete=models.CASCADE, related_name='slides')
-    content = MartorField(default="")
+    content = MartorField(blank=True, null=True) # allow slideshow text content to be null, for just images
     image = ImageField(upload_to='public/slideshow/slides/images', blank=True,
                        auto_add_fields=True, formats=GENERIC_FORWARD_IMAGE.formats)
     order = models.PositiveIntegerField(
@@ -1629,17 +1574,20 @@ class UserQuestionResponse(models.Model):
         return f"Response to question {self.question.order} in {self.quiz_response}"
 
     def evaluate_correctness(self):
+
+        feedback_config = self.question.feedback_config or {}
+        options = self.question.choices.get('options', [])
+
         """Determine if the response is correct based on question type and correct answer"""
         if not self.question.has_correct_answer:
 
             self.is_correct = True
-            feedback_config = self.question.feedback_config or {}
-            self.feedback = self.question.feedback_config.get('correct', '')
-            return True
 
-        options = self.question.choices.get('options', [])
-        # Get correct answers from the question
-        correct_answers = self.question.choices.get('is_correct', [])
+            if feedback_config.get('correct'):
+                self.feedback = feedback_config.get('correct', )
+            else:
+                self.feedback = self._get_choice_feedback(options)
+            return True
 
         #lets try and extract the ID's of options where is_correct is TRUE
         correct_answer_ids = []
@@ -1648,9 +1596,6 @@ class UserQuestionResponse(models.Model):
                 correct_answer_ids.append(opt['id'])
 
         selected = self.response_data.get('selected', None)
-
-        # Set default feedback
-        feedback_config = self.question.feedback_config or {}
         default_feedback = feedback_config.get('default', '')
 
         # If nothing's selected, it's incorrect
@@ -1658,12 +1603,10 @@ class UserQuestionResponse(models.Model):
             self.is_correct = False
             self.feedback = feedback_config.get(
                 'no_response', default_feedback)
-            # self.save()
             return False
 
         # Handle different question types
         if self.question.question_type == 'multiple_choice':
-            # self.is_correct = selected in correct_answers
             self.is_correct = selected[0] in correct_answer_ids
         elif self.question.question_type == 'multiple_select':
             if not isinstance(selected, list):
@@ -1678,12 +1621,13 @@ class UserQuestionResponse(models.Model):
             self.is_correct = None
 
         # Set appropriate feedback based on correctness
-        if self.is_correct:
-            self.feedback = feedback_config.get('correct', default_feedback)
+        if self.is_correct and feedback_config.get('correct'):
+            self.feedback = feedback_config.get('correct')
+        elif not self.is_correct and feedback_config.get('incorrect'):
+            self.feedback = feedback_config.get('incorrect')
         else:
-            self.feedback = feedback_config.get('incorrect', default_feedback)
+            self.feedback = self._get_choice_feedback(options) or default_feedback
 
-        # self.save()
         return self.is_correct
 
     def to_dict(self):
@@ -1696,10 +1640,42 @@ class UserQuestionResponse(models.Model):
             "partial_response": self.partial_response,
             "time_spent": self.time_spent,
             "attempts_left": self.attempts_left,
-            # test
             "is_correct": self.is_correct,
             "feedback": self.feedback,
         }
+
+    def _get_choice_feedback(self, options):
+        """
+        Helper method to get feedback from the selected choice.
+        
+        Args:
+            options: List of choice options from question.choices['options']
+            
+        Returns:
+            str or None: The feedback text from the selected option, or None if not found
+        """
+
+        selected = self.response_data.get('selected', None)
+
+        if selected is None:
+            return None
+        
+        # Single selection
+        if self.question.question_type == 'multiple_choice':
+            selected_id = selected[0] if isinstance(selected, list) else selected
+            for opt in options:
+                if opt.get('id') == selected_id:
+                    return opt.get('feedback', None)
+                
+        #TODO ask annee but maybe handle multiple select? How would that work
+
+        #True/False --> Do we even do true or false
+        elif self.question.question_type == 'true_false':
+            selected_id = selected[0] if isinstance(selected,list) else selected
+            for opt in options:
+                if opt.get('id') == selected_id:
+                    return opt.get('feedback', None)
+
 
 class VideoResponse(BaseResponse):
     """
@@ -1886,6 +1862,24 @@ class TextContentResponse(BaseResponse):
         return {
             **super().to_dict(),
         }
+    
+class PDFResponse(BaseResponse):
+    
+    associated_activity = models.ForeignKey(
+        PDF,
+        on_delete=models.CASCADE,
+        related_name='associated_pdf',
+        help_text='The pdf associated with this response'
+    )
+
+    class Meta:
+        verbose_name = "PDF Response"
+        verbose_name_plural = "PDF Responses"
+    
+    def to_dict(self):
+        return {
+            **super().to_dict(),
+        }
 
 
 class TwineResponse(BaseResponse):
@@ -1907,30 +1901,6 @@ class TwineResponse(BaseResponse):
             **super().to_dict(),
         }
 
-
-class PollQuestionResponse(BaseResponse):
-    response_data = models.JSONField(
-        help_text="The user's response data in JSON format"
-    )
-
-    associated_activity = models.ForeignKey(
-        Poll,
-        on_delete=models.CASCADE,
-        related_name='associated_poll_for_question',
-        help_text="The poll associated with this question"
-    )
-
-    class Meta:
-        verbose_name = "Poll Question Response"
-        verbose_name_plural = "Poll Question Responses"
-
-    def to_dict(self):
-        return {
-            **super().to_dict(),
-            "response_data": self.response_data
-        }
-
-
 class IdentificationResponse(BaseResponse):
     associated_activity = models.ForeignKey(
         Identification,
@@ -1950,25 +1920,6 @@ class IdentificationResponse(BaseResponse):
             **super().to_dict(),
             "identified": self.identified
         }
-
-
-class PollResponse(BaseResponse):
-    associated_activity = models.ForeignKey(
-        Poll,
-        on_delete=models.CASCADE,
-        related_name='associated_poll',
-        help_text='The poll associated with this response'
-    )
-
-    class Meta:
-        verbose_name = "Poll Response"
-        verbose_name_plural = "Poll Responses"
-
-    def to_dict(self):
-        return {
-            **super().to_dict(),
-        }
-
 
 class EmbedResponse(BaseResponse):
     associated_activity = models.ForeignKey(
@@ -2098,12 +2049,10 @@ class ActivityManager():
             return
         self._initialized = True
         self.registerActivity(TextContent, TextContentResponse)
+        self.registerActivity(PDF, PDFResponse)
         self.registerActivity(Identification, IdentificationResponse)
         self.registerActivity(Writing, WritingResponse, {
                               "responses": ["responses", []]})
-        self.registerActivity(Poll, PollResponse)
-        self.registerActivity(
-            PollQuestion, PollQuestionResponse, child_class=True)
         self.registerActivity(Quiz, UserQuizResponse, {
                                 "submission": ["submission", []]}) # test
         # self.registerActivity(Question, UserQuestionResponse, child_class=True) # Testing this
@@ -2115,7 +2064,7 @@ class ActivityManager():
         self.registerActivity(DndMatch, DndMatchResponse, {
                               "submission": ["submission", []]})
         self.registerActivity(FillInTheBlank, FillInTheBlankResponse, {
-                              "submission": ["submission", []]}) # a little unsure about this part
+                              "submission": ["submission", []]}) 
         self.registerActivity(LikertScale, LikertScaleResponse, {
                               "content": ["content", {}]})
         self.registerActivity(Video, VideoResponse, {
@@ -2143,6 +2092,8 @@ class BugReport(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        null = True,
+        blank= True,
         related_name='bug_reports',
         help_text='The user who reported the bug'
     )
@@ -2198,12 +2149,13 @@ class BugReport(models.Model):
         verbose_name_plural = "Bug Reports"
 
     def __str__(self):
-        return f"Bug Report by {self.user.username} at {self.created_at}"
+        username = self.user.username if self.user else "Guest"
+        return f"Bug Report by {username} at {self.created_at}"
 
     def to_dict(self):
         return {
             "id": self.id,
-            "user": self.user.username,
+            "user": self.user.username if self.user else None,
             "description": self.description,
             "steps_to_reproduce": self.steps_to_reproduce,
             "created_at": self.created_at.isoformat(),

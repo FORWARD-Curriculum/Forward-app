@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     QuizResponseStatusView, UserRegistrationView, SessionView, CurrentUserView, QuizView,
     LessonView, LessonContentView, TextContentView, WritingView,
-    PollView, GetLessonIds, CurriculumView, ResponseView, OnboardView, BugReportView, ResetStudentProgressView
+    GetLessonIds, CurriculumView, ResponseView, OnboardView, BugReportView, ResetStudentProgressView
     # , QuestionResponseView
 )
 
@@ -23,7 +23,6 @@ urlpatterns = [
 
     path('textcontent/<uuid:id>', TextContentView.as_view(), name='text-content'),
     path('writing/<uuid:id>', WritingView.as_view(), name='writings'),
-    path('poll/<uuid:id>', PollView.as_view(), name='polls'),
 
     path('responses/<str:activitytype>', ResponseView.as_view(), name='general-response'),
     

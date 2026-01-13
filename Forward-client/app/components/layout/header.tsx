@@ -71,7 +71,7 @@ export default function Header() {
                       )}
                     </div>
                   </DropdownMenu.DropdownMenuTrigger>
-                  <DropdownMenu.DropdownMenuContent className="bg-secondary text-secondary-foreground w-full rounded-sm border-none p-0 *:p-0 **:active:backdrop-brightness-95">
+                  <DropdownMenu.DropdownMenuContent className={`bg-secondary text-secondary-foreground w-full rounded-sm border-none p-0 *:p-0 **:active:backdrop-brightness-95 ${user?.preferences?.text_size || ""}`}>
                     <DropdownMenu.DropdownMenuItem>
                       <Link prefetch="intent"
                         to="/account"
