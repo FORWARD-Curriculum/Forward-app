@@ -8,6 +8,13 @@ from django.db import models
 from django.utils.safestring import mark_safe
 from martor.widgets import AdminMartorWidget
 from martor.utils import markdownify
+from django.db.models import Q
+from django.contrib.auth.forms import AdminPasswordChangeForm
+
+class AdminPasswordChangeFormNoPBA(AdminPasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop("usable_password", None)
 
 @admin.register(User, site=custom_admin_site)
 class CustomUserAdmin(UserAdmin):
@@ -15,6 +22,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = ("display_name", "username", "facility_name", "is_staff", "is_superuser")
     list_filter = ("is_staff", "is_superuser", "groups")
     search_fields = ("username", "display_name", "email")
+    change_password_form = AdminPasswordChangeFormNoPBA
     ordering = ("username",)
     fieldsets = (
         (None, {"fields": ("username", "password")}),
@@ -57,7 +65,7 @@ class CustomUserAdmin(UserAdmin):
         if request.user.is_superuser:
             return qs
         if self._is_instructor(request) and request.user.facility_id:
-            return qs.filter(facility_id=request.user.facility_id)
+            return qs.filter(Q(facility_id=request.user.facility_id) & ~Q(groups__name="Instructors") | Q(pk=request.user.pk))
         return qs.none()
 
     def get_fieldsets(self, request, obj=None):
@@ -97,8 +105,11 @@ class CustomUserAdmin(UserAdmin):
     def has_change_permission(self, request, obj=None):
         if request.user.is_superuser:
             return True
-        if obj and self._is_instructor(request):
+        if self._is_instructor(request):
+            if obj is None:
+                return True 
             return obj.facility_id == request.user.facility_id
+            
         return False
 
     def has_add_permission(self, request):
@@ -121,11 +132,20 @@ class UserInline(admin.TabularInline):
     def password_reset_link(self, obj):
         if obj.pk:
             app_label = obj._meta.app_label
-            url = reverse(f"custom_admin:{app_label}_user_change", args=(obj.pk,))
+            # BRITTLE
+            url = reverse(f"custom_admin:{app_label}_user_change", args=(obj.pk,)).replace("/change/", "/password/")
             return format_html('<a href="{}">Reset Password</a>', url)
         return "N/A (save facility first)"
 
     password_reset_link.short_description = "Password"
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if self._is_instructor(request) and request.user.facility_id:
+            return qs.filter(Q(facility_id=request.user.facility_id) & ~Q(groups__name="Instructors") | Q(pk=request.user.pk))
+        return qs.none()
 
     def _is_instructor(self, request):
         return request.user.groups.filter(name="Instructors").exists()
@@ -195,6 +215,11 @@ class FacilityAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+    
+    def get_readonly_fields(self, request, obj = None):
+        if not request.user.is_superuser:
+            return ("name", "code")
+        return super().get_readonly_fields(request, obj)
 
 # Announcement model and admin
 class Announcement(models.Model):
