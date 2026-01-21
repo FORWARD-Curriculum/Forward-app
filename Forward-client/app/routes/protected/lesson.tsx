@@ -403,7 +403,7 @@ export function NextActivity() {
 
   return (
     <div className="mt-4 flex lg:mt-auto justify-between">
-    {current_activity >= 2 && (
+    {current_activity >= 2 ? (
       <button
         className="bg-primary text-primary-foreground inline-flex gap-2 rounded-md p-2 disabled:hidden active:brightness-85 hover:brightness-105"
         onClick={() => {
@@ -412,6 +412,8 @@ export function NextActivity() {
       >
         Back
       </button>
+    ) : (
+      <div/>
     )}
       <button
         disabled={user ? current_partial_response || undefined : false}
