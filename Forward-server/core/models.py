@@ -957,7 +957,11 @@ class FillInTheBlank(BaseActivity):
       <strong>Example</strong>: To create a simple text input field for a user's favorite color, you would write:
       <pre><code>"My favorite color is &lt;options&gt;&lt;/options&gt;."</code></pre>
     </li>
-  </ul></details>""")
+  </ul></details>
+
+    <p><b>!! One important thing to Note. If one of your answers include a comma such as ---> Orlando, Fl. Please but double commas --> Orlando,, Fl. This will tell the 
+            system to not treat it as two different options but as one option. When you see the actual choices on the website it will visually transoform the double commas into a single one</b></p>
+                            """)
     )
 
     def incorrect_fills(self):
