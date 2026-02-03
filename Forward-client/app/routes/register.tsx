@@ -86,7 +86,8 @@ export default function Login() {
       login({...result.data.user});
 
       // Redirect to the dashboard on success
-      window.location.href = consent ? "/survey" : "/dashboard";
+      // window.location.href = consent ? "/survey" : "/dashboard";
+      window.location.href = "./dashboard"
     } catch (err: any) {
       setError(err.message);
     }

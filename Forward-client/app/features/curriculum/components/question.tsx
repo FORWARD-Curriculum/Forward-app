@@ -155,12 +155,12 @@ export default function Question({
             {question.has_correct_answer ? (
               isCorrect ? (
                 <>
-                  <span className="text-green-600 font-semibold">Correct!</span>{" "}
+                  {/* <span className="text-green-600 font-semibold">Correct!</span>{" "} */}
                   {selectedOptionsFeedback || question.feedback_config.correct}
                 </>
               ) : (
                 <>
-                  <span className="text-error font-semibold">Not quite!</span>{" "}
+                  {/* <span className="text-error font-semibold">Not quite!</span>{" "} */}
                   {question.feedback_config.incorrect}
                 </>
               )

@@ -98,23 +98,24 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
     }
   }, [theme, textSize]);
 
-    useEffect(() => {
-      if (
-        user &&
-        user.consent &&
-        user.surveyed_at === null &&
-        (!location.pathname.startsWith("/account") && !location.pathname.startsWith("/survey"))
-      ) {
-        console.log("Redirecting to survey");
-        navigate("/survey", { replace: true, state: { from: location } });
-      }
-    }, [
-      user?.consent,
-      user?.surveyed_at,
-      location.pathname,
-      navigate,
-      location,
-    ]);
+    // Removed survey redirect for now
+    // useEffect(() => {
+    //   if (
+    //     user &&
+    //     user.consent &&
+    //     user.surveyed_at === null &&
+    //     (!location.pathname.startsWith("/account") && !location.pathname.startsWith("/survey"))
+    //   ) {
+    //     console.log("Redirecting to survey");
+    //     navigate("/survey", { replace: true, state: { from: location } });
+    //   }
+    // }, [
+    //   user?.consent,
+    //   user?.surveyed_at,
+    //   location.pathname,
+    //   navigate,
+    //   location,
+    // ]);
 
   return (
     <>

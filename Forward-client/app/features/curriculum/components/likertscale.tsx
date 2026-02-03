@@ -135,7 +135,7 @@ export default function LikertScale({
                       return (
                         <span
                           key={i}
-                          className="1w absolute max-w-2 -translate-x-1/2 text-center text-xs/5 lg:max-w-15 lg:text-xs"
+                          className="1w absolute max-w-2 -translate-x-1/2 text-center text-xs/5 lg:max-w-48 lg:text-xs"
                           style={{ left: `${pct}%` }}
                         >
                           {option}

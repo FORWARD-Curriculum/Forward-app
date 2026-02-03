@@ -45,6 +45,7 @@ import {
 } from "@/features/curriculum/slices/userLessonDataSlice";
 import {
   nextActivity,
+  previousActivity,
   setActivity,
   setLesson,
 } from "@/features/curriculum/slices/lessonSlice";
@@ -399,11 +400,24 @@ export function NextActivity() {
       });
     }, 150);
   }, []);
+
   return (
-    <div className="mt-4 flex lg:mt-auto">
+    <div className="mt-4 flex lg:mt-auto justify-between">
+    {current_activity >= 2 ? (
+      <button
+        className="bg-primary text-primary-foreground inline-flex gap-2 rounded-md p-2 disabled:hidden active:brightness-85 hover:brightness-105"
+        onClick={() => {
+          dispatch(previousActivity())
+        }}
+      >
+        Back
+      </button>
+    ) : (
+      <div/>
+    )}
       <button
         disabled={user ? current_partial_response || undefined : false}
-        className="bg-primary text-primary-foreground ml-auto inline-flex gap-2 rounded-md p-2 disabled:hidden active:brightness-85 hover:brightness-105"
+        className="bg-primary text-primary-foreground inline-flex gap-2 rounded-md p-2 disabled:hidden active:brightness-85 hover:brightness-105"
         onClick={() => {
           setSaving(true);
           dispatch(saveCurrentResponseThunk())
@@ -476,7 +490,7 @@ export function NextActivity() {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  ); 
 }
 
 export default function Lesson({ loaderData }: Route.ComponentProps) {

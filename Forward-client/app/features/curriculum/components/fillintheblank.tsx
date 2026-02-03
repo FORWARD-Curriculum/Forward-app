@@ -51,7 +51,8 @@ export default function FillInTheBlank({fillInTheBlank}: FillInTheBlankProps){
         const sentences = fillInTheBlank.content.map(sentence => {
             let rendered = sentence;
             rendered = rendered.replace(optionsRegex, (match, attributes, content) => {
-                const opts = content.split(',').map((s: string) => s.trim()).filter((s: string) => s);
+                const delimiterText = content.replace(/,,/g, "@@PLACEHOLDER@@");
+                const opts = delimiterText.split(',').map((s: string) => s.trim().replace(/@@PLACEHOLDER@@/g, ",")).filter((s: string) => s);
                 
                 /** 
                  * this is a weird solution but basically I'm grabbing the data structure here
