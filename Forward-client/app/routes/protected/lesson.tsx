@@ -407,10 +407,30 @@ export function NextActivity() {
       <button
         className="bg-primary text-primary-foreground inline-flex gap-2 rounded-md p-2 disabled:hidden active:brightness-85 hover:brightness-105"
         onClick={() => {
-          dispatch(previousActivity())
+          setSaving(true);
+          dispatch(saveCurrentResponseThunk())
+            .unwrap()
+            .then((_) => {
+              setSaving(false);
+              if (isMobile) {
+                window.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                });
+              }
+                dispatch(previousActivity());
+                history.replaceState(null, "", "#" + (current_activity - 1));
+            })
+            .catch((e) =>{
+              toast.error("Something went wrong saving the activity.");
+              throw e;
+            }
+            );
         }}
       >
-        Back
+        <span className="flex min-w-[6ch] justify-center">
+          {saving ? <LoadingSpinner /> : "Back"}
+        </span>
       </button>
     ) : (
       <div/>
