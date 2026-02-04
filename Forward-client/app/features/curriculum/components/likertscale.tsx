@@ -1,5 +1,5 @@
 import type React from "react";
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 import type { LikertScale, LikertScaleResponse } from "../types";
 import { useResponse } from "../hooks";
 
@@ -9,6 +9,9 @@ export default function LikertScale({
   likertScale: LikertScale;
 }) {
   const debounceTimers = useRef<{ [key: number]: NodeJS.Timeout }>({});
+  //Dictionary of likert items, second variable stores measured height of each item
+  const labelsContainerRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+  const [labelHeights, setLabelHeights] = useState<{ [key: number]: number }>({});
 
   const [response, setResponse] = useResponse<LikertScaleResponse, LikertScale>(
     {
@@ -71,6 +74,28 @@ export default function LikertScale({
     [setResponse],
   );
 
+  /**This useEffect loops through all items in a likert scale and calulates their 
+   * respective height based off number of 'span'and keeps track of teh tallest label
+   * for that likert item. These heights are stored in our labelHeigts hashmap
+   */
+  useEffect(() => {
+    const newHeights: { [key: number]: number } = {};
+    
+    Object.entries(labelsContainerRefs.current).forEach(([index, container]) => {
+      if (container) {
+        const labels = container.querySelectorAll('span');
+        let maxHeight = 0;
+        labels.forEach(label => {
+          const height = label.offsetHeight;
+          if (height > maxHeight) maxHeight = height;
+        });
+        newHeights[Number(index)] = maxHeight;
+      }
+    });
+    
+    setLabelHeights(newHeights);
+  }, [likertScale.content]);
+
   return (
     <div className="likert-scale mb-6">
       <div className="flex flex-col gap-6 px-4 md:px-10">
@@ -89,6 +114,12 @@ export default function LikertScale({
           } as React.CSSProperties;
 
           const rangeId = `likert-scale-${likertScale.id}-${index}`;
+          
+          //This maxes the height based off the current index of our labelheightindex
+          // plus a buffer and a fallback if anything fails.
+          const dynamicPadding = labelHeights[index] 
+            ? `${labelHeights[index] + 16}px` 
+            : '5rem';
 
           return (
             <div
@@ -128,14 +159,14 @@ export default function LikertScale({
                   aria-valuenow={defaultValue}
                 />
 
-                <div className="relative pt-8">
-                  <div className="pointer-events-none absolute top-2 right-1 left-1">
+                <div className="relative pt-8" style={{ paddingBottom: dynamicPadding }}>
+                  <div  ref={(el) => {labelsContainerRefs.current[index] = el}} className="pointer-events-none absolute top-2 right-1 left-1">
                     {scale.map((option, i) => {
                       const pct = n > 1 ? (i / (n - 1)) * 98 + 0.95 : 0;
                       return (
                         <span
                           key={i}
-                          className="1w absolute max-w-2 -translate-x-1/2 text-center text-xs/5 lg:max-w-48 lg:text-xs"
+                          className="absolute -translate-x-1/2 text-center text-xs max-w-[100px] sm:max-w-[120px]"
                           style={{ left: `${pct}%` }}
                         >
                           {option}
