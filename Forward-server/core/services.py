@@ -287,7 +287,7 @@ class QuizResponseService:
                     question_response.save()
 
                     # Questions are considered responded after one answer is submitted
-                    total_questions = Question.objects.filter(quiz=quiz).count()
+                    total_questions = Question.objects.filter(quiz=quiz, is_required = True).count()
                     attempted_questions = quiz_response.question_responses.count()
 
                     if attempted_questions >= total_questions:

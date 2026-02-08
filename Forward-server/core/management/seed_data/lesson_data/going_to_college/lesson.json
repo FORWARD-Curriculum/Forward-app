@@ -206,7 +206,7 @@
         {
           "question_text": "Which type of college might you choose to attend to become a doctor?",
           "question_type": "multiple_select",
-          "has_correct_answer": true,
+          "has_correct_answer": true,          
           "choices": {
             "options": [
               { "id": 1, "text": "Trade school", "is_correct": false },
