@@ -77,7 +77,7 @@ export function PromptArea({
           <span>Free Write!</span>
         ) : (
           <span>
-            {count} {promptObj.min_type === "char" ? "Charcaters" : "Words"} / {promptObj?.minimum ?? 0}{" "}
+            {count} {promptObj.min_type === "char" ? "Characters" : "Words"} / {promptObj?.minimum ?? 0}{" "}
             {promptObj.min_type === "char" ? "Characters" : "Words"} Minimum
           </span>
         )}
