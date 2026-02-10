@@ -27,6 +27,7 @@ export default function Quiz({ quiz }: { quiz: Quiz }) {
     disableAutoSave: true,
     initialFields: { 
       score: null, 
+      partial_response: quiz.questions.some(q => q.is_required),
       completion_percentage: 0,
       submission: []
     },
