@@ -255,7 +255,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                 )}
               </div>
             )}
-            {user?.consent && (
+            {/* {user?.consent && (
               <div className="text-secondary-foreground bg-foreground outline-foreground-border col-start-2 col-end-2 rounded-3xl p-4 outline-1">
                 <p className="mb-2 text-left font-medium">
                   FORWARD Readiness Survey
@@ -267,7 +267,7 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
                   Re-Take
                 </Link>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>
