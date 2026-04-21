@@ -1,5 +1,6 @@
 from django.contrib.auth.admin import UserAdmin
-from core.models import User, Facility
+from core.models import User, Facility, Lesson
+from core.services import LessonService
 from django.contrib import admin
 from .admin import custom_admin_site
 from django.utils.html import format_html
@@ -19,14 +20,16 @@ class AdminPasswordChangeFormNoPBA(AdminPasswordChangeForm):
 @admin.register(User, site=custom_admin_site)
 class CustomUserAdmin(UserAdmin):
     grouping = "Core"
-    list_display = ("display_name", "username", "facility_name", "is_staff", "is_superuser")
+    list_display = ("display_name", "username", "facility_name", "is_staff", "is_superuser", "lesson_completion")
     list_filter = ("is_staff", "is_superuser", "groups")
     search_fields = ("username", "display_name", "email")
     change_password_form = AdminPasswordChangeFormNoPBA
     ordering = ("username",)
+    readonly_fields = ("progress_widget",)
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (("Personal info"), {"fields": ("display_name", "facility", "profile_picture")}),
+        (("Progress"),{"fields": ("progress_widget",)}),
         (
             ("Permissions"),
             {
@@ -51,6 +54,50 @@ class CustomUserAdmin(UserAdmin):
             },
         ),
     )
+    
+    def lesson_completion(self, obj):
+        lessons = Lesson.objects.filter(active=True)
+        total = 0
+        for l in lessons:
+            total += float(LessonService.get_lesson_completion(obj, l))
+        return f"{(total/len(lessons)) * 100:.1f}%"
+    
+    lesson_completion.short_description = "Total Lesson Completion"
+
+    
+    def progress_widget(self, obj):
+        lessons = Lesson.objects.filter(active=True)
+        html_list_items = []
+        for l in lessons:
+            list_item = format_html(
+                '<tr style="margin-bottom: 5px;">'
+                    '<td>{lesson_name}</td>'
+                    '<td>{completion}</td>'
+                '</tr>',
+                lesson_name=l.title,
+                completion=f"{float(LessonService.get_lesson_completion(obj, l)) * 100:.1f}%",
+            )
+            html_list_items.append(list_item)
+            
+        return format_html(
+            '<style>'
+            '.readonly:has(table) {{flex-grow: 1;}}'
+            '</style>'
+            '<table style="width: 100%;">'
+            '<thead>'
+                '<tr>'
+                    '<th scope="col">'
+                        '<div class="text">Lesson</div>'
+                    '</th>'
+                    '<th scope="col">'
+                        '<div class="text">Completion Percentage</div>'
+                    '</th>'
+                '</tr>'
+            '</thead>'
+            '<tbody>{}</tbody>''</table>', format_html("".join(html_list_items)))
+    
+    progress_widget.short_description = "Lesson Progress"
+        
 
     def facility_name(self, obj):
         return obj.facility.name if obj.facility else "-"
