@@ -20,7 +20,7 @@ class AdminPasswordChangeFormNoPBA(AdminPasswordChangeForm):
 @admin.register(User, site=custom_admin_site)
 class CustomUserAdmin(UserAdmin):
     grouping = "Core"
-    list_display = ("display_name", "username", "facility_name", "is_staff", "is_superuser", "lesson_completion")
+    list_display = ("display_name", "username", "facility_name", "is_staff", "is_superuser")
     list_filter = ("is_staff", "is_superuser", "groups")
     search_fields = ("username", "display_name", "email")
     change_password_form = AdminPasswordChangeFormNoPBA
@@ -54,15 +54,6 @@ class CustomUserAdmin(UserAdmin):
             },
         ),
     )
-    
-    def lesson_completion(self, obj):
-        lessons = Lesson.objects.filter(active=True)
-        total = 0
-        for l in lessons:
-            total += float(LessonService.get_lesson_completion(obj, l))
-        return f"{(total/len(lessons)) * 100:.1f}%"
-    
-    lesson_completion.short_description = "Total Lesson Completion"
 
     
     def progress_widget(self, obj):
